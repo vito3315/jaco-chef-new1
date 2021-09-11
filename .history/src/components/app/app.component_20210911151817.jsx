@@ -36,10 +36,20 @@ import { useHistory } from "react-router-dom";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
+//import { Provider } from 'mobx-react';
+//import itemsStore from '../../stores/items-store';
+//const stores = { itemsStore };
+
 import routes from '../../../server/routes';
 
 const queryString = require('query-string');
 
+import { LiveOrders } from '../live_orders';
+
+import { Home } from '../home';
+import { Orders } from '../orders';
+import { ordercook } from '../ordercook';
+import { Auth } from '../auth';
 
 const theme = createTheme({
     palette: {
@@ -324,6 +334,8 @@ export function App () {
     const classes = useStyles();
     let history = useHistory();
     
+    console.log( routes )
+    
     return (
       <ThemeProvider theme={theme}>
         <div className={classes.root}>
@@ -335,13 +347,19 @@ export function App () {
         
               <Switch>
                 { routes.map( (item, key) =>
-                  <Route
-                    key={key}
-                    path={item.path}
-                    exact={ item.exact }
-                    component={ item.component }
-                  />
+                  { item.code == 200 ?
+                      <Route
+                        key={key}
+                        path={item.path}
+                        exact={ item.exact }
+                        component={ item.component }
+                      />
+                        :
+                      null
+                  }
                 ) }
+                  
+                
                 
                 <Route
                   component={ () =>

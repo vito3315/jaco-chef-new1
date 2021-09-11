@@ -36,10 +36,18 @@ import { useHistory } from "react-router-dom";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
-import routes from '../../../server/routes';
+//import { Provider } from 'mobx-react';
+//import itemsStore from '../../stores/items-store';
+//const stores = { itemsStore };
 
 const queryString = require('query-string');
 
+import { LiveOrders } from '../live_orders';
+
+import { Home } from '../home';
+import { Orders } from '../orders';
+import { ordercook } from '../ordercook';
+import { Auth } from '../auth';
 
 const theme = createTheme({
     palette: {
@@ -325,43 +333,50 @@ export function App () {
     let history = useHistory();
     
     return (
-      <ThemeProvider theme={theme}>
-        <div className={classes.root}>
-          <CssBaseline />
-          <Header classes={classes} history={history} />
-          <main className={classes.content}>
-            <div className={classes.appBarSpacer} />
-            <Container maxWidth={false} className={classes.container}>
         
-              <Switch>
-                { routes.map( (item, key) =>
-                  <Route
-                    key={key}
-                    path={item.path}
-                    exact={ item.exact }
-                    component={ item.component }
-                  />
-                ) }
-                
-                <Route
-                  component={ () =>
-                    <Status code={404}>
-                      <Grid container className="Contact mainContainer MuiGrid-spacing-xs-3" style={{ marginTop: 64 }}>
-                        <Grid item xs={12}>
-                          <Typography variant="h5" component="h1">404 Страница не найдена</Typography>
-                        </Grid>
-                      </Grid>
-                    </Status>
-                  }
-                />
-              </Switch>
+            <ThemeProvider theme={theme}>
+                <div className={classes.root}>
+                    <CssBaseline />
+                    <Header classes={classes} history={history} />
+                    <main className={classes.content}>
+                        <div className={classes.appBarSpacer} />
+                        <Container maxWidth={false} className={classes.container}>
+                    
+                            <Switch>
+                                <Route
+                                    path='/'
+                                    exact={ true }
+                                    component={ Home }
+                                />
+                                <Route
+                                    path='/live_orders'
+                                    exact={ true }
+                                    component={ LiveOrders }
+                                />
+                                <Route
+                                    path='/ordercook'
+                                    exact={ true }
+                                    component={ ordercook }
+                                />
+                                <Route
+                                    path='/auth'
+                                    exact={ true }
+                                    component={ Auth }
+                                />
+                                <Route
+                                    component={ NotFound }
+                                />
+                            </Switch>
+                    
+                   
+                    
+                            <Box pt={4}>
+                                <Copyright />
+                            </Box>
+                        </Container>
+                    </main>
+                </div>
+            </ThemeProvider>
         
-              <Box pt={4}>
-                <Copyright />
-              </Box>
-            </Container>
-          </main>
-        </div>
-      </ThemeProvider>
     );
 }

@@ -36,10 +36,20 @@ import { useHistory } from "react-router-dom";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
+//import { Provider } from 'mobx-react';
+//import itemsStore from '../../stores/items-store';
+//const stores = { itemsStore };
+
 import routes from '../../../server/routes';
 
 const queryString = require('query-string');
 
+import { LiveOrders } from '../live_orders';
+
+import { Home } from '../home';
+import { Orders } from '../orders';
+import { ordercook } from '../ordercook';
+import { Auth } from '../auth';
 
 const theme = createTheme({
     palette: {
@@ -342,18 +352,6 @@ export function App () {
                     component={ item.component }
                   />
                 ) }
-                
-                <Route
-                  component={ () =>
-                    <Status code={404}>
-                      <Grid container className="Contact mainContainer MuiGrid-spacing-xs-3" style={{ marginTop: 64 }}>
-                        <Grid item xs={12}>
-                          <Typography variant="h5" component="h1">404 Страница не найдена</Typography>
-                        </Grid>
-                      </Grid>
-                    </Status>
-                  }
-                />
               </Switch>
         
               <Box pt={4}>

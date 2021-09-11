@@ -1,5 +1,5 @@
 const { Home } = require( '../src/components/home' );
-//const { NotFound } = require( '../src/components/app' );
+const { NotFound } = require( '../src/components/app' );
 const { Orders } = require( '../src/components/orders' );
 const { ordercook } = require( '../src/components/ordercook' );
 const { LiveOrders } = require( '../src/components/live_orders' );
@@ -33,5 +33,11 @@ module.exports = [
         component: ordercook,
         title: 'Заказы на кухне',
         code: 200
+    },
+    {
+        path: '*',
+        component: NotFound,
+        title: 'Страница не найдена',
+        code: 404
     },
 ];

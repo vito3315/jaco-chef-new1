@@ -324,6 +324,8 @@ export function App () {
     const classes = useStyles();
     let history = useHistory();
     
+    console.log( routes )
+    
     return (
       <ThemeProvider theme={theme}>
         <div className={classes.root}>

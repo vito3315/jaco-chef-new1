@@ -19,12 +19,26 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 
 import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+import PeopleIcon from '@material-ui/icons/People';
+import BarChartIcon from '@material-ui/icons/BarChart';
+import LayersIcon from '@material-ui/icons/Layers';
+import AssignmentIcon from '@material-ui/icons/Assignment';
 
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
+import Collapse from '@material-ui/core/Collapse';
+import InboxIcon from '@material-ui/icons/MoveToInbox';
+import DraftsIcon from '@material-ui/icons/Drafts';
+import SendIcon from '@material-ui/icons/Send';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import StarBorder from '@material-ui/icons/StarBorder';
 
 import { createTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
@@ -36,10 +50,20 @@ import { useHistory } from "react-router-dom";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
-import routes from '../../../server/routes';
+import { Provider } from 'mobx-react';
+import itemsStore from '../../stores/items-store';
+const stores = { itemsStore };
 
 const queryString = require('query-string');
 
+
+
+import { LiveOrders } from '../live_orders';
+
+import { Home } from '../home';
+import { Orders } from '../orders';
+import { ordercook } from '../ordercook';
+import { Auth } from '../auth';
 
 const theme = createTheme({
     palette: {
@@ -51,7 +75,84 @@ const theme = createTheme({
         secondary: '#fff'
       },
     },
-});
+  });
+
+const mainListItems = (
+  <div>
+    
+      
+      
+      <Link to={"/live_orders/"}>
+          
+        <ListItem button>
+          <ListItemIcon>
+            <PeopleIcon />
+          </ListItemIcon>
+          <ListItemText primary="Заказы на кухне" />
+        </ListItem>
+          
+      </Link>
+      <Link to={"/"}>
+          
+        <ListItem button>
+          <ListItemIcon>
+            <PeopleIcon />
+          </ListItemIcon>
+          <ListItemText primary="Index" />
+        </ListItem>
+          
+      </Link>
+    
+    <ListItem button>
+      <ListItemIcon>
+        <ShoppingCartIcon />
+      </ListItemIcon>
+      <Link to={"/"}>Index</Link>
+    </ListItem>
+    <ListItem button>
+      <ListItemIcon>
+        <PeopleIcon />
+      </ListItemIcon>
+      <ListItemText primary="Customers" />
+    </ListItem>
+    <ListItem button>
+      <ListItemIcon>
+        <BarChartIcon />
+      </ListItemIcon>
+      <ListItemText primary="Reports" />
+    </ListItem>
+    <ListItem button>
+      <ListItemIcon>
+        <LayersIcon />
+      </ListItemIcon>
+      <ListItemText primary="Integrations" />
+    </ListItem>
+  </div>
+);
+
+const secondaryListItems = (
+  <div>
+    <ListSubheader inset>Saved reports</ListSubheader>
+    <ListItem button>
+      <ListItemIcon>
+        <AssignmentIcon />
+      </ListItemIcon>
+      <ListItemText primary="Current month" />
+    </ListItem>
+    <ListItem button>
+      <ListItemIcon>
+        <AssignmentIcon />
+      </ListItemIcon>
+      <ListItemText primary="Last quarter" />
+    </ListItem>
+    <ListItem button>
+      <ListItemIcon>
+        <AssignmentIcon />
+      </ListItemIcon>
+      <ListItemText primary="Year-end sale" />
+    </ListItem>
+  </div>
+);
 
 function Copyright() {
   return (
@@ -325,43 +426,50 @@ export function App () {
     let history = useHistory();
     
     return (
-      <ThemeProvider theme={theme}>
-        <div className={classes.root}>
-          <CssBaseline />
-          <Header classes={classes} history={history} />
-          <main className={classes.content}>
-            <div className={classes.appBarSpacer} />
-            <Container maxWidth={false} className={classes.container}>
-        
-              <Switch>
-                { routes.map( (item, key) =>
-                  <Route
-                    key={key}
-                    path={item.path}
-                    exact={ item.exact }
-                    component={ item.component }
-                  />
-                ) }
-                
-                <Route
-                  component={ () =>
-                    <Status code={404}>
-                      <Grid container className="Contact mainContainer MuiGrid-spacing-xs-3" style={{ marginTop: 64 }}>
-                        <Grid item xs={12}>
-                          <Typography variant="h5" component="h1">404 Страница не найдена</Typography>
-                        </Grid>
-                      </Grid>
-                    </Status>
-                  }
-                />
-              </Switch>
-        
-              <Box pt={4}>
-                <Copyright />
-              </Box>
-            </Container>
-          </main>
-        </div>
-      </ThemeProvider>
+        <Provider { ...stores }>
+            <ThemeProvider theme={theme}>
+                <div className={classes.root}>
+                    <CssBaseline />
+                    <Header classes={classes} history={history} />
+                    <main className={classes.content}>
+                        <div className={classes.appBarSpacer} />
+                        <Container maxWidth={false} className={classes.container}>
+                    
+                            <Switch>
+                                <Route
+                                    path='/'
+                                    exact={ true }
+                                    component={ Home }
+                                />
+                                <Route
+                                    path='/live_orders'
+                                    exact={ true }
+                                    component={ LiveOrders }
+                                />
+                                <Route
+                                    path='/ordercook'
+                                    exact={ true }
+                                    component={ ordercook }
+                                />
+                                <Route
+                                    path='/auth'
+                                    exact={ true }
+                                    component={ Auth }
+                                />
+                                <Route
+                                    component={ NotFound }
+                                />
+                            </Switch>
+                    
+                   
+                    
+                            <Box pt={4}>
+                                <Copyright />
+                            </Box>
+                        </Container>
+                    </main>
+                </div>
+            </ThemeProvider>
+        </Provider>
     );
 }

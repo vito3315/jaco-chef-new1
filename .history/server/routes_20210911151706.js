@@ -1,5 +1,5 @@
 const { Home } = require( '../src/components/home' );
-//const { NotFound } = require( '../src/components/app' );
+const { NotFound } = require( '../src/components/app' );
 const { Orders } = require( '../src/components/orders' );
 const { ordercook } = require( '../src/components/ordercook' );
 const { LiveOrders } = require( '../src/components/live_orders' );
