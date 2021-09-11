@@ -1,0 +1,12 @@
+body{margin:0px !important}p,span,b,th,td,label{font-size:1rem !important}h1,h2,h3,h4,h5{margin:0}.MuiAccordion-root.Mui-expanded{margin:0 !important}.MuiAccordionSummary-content.Mui-expanded{margin:12px 0 !important}a{text-decoration:none;color:black;width:100%}
+
+
+
+.showOrderDialog h6{font-size:1.3rem !important;text-align:center}.showOrderDialog .showOrderDialogContent{display:flex;flex-direction:column;padding-bottom:20px}.showOrderDialog .showOrderDialogContent span{font-size:1rem !important;padding:6px 0px;font-weight:normal}.showOrderDialog .showOrderDialogContent b{font-size:1rem !important;padding:6px 0px;font-weight:bolder}.showOrderDialog .showOrderDialogContent span.noSpace{padding:0px;margin-top:-10px}.showOrderDialog .showOrderDialogContent table span{font-size:1rem !important}.showOrderDialogContent .CardPriceItem{justify-content:flex-start}.dis_none{display:none !important}
+
+
+.showOrderDialog h6{font-size:1.3rem !important;text-align:center}.showOrderDialog .showOrderDialogContent{display:flex;flex-direction:column;padding-bottom:20px}.showOrderDialog .showOrderDialogContent>span{font-size:1rem !important;padding:6px 0px;font-weight:400}.showOrderDialog .showOrderDialogContent>span.noSpace{padding:0px;margin-top:-10px}.showOrderDialog .showOrderDialogContent table span{font-size:1rem !important}.showOrderDialogContent .CardPriceItem{justify-content:flex-start}.dis_none{display:none !important}
+
+
+
+/*# sourceMappingURL=styles.css.map*/
