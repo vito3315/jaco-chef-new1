@@ -67,10 +67,6 @@ const useStyles = makeStyles((theme) => ({
   selectEmpty: {
     marginTop: theme.spacing(2),
   },
-  backdrop: {
-    zIndex: 999,
-    color: '#fff',
-  },
 }));
 
 class MySelect extends React.PureComponent {
