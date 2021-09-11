@@ -1,0 +1,33 @@
+@mixin fons($size: 1rem) {
+    font-size: $size !important;
+}
+
+.showOrderDialog{
+    & h6{
+        @include fons(1.3rem);
+        text-align: center;
+    }
+    & .showOrderDialogContent{
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 20px;
+        & > span{
+            @include fons(1rem);
+            padding: 6px 0px;
+            font-weight: 400;
+        }
+        & > span.noSpace{
+            padding: 0px;
+            margin-top: -10px;
+        }
+        & table span{
+            @include fons(1rem);
+        }
+    }
+}
+.showOrderDialogContent .CardPriceItem{
+    justify-content: flex-start;
+}
+.dis_none{
+    display: none!important;
+}
