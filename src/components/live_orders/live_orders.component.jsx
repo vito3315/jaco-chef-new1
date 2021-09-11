@@ -248,16 +248,23 @@ class Live_Orders extends React.Component {
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
-          <Grid item xs={6} sm={6}>
-            <MySelect classes={this.state.classes} data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
-          </Grid>
-          <Grid item xs={6} sm={6}>
-            <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
-          </Grid>
+          { this.state.points.length > 0 ?
+            <>
+              <Grid item xs={6} sm={6}>
+                <MySelect classes={this.state.classes} data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
+              </Grid>
+              <Grid item xs={6} sm={6}>
+                <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
+              </Grid>
+              <Grid item xs={12} sm={12}>
+                <MyCheckBox classes={this.state.classes} value={this.state.showReady} func={ this.changeCheckOrders.bind(this) } label='Показывать готовые' />
+              </Grid>
+            </>
+              :
+            null
+          }
           
-          <Grid item xs={12} sm={12}>
-            <MyCheckBox classes={this.state.classes} value={this.state.showReady} func={ this.changeCheckOrders.bind(this) } label='Показывать готовые' />
-          </Grid>
+          
           
           <Grid item xs={12} sm={12}>
             
