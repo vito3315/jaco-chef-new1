@@ -80,6 +80,9 @@ app.use( '*', async ( req, res ) => {
         res.status( matchRoute.code );
 
         return res.send( indexHTML );
+    }else{
+        res.status( 302 );
+        return res.redirect("/")
     }
 } );
 

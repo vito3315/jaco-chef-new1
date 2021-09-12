@@ -10,14 +10,7 @@ module.exports = [
         path: '/',
         exact: true,
         component: Home,
-        title: 'Оформление заказа',
-        code: 200
-    },
-    {
-        path: '/orders',
-        exact: true,
-        component: Orders,
-        title: 'Оформленные заказы',
+        title: 'Главная',
         code: 200
     },
     {
@@ -28,10 +21,10 @@ module.exports = [
         code: 200
     },
     {
-        path: '/ordercook',
+        path: '/auth',
         exact: true,
-        component: ordercook,
-        title: 'Заказы на кухне',
+        component: Auth,
+        title: 'Авторизация',
         code: 200
     },
 ];
