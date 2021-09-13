@@ -249,11 +249,10 @@ class Reg_ extends React.Component {
         </Dialog>
         
         <Grid container spacing={3} direction="row" justifyContent="center" alignItems="center">
-          <Grid item xs={12} sm={6} md={6} lg={3} xl={3}>
+          <Grid item xs={12} sm={6} md={6} lg={4} xl={3}>
             <div className={this.state.classes.paper}>
               <Avatar className={this.state.classes.avatar}>
-                <img alt="Жако доставка роллов и пиццы" src="../assets/img_other/Favikon.png" style={{ height: '100%', width: 'inherit' }} />
-                <img alt="Жако доставка роллов и пиццы" src="../assets/text.jpeg" style={{ height: '100%', width: 'inherit' }} />
+                <img alt="Жако доставка роллов и пиццы" src="../assets/img_other/Favikon.png" style={{ height: '100%' }} />
               </Avatar>
               
               <Stepper activeStep={this.state.activeStep} alternativeLabel style={{ width: '100%' }}>

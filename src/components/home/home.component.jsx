@@ -58,8 +58,7 @@ class Home_ extends React.Component {
         method: method, 
         module: this.state.module,
         version: 2,
-        login: '+79879340391',
-        //login: localStorage.getItem('login'),
+        login: localStorage.getItem('token'),
         data: JSON.stringify( data )
       })
     }).then(res => res.json()).then(json => {
