@@ -36,6 +36,12 @@ import { useHistory } from "react-router-dom";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
+import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
+import Button from '@material-ui/core/Button';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import InboxIcon from '@material-ui/icons/MoveToInbox';
+import MailIcon from '@material-ui/icons/Mail';
+
 import routes from '../../../server/routes';
 
 const queryString = require('query-string');
@@ -162,7 +168,9 @@ class Header extends React.Component {
       
       open: false,
       menu: [],
-      full_menu: []
+      full_menu: [],
+      
+      left: false
     };
   }
   
@@ -246,62 +254,66 @@ class Header extends React.Component {
           </Toolbar>
         </AppBar>
         
-        <Drawer
-          //variant="persistent"
-          classes={{
-            paper: clsx(this.state.classes.drawerPaper, !this.state.open && this.state.classes.drawerPaperClose),
-          }}
-          open={this.state.open}
-        >
-          <div className={this.state.classes.toolbarIcon}>
-            
-            <Autocomplete
-              size="small"
-              options={this.state.full_menu}
-              getOptionLabel={(option) => option.name}
-              onChange={(event, newValue) => {
-                if( newValue ){
-                  this.state.history.push("/"+newValue.key_query+"/");
-                }
-              }}
-              style={{ width: 300 }}
-              renderInput={(params) => <TextField {...params} label="Поиск" variant="outlined" />}
-            />
-            
-            <IconButton onClick={this.handleDrawerClose.bind(this)}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </div>
-          <Divider />
-          
-          { this.state.menu.map( (item, key) =>
-            <Accordion key={key} >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-              >
-                <Typography className={this.state.classes.heading}>{ item.parent.name }</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                
-                <List style={{ width: '100%' }}>
-                
-                  { item.chaild.map( (it, k) =>
-                    <ListItem button key={k}>
-                      <Link to={"/"+it.key_query+"/"}>
-                        <ListItemText primary={ it.name } />
-                      </Link>
-                    </ListItem>
-                  ) }
-                
-                </List>
-                
-              </AccordionDetails>
-            </Accordion>
-          ) }
         
-        </Drawer>
+        <React.Fragment >
+          <SwipeableDrawer
+            anchor={'left'}
+            open={ this.state.open }
+            onClose={ () => { this.setState({ open: false }) } }
+            onOpen={ () => { this.setState({ open: true }) } }
+          >
+            <div className={this.state.classes.toolbarIcon}>
+            
+              <Autocomplete
+                size="small"
+                options={this.state.full_menu}
+                getOptionLabel={(option) => option.name}
+                onChange={(event, newValue) => {
+                  if( newValue ){
+                    this.state.history.push("/"+newValue.key_query+"/");
+                  }
+                }}
+                style={{ width: 300 }}
+                renderInput={(params) => <TextField {...params} label="Поиск" variant="outlined" />}
+              />
+              
+              <IconButton onClick={this.handleDrawerClose.bind(this)}>
+                <ChevronLeftIcon />
+              </IconButton>
+            </div>
+            <Divider />
+            
+            { this.state.menu.map( (item, key) =>
+              <Accordion key={key} >
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                >
+                  <Typography className={this.state.classes.heading}>{ item.parent.name }</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  
+                  <List style={{ width: '100%' }}>
+                  
+                    { item.chaild.map( (it, k) =>
+                      <ListItem button key={k}>
+                        <Link to={"/"+it.key_query+"/"}>
+                          <ListItemText primary={ it.name } />
+                        </Link>
+                      </ListItem>
+                    ) }
+                  
+                  </List>
+                  
+                </AccordionDetails>
+              </Accordion>
+            ) }
+          </SwipeableDrawer>
+        </React.Fragment>
+        
+        
+        
       </>
     )
   }
