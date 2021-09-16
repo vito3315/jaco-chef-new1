@@ -108,7 +108,8 @@ class Events_ extends React.Component {
       timeEnd2: '21:30',
       
       expanded: '',
-      dayEvents: []
+      dayEvents: [],
+      events_hist: []
     };
   }
   
@@ -244,7 +245,8 @@ class Events_ extends React.Component {
         everyYear1: false,
         timeStart2: '10:00',
         timeEnd2: '21:30',
-        modalDialog: false
+        modalDialog: false,
+        events_hist: []
       })
       
       let data = {
@@ -260,6 +262,7 @@ class Events_ extends React.Component {
         chooseDay: day,
         chooseDayHoly: res.holy,
         events: res.events,
+        events_hist: res.hist,
         dayEvents: res.this_events,
         modalDialog: true
       })
@@ -435,7 +438,24 @@ class Events_ extends React.Component {
                 )}
               </List>
               
-              
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                >
+                  <Typography>История</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <List component="nav">
+                    { this.state.events_hist.map( (item, key) => 
+                      <ListItem key={key}>
+                        <ListItemText primary={item.title} />
+                      </ListItem>
+                    )}
+                  </List>
+                </AccordionDetails>
+              </Accordion>
               
               
             </DialogContentText>
