@@ -433,7 +433,9 @@ class Events_ extends React.Component {
                 { this.state.dayEvents.map( (item, key) => 
                   <ListItem key={key}>
                     <ListItemText primary={item.title} />
-                    <CloseIcon color="primary" onClick={this.delEvent.bind(this, item)} style={{ cursor: 'pointer' }} />
+                    { parseInt(item.type) == 4 ? null :
+                      <CloseIcon color="primary" onClick={this.delEvent.bind(this, item)} style={{ cursor: 'pointer' }} />
+                    }
                   </ListItem>
                 )}
               </List>
@@ -514,7 +516,7 @@ class Events_ extends React.Component {
                               key={k} 
                               onClick={ this.chooseDay.bind(this, day) } 
                               
-                              style={{ color: day.holy ? '#c03' : '#000' }}
+                              style={{ color: day.dir ? 'yellow' : day.holy ? '#c03' : '#000' }}
                               
                               className={ day.event ? this.state.classes.customCel : this.state.classes.tableCel }
                             > { day.day } </TableCell>
