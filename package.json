@@ -17,6 +17,7 @@
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "*",
     "@material-ui/pickers": "^3.3.10",
+    "@mui/icons-material": "^5.0.0",
     "@mui/lab": "^5.0.0-alpha.47",
     "@mui/material": "^5.0.0",
     "axios": "^0.21.4",

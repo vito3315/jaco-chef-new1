@@ -12,20 +12,21 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-
 import CloseIcon from '@material-ui/icons/Close';
 
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Divider from '@material-ui/core/Divider';
-import InboxIcon from '@material-ui/icons/Inbox';
-import DraftsIcon from '@material-ui/icons/Drafts';
+import Box from '@mui/material/Box';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import InboxIcon from '@mui/icons-material/Inbox';
+import DraftsIcon from '@mui/icons-material/Drafts';
+
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -171,6 +172,9 @@ class RasByBill_ extends React.Component {
     })
     .catch(err => { 
       console.log( err )
+      this.setState({
+        is_load: false
+      })
     });
   }
    
@@ -179,18 +183,6 @@ class RasByBill_ extends React.Component {
     
     this.setState({
       point: data
-    })
-  }
-  
-  changeTimeStart(event){
-    this.setState({
-      date_start: formatDate(event)
-    })
-  }
-  
-  changeTimeEnd(event){
-    this.setState({
-      date_end: formatDate(event)
     })
   }
   
@@ -208,23 +200,36 @@ class RasByBill_ extends React.Component {
       end_date: this.state.rangeDate[1],
     };
     
-    console.log( data )
-    
     let res = await this.getData('get_this_rev', data);
-    
-    console.log( res )
     
     this.setState({
       resItems: {
         items_ras: res.items_ras,
         pf_ras: res.pf_ras,
         rec_ras: res.rec_ras
-      }
+      },
+      catItems: null
     })
   }
   
   async getCats(){
+    let data = {
+      points: this.state.point,
+      items: this.state.myItems,
+      start_date: this.state.rangeDate[0],
+      end_date: this.state.rangeDate[1],
+    };
     
+    let res = await this.getData('get_this_rev_cat', data);
+    
+    this.setState({
+      catItems: {
+        count_pos: res.count_pos,
+        items_ras: res.items_ras,
+        rec_ras: res.rec_ras
+      },
+      resItems: null
+    })
   }
   
   changeDateRange(data){
@@ -287,132 +292,30 @@ class RasByBill_ extends React.Component {
         
           { this.state.resItems && this.state.resItems.items_ras ?
               
-              <>
-                <Grid item xs={12}>
-                  
-                  <h1>Куплено по наклданым</h1>
-                  <TableContainer component={Paper}>
-                    <Table aria-label="a dense table">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Наименование товара</TableCell>
-                          <TableCell>Объем товра</TableCell>
-                          <TableCell>Объем заготовки</TableCell>
-                          <TableCell>Сумма</TableCell>
-                          <TableCell>Кол-во наклданых</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        
-                        { this.state.resItems.items_ras.map( (item, key) =>
-                          <TableRow key={key}>
-                            <TableCell> { item.name } </TableCell>
-                            <TableCell> { item.count_item + ' ' + item.ei_name } </TableCell>
-                            <TableCell> { item.count_pf + ' ' + item.ei_name_pf } </TableCell>
-                            <TableCell> { item.sum } </TableCell>
-                            <TableCell> { item.count_bill } </TableCell>
-                          </TableRow>
-                        ) }
-                        
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
+            <>
+              <Grid item xs={12}>
                 
-                <Grid item xs={12}>
-                  
-                  <h1>Расход заготовок (включая рецепты)</h1>
-                  <TableContainer component={Paper}>
-                    <Table aria-label="a dense table">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Наименование заготовки</TableCell>
-                          <TableCell>Объем заготовок</TableCell>
-                          <TableCell>Кол-во роллов</TableCell>
-                          <TableCell>Сумма роллов (примерно)</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        
-                        { this.state.resItems.pf_ras.map( (item, key) =>
-                          <TableRow key={key}>
-                            <TableCell> { item.pf_name } </TableCell>
-                            <TableCell> { item.count_pf + ' ' + item.ei_name } </TableCell>
-                            <TableCell> { item.count_rolls } </TableCell>
-                            <TableCell> { item.price_rolls } </TableCell>
-                          </TableRow>
-                        ) }
-                        
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
-                
-                <Grid item xs={12}>
-                  
-                  <h1>Расход рецептов</h1>
-                  <TableContainer component={Paper}>
-                    <Table aria-label="a dense table">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Наименование заготовки</TableCell>
-                          <TableCell>Объем заготовок</TableCell>
-                          <TableCell>Кол-во роллов</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        
-                        { this.state.resItems.rec_ras.map( (item, key) =>
-                          <TableRow key={key}>
-                            <TableCell> { item.pf_name } </TableCell>
-                            <TableCell> { item.count_pf + ' ' + item.ei_name } </TableCell>
-                            <TableCell> { item.count_rolls } </TableCell>
-                          </TableRow>
-                        ) }
-                        
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
-              </>
-                :
-              null              
-            }
-          
-          
-          <Grid container direction="row" justifyContent="center" style={{ paddingTop: 20 }}>
-            
-            { this.state.calendar.map( (item, key) =>
-            
-              <Grid item xs={12} sm={4} key={key} style={{ padding: 20 }}>
-                <h1 style={{ textAlign: 'center' }}>{ item[0][0].mounth }</h1>
+                <h1>Куплено по наклданым</h1>
                 <TableContainer component={Paper}>
-                  <Table aria-label="a dense table" style={{ overflow: 'hidden' }}>
+                  <Table aria-label="a dense table">
                     <TableHead>
                       <TableRow>
-                        <TableCell className={this.state.classes.tableCelHead}>Пн</TableCell>
-                        <TableCell className={this.state.classes.tableCelHead}>Вт</TableCell>
-                        <TableCell className={this.state.classes.tableCelHead}>Ср</TableCell>
-                        <TableCell className={this.state.classes.tableCelHead}>Чт</TableCell>
-                        <TableCell className={this.state.classes.tableCelHead}>Пт</TableCell>
-                        <TableCell className={this.state.classes.tableCelHead}>Сб</TableCell>
-                        <TableCell className={this.state.classes.tableCelHead}>Вс</TableCell>
+                        <TableCell>Наименование товара</TableCell>
+                        <TableCell>Объем товра</TableCell>
+                        <TableCell>Объем заготовки</TableCell>
+                        <TableCell>Сумма</TableCell>
+                        <TableCell>Кол-во наклданых</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       
-                      { item.map( (mounth, m_key) =>
-                        <TableRow key={m_key}>
-                          { mounth.map( (day, k) =>
-                            <TableCell 
-                              key={k} 
-                              onClick={ this.chooseDay.bind(this, day) } 
-                              
-                              style={{ color: day.dir ? 'yellow' : day.holy ? '#c03' : '#000' }}
-                              
-                              className={ day.event ? this.state.classes.customCel : this.state.classes.tableCel }
-                            > { day.day } </TableCell>
-                          ) }
+                      { this.state.resItems.items_ras.map( (item, key) =>
+                        <TableRow key={key}>
+                          <TableCell> { item.name } </TableCell>
+                          <TableCell> { item.count_item + ' ' + item.ei_name } </TableCell>
+                          <TableCell> { item.count_pf + ' ' + item.ei_name_pf } </TableCell>
+                          <TableCell> { item.sum } </TableCell>
+                          <TableCell> { item.count_bill } </TableCell>
                         </TableRow>
                       ) }
                       
@@ -420,9 +323,128 @@ class RasByBill_ extends React.Component {
                   </Table>
                 </TableContainer>
               </Grid>
-            )}
-            
-          </Grid>
+              
+              <Grid item xs={12}>
+                
+                <h1>Расход заготовок (включая рецепты)</h1>
+                <TableContainer component={Paper}>
+                  <Table aria-label="a dense table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Наименование заготовки</TableCell>
+                        <TableCell>Объем заготовок</TableCell>
+                        <TableCell>Кол-во роллов</TableCell>
+                        <TableCell>Сумма роллов (примерно)</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      
+                      { this.state.resItems.pf_ras.map( (item, key) =>
+                        <TableRow key={key}>
+                          <TableCell> { item.pf_name } </TableCell>
+                          <TableCell> { item.count_pf + ' ' + item.ei_name } </TableCell>
+                          <TableCell> { item.count_rolls } </TableCell>
+                          <TableCell> { item.price_rolls } </TableCell>
+                        </TableRow>
+                      ) }
+                      
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Grid>
+              
+              <Grid item xs={12}>
+                
+                <h1>Расход рецептов</h1>
+                <TableContainer component={Paper}>
+                  <Table aria-label="a dense table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Наименование заготовки</TableCell>
+                        <TableCell>Объем заготовок</TableCell>
+                        <TableCell>Кол-во роллов</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      
+                      { this.state.resItems.rec_ras.map( (item, key) =>
+                        <TableRow key={key}>
+                          <TableCell> { item.pf_name } </TableCell>
+                          <TableCell> { item.count_pf + ' ' + item.ei_name } </TableCell>
+                          <TableCell> { item.count_rolls } </TableCell>
+                        </TableRow>
+                      ) }
+                      
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Grid>
+            </>
+              :
+            null              
+          }
+          
+          { this.state.catItems && this.state.catItems.rec_ras ?
+            <Grid item xs={12}>
+              { this.state.catItems.rec_ras.map( (item, key) =>
+                <Accordion key={key}>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1bh-content"
+                  >
+                    <Typography style={{ width: '60%' }}>{item.name}</Typography>
+                    <Typography style={{ width: '20%' }}>{item.this_price}</Typography>
+                    <Typography style={{ width: '20%' }}>{item.price_by_items}</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    
+                    { item.parent_cat.map( (it, k) =>
+                      <Accordion key={k}>
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreIcon />}
+                          aria-controls="panel1bh-content"
+                        >
+                          <Typography style={{ width: '60%', paddingLeft: 20 }}>{it.name}</Typography>
+                          <Typography style={{ width: '20%', paddingLeft: 20 }}>{it.this_price}</Typography>
+                          <Typography style={{ width: '20%', paddingLeft: 20 }}>{it.price_by_items}</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          
+                          <Accordion disabled={true}>
+                            <AccordionSummary>
+                              <Typography style={{ width: '20%', paddingLeft: 40 }}>Товар</Typography>
+                              <Typography style={{ width: '20%', paddingLeft: 40 }}>Товара</Typography>
+                              <Typography style={{ width: '20%', paddingLeft: 40 }}>Заготовок</Typography>
+                              <Typography style={{ width: '20%', paddingLeft: 40 }}>Накладных</Typography>
+                              <Typography style={{ width: '20%', paddingLeft: 40 }}>Сумма</Typography>
+                            </AccordionSummary>
+                          </Accordion>
+                          
+                          { it.items.map( (parent_items, parent_key) =>
+                            <Accordion key={parent_key} disabled={true}>
+                              <AccordionSummary>
+                                <Typography style={{ width: '20%', paddingLeft: 40 }}>{parent_items.name}</Typography>
+                                <Typography style={{ width: '20%', paddingLeft: 40 }}>{parent_items.count_item} {parent_items.ei_name}</Typography>
+                                <Typography style={{ width: '20%', paddingLeft: 40 }}>{parent_items.count_pf} {parent_items.ei_name}</Typography>
+                                <Typography style={{ width: '20%', paddingLeft: 40 }}>{parent_items.count_bill}</Typography>
+                                <Typography style={{ width: '20%', paddingLeft: 40 }}>{parent_items.sum}</Typography>
+                              </AccordionSummary>
+                            </Accordion>
+                          ) }
+                          
+                        </AccordionDetails>
+                      </Accordion>
+                    ) }
+                    
+                    
+                  </AccordionDetails>
+                </Accordion>
+              ) }
+            </Grid>
+              :
+            null              
+          }
+          
         </Grid>
       </>
     )
