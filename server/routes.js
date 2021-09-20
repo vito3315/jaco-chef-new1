@@ -4,6 +4,7 @@ const { Reg } = require( '../src/components/registration' );
 
 const { LiveOrders } = require( '../src/components/live_orders' );
 const { Events } = require( '../src/components/events' );
+const { RasByBill } = require( '../src/components/ras_by_bill' );
 
 
 module.exports = [
@@ -41,6 +42,13 @@ module.exports = [
         exact: true,
         component: Events,
         title: 'События',
+        code: 200
+    },
+    {
+        path: '/ras_by_bill',
+        exact: true,
+        component: RasByBill,
+        title: 'Расход по накладным',
         code: 200
     },
 ];
