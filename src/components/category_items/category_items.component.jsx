@@ -432,7 +432,7 @@ class CategoryItems_ extends React.Component {
                           expandIcon={<ExpandMoreIcon />}
                           aria-controls="panel1a-content"
                         >
-                          <MenuIcon style={{ marginRight: 10 }} onClick={ this.editCat.bind(this, main_cat) } />
+                          <MenuIcon style={{ marginRight: 10 }} onClick={ this.editCat.bind(this, parent_cat) } />
                           <Typography>{parent_cat.name}</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
