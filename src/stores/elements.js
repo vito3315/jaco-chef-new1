@@ -73,6 +73,7 @@ export class MyAutocomplite extends React.PureComponent {
     return (
       <Stack spacing={3}>
         <Autocomplete
+          disableCloseOnSelect={true}
           multiple={true}
           id={ this.props.id ?? null }
           options={this.props.data}

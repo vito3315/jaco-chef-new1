@@ -23,6 +23,8 @@ import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/Inbox';
 import DraftsIcon from '@mui/icons-material/Drafts';
 
+import MenuIcon from '@mui/icons-material/Menu';
+
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -107,9 +109,15 @@ class CategoryItems_ extends React.Component {
       
       modalDialog: false,
       modalDialog2: false,
+      modalDialog3: false,
       
       newMainCatMy: 0,
+      editMainCatMy: 0,
       newMainNameMy: '',
+      editMainNameMy: '',
+      
+      editCat: null,
+      
       allCats: [],
       allItems: [],
       
@@ -178,7 +186,9 @@ class CategoryItems_ extends React.Component {
    
   createCat(){
     this.setState({
-      modalDialog: true
+      modalDialog: true,
+      newMainCatMy: 0,
+      newMainNameMy: ''
     })
   }
   
@@ -190,11 +200,27 @@ class CategoryItems_ extends React.Component {
     })
   }
   
+  changeCatMainEdit(event){
+    let data = event.target.value;
+    
+    this.setState({
+      editMainCatMy: data
+    })
+  }
+  
   changeNameMain(event){
     let data = event.target.value;
     
     this.setState({
       newMainNameMy: data
+    })
+  }
+  
+  changeNameMainEdit(event){
+    let data = event.target.value;
+    
+    this.setState({
+      editMainNameMy: data
     })
   }
   
@@ -246,6 +272,35 @@ class CategoryItems_ extends React.Component {
       thisValItems: [],
       thisDataItems: [],
       thisCatId: 0
+    })
+  }
+  
+  editCat(cat){
+    this.setState({
+      modalDialog3: true,
+      editMainCatMy: cat.parent_id,
+      editMainNameMy: cat.name,
+      editCat: cat
+    })
+  }
+  
+  async saveEditCat(){
+    let data = {
+      name: this.state.editMainNameMy,
+      cat_id: this.state.editMainCatMy,
+      id: this.state.editCat.id
+    };
+    
+    let res = await this.getData('edit_cat', data);
+    
+    if( res.st === false ){
+      alert(res.text);
+      return ;
+    }
+    
+    this.setState({
+      allCats: res.cats,
+      modalDialog: false
     })
   }
   
@@ -305,6 +360,44 @@ class CategoryItems_ extends React.Component {
           </DialogActions>
         </Dialog>
         
+        <Dialog
+          open={this.state.modalDialog3}
+          onClose={ () => { this.setState({ modalDialog3: false }) } }
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">Редактирование категории</DialogTitle>
+          <DialogContent>
+            
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={12}>
+                <MySelect 
+                  classes={this.state.classes} 
+                  label="Главная категория" 
+                  data={this.state.allCats} 
+                  value={this.state.editMainCatMy} 
+                  func={ this.changeCatMainEdit.bind(this) } 
+                />
+              </Grid>  
+              <Grid item xs={12} sm={12}>
+                <TextField 
+                  label="Название категории" 
+                  size="small" 
+                  variant="outlined" 
+                  style={{ width: '100%' }} 
+                  color="primary" 
+                  value={this.state.editMainNameMy} 
+                  onChange={ this.changeNameMainEdit.bind(this) }
+                />
+              </Grid>
+            </Grid>
+            
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={ this.saveEditCat.bind(this) } color="primary">Сохранить</Button>
+          </DialogActions>
+        </Dialog>
+        
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
@@ -322,23 +415,25 @@ class CategoryItems_ extends React.Component {
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1a-content"
                   >
+                    <MenuIcon style={{ marginRight: 10 }} onClick={ this.editCat.bind(this, main_cat) } />
                     <Typography>{main_cat.name}</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     
                   { this.state.allCats.map( (parent_cat, parent_key) =>
                     parseInt(main_cat.id) != parseInt(parent_cat.parent_id) ? null :
-                      <Accordion key={parent_key}>
+                      <Accordion key={main_key+'_'+parent_key}>
                         <AccordionSummary
                           expandIcon={<ExpandMoreIcon />}
                           aria-controls="panel1a-content"
                         >
+                          <MenuIcon style={{ marginRight: 10 }} />
                           <Typography>{parent_cat.name}</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
                           
                           { this.state.allItems.filter( (item) => parseInt(item.cat_id) == parseInt(parent_cat.id) ).map( (item, key) =>
-                            <Accordion key={parent_key}>
+                            <Accordion key={main_key+'_'+parent_key+'_'+key}>
                               <AccordionSummary
                                 expandIcon={<ExpandMoreIcon />}
                                 aria-controls="panel1a-content"
