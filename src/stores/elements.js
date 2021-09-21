@@ -74,7 +74,7 @@ export class MyAutocomplite extends React.PureComponent {
       <Stack spacing={3}>
         <Autocomplete
           multiple={true}
-          id="tags-outlined"
+          id={ this.props.id ?? null }
           options={this.props.data}
           getOptionLabel={(option) => option.name}
           value={this.props.value}
