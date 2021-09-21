@@ -322,7 +322,12 @@ class CategoryItems_ extends React.Component {
             
             <Grid container spacing={3}>
               <Grid item xs={12} sm={12}>
-                <MySelect classes={this.state.classes} label="Главная категория" data={this.state.allCats} value={this.state.newMainCatMy} func={ this.changeCatMain.bind(this) } />
+                <MySelect 
+                  classes={this.state.classes} 
+                  label="Главная категория" 
+                  data={ this.state.allCats.filter( (item) => parseInt(item.parent_id) == -1 || !item.parent_id ) }
+                  value={this.state.newMainCatMy} 
+                  func={ this.changeCatMain.bind(this) } />
               </Grid>  
               <Grid item xs={12} sm={12}>
                 <TextField label="Название категории" size="small" variant="outlined" style={{ width: '100%' }} color="primary" value={this.state.newMainNameMy} onChange={this.changeNameMain.bind(this)} />
@@ -374,7 +379,7 @@ class CategoryItems_ extends React.Component {
                 <MySelect 
                   classes={this.state.classes} 
                   label="Главная категория" 
-                  data={this.state.allCats} 
+                  data={ this.state.allCats.filter( (item) => parseInt(item.parent_id) == -1 || !item.parent_id ) } 
                   value={this.state.editMainCatMy} 
                   func={ this.changeCatMainEdit.bind(this) } 
                 />
