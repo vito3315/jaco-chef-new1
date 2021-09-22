@@ -112,6 +112,8 @@ class RasByBill_ extends React.Component {
       rangeDate: [formatDate(new Date()), formatDate(new Date())],
       items: [],
       cats: [],
+      items_cat: [],
+      item_cat: 0,
       
       myItems: [],
       
@@ -127,7 +129,8 @@ class RasByBill_ extends React.Component {
       points: data.points,
       
       items: data.items,
-      cats: data.cats
+      cats: data.cats,
+      items_cat: data.items_cat
     })
     
     document.title = data.module_info.name;
@@ -196,6 +199,7 @@ class RasByBill_ extends React.Component {
     let data = {
       points: this.state.point,
       items: this.state.myItems,
+      item_cat: this.state.item_cat,
       start_date: this.state.rangeDate[0],
       end_date: this.state.rangeDate[1],
     };
@@ -222,11 +226,21 @@ class RasByBill_ extends React.Component {
     
     let res = await this.getData('get_this_rev_cat', data);
     
+    
+    let summ = 0;
+    
+    res.rec_ras.map( (item, key) => {
+      summ += parseFloat(item.this_price);
+    } )
+    
+    console.log( summ )
+    
     this.setState({
       catItems: {
         count_pos: res.count_pos,
         items_ras: res.items_ras,
-        rec_ras: res.rec_ras
+        rec_ras: res.rec_ras,
+        full_sum: summ
       },
       resItems: null
     })
@@ -277,6 +291,10 @@ class RasByBill_ extends React.Component {
           
           <Grid item xs={12} sm={3}>
             <MyDaterange startText="Дата от" endText="Дата до" value={this.state.rangeDate} func={ this.changeDateRange.bind(this) } />
+          </Grid>
+          
+          <Grid item xs={12} sm={4}>
+            <MySelect classes={this.state.classes} data={this.state.items_cat} multiple={false} value={this.state.item_cat} func={ (event) => {this.setState({ item_cat: event.target.value })} } label='Категория товара' />
           </Grid>
           
           <Grid item xs={12} sm={12}>
@@ -386,6 +404,14 @@ class RasByBill_ extends React.Component {
           
           { this.state.catItems && this.state.catItems.rec_ras ?
             <Grid item xs={12}>
+              
+              <Accordion disabled>
+                <AccordionSummary>
+                  <Typography style={{ width: '50%' }}>Роллов: {this.state.catItems.count_pos.count_rolls}</Typography>
+                  <Typography style={{ width: '50%' }}>Пиццы: {this.state.catItems.count_pos.count_pizza}</Typography>
+                </AccordionSummary>
+              </Accordion>
+              
               { this.state.catItems.rec_ras.map( (item, key) =>
                 <Accordion key={key}>
                   <AccordionSummary
@@ -440,6 +466,14 @@ class RasByBill_ extends React.Component {
                   </AccordionDetails>
                 </Accordion>
               ) }
+              
+              <Accordion disabled>
+                <AccordionSummary>
+                  <Typography style={{ width: '60%', marginRight: -15 }}>Всего:</Typography>
+                  <Typography style={{ width: '40%' }}>{ this.state.catItems.full_sum }</Typography>
+                </AccordionSummary>
+              </Accordion>
+              
             </Grid>
               :
             null              
