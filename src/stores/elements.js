@@ -42,6 +42,8 @@ export class MyDaterange extends React.PureComponent {
     return (
       <LocalizationProvider dateAdapter={AdapterDateFns} locale={ruLocale}>
         <DateRangePicker
+          allowSameDateSelection={true}
+          showTodayButton={true}
           startText={this.props.startText}
           endText={this.props.endText}
           value={this.props.value}

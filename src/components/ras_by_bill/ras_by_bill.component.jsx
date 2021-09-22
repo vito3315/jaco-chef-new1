@@ -206,11 +206,18 @@ class RasByBill_ extends React.Component {
     
     let res = await this.getData('get_this_rev', data);
     
+    let summ = 0;
+    
+    res.items_ras.map( (item, key) => {
+      summ += parseFloat(item.sum);
+    } )
+    
     this.setState({
       resItems: {
         items_ras: res.items_ras,
         pf_ras: res.pf_ras,
-        rec_ras: res.rec_ras
+        rec_ras: res.rec_ras,
+        full_sum: summ.toFixed(2)
       },
       catItems: null
     })
@@ -233,14 +240,12 @@ class RasByBill_ extends React.Component {
       summ += parseFloat(item.this_price);
     } )
     
-    console.log( summ )
-    
     this.setState({
       catItems: {
         count_pos: res.count_pos,
         items_ras: res.items_ras,
         rec_ras: res.rec_ras,
-        full_sum: summ
+        full_sum: summ.toFixed(2)
       },
       resItems: null
     })
@@ -336,6 +341,14 @@ class RasByBill_ extends React.Component {
                           <TableCell> { item.count_bill } </TableCell>
                         </TableRow>
                       ) }
+                      
+                      <TableRow>
+                        <TableCell> Всего: </TableCell>
+                        <TableCell> </TableCell>
+                        <TableCell> </TableCell>
+                        <TableCell> { this.state.resItems.full_sum } </TableCell>
+                        <TableCell> </TableCell>
+                      </TableRow>
                       
                     </TableBody>
                   </Table>
