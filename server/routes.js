@@ -6,6 +6,10 @@ const { LiveOrders } = require( '../src/components/live_orders' );
 const { Events } = require( '../src/components/events' );
 const { RasByBill } = require( '../src/components/ras_by_bill' );
 const { CategoryItems } = require( '../src/components/category_items' );
+const { VendorModule } = require( '../src/components/vendor_module' );
+const { VendorItemPrice } = require( '../src/components/vendor_item_price' );
+
+
 
 
 module.exports = [
@@ -57,6 +61,20 @@ module.exports = [
         exact: true,
         component: CategoryItems,
         title: 'Категории товаров',
+        code: 200
+    },
+    {
+        path: '/vendor_module',
+        exact: true,
+        component: VendorModule,
+        title: 'Поставщики',
+        code: 200
+    },
+    {
+        path: '/vendor_item_price',
+        exact: true,
+        component: VendorItemPrice,
+        title: 'Цены на товары поставщика',
         code: 200
     },
 ];

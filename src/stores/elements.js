@@ -83,6 +83,7 @@ export class MyAutocomplite extends React.PureComponent {
           value={this.props.value}
           onChange={this.props.func}
           filterSelectedOptions
+          isOptionEqualToValue={(option, value) => option.id === value.id}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -130,6 +131,31 @@ export class MySelect extends React.PureComponent {
   }
 }
   
+export class MyTextInput extends React.PureComponent {
+  constructor(props) {
+    super(props);
+        
+    this.state = {
+      classes: this.props.classes,
+    };
+  }
+  
+  render(){
+    return (
+      <TextField 
+        label={this.props.label}
+        value={this.props.value}
+        onChange={this.props.func}
+        disabled={ this.props.disabled || this.props.disabled === true ? true : false }
+        variant="outlined" 
+        size={'small'} 
+        color='primary'
+        style={{ width: '100%' }} 
+      />
+    )
+  }
+}
+
 export class MyTimePicker extends React.PureComponent {
   constructor(props) {
     super(props);
