@@ -29,6 +29,8 @@ module.exports = {
         clean: true,
     },
 
+    
+    
     // module/loaders configuration
     module: {
         rules: [
@@ -119,7 +121,7 @@ module.exports = {
     
     // development server configuration
     devServer: {
-        port: 5074,
+        port: 5080,
         historyApiFallback: true,
     },
 

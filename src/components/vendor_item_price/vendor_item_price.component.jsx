@@ -55,6 +55,11 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { MySelect, MyCheckBox, MyAutocomplite, MyTextInput } from '../../stores/elements';
 import { Typography } from '@material-ui/core';
 
+import {AgGridColumn, AgGridReact} from 'ag-grid-react';
+
+//import 'ag-grid-community/dist/styles/ag-grid.css';
+//import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
+
 const queryString = require('query-string');
 
 const useStyles = makeStyles((theme) => ({
@@ -107,11 +112,13 @@ class VendorItemPrice_ extends React.Component {
       modalDialog: false,
       
       vendors: [],
+      vendor: 0,
       
       items: [],
       
       cities: [],
-      city: -1
+      city: -1,
+      allCity: false,
     };
   }
   
@@ -184,7 +191,7 @@ class VendorItemPrice_ extends React.Component {
     this.setState({
       vendors: res,
       city: event.target.value,
-      vendor_id: 0,
+      vendor: 0,
       items: []
     })
   }
@@ -199,16 +206,20 @@ class VendorItemPrice_ extends React.Component {
     
     this.setState({
       items: res,
-      vendor_id: event.target.value,
+      vendor: event.target.value,
     })
   }
   
-  changePrice(item_id, event){
+  update(item_id, data, event){
     let this_items = this.state.items;
+    
+    
     
     this_items.map( (item, key) => {
       if( parseInt(item.item_id) == parseInt(item_id) ){
-        this_items[key]['price'] = event.target.value;
+        this_items[key][data] = event.target.value;
+        
+        this_items[key]['price'] = (parseFloat(this_items[key]['full_price']) / parseFloat(this_items[key]['rec_pq'])).toFixed(2);
       }
     } )
     
@@ -219,15 +230,34 @@ class VendorItemPrice_ extends React.Component {
   
   async save(){
     let data = {
-      vendor_id: this.state.vendor_id,
+      vendor_id: this.state.vendor,
       items: this.state.items,
-      city_id: this.state.city
+      city_id: this.state.city,
+      all_city: this.state.allCity === true ? 1 : 0
     }
     
-    let res = await this.getData('save_price', data);
+    if( data.all_city == 1 ){
+      if( confirm("Точно сохранить на все города поставщика ?") ){
+        let res = await this.getData('save_price', data);
+      }
+    }else{
+      let res = await this.getData('save_price', data);
+    }
+  }
+  
+  onCellClicked(event){
+    console.log( event.data );
+    console.log( event.colDef.field );
   }
   
   render(){
+    
+    const rowData = [
+      {make: "Toyota", model: "Celica", price: 35000},
+      {make: "Ford", model: "Mondeo", price: 32000},
+      {make: "Porsche", model: "Boxter", price: 72000}
+    ];
+    
     return (
       <>
         <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
@@ -266,11 +296,26 @@ class VendorItemPrice_ extends React.Component {
           <Grid item xs={12} sm={3}>
             <MySelect classes={this.state.classes} data={this.state.vendors} value={this.state.vendor} func={ this.changeVendor.bind(this) } label='Поставщик' />
           </Grid>
+          <Grid item xs={12} sm={3}>
+            <MyCheckBox classes={this.state.classes} value={this.state.allCity} func={ (event) => { this.setState({ allCity: event.target.checked }) } } label='На все города поставщика' />
+          </Grid>
           
           <Grid item xs={12}>
             <Button onClick={this.save.bind(this)} variant="contained">Сохранить</Button>
           </Grid>
           
+          <Grid item xs={12}>
+            <div className="ag-theme-alpine" style={{height: 400, width: 600}}>
+              <AgGridReact
+                  onCellClicked={this.onCellClicked}
+                  rowData={rowData}>
+                  <AgGridColumn field="make"></AgGridColumn>
+                  <AgGridColumn field="model"></AgGridColumn>
+                  <AgGridColumn field="price"></AgGridColumn>
+              </AgGridReact>
+          </div>
+          </Grid>
+            
           <Grid container direction="row" justifyContent="center" style={{ paddingTop: 20 }}>
             <Grid item xs={12}>
                 
@@ -278,18 +323,28 @@ class VendorItemPrice_ extends React.Component {
                 <TableHead>
                   <TableRow>
                     <TableCell>Позиция</TableCell>
-                    <TableCell>Цена</TableCell>
-                    <TableCell>Еденица измерения</TableCell>
+                    <TableCell></TableCell>
+                    <TableCell>Комментарий</TableCell>
+                    <TableCell>Цена за упаковку</TableCell>
+                    <TableCell>Объем упаковки</TableCell>
+                    <TableCell>Цена за 1 ед.</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   { this.state.items.map( (item, key) => 
                     <TableRow key={key}>
                       <TableCell>{item.name}</TableCell>
+                      <TableCell>{item.name_for_vendor}</TableCell>
                       <TableCell>
-                        <MyTextInput label="" value={item.price} func={ this.changePrice.bind(this, item.item_id) } />
+                        <MyTextInput label="" value={item.comment} func={ this.update.bind(this, item.item_id, 'comment') } />
                       </TableCell>
-                      <TableCell>{item.ei_name}</TableCell>
+                      <TableCell>
+                        <MyTextInput label="" value={item.full_price} func={ this.update.bind(this, item.item_id, 'full_price') } />
+                      </TableCell>
+                      <TableCell>
+                        <MySelect classes={this.state.classes} data={item.pqs} value={item.rec_pq} func={ this.update.bind(this, item.item_id, 'rec_pq') } label='' />
+                      </TableCell>
+                      <TableCell>{item.price} / {item.ei_name}</TableCell>
                     </TableRow>
                   ) }
                 </TableBody>
