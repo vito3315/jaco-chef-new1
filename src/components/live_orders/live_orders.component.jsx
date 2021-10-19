@@ -1,33 +1,23 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
 import { useHistory } from "react-router-dom";
 
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 
-import Backdrop from '@material-ui/core/Backdrop';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { MySelect, MyCheckBox } from '../../stores/elements';
 
 const queryString = require('query-string');
-
-const useStyles = makeStyles((theme) => ({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-}));
 
 class Live_Orders extends React.Component {
   constructor(props) {
@@ -146,7 +136,7 @@ class Live_Orders extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -157,13 +147,13 @@ class Live_Orders extends React.Component {
           { this.state.points.length > 0 ?
             <>
               <Grid item xs={6} sm={6}>
-                <MySelect classes={this.state.classes} data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
+                <MySelect data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
               </Grid>
               <Grid item xs={6} sm={6}>
                 <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
               </Grid>
               <Grid item xs={12} sm={12}>
-                <MyCheckBox classes={this.state.classes} value={this.state.showReady} func={ this.changeCheckOrders.bind(this) } label='Показывать готовые' />
+                <MyCheckBox value={this.state.showReady} func={ this.changeCheckOrders.bind(this) } label='Показывать готовые' />
               </Grid>
             </>
               :
@@ -279,10 +269,9 @@ class Live_Orders extends React.Component {
 }
 
 export function LiveOrders () {
-  const classes = useStyles();
   let history = useHistory();
   
   return (
-    <Live_Orders classes={classes} history={history} />
+    <Live_Orders history={history} />
   );
 }

@@ -1,25 +1,19 @@
 import React from 'react';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
 import { useHistory } from "react-router-dom";
 
+import { makeStyles } from '@mui/styles';
+import { createTheme } from '@mui/material/styles';
+
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+
 import Table from '@mui/material/Table';
-import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
-import TableFooter from '@mui/material/TableFooter';
-import TablePagination from '@mui/material/TablePagination';
+import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import IconButton from '@mui/material/IconButton';
-import FirstPageIcon from '@mui/icons-material/FirstPage';
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import LastPageIcon from '@mui/icons-material/LastPage';
-
-import TextField from '@mui/material/TextField';
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -28,36 +22,29 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
-
-
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Divider from '@material-ui/core/Divider';
-import InboxIcon from '@material-ui/icons/Inbox';
-import DraftsIcon from '@material-ui/icons/Drafts';
-
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-
-import Backdrop from '@material-ui/core/Backdrop';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { MySelect, MyCheckBox, MyAutocomplite, MyTextInput } from '../../stores/elements';
-import { Typography } from '@material-ui/core';
+import Typography from '@mui/material/Typography';
 
 const queryString = require('query-string');
 
-const useStyles = makeStyles((theme) => ({
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#c03',
+    }
+  },
+});
+
+const useStyles = makeStyles({
   formControl: {
     //margin: theme.spacing(1),
     width: '100%',
@@ -91,7 +78,7 @@ const useStyles = makeStyles((theme) => ({
   timePicker: {
     width: '100%'
   }
-}));
+});
 
 class VendorModule_ extends React.Component {
   constructor(props) {
@@ -434,7 +421,7 @@ class VendorModule_ extends React.Component {
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle id="alert-dialog-title">Товары поставщика {this.state.openVendor ? this.state.openVendor.name : ''}</DialogTitle>
-          <DialogContent>
+          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             
             <Grid container style={{ paddingTop: 20 }}>
               
@@ -497,7 +484,7 @@ class VendorModule_ extends React.Component {
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle id="alert-dialog-title">Поставщик {this.state.openVendor ? this.state.openVendor.name : ''}</DialogTitle>
-          <DialogContent>
+          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             
             <Grid container spacing={3}>
               
@@ -644,35 +631,31 @@ class VendorModule_ extends React.Component {
             <Button onClick={this.openModalVendorNew.bind(this)} variant="contained">Добавить поставщика</Button>
           </Grid>
         
+          <Grid item xs={12}>
           
-          
-          
-          <Grid container direction="row" justifyContent="center" style={{ paddingTop: 20 }}>
-            <Grid item xs={12}>
-            
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell component="th">Название</TableCell>
-                      <TableCell component="th">Назначенные товары</TableCell>
-                      <TableCell component="th"><VisibilityIcon /></TableCell>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell component="th">Название</TableCell>
+                    <TableCell component="th">Назначенные товары</TableCell>
+                    <TableCell component="th"><VisibilityIcon /></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  { this.state.vendors.map( (item, key) => 
+                    <TableRow key={key}>
+                      <TableCell><Typography onClick={ this.openModalVendor.bind(this, item) } style={{ cursor: 'pointer', width: 'max-content' }}>{item.name}</Typography></TableCell>
+                      <TableCell><DirectionsCarIcon onClick={ this.openModalItems.bind(this, item) } style={{ cursor: 'pointer' }} /></TableCell>
+                      <TableCell>{ parseInt(item.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> }</TableCell>
                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    { this.state.vendors.map( (item, key) => 
-                      <TableRow key={key}>
-                        <TableCell><Typography onClick={ this.openModalVendor.bind(this, item) } style={{ cursor: 'pointer', width: 'max-content' }}>{item.name}</Typography></TableCell>
-                        <TableCell><DirectionsCarIcon onClick={ this.openModalItems.bind(this, item) } style={{ cursor: 'pointer' }} /></TableCell>
-                        <TableCell>{ parseInt(item.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> }</TableCell>
-                      </TableRow>
-                    ) }
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              
-            </Grid>
+                  ) }
+                </TableBody>
+              </Table>
+            </TableContainer>
+            
           </Grid>
+          
         </Grid>
       </>
     )

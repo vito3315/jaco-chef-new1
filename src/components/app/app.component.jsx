@@ -1,39 +1,41 @@
 import React from 'react';
 import clsx from 'clsx';
-import { makeStyles } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import Badge from '@material-ui/core/Badge';
-import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import NotificationsIcon from '@material-ui/icons/Notifications';
+import { makeStyles } from '@mui/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
 
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
 
-import { createTheme } from '@material-ui/core/styles';
-import { ThemeProvider } from '@material-ui/styles';
+import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+
+import Badge from '@mui/material/Badge';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import MenuIcon from '@mui/icons-material/Menu';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { NavLink as Link, Switch, Route, Redirect } from 'react-router-dom';
 
 import { useHistory } from "react-router-dom";
 
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 
-import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
+import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 
 import routes from '../../../server/routes';
 
@@ -53,7 +55,7 @@ const theme = createTheme({
 
 const drawerWidth = 300;
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles({
   root: {
     display: 'flex',
   },
@@ -134,7 +136,8 @@ const useStyles = makeStyles((theme) => ({
     fontSize: theme.typography.pxToRem(15),
     fontWeight: theme.typography.fontWeightRegular,
   },
-}));
+});
+
 
 class Header extends React.Component {
   constructor(props) {
@@ -326,8 +329,6 @@ export function NotFound() {
 export function App () {
     const classes = useStyles();
     let history = useHistory();
-    
-    console.log( 'history', history.location.pathname )
     
     let check_header = true;
     

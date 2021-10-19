@@ -8,7 +8,8 @@ const { RasByBill } = require( '../src/components/ras_by_bill' );
 const { CategoryItems } = require( '../src/components/category_items' );
 const { VendorModule } = require( '../src/components/vendor_module' );
 const { VendorItemPrice } = require( '../src/components/vendor_item_price' );
-
+const { Tender } = require( '../src/components/tender' );
+const { Revizion, RevizionNew } = require( '../src/components/revizion' );
 
 
 
@@ -77,4 +78,28 @@ module.exports = [
         title: 'Цены на товары поставщика',
         code: 200
     },
+    {
+        path: '/tender',
+        exact: true,
+        component: Tender,
+        title: 'Цены на товары поставщика',
+        code: 200
+    },
+    {
+        path: '/revizion',
+        exact: true,
+        component: Revizion,
+        title: 'Ревизия',
+        code: 200
+    },
+    {
+        path: '/revizion/new',
+        exact: true,
+        component: RevizionNew,
+        title: 'Новая ревизия',
+        code: 200
+    },
+    
+    
+    
 ];

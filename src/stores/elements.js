@@ -1,33 +1,31 @@
 import React from 'react';
 
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
-import TextField from '@material-ui/core/TextField';
 
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+import TextField from '@mui/material/TextField';
 
-import Chip from '@mui/material/Chip';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+
 import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
 
-import Grid from '@material-ui/core/Grid';
+//import Grid from '@mui/material/Grid';
 import ruLocale from "date-fns/locale/ru";
-import DateFnsUtils from '@date-io/date-fns';
+/*import DateFnsUtils from '@date-io/date-fns';
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
-} from '@material-ui/pickers';
-import { alpha } from '@material-ui/core/styles'
+} from '@material-ui/pickers';*/
 
 import DateRangePicker from '@mui/lab/DateRangePicker';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import Box from '@mui/material/Box';
 
 export class MyDaterange extends React.PureComponent {
   constructor(props) {
@@ -40,8 +38,9 @@ export class MyDaterange extends React.PureComponent {
   
   render(){
     return (
-      <LocalizationProvider dateAdapter={AdapterDateFns} locale={ruLocale}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} locale={ruLocale} size="small">
         <DateRangePicker
+          
           allowSameDateSelection={true}
           showTodayButton={true}
           startText={this.props.startText}
@@ -75,6 +74,7 @@ export class MyAutocomplite extends React.PureComponent {
     return (
       <Stack spacing={3}>
         <Autocomplete
+          size="small"
           disableCloseOnSelect={true}
           multiple={true}
           id={ this.props.id ?? null }
@@ -108,20 +108,15 @@ export class MySelect extends React.PureComponent {
   
   render(){
     return (
-      <FormControl size="small" variant="outlined" className={this.state.classes.formControl}>
-        <InputLabel id="demo-simple-select-outlined-label">{this.props.label}</InputLabel>
+      <FormControl fullWidth variant="outlined" size="small">
+        <InputLabel>{this.props.label}</InputLabel>
         <Select
-          labelId="demo-simple-select-outlined-label"
-          id="demo-simple-select-outlined"
           value={this.props.value}
-          onChange={ this.props.func }
           label={this.props.label}
-          size="small"
+          onChange={ this.props.func }
           multiple={ this.props.multiple && this.props.multiple === true ? true : false }
         >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
+          <MenuItem value=""><em>None</em></MenuItem>
           { this.props.data.map( (item, key) =>
             <MenuItem key={key} value={item.id}>{item.name}</MenuItem>
           ) }
@@ -130,7 +125,7 @@ export class MySelect extends React.PureComponent {
     )
   }
 }
-  
+
 export class MyTextInput extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -186,7 +181,7 @@ export class MyTimePicker extends React.PureComponent {
     )
   }
 }
-
+/*
 export class MyDatePicker extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -220,7 +215,7 @@ export class MyDatePicker extends React.PureComponent {
       </MuiPickersUtilsProvider>
     )
   }
-}
+}*/
 
 export class MyCheckBox extends React.PureComponent {
   constructor(props) {

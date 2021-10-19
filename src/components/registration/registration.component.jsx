@@ -1,30 +1,38 @@
 import React from 'react';
 import { useHistory } from "react-router-dom";
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
+import Avatar from '@mui/material/Avatar';
+import TextField from '@mui/material/TextField';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import { makeStyles } from '@mui/styles';
+import { createTheme } from '@mui/material/styles';
 
-import Backdrop from '@material-ui/core/Backdrop';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const queryString = require('query-string');
 
-const useStyles = makeStyles((theme) => ({
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#c03',
+    }
+  },
+});
+
+const useStyles = makeStyles({
   paper: {
     display: 'flex',
     flexDirection: 'column',
@@ -61,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
   textLink: {
     color: '#c03'
   }
-}));
+});
 
 class Reg_ extends React.Component {
   constructor(props) {

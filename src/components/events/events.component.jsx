@@ -1,47 +1,55 @@
 import React from 'react';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
 import { useHistory } from "react-router-dom";
 
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
+import { makeStyles } from '@mui/styles';
+import { createTheme } from '@mui/material/styles';
 
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 
-import CloseIcon from '@material-ui/icons/Close';
 
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Divider from '@material-ui/core/Divider';
-import InboxIcon from '@material-ui/icons/Inbox';
-import DraftsIcon from '@material-ui/icons/Drafts';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-import Backdrop from '@material-ui/core/Backdrop';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CloseIcon from '@mui/icons-material/Close';
+
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { MySelect, MyCheckBox, MyTimePicker } from '../../stores/elements';
-import { Typography } from '@material-ui/core';
+import Typography from '@mui/material/Typography';
 
 const queryString = require('query-string');
 
-const useStyles = makeStyles((theme) => ({
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#c03',
+    }
+  },
+});
+
+const useStyles = makeStyles({
   formControl: {
     //margin: theme.spacing(1),
     width: '100%',
@@ -75,7 +83,7 @@ const useStyles = makeStyles((theme) => ({
   timePicker: {
     width: '100%'
   }
-}));
+});
 
 class Events_ extends React.Component {
   constructor(props) {
@@ -393,7 +401,7 @@ class Events_ extends React.Component {
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle id="alert-dialog-title">{this.state.chooseDay ? this.state.chooseDay.full_day : ''}</DialogTitle>
-          <DialogContent>
+          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             <DialogContentText id="alert-dialog-description">
               
               <Grid container spacing={3}>

@@ -1,52 +1,46 @@
 import React from 'react';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
 import { useHistory } from "react-router-dom";
 
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-
-import CloseIcon from '@material-ui/icons/Close';
-
-import Box from '@mui/material/Box';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/Inbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
+import { makeStyles } from '@mui/styles';
+import { createTheme } from '@mui/material/styles';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 
 import MenuIcon from '@mui/icons-material/Menu';
 
 import Accordion from '@mui/material/Accordion';
-import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import TextField from '@mui/material/TextField';
 
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 
-import Backdrop from '@material-ui/core/Backdrop';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyTimePicker, MyDatePicker, MyAutocomplite, MyDaterange } from '../../stores/elements';
-import { Typography } from '@material-ui/core';
+import { MySelect, MyAutocomplite } from '../../stores/elements';
+import Typography from '@mui/material/Typography';
 
 const queryString = require('query-string');
 
-const useStyles = makeStyles((theme) => ({
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#c03',
+    },
+    def: {
+      main: '#353b48',
+      secondary: '#fff'
+    },
+  },
+});
+
+const useStyles = makeStyles({
   formControl: {
     //margin: theme.spacing(1),
     width: '100%',
@@ -80,21 +74,7 @@ const useStyles = makeStyles((theme) => ({
   timePicker: {
     width: '100%'
   }
-}));
-
-function formatDate(date) {
-  var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-  if (month.length < 2) 
-      month = '0' + month;
-  if (day.length < 2) 
-      day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+});
 
 class CategoryItems_ extends React.Component {
   constructor(props) {
@@ -318,7 +298,7 @@ class CategoryItems_ extends React.Component {
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle id="alert-dialog-title">Новая категория</DialogTitle>
-          <DialogContent>
+          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             
             <Grid container spacing={3}>
               <Grid item xs={12} sm={12}>
@@ -347,7 +327,7 @@ class CategoryItems_ extends React.Component {
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle>Позиции категории</DialogTitle>
-          <DialogContent>
+          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             
             <Grid container spacing={3}>
               <Grid item xs={12} sm={12}>
@@ -372,7 +352,7 @@ class CategoryItems_ extends React.Component {
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle id="alert-dialog-title">Редактирование категории</DialogTitle>
-          <DialogContent>
+          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             
             <Grid container spacing={3}>
               <Grid item xs={12} sm={12}>

@@ -1,68 +1,42 @@
 import React from 'react';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
 import { useHistory } from "react-router-dom";
 
+import { makeStyles } from '@mui/styles';
+import { createTheme } from '@mui/material/styles';
+
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+
 import Table from '@mui/material/Table';
-import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
-import TableFooter from '@mui/material/TableFooter';
-import TablePagination from '@mui/material/TablePagination';
+import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import IconButton from '@mui/material/IconButton';
-import FirstPageIcon from '@mui/icons-material/FirstPage';
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import LastPageIcon from '@mui/icons-material/LastPage';
 
-import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
-import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
-
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-
-
-
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Divider from '@material-ui/core/Divider';
-import InboxIcon from '@material-ui/icons/Inbox';
-import DraftsIcon from '@material-ui/icons/Drafts';
-
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-
-import Backdrop from '@material-ui/core/Backdrop';
-import CircularProgress from '@material-ui/core/CircularProgress';
-
-import { MySelect, MyCheckBox, MyAutocomplite, MyTextInput } from '../../stores/elements';
-import { Typography } from '@material-ui/core';
-
-import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-
-//import 'ag-grid-community/dist/styles/ag-grid.css';
-//import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
+import { MySelect, MyCheckBox, MyTextInput } from '../../stores/elements';
 
 const queryString = require('query-string');
 
-const useStyles = makeStyles((theme) => ({
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#c03',
+    }
+  },
+});
+
+const useStyles = makeStyles({
   formControl: {
     //margin: theme.spacing(1),
     width: '100%',
@@ -96,7 +70,7 @@ const useStyles = makeStyles((theme) => ({
   timePicker: {
     width: '100%'
   }
-}));
+});
 
 class VendorItemPrice_ extends React.Component {
   constructor(props) {
@@ -119,6 +93,7 @@ class VendorItemPrice_ extends React.Component {
       cities: [],
       city: -1,
       allCity: false,
+      isPrioriti: false
     };
   }
   
@@ -233,7 +208,8 @@ class VendorItemPrice_ extends React.Component {
       vendor_id: this.state.vendor,
       items: this.state.items,
       city_id: this.state.city,
-      all_city: this.state.allCity === true ? 1 : 0
+      all_city: this.state.allCity === true ? 1 : 0,
+      is_prioriti: this.state.isPrioriti === true ? 1 : 0,
     }
     
     if( data.all_city == 1 ){
@@ -245,19 +221,7 @@ class VendorItemPrice_ extends React.Component {
     }
   }
   
-  onCellClicked(event){
-    console.log( event.data );
-    console.log( event.colDef.field );
-  }
-  
   render(){
-    
-    const rowData = [
-      {make: "Toyota", model: "Celica", price: 35000},
-      {make: "Ford", model: "Mondeo", price: 32000},
-      {make: "Porsche", model: "Boxter", price: 72000}
-    ];
-    
     return (
       <>
         <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
@@ -299,26 +263,18 @@ class VendorItemPrice_ extends React.Component {
           <Grid item xs={12} sm={3}>
             <MyCheckBox classes={this.state.classes} value={this.state.allCity} func={ (event) => { this.setState({ allCity: event.target.checked }) } } label='На все города поставщика' />
           </Grid>
+          <Grid item xs={12} sm={12}>
+            <MyCheckBox classes={this.state.classes} value={this.state.isPrioriti} func={ (event) => { this.setState({ isPrioriti: event.target.checked }) } } label='Приоритетный постащик' />
+          </Grid>
           
           <Grid item xs={12}>
             <Button onClick={this.save.bind(this)} variant="contained">Сохранить</Button>
           </Grid>
           
+          
           <Grid item xs={12}>
-            <div className="ag-theme-alpine" style={{height: 400, width: 600}}>
-              <AgGridReact
-                  onCellClicked={this.onCellClicked}
-                  rowData={rowData}>
-                  <AgGridColumn field="make"></AgGridColumn>
-                  <AgGridColumn field="model"></AgGridColumn>
-                  <AgGridColumn field="price"></AgGridColumn>
-              </AgGridReact>
-          </div>
-          </Grid>
-            
-          <Grid container direction="row" justifyContent="center" style={{ paddingTop: 20 }}>
-            <Grid item xs={12}>
-                
+              
+            <TableContainer component={Paper}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -349,10 +305,11 @@ class VendorItemPrice_ extends React.Component {
                   ) }
                 </TableBody>
               </Table>
-              
-            </Grid>
+            </TableContainer>
             
           </Grid>
+            
+          
         </Grid>
       </>
     )

@@ -1,13 +1,23 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@mui/styles';
+import { createTheme } from '@mui/material/styles';
 
-import Backdrop from '@material-ui/core/Backdrop';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import Grid from '@mui/material/Grid';
+
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const queryString = require('query-string');
 
-const useStyles = makeStyles((theme) => ({
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#c03',
+    }
+  },
+});
+
+const useStyles = makeStyles({
   formControl: {
     //margin: theme.spacing(1),
     width: '100%',
@@ -19,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
     zIndex: theme.zIndex.drawer + 1,
     color: '#fff',
   },
-}));
+});
 
 class Home_ extends React.Component {
   constructor(props) {
