@@ -259,7 +259,7 @@ class Revizion_ extends React.Component {
           </Grid>
           
           <Grid item xs={12}>
-            <Link to={"/revizion/new"}>Новая ревизия</Link>
+            <Link to={"/revizion/new"}>Новая ревизия2</Link>
           </Grid>
           
           <Grid item xs={12} sm={6}>
