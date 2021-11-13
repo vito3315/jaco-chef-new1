@@ -26,6 +26,11 @@ import {
 import DateRangePicker from '@mui/lab/DateRangePicker';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
+//import DatePicker from '@mui/lab/DatePicker';
+import Typography from '@mui/material/Typography';
+
+
+import DatePicker from "react-multi-date-picker"
 
 export class MyDaterange extends React.PureComponent {
   constructor(props) {
@@ -83,6 +88,7 @@ export class MyAutocomplite extends React.PureComponent {
           value={this.props.value}
           onChange={this.props.func}
           filterSelectedOptions
+          multiple={ this.props.multiple && this.props.multiple === true ? true : false }
           isOptionEqualToValue={(option, value) => option.id === value.id}
           renderInput={(params) => (
             <TextField
@@ -174,14 +180,15 @@ export class MyTimePicker extends React.PureComponent {
         InputLabelProps={{
           shrink: true,
         }}
+        step={600}
         inputProps={{
-          step: 300, // 5 min
+          step: 600, // 5 min
         }}
       />
     )
   }
 }
-/*
+
 export class MyDatePicker extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -193,29 +200,47 @@ export class MyDatePicker extends React.PureComponent {
   
   render(){
     return (
-      <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ruLocale}>
-        <Grid container justifyContent="space-around">
-          <KeyboardDatePicker
-            disableToolbar
-            variant="inline"
-            size="small"
-            color="primary"
-            format="yyyy-MM-dd"
-            style={{ width: '100%' }}
-            //margin="normal"
-            //id="date-picker-inline"
-            label={this.props.label}
-            value={this.props.value}
-            onChange={this.props.func}
-            KeyboardButtonProps={{
-              'aria-label': 'change date',
-            }}
-          />
-        </Grid>
-      </MuiPickersUtilsProvider>
+      <>
+        <Typography>{this.props.label}</Typography>
+        <DatePicker
+          format="YYYY-MM-DD"
+          
+          multiple
+          sort
+          
+          //mask="____/__/__"
+          //multiple={ this.props.multiple && this.props.multiple === true ? true : false }
+          //disableCloseOnSelect={true}
+          //inputFormat="yyyy-MM-dd"
+          style={{ width: '100%' }}
+          label={this.props.label}
+          value={this.props.value}
+          onChange={this.props.func}
+        />
+      </>
     )
   }
-}*/
+}
+
+export class MyDatePickerTest extends React.PureComponent {
+  constructor(props) {
+    super(props);
+        
+    this.state = {
+      classes: this.props.classes,
+    };
+  }
+  
+  render(){
+    return (
+      <DatePicker 
+        multiple
+        value={this.props.value}
+        onChange={this.props.func}
+      />
+    )
+  }
+}
 
 export class MyCheckBox extends React.PureComponent {
   constructor(props) {

@@ -10,7 +10,8 @@ const { VendorModule } = require( '../src/components/vendor_module' );
 const { VendorItemPrice } = require( '../src/components/vendor_item_price' );
 const { Tender } = require( '../src/components/tender' );
 const { Revizion, RevizionNew } = require( '../src/components/revizion' );
-
+const { WorkSchedule } = require( '../src/components/work_schedule' );
+const { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat } = require( '../src/components/site_sale_2' );
 
 
 module.exports = [
@@ -97,6 +98,42 @@ module.exports = [
         exact: true,
         component: RevizionNew,
         title: 'Новая ревизия',
+        code: 200
+    },
+    {
+        path: '/work_schedule',
+        exact: true,
+        component: WorkSchedule,
+        title: 'График работы',
+        code: 200
+    },
+    
+    {
+        path: '/site_sale_2',
+        exact: true,
+        component: SiteSale2,
+        title: 'Промокоды маркетолога',
+        code: 200
+    },
+    {
+        path: '/site_sale_2/new',
+        exact: true,
+        component: SiteSale2_New,
+        title: 'Промокоды маркетолога',
+        code: 200
+    },
+    {
+        path: '/site_sale_2/edit/:promoId',
+        exact: true,
+        component: SiteSale2_Edit,
+        title: 'Промокоды маркетолога',
+        code: 200
+    },
+    {
+        path: '/site_sale_2/stat',
+        exact: true,
+        component: SiteSale2_Stat,
+        title: 'Промокоды маркетолога',
         code: 200
     },
     
