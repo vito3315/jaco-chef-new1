@@ -292,7 +292,7 @@ class SiteSale2_new_ extends React.Component {
       textSMS: '',
       
       
-      addItem: 1,
+      addItem: null,
       addItemCount: 1,
       addItemPrice: 1,
       addItemAllPrice: 0,
@@ -304,7 +304,7 @@ class SiteSale2_new_ extends React.Component {
       saleCat: [],
       saleItem: [],
       
-      priceItem: 1,
+      priceItem: null,
       
       conditionItems: [],
       
@@ -656,7 +656,7 @@ class SiteSale2_new_ extends React.Component {
         }
       } )
       
-      itemText = itemText.substring(0, item.length - 2);
+      itemText = itemText.substring(0, itemText.length - 2);
 
       textTrue = this.state.itemsAdd.length == 1 ? 'позицию '+itemText : 'позиции '+itemText;
     }	
@@ -664,13 +664,13 @@ class SiteSale2_new_ extends React.Component {
     if(parseInt(promo_action) == 3){//товар за цену
       var itemText = '';
 
-      this.state.promo_items_sale.map( (item, key) => {
+      this.state.itemsAddPrice.map( (item, key) => {
         itemText += item['name']+' по '+item['price']+'руб., ';
       } )
       
       itemText = itemText.substring(0, itemText.length - 2);
 
-      textTrue = this.state.promo_items_sale.length-1 == 1 ? 'позицию '+itemText : 'позиции '+itemText;
+      textTrue = this.state.itemsAddPrice.length-1 == 1 ? 'позицию '+itemText : 'позиции '+itemText;
     }
     
     let textSMS = 'Промокод --promo_name--, действует до '+formatDateName(this.state.date_end)+'. Заказывай на jacofood.ru!'
@@ -747,13 +747,13 @@ class SiteSale2_new_ extends React.Component {
   addItemAdd(){
     let thisItems = this.state.itemsAdd;
     
-    let check = thisItems.find( (item) => parseInt(item.item_id) == parseInt(this.state.addItem) );
+    let check = thisItems.find( (item) => parseInt(item.item_id) == parseInt(this.state.addItem.id) );
     
     if( !check ){
-      let thisItem = this.state.items.find( (item) => parseInt(item.id) == parseInt(this.state.addItem) );
+      let thisItem = this.state.items.find( (item) => parseInt(item.id) == parseInt(this.state.addItem.id) );
       
       thisItems.push({
-        item_id: this.state.addItem,
+        item_id: this.state.addItem.id,
         name: thisItem.name,
         count: this.state.addItemCount,
         price: this.state.addItemPrice,
@@ -770,18 +770,45 @@ class SiteSale2_new_ extends React.Component {
         addItemAllPrice: addItemAllPrice
       })
     }
+    
+    setTimeout( () => {
+      this.generateTextDescFalse();  
+      this.generateTextDescTrue();    
+    }, 300 )
+  }
+  
+  delItemAdd(item){
+    let thisItems = this.state.itemsAdd;
+    
+    let newItems = thisItems.filter( (it) => parseInt(it.item_id) != parseInt(item.item_id) );
+    
+    let addItemAllPrice = 0;
+      
+    newItems.map( (item) => {
+      addItemAllPrice += parseInt(item.price)
+    } )
+    
+    this.setState({
+      itemsAdd: newItems,
+      addItemAllPrice: addItemAllPrice
+    })
+    
+    setTimeout( () => {
+      this.generateTextDescFalse();  
+      this.generateTextDescTrue();    
+    }, 300 )
   }
   
   priceItemAdd(){
     let thisItems = this.state.itemsAddPrice;
     
-    let check = thisItems.find( (item) => parseInt(item.item_id) == parseInt(this.state.priceItem) );
+    let check = thisItems.find( (item) => parseInt(item.item_id) == parseInt(this.state.priceItem.id) );
     
     if( !check ){
-      let thisItem = this.state.items.find( (item) => parseInt(item.id) == parseInt(this.state.priceItem) );
+      let thisItem = this.state.items.find( (item) => parseInt(item.id) == parseInt(this.state.priceItem.id) );
       
       thisItems.push({
-        item_id: this.state.priceItem,
+        item_id: this.state.priceItem.id,
         name: thisItem.name,
         price: this.state.addItemPrice,
       })
@@ -790,6 +817,32 @@ class SiteSale2_new_ extends React.Component {
         itemsAddPrice: thisItems
       })
     }
+    
+    setTimeout( () => {
+      this.generateTextDescFalse();  
+      this.generateTextDescTrue();    
+    }, 300 )
+  }
+  
+  delItemPrice(item){
+    let thisItems = this.state.itemsAddPrice;
+    
+    let newItems = thisItems.filter( (it) => parseInt(it.item_id) != parseInt(item.item_id) );
+    
+    let addItemAllPrice = 0;
+      
+    newItems.map( (item) => {
+      addItemAllPrice += parseInt(item.price)
+    } )
+    
+    this.setState({
+      itemsAddPrice: newItems
+    })
+    
+    setTimeout( () => {
+      this.generateTextDescFalse();  
+      this.generateTextDescTrue();    
+    }, 300 )
   }
   
   render(){
@@ -894,7 +947,7 @@ class SiteSale2_new_ extends React.Component {
             <Grid container direction="row" justifyContent="center" style={{ paddingTop: 20 }} spacing={3}>
               
               <Grid item xs={12} sm={3}>
-                <MySelect classes={this.state.classes} data={this.state.items} value={this.state.addItem} func={ this.changeData.bind(this, 'addItem') } label='Позиция' />
+                <MyAutocomplite classes={this.state.classes} data={this.state.items} value={this.state.addItem} func={ (event, data) => { this.changeDataData('addItem', data) } } label='Позиция' />
               </Grid>
             
               <Grid item xs={12} sm={3}>
@@ -931,7 +984,7 @@ class SiteSale2_new_ extends React.Component {
                         <TableCell>{item.name}</TableCell>
                         <TableCell>{item.count}</TableCell>
                         <TableCell>{item.price}</TableCell>
-                        <TableCell></TableCell>
+                        <TableCell> <CloseIcon onClick={this.delItemAdd.bind(this, item)} style={{ cursor: 'pointer' }} /> </TableCell>
                       </TableRow>
                     ) }
                     
@@ -957,7 +1010,7 @@ class SiteSale2_new_ extends React.Component {
             <Grid container direction="row" justifyContent="center" style={{ paddingTop: 20 }} spacing={3}>
               
               <Grid item xs={12} sm={3}>
-                <MySelect classes={this.state.classes} data={this.state.items} value={this.state.priceItem} func={ this.changeData.bind(this, 'priceItem') } label='Позиция' />
+                <MyAutocomplite classes={this.state.classes} data={this.state.items} value={this.state.priceItem} func={ (event, data) => { this.changeDataData('priceItem', data) } } label='Позиция' />
               </Grid>
             
               <Grid item xs={12} sm={3}>
@@ -988,7 +1041,7 @@ class SiteSale2_new_ extends React.Component {
                       <TableRow key={key}>
                         <TableCell>{item.name}</TableCell>
                         <TableCell>{item.price}</TableCell>
-                        <TableCell></TableCell>
+                        <TableCell> <CloseIcon onClick={this.delItemPrice.bind(this, item)} style={{ cursor: 'pointer' }} /> </TableCell>
                       </TableRow>
                     ) }
                     
