@@ -324,9 +324,6 @@ class WorkSchedule_ extends React.Component {
   }
   
   async saveDayHourse(){
-    console.log( this.state.userInfo )
-<<<<<<< Updated upstream
-    
     let data = {
       date: this.state.userInfo.date,
       user_id: this.state.userInfo.user_id,
@@ -378,10 +375,8 @@ class WorkSchedule_ extends React.Component {
     let res = await this.getData('save_fastTime', data);
     
     console.log( res );
-=======
->>>>>>> Stashed changes
   }
-  
+
   render(){
     return (
       <>
@@ -486,7 +481,6 @@ class WorkSchedule_ extends React.Component {
               <Typography>{'Моя нагрузка: ' + this.state.userInfo.user.my_load_h + ' / Средняя нагрузка: ' + this.state.userInfo.user.all_load_h}</Typography>
               <Typography style={{ marginBottom: 10 }}>{'Бонус: ' + this.state.userInfo.user.bonus}</Typography>
               
-<<<<<<< Updated upstream
               { this.state.otherAppList.length == 0 ? null :
                 <MySelect data={this.state.otherAppList} value={this.state.userInfo.new_app} func={ (event) => { let userInfo = this.state.userInfo; userInfo.new_app = event.target.value; this.setState({ userInfo: userInfo }) } } label='Кем работает' />
               }
@@ -500,9 +494,6 @@ class WorkSchedule_ extends React.Component {
                 expanded={this.state.openNewTimeAdd} 
                 onChange={ () => { this.setState({ openNewTimeAdd: !this.state.openNewTimeAdd }) } }>
                   
-=======
-              <Accordion style={{ marginTop: 10 }}>
->>>>>>> Stashed changes
                 <AccordionSummary
                   expandIcon={<AddIcon />}
                 >
