@@ -34,6 +34,11 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 
+
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Box from '@mui/material/Box';
+
 import PropTypes from 'prop-types';
 import Avatar from '@mui/material/Avatar';
 import List from '@mui/material/List';
@@ -120,6 +125,86 @@ SimpleDialog.propTypes = {
   selectedValue: PropTypes.string.isRequired,
 };
 
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>{children}</Box>
+      )}
+    </div>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+class HeaderItem extends React.Component {
+  render(){
+    return (
+      <>
+        <TableRow>
+          <TableCell></TableCell>
+          <TableCell>Число месяца</TableCell>
+          <TableCell></TableCell>
+          
+          {this.props.days.map( (item, key) => 
+            <TableCell className="min_block" style={{ backgroundColor: item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс' ? '#ffe9bd' : '#fff' }} key={key}>{item.date}</TableCell>
+          )}
+          
+          <TableCell></TableCell>
+          <TableCell>+ / -</TableCell>
+          <TableCell>Ур дира: 9</TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+
+        </TableRow>
+        <TableRow>
+          <TableCell>Сотрудник</TableCell>
+          <TableCell>Должность</TableCell>
+          <TableCell></TableCell>
+          
+          {this.props.days.map( (item, key) => 
+            <TableCell className="min_block" style={{ backgroundColor: item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс' ? '#ffe9bd' : '#fff' }} key={key}>{item.day}</TableCell>
+          )}
+          
+          <TableCell>За 1ч</TableCell>
+          <TableCell>Командный бонус</TableCell>
+          <TableCell>За часы</TableCell>
+          <TableCell>Ошибки</TableCell>
+          <TableCell>Бонус</TableCell>
+          <TableCell>Всего</TableCell>
+          <TableCell>Выдано</TableCell>
+
+        </TableRow>
+        
+        <TableRow style={{ backgroundColor: '#e5e5e5' }}>
+          <TableCell style={{ textAlign: 'center' }} colSpan={ this.props.days.length + 3 }>{this.props.item.data}</TableCell>
+        </TableRow>
+      </>
+    )
+  }
+}
+
 class WorkSchedule_ extends React.Component {
   constructor(props) {
     super(props);
@@ -139,6 +224,7 @@ class WorkSchedule_ extends React.Component {
       one: null,
       two: null,
       test_one: [],
+      test_two: [],
       
       isOpenModalH: false,
       
@@ -161,7 +247,9 @@ class WorkSchedule_ extends React.Component {
       mainMenu: false,
       mainMenuH: false,
       
-      chooseUser: null
+      chooseUser: null,
+
+      tabTable: 1
     };
   }
   
@@ -267,6 +355,7 @@ class WorkSchedule_ extends React.Component {
   async updateData(){
     let data = {
       point_id: this.state.point,
+      mounth: this.state.mounth
     };
     
     let res = await this.getData('get_graph', data);
@@ -277,7 +366,8 @@ class WorkSchedule_ extends React.Component {
       one: res.date.one,
       two: res.date.two,
       
-      test_one: res.one
+      test_one: res.one,
+      test_two: res.two,
     })
   }
   
@@ -368,7 +458,7 @@ class WorkSchedule_ extends React.Component {
       type: type,
       user_id: this.state.chooseUser.id,
       app_id: this.state.chooseUser.app_id,
-      smena_id: this.state.chooseUser.id,
+      smena_id: this.state.chooseUser.smena_id,
       date: this.state.mounth
     }
     
@@ -572,114 +662,197 @@ class WorkSchedule_ extends React.Component {
           
             
               
+          <Box sx={{ width: '100%' }}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Tabs value={this.state.tabTable} onChange={ (event, data) => { this.setState({ tabTable: data }) } } centered >
+                <Tab label="С 1 по 15 числа" {...a11yProps(0)} />
+                <Tab label="С 16 по конец месяца" {...a11yProps(1)} />
+              </Tabs>
+            </Box>
+            <TabPanel value={this.state.tabTable} index={0}>
+              { !this.state.one ? null :
+                <TableContainer component={Paper}>
+                  <Table aria-label="a dense table" id="table_graph_one">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell>Число месяца</TableCell>
+                        <TableCell></TableCell>
+                        
+                        {this.state.one.days.map( (item, key) => 
+                          <TableCell className="min_block" style={{ backgroundColor: item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс' ? '#ffe9bd' : '#fff' }} key={key}>{item.date}</TableCell>
+                        )}
+                        
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>Сотрудник</TableCell>
+                        <TableCell>Должность</TableCell>
+                        <TableCell></TableCell>
+                        
+                        {this.state.one.days.map( (item, key) => 
+                          <TableCell className="min_block" style={{ backgroundColor: item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс' ? '#ffe9bd' : '#fff' }} key={key}>{item.day}</TableCell>
+                        )}
+                        
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      
+                      { this.state.test_one.map( (item, key) =>
+                        item.row == 'header' ?
+                          <TableRow key={key} style={{ backgroundColor: '#e5e5e5' }}>
+                            <TableCell style={{ textAlign: 'center' }} colSpan={ this.state.one.days.length + 3 }>{item.data}</TableCell>
+                          </TableRow>
+                            :
+                          <TableRow key={key}>
+                            <TableCell>{item.data.user_name}</TableCell>
+                            <TableCell>{item.data.app_name}</TableCell>
+                            <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer' }} onClick={ () => { this.setState({ mainMenu: true, chooseUser: item.data }) } } /> </TableCell>
+                            
+                            { item.data.dates.map( (date, date_k) =>
+                              <TableCell onClick={ this.openH.bind(this, item.data, date.date) } className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
+                            ) }
+                            
+                          </TableRow>
+                      ) }
+                      
+                      
+                    </TableBody>
+                    
+                    <TableFooter>
+                      <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                        
+                        {this.state.one.bonus.map( (item, key) => 
+                          <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
+                        )}
+                        
+                      </TableRow>
+                      
+                      <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell>Роллов</TableCell>
+                        <TableCell></TableCell>
+                        
+                        {this.state.one.bonus.map( (item, key) => 
+                          <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
+                        )}
+                        
+                      </TableRow>
+                      
+                      <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell>Пиццы</TableCell>
+                        <TableCell></TableCell>
+                        
+                        {this.state.one.bonus.map( (item, key) => 
+                          <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
+                        )}
+                        
+                      </TableRow>
+                      
+                      <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell className="min_size">Заказы готовились больше 40 минут</TableCell>
+                        <TableCell></TableCell>
+                        
+                        {this.state.one.order_stat.map( (item, key) => 
+                          <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
+                        )}
+                        
+                      </TableRow>
+                      
+                    </TableFooter>
+                    
+                    
+                  </Table>
+                </TableContainer>
+              }
+            </TabPanel>
+            <TabPanel value={this.state.tabTable} index={1}>
+              { !this.state.two ? null :
+                <TableContainer component={Paper}>
+                  <Table aria-label="a dense table" id="table_graph_one">
+                    
+                    <TableBody>
+                      
+                      { this.state.test_two.map( (item, key) =>
+                        item.row == 'header' ?
+                          <HeaderItem key={key} days={this.state.two.days} item={item} />
+                            :
+                          <TableRow key={key}>
+                            <TableCell>{item.data.user_name}</TableCell>
+                            <TableCell>{item.data.app_name}</TableCell>
+                            <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer' }} onClick={ () => { this.setState({ mainMenu: true, chooseUser: item.data }) } } /> </TableCell>
+                            
+                            { item.data.dates.map( (date, date_k) =>
+                              <TableCell onClick={ this.openH.bind(this, item.data, date.date) } className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
+                            ) }
+                            
+                          </TableRow>
+                      ) }
+                      
+                      
+                    </TableBody>
+                    
+                    <TableFooter>
+                      <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                        
+                        {this.state.two.bonus.map( (item, key) => 
+                          <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
+                        )}
+                        
+                      </TableRow>
+                      
+                      <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell>Роллов</TableCell>
+                        <TableCell></TableCell>
+                        
+                        {this.state.two.bonus.map( (item, key) => 
+                          <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
+                        )}
+                        
+                      </TableRow>
+                      
+                      <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell>Пиццы</TableCell>
+                        <TableCell></TableCell>
+                        
+                        {this.state.two.bonus.map( (item, key) => 
+                          <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
+                        )}
+                        
+                      </TableRow>
+                      
+                      <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell className="min_size">Заказы готовились больше 40 минут</TableCell>
+                        <TableCell></TableCell>
+                        
+                        {this.state.two.order_stat.map( (item, key) => 
+                          <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
+                        )}
+                        
+                      </TableRow>
+                      
+                    </TableFooter>
+                    
+                    
+                  </Table>
+                </TableContainer>
+              }
+            </TabPanel>
+            
+          </Box>
           
           
           
-          <Grid item xs={12} sm={12}>
-            
-            { !this.state.one ? null :
-              <TableContainer component={Paper}>
-                <Table aria-label="a dense table" id="table_graph_one">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell></TableCell>
-                      <TableCell>Число месяца</TableCell>
-                      <TableCell></TableCell>
-                      
-                      {this.state.one.days.map( (item, key) => 
-                        <TableCell className="min_block" style={{ backgroundColor: item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс' ? '#ffe9bd' : '#fff' }} key={key}>{item.date}</TableCell>
-                      )}
-                      
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Сотрудник</TableCell>
-                      <TableCell>Должность</TableCell>
-                      <TableCell></TableCell>
-                      
-                      {this.state.one.days.map( (item, key) => 
-                        <TableCell className="min_block" style={{ backgroundColor: item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс' ? '#ffe9bd' : '#fff' }} key={key}>{item.day}</TableCell>
-                      )}
-                      
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    
-                    { this.state.test_one.map( (item, key) =>
-                      item.row == 'header' ?
-                        <TableRow key={key} style={{ backgroundColor: '#e5e5e5' }}>
-                          <TableCell style={{ textAlign: 'center' }} colSpan={ this.state.one.days.length + 3 }>{item.data}</TableCell>
-                        </TableRow>
-                          :
-                        <TableRow key={key}>
-                          <TableCell>{item.data.user_name}</TableCell>
-                          <TableCell>{item.data.app_name}</TableCell>
-                          <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer' }} onClick={ () => { this.setState({ mainMenu: true, chooseUser: item.data }) } } /> </TableCell>
-                          
-                          { item.data.dates.map( (date, date_k) =>
-                            <TableCell onClick={ this.openH.bind(this, item.data, date.date) } className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
-                          ) }
-                          
-                        </TableRow>
-                    ) }
-                    
-                    
-                  </TableBody>
-                  
-                  <TableFooter>
-                    <TableRow>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      
-                      {this.state.one.bonus.map( (item, key) => 
-                        <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
-                      )}
-                      
-                    </TableRow>
-                    
-                    <TableRow>
-                      <TableCell></TableCell>
-                      <TableCell>Роллов</TableCell>
-                      <TableCell></TableCell>
-                      
-                      {this.state.one.bonus.map( (item, key) => 
-                        <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
-                      )}
-                      
-                    </TableRow>
-                    
-                    <TableRow>
-                      <TableCell></TableCell>
-                      <TableCell>Пиццы</TableCell>
-                      <TableCell></TableCell>
-                      
-                      {this.state.one.bonus.map( (item, key) => 
-                        <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
-                      )}
-                      
-                    </TableRow>
-                    
-                    <TableRow>
-                      <TableCell></TableCell>
-                      <TableCell className="min_size">Заказы готовились больше 40 минут</TableCell>
-                      <TableCell></TableCell>
-                      
-                      {this.state.one.order_stat.map( (item, key) => 
-                        <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
-                      )}
-                      
-                    </TableRow>
-                    
-                  </TableFooter>
-                  
-                  
-                </Table>
-              </TableContainer>
-            }
-            
-            
-            
-          </Grid>
         </Grid>
       </>
     )

@@ -12,6 +12,7 @@ const { Tender } = require( '../src/components/tender' );
 const { Revizion, RevizionNew } = require( '../src/components/revizion' );
 const { WorkSchedule } = require( '../src/components/work_schedule' );
 const { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat } = require( '../src/components/site_sale_2' );
+const { DriveMapStatAll } = require( '../src/components/drive_map_stat_all' );
 
 
 module.exports = [
@@ -134,6 +135,13 @@ module.exports = [
         exact: true,
         component: SiteSale2_Stat,
         title: 'Промокоды маркетолога',
+        code: 200
+    },
+    {
+        path: '/drive_map_stat_all',
+        exact: true,
+        component: DriveMapStatAll,
+        title: 'Курьеры на карте',
         code: 200
     },
     
