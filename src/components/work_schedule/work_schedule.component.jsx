@@ -55,6 +55,8 @@ import LooksOneIcon from '@mui/icons-material/LooksOne';
 import LooksTwoIcon from '@mui/icons-material/LooksTwo';
 import Looks3Icon from '@mui/icons-material/Looks3';
 
+import AssessmentIcon from '@mui/icons-material/Assessment';
+
 import { MySelect, MyCheckBox, MyTimePicker } from '../../stores/elements';
 
 const queryString = require('query-string');
@@ -170,8 +172,10 @@ class HeaderItem extends React.Component {
           )}
           
           <TableCell></TableCell>
-          <TableCell>+ / -</TableCell>
-          <TableCell>Ур дира: 9</TableCell>
+          
+          <TableCell style={{ textAlign: 'center' }}>+ / -</TableCell>
+          <TableCell style={{ textAlign: 'center' }}>Ур дира: 9</TableCell>
+              
           <TableCell></TableCell>
           <TableCell></TableCell>
           <TableCell></TableCell>
@@ -187,18 +191,18 @@ class HeaderItem extends React.Component {
             <TableCell className="min_block" style={{ backgroundColor: item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс' ? '#ffe9bd' : '#fff' }} key={key}>{item.day}</TableCell>
           )}
           
-          <TableCell>За 1ч</TableCell>
-          <TableCell>Командный бонус</TableCell>
-          <TableCell>За часы</TableCell>
-          <TableCell>Ошибки</TableCell>
-          <TableCell>Бонус</TableCell>
-          <TableCell>Всего</TableCell>
-          <TableCell>Выдано</TableCell>
+          <TableCell style={{ textAlign: 'center' }}>За 1ч</TableCell>
+          <TableCell style={{ textAlign: 'center' }}>Командный бонус</TableCell>
+          <TableCell style={{ textAlign: 'center' }}>За часы</TableCell>
+          <TableCell style={{ textAlign: 'center' }}>Ошибки</TableCell>
+          <TableCell style={{ textAlign: 'center' }}>Бонус</TableCell>
+          <TableCell style={{ textAlign: 'center' }}>Всего</TableCell>
+          <TableCell style={{ textAlign: 'center' }}>Выдано</TableCell>
 
         </TableRow>
         
         <TableRow style={{ backgroundColor: '#e5e5e5' }}>
-          <TableCell style={{ textAlign: 'center' }} colSpan={ this.props.days.length + 3 }>{this.props.item.data}</TableCell>
+          <TableCell style={{ textAlign: 'center' }} colSpan={ this.props.days.length + 3 + 7 }>{this.props.item.data}</TableCell>
         </TableRow>
       </>
     )
@@ -246,6 +250,9 @@ class WorkSchedule_ extends React.Component {
       
       mainMenu: false,
       mainMenuH: false,
+      mainMenuSmena: false,
+
+      myOtherSmens: [],
       
       chooseUser: null,
 
@@ -467,6 +474,21 @@ class WorkSchedule_ extends React.Component {
     console.log( res );
   }
 
+  async fastSmena(smena_id){
+    let data = {
+      new_smena_id: smena_id,
+      user_id: this.state.chooseUser.id,
+      app_id: this.state.chooseUser.app_id,
+      smena_id: this.state.chooseUser.smena_id,
+      date: this.state.mounth,
+      part: this.state.tabTable
+    }
+    
+    let res = await this.getData('save_fastSmena', data);
+    
+    console.log( res );
+  }
+
   render(){
     return (
       <>
@@ -491,7 +513,7 @@ class WorkSchedule_ extends React.Component {
               <ListItemText primary="Сменить часы на месяц" />
             </ListItem>
             
-            <ListItem button>
+            <ListItem button onClick={ () => { this.setState({ mainMenu: false, mainMenuSmena: true, myOtherSmens: this.state.chooseUser.other_smens }) } }>
               <ListItemAvatar>
                 <Avatar>
                   <SyncAltIcon />
@@ -553,6 +575,28 @@ class WorkSchedule_ extends React.Component {
               <ListItemText primary="С 4 числа 2/2 с 10 до 22 на месяц" />
             </ListItem>
             
+          </List>
+        </Dialog>
+
+        <Dialog onClose={ () => { this.setState({ mainMenuSmena: false }) } } open={this.state.mainMenuSmena}>
+          
+          { !this.state.chooseUser ? null :
+            <DialogTitle>{this.state.chooseUser.user_name} {this.state.mounth} Смена</DialogTitle>
+          }
+          
+          <List sx={{ pt: 0 }}>
+            
+            { this.state.myOtherSmens.map( (item, key) =>
+              <ListItem key={key} button onClick={this.fastSmena.bind(this, item.id)}>
+                <ListItemAvatar>
+                  <Avatar>
+                    <AssessmentIcon />
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText primary={item.name} />
+              </ListItem>
+            ) }
+        
           </List>
         </Dialog>
         
@@ -673,35 +717,12 @@ class WorkSchedule_ extends React.Component {
               { !this.state.one ? null :
                 <TableContainer component={Paper}>
                   <Table aria-label="a dense table" id="table_graph_one">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell></TableCell>
-                        <TableCell>Число месяца</TableCell>
-                        <TableCell></TableCell>
-                        
-                        {this.state.one.days.map( (item, key) => 
-                          <TableCell className="min_block" style={{ backgroundColor: item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс' ? '#ffe9bd' : '#fff' }} key={key}>{item.date}</TableCell>
-                        )}
-                        
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Сотрудник</TableCell>
-                        <TableCell>Должность</TableCell>
-                        <TableCell></TableCell>
-                        
-                        {this.state.one.days.map( (item, key) => 
-                          <TableCell className="min_block" style={{ backgroundColor: item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс' ? '#ffe9bd' : '#fff' }} key={key}>{item.day}</TableCell>
-                        )}
-                        
-                      </TableRow>
-                    </TableHead>
+                    
                     <TableBody>
                       
                       { this.state.test_one.map( (item, key) =>
                         item.row == 'header' ?
-                          <TableRow key={key} style={{ backgroundColor: '#e5e5e5' }}>
-                            <TableCell style={{ textAlign: 'center' }} colSpan={ this.state.one.days.length + 3 }>{item.data}</TableCell>
-                          </TableRow>
+                          <HeaderItem key={key} dataKey={key} days={this.state.one.days} item={item} />
                             :
                           <TableRow key={key}>
                             <TableCell>{item.data.user_name}</TableCell>
@@ -709,9 +730,17 @@ class WorkSchedule_ extends React.Component {
                             <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer' }} onClick={ () => { this.setState({ mainMenu: true, chooseUser: item.data }) } } /> </TableCell>
                             
                             { item.data.dates.map( (date, date_k) =>
-                              <TableCell onClick={ this.openH.bind(this, item.data, date.date) } className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
+                              <TableCell onClick={ this.openH.bind(this, item.data, date.date) } className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff', cursor: 'pointer' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
                             ) }
                             
+                            <TableCell style={{textAlign: 'center'}}>{item.data.price_p_h}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{item.data.given}</TableCell>
+
                           </TableRow>
                       ) }
                       
@@ -773,7 +802,7 @@ class WorkSchedule_ extends React.Component {
             <TabPanel value={this.state.tabTable} index={1}>
               { !this.state.two ? null :
                 <TableContainer component={Paper}>
-                  <Table aria-label="a dense table" id="table_graph_one">
+                  <Table aria-label="a dense table" id="table_graph_two">
                     
                     <TableBody>
                       
@@ -787,9 +816,17 @@ class WorkSchedule_ extends React.Component {
                             <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer' }} onClick={ () => { this.setState({ mainMenu: true, chooseUser: item.data }) } } /> </TableCell>
                             
                             { item.data.dates.map( (date, date_k) =>
-                              <TableCell onClick={ this.openH.bind(this, item.data, date.date) } className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
+                              <TableCell onClick={ this.openH.bind(this, item.data, date.date) } className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff', cursor: 'pointer' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
                             ) }
                             
+                            <TableCell style={{textAlign: 'center'}} >{item.data.price_p_h}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{item.data.given}</TableCell>
+
                           </TableRow>
                       ) }
                       
