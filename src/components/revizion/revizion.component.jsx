@@ -49,7 +49,7 @@ import Avatar from '@mui/material/Avatar';
 
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 
-import { MySelect } from '../../stores/elements';
+import { MySelect, MyCheckBox, MyTimePicker, MyTextInput, MyDaterange, MyAutocomplite, MyDatePicker } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -109,7 +109,7 @@ class Revizion_ extends React.Component {
       
       items: [],
       pf: [],
-      
+      all_data: [],
       chooseTab: 0,
       
     };
@@ -122,7 +122,8 @@ class Revizion_ extends React.Component {
     this.setState({
       points: data.point_list,
       point: data.point_list.length == 1 ? data.point_list[0].id : '0',
-      module_name: data.module_info.name
+      module_name: data.module_info.name,
+	  all_data: data.get_data_for_new_rev
     })
     
     document.title = data.module_info.name;
@@ -198,19 +199,55 @@ class Revizion_ extends React.Component {
     }, 300 )
   }
   
+   async search(event){
+	    
+		let data = {
+			point_id: this.state.point,
+			showReady: this.state.showReady === true ? 1 : 0
+		};
+    
+		// let res =  this.getData('get_orders', data);	
+		let res2 = this.state;
+		// let res3 = await this.getData('all_items_list', data);
+		// let word = event.target.value;
+   
+		console.log('res2');
+		console.log(res2);
+		//res2.forEach(element => console.log(element));
+		
+		
+		// data
+		// d.forEach(item => { 
+			// console.log(item);
+		// })
+  }
+  
   async updateData(){
+	  
     let data = {
-      point_id: this.state.point,
-      showReady: this.state.showReady === true ? 1 : 0
+      rev_id	: this.state.chooseRev,
+      point_id	: this.state.point,
     };
     
-    let res = await this.getData('get_orders', data);
-    
-    this.setState({
-      read: res.read,
-      onstol: res.onstol,
-      ordersQueue: res.prestol_new
+	console.log('data=');
+	console.log(data);
+	
+	// to do переписать
+    let res = await this.getData('get_data_rev', data);
+	
+	// отрисовка
+	this.setState({
+      items: 	res.item,
+      rec: 		res.rec,
+      pf: 		res.pf
     })
+	console.log('res=');
+    console.log(res);
+    // this.setState({
+      // read: res.read,
+      // onstol: res.onstol,
+      // ordersQueue: res.prestol_new
+    // })
   }
   
   async getRevList(){
@@ -267,6 +304,9 @@ class Revizion_ extends React.Component {
           </Grid>
           <Grid item xs={12} sm={6}>
             <MySelect data={this.state.revList} value={this.state.chooseRev} func={ this.changeRev.bind(this) } label='Ревизия' />
+          </Grid>
+		  <Grid item xs={12} sm={6}>
+			<MyTextInput classes={this.state.classes} func={ this.search.bind(this) } label='Поиск' />
           </Grid>
           <Grid item xs={12} sm={6}>
             <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
@@ -480,6 +520,7 @@ class RevizionNew_ extends React.Component {
         return;
       }
       
+	  
       setTimeout( () => {
         this.setState({
           is_load: false
