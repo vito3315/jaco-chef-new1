@@ -56,6 +56,7 @@ import LooksTwoIcon from '@mui/icons-material/LooksTwo';
 import Looks3Icon from '@mui/icons-material/Looks3';
 
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import CheckIcon from '@mui/icons-material/Check';
 
 import { MySelect, MyCheckBox, MyTimePicker } from '../../stores/elements';
 
@@ -185,8 +186,8 @@ class HeaderItem extends React.Component {
                 </>
                   :
                 <>
-                  <TableCell style={{ textAlign: 'center' }}>+ / -</TableCell>
-                  <TableCell style={{ textAlign: 'center' }} onClick={this.props.changeLVDir}>Ур. дира: {this.props.lv_dir}</TableCell>
+                  <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.props.changeDopBonus}>{ !this.props.bonus_other ? '+ / -' : parseInt(this.props.bonus_other) == 1 ? <AddIcon style={{ fontSize: 30, color: 'green' }} /> : <CloseIcon style={{ fontSize: 30, color: 'red' }} /> }</TableCell>
+                  <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.props.changeLVDir}>Ур. дира: {this.props.lv_dir}</TableCell>
                 </>
               }
                   
@@ -280,6 +281,7 @@ class WorkSchedule_ extends React.Component {
       show_bonus: false,
       mainMenuPrice: false,
       mainMenuLVDIR: false,
+      mainMenuDopBonus: false,
 
       show_zp_one: 0,
       show_zp_two: 0,
@@ -633,6 +635,35 @@ class WorkSchedule_ extends React.Component {
     }
   }
 
+  changeDopBonus(){
+    this.setState({
+      mainMenuDopBonus: true
+    })
+  }
+
+  async dop_bonus(type){
+    let data = {
+      date: this.state.mounth,
+      part: this.state.tabTable,
+      point_id: this.state.point,
+      type: type
+    }
+    
+    let res = await this.getData('save_dop_bonus', data);
+    
+    console.log( res );
+
+    if( res['st'] == true ){
+      this.setState({
+        mainMenuDopBonus: false
+      })
+
+      this.updateData();
+    }else{
+      alert(res['text'])
+    }
+  }
+
   render(){ 
     return (
       <>
@@ -787,6 +818,33 @@ class WorkSchedule_ extends React.Component {
           </List>
           
         </Dialog>
+
+        <Dialog onClose={ () => { this.setState({ mainMenuDopBonus: false }) } } open={this.state.mainMenuDopBonus}>
+          
+          <DialogTitle>{this.state.mounth} Командный бонус</DialogTitle>
+          
+          <List sx={{ pt: 0 }}>
+            
+            <ListItem button>
+              <ListItemAvatar>
+                <Avatar style={{ backgroundColor: 'green' }}>
+                  <CheckIcon style={{ color: '#fff' }} />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary={'Выдать'} />
+            </ListItem>
+            <ListItem button>
+              <ListItemAvatar>
+                <Avatar style={{ backgroundColor: 'red' }}>
+                  <CloseIcon style={{ color: '#fff' }} />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary={'Отказать'} />
+            </ListItem>
+            
+          </List>
+          
+        </Dialog>
         
         { !this.state.userInfo ? null :
           <Dialog
@@ -911,7 +969,7 @@ class WorkSchedule_ extends React.Component {
                       
                       { this.state.test_one.map( (item, key) =>
                         item.row == 'header' ?
-                          <HeaderItem key={key} changeLVDir={this.changeLVDir.bind(this)} kind={this.state.kind} show_zp={this.state.show_zp_one} lv_dir={this.state.lv_dir} lv_cafe={this.state.lv_cafe} dataKey={key} days={this.state.one.days} item={item} />
+                          <HeaderItem key={key} bonus_other={this.state.one.bonus_other} changeLVDir={this.changeLVDir.bind(this)} changeDopBonus={this.changeDopBonus.bind(this)} kind={this.state.kind} show_zp={this.state.show_zp_one} lv_dir={this.state.lv_dir} lv_cafe={this.state.lv_cafe} dataKey={key} days={this.state.one.days} item={item} />
                             :
                           <TableRow key={key}>
                             <TableCell style={{ minWidth: 140, minHeight: 38, position: 'absolute', backgroundColor: '#fff', marginLeft: '-1px', borderBottom: '2px solid #e5e5e5' }}>{item.data.user_name}</TableCell>
@@ -927,7 +985,7 @@ class WorkSchedule_ extends React.Component {
                             
                             { this.state.kind == 'manager' ? null :
                               <>
-                                <TableCell style={{textAlign: 'center', minWidth: 70}} onClick={ () => {this.setState({ mainMenuPrice: true, chooseUser: item.data }) } }>{item.data.price_p_h}</TableCell>
+                                <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}} onClick={ () => {this.setState({ mainMenuPrice: true, chooseUser: item.data }) } }>{item.data.price_p_h}</TableCell>
                                 <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
                                 <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
                                 <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
@@ -1021,7 +1079,7 @@ class WorkSchedule_ extends React.Component {
                       
                       { this.state.test_two.map( (item, key) =>
                         item.row == 'header' ?
-                          <HeaderItem changeLVDir={this.changeLVDir.bind(this)} key={key} kind={this.state.kind} show_zp={this.state.show_zp_two} lv_dir={this.state.lv_dir} lv_cafe={this.state.lv_cafe} dataKey={key} days={this.state.two.days} item={item} />
+                          <HeaderItem bonus_other={this.state.two.bonus_other} changeLVDir={this.changeLVDir.bind(this)} changeDopBonus={this.changeDopBonus.bind(this)} key={key} kind={this.state.kind} show_zp={this.state.show_zp_two} lv_dir={this.state.lv_dir} lv_cafe={this.state.lv_cafe} dataKey={key} days={this.state.two.days} item={item} />
                             :
                           <TableRow key={key}>
                             <TableCell style={{ minWidth: 140, minHeight: 38, position: 'absolute', backgroundColor: '#fff', marginLeft: '-1px', borderBottom: '2px solid #e5e5e5' }}>{item.data.user_name}</TableCell>
@@ -1037,7 +1095,7 @@ class WorkSchedule_ extends React.Component {
                             
                             { this.state.kind == 'manager' ? null :
                               <>
-                                <TableCell style={{textAlign: 'center', minWidth: 70}} onClick={ () => {this.setState({ mainMenuPrice: true, chooseUser: item.data }) } }>{item.data.price_p_h}</TableCell>
+                                <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}} onClick={ () => {this.setState({ mainMenuPrice: true, chooseUser: item.data }) } }>{item.data.price_p_h}</TableCell>
                                 <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
                                 <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
                                 <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
