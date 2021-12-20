@@ -160,14 +160,11 @@ function a11yProps(index) {
 
 class HeaderItem extends React.Component {
   render(){
-
-    console.log( 'dataKey', this.props.dataKey )
-
     return (
       <>
         <TableRow>
-          <TableCell></TableCell>
-          <TableCell>Число месяца</TableCell>
+          <TableCell style={{ minWidth: 140, minHeight: 38 }}>Ур. кафе: {this.props.lv_cafe}</TableCell>
+          <TableCell style={{ minWidth: 165, minHeight: 38 }}>Число месяца</TableCell>
 
           { this.props.kind == 'manager' ? null :
             <TableCell></TableCell>
@@ -189,7 +186,7 @@ class HeaderItem extends React.Component {
                   :
                 <>
                   <TableCell style={{ textAlign: 'center' }}>+ / -</TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>Ур дира: 9</TableCell>
+                  <TableCell style={{ textAlign: 'center' }} onClick={this.props.changeLVDir}>Ур. дира: {this.props.lv_dir}</TableCell>
                 </>
               }
                   
@@ -202,8 +199,8 @@ class HeaderItem extends React.Component {
 
         </TableRow>
         <TableRow>
-          <TableCell>Сотрудник</TableCell>
-          <TableCell>Должность</TableCell>
+          <TableCell style={{ minWidth: 140, minHeight: 38 }}>Сотрудник</TableCell>
+          <TableCell style={{ minWidth: 165, minHeight: 38 }}>Должность</TableCell>
           
           { this.props.kind == 'manager' ? null :
             <TableCell></TableCell>
@@ -282,6 +279,7 @@ class WorkSchedule_ extends React.Component {
       mainMenuSmena: false,
       show_bonus: false,
       mainMenuPrice: false,
+      mainMenuLVDIR: false,
 
       show_zp_one: 0,
       show_zp_two: 0,
@@ -291,7 +289,11 @@ class WorkSchedule_ extends React.Component {
       
       chooseUser: null,
 
-      tabTable: 1
+      tabTable: 1,
+
+      lv_cafe: 0,
+      lv_dir: 0,
+      arr_dir_lv: []
     };
   }
   
@@ -334,6 +336,16 @@ class WorkSchedule_ extends React.Component {
     
     document.title = res.module_info.name;
     
+    let arr_dir_lv = [];
+
+    for(let i = 1; i <= 20; i ++){
+      arr_dir_lv.push(i);
+    }
+
+    this.setState({
+      arr_dir_lv: arr_dir_lv
+    })
+
     setTimeout( () => {
       this.updateData();
     }, 100 )
@@ -413,7 +425,10 @@ class WorkSchedule_ extends React.Component {
 
       show_zp_one: res.show_zp_one,
       show_zp_two: res.show_zp_two,
-      kind: res.kind
+      kind: res.kind,
+
+      lv_cafe: res.lv_cafe,
+      lv_dir: res.lv_dir
     })
   }
   
@@ -590,6 +605,34 @@ class WorkSchedule_ extends React.Component {
     }
   }
 
+  changeLVDir(){
+    this.setState({
+      mainMenuLVDIR: true
+    })
+  }
+
+  async newLvDir(LV){
+    let data = {
+      date: this.state.mounth,
+      point_id: this.state.point,
+      dir_lv: LV
+    }
+    
+    let res = await this.getData('save_dir_lv', data);
+    
+    console.log( res );
+
+    if( res['st'] == true ){
+      this.setState({
+        mainMenuLVDIR: false
+      })
+
+      this.updateData();
+    }else{
+      alert(res['text'])
+    }
+  }
+
   render(){ 
     return (
       <>
@@ -724,6 +767,26 @@ class WorkSchedule_ extends React.Component {
             </List>
           }
         </Dialog>
+
+        <Dialog onClose={ () => { this.setState({ mainMenuLVDIR: false }) } } open={this.state.mainMenuLVDIR}>
+          
+          <DialogTitle>{this.state.mounth} Уровень директора</DialogTitle>
+          
+          <List sx={{ pt: 0 }}>
+            
+            { this.state.arr_dir_lv.map( (item, key) =>
+              <ListItem key={key} button style={ parseFloat(this.state.lv_dir) == parseFloat(item) ? { backgroundColor: 'green', color: '#fff' } : {} } onClick={this.newLvDir.bind(this, item)}>
+                <ListItemAvatar>
+                  <Avatar>
+                    <AssessmentIcon />
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText primary={item+' уровень'} />
+              </ListItem>
+            ) }
+          </List>
+          
+        </Dialog>
         
         { !this.state.userInfo ? null :
           <Dialog
@@ -848,11 +911,11 @@ class WorkSchedule_ extends React.Component {
                       
                       { this.state.test_one.map( (item, key) =>
                         item.row == 'header' ?
-                          <HeaderItem key={key} kind={this.state.kind} show_zp={this.state.show_zp_one} dataKey={key} days={this.state.one.days} item={item} />
+                          <HeaderItem key={key} changeLVDir={this.changeLVDir.bind(this)} kind={this.state.kind} show_zp={this.state.show_zp_one} lv_dir={this.state.lv_dir} lv_cafe={this.state.lv_cafe} dataKey={key} days={this.state.one.days} item={item} />
                             :
                           <TableRow key={key}>
-                            <TableCell style={{ minWidth: 180 }}>{item.data.user_name}</TableCell>
-                            <TableCell>{item.data.app_name}</TableCell>
+                            <TableCell style={{ minWidth: 140, minHeight: 38, position: 'absolute', backgroundColor: '#fff', marginLeft: '-1px', borderBottom: '2px solid #e5e5e5' }}>{item.data.user_name}</TableCell>
+                            <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
 
                             { this.state.kind == 'manager' ? null :
                               <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer' }} onClick={ () => { this.setState({ mainMenu: true, chooseUser: item.data }) } } /> </TableCell>
@@ -958,11 +1021,11 @@ class WorkSchedule_ extends React.Component {
                       
                       { this.state.test_two.map( (item, key) =>
                         item.row == 'header' ?
-                          <HeaderItem key={key} kind={this.state.kind} show_zp={this.state.show_zp_two} dataKey={key} days={this.state.two.days} item={item} />
+                          <HeaderItem changeLVDir={this.changeLVDir.bind(this)} key={key} kind={this.state.kind} show_zp={this.state.show_zp_two} lv_dir={this.state.lv_dir} lv_cafe={this.state.lv_cafe} dataKey={key} days={this.state.two.days} item={item} />
                             :
                           <TableRow key={key}>
-                            <TableCell style={{ minWidth: 180 }}>{item.data.user_name}</TableCell>
-                            <TableCell>{item.data.app_name}</TableCell>
+                            <TableCell style={{ minWidth: 140, minHeight: 38, position: 'absolute', backgroundColor: '#fff', marginLeft: '-1px', borderBottom: '2px solid #e5e5e5' }}>{item.data.user_name}</TableCell>
+                            <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
 
                             { this.state.kind == 'manager' ? null :
                               <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer' }} onClick={ () => { this.setState({ mainMenu: true, chooseUser: item.data }) } } /> </TableCell>
