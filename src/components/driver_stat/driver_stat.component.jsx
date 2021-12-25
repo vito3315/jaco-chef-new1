@@ -17,28 +17,15 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-
-import CloseIcon from '@mui/icons-material/Close';
-
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyTextInput, MyTimePicker, MyDaterange } from '../../stores/elements';
-import Typography from '@mui/material/Typography';
+import { MySelect, MyTextInput, MyDaterange } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -323,7 +310,7 @@ class DriverStat_ extends React.Component {
                     <TableCell>Кол-во по безналу</TableCell>
                     <TableCell>К сдаче</TableCell>
                     <TableCell>Довозы</TableCell>
-                    <TableCell>Часы</TableCell>
+                    <TableCell>-</TableCell>
                     <TableCell>Заказы</TableCell>
                     <TableCell>Заработал</TableCell>
                     <TableCell>Налички на руках</TableCell>
