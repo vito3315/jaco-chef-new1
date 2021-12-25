@@ -13,7 +13,9 @@ const { Revizion, RevizionNew } = require( '../src/components/revizion' );
 const { WorkSchedule } = require( '../src/components/work_schedule' );
 const { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat } = require( '../src/components/site_sale_2' );
 const { DriveMapStatAll } = require( '../src/components/drive_map_stat_all' );
+const { DriverStat } = require( '../src/components/driver_stat' );
 
+//
 
 module.exports = [
     {
@@ -142,6 +144,13 @@ module.exports = [
         exact: true,
         component: DriveMapStatAll,
         title: 'Курьеры на карте',
+        code: 200
+    },
+    {
+        path: '/driver_stat',
+        exact: true,
+        component: DriverStat,
+        title: 'Статистика курьеров',
         code: 200
     },
     
