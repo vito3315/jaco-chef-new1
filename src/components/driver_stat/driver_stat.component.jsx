@@ -309,6 +309,9 @@ class DriverStat_ extends React.Component {
                     <TableCell>Кол-во по налу</TableCell>
                     <TableCell>Кол-во по безналу</TableCell>
                     <TableCell>К сдаче</TableCell>
+
+                    <TableCell>Сдал за период</TableCell>
+
                     <TableCell>Довозы</TableCell>
                     <TableCell>-</TableCell>
                     <TableCell>Заказы</TableCell>
@@ -329,6 +332,9 @@ class DriverStat_ extends React.Component {
                       <TableCell>{item.count_cash}</TableCell>
                       <TableCell>{item.count_bank}</TableCell>
                       <TableCell>{item.sdacha}</TableCell>
+
+                      <TableCell>{item.give_by_date}</TableCell>
+
                       <TableCell>{item.dop_price ? item.dop_price : 0}</TableCell>
                       <TableCell>{item.my_price ? item.my_price : 0}</TableCell>
                       <TableCell>{item.my_orders}</TableCell>
