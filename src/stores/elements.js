@@ -17,6 +17,7 @@ import Stack from '@mui/material/Stack';
 
 //import Grid from '@mui/material/Grid';
 import ruLocale from "date-fns/locale/ru";
+
 /*import DateFnsUtils from '@date-io/date-fns';
 import {
   MuiPickersUtilsProvider,
@@ -29,8 +30,9 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 //import DatePicker from '@mui/lab/DatePicker';
 import Typography from '@mui/material/Typography';
 
+import DatePicker from '@mui/lab/DatePicker';
 
-import DatePicker from "react-multi-date-picker"
+//import DatePicker from "react-multi-date-picker"
 
 export class MyDaterange extends React.PureComponent {
   constructor(props) {
@@ -218,6 +220,30 @@ export class MyDatePicker extends React.PureComponent {
           onChange={this.props.func}
         />
       </>
+    )
+  }
+}
+
+export class MyDatePickerNew extends React.PureComponent {
+  constructor(props) {
+    super(props);
+        
+    this.state = {
+      classes: this.props.classes,
+    };
+  }
+  
+  render(){
+    return (
+      <LocalizationProvider dateAdapter={AdapterDateFns} locale={ruLocale}>
+        <DatePicker
+          inputFormat="yyyy-MM-dd"
+          label={this.props.label}
+          value={this.props.value}
+          onChange={this.props.func}
+          renderInput={(params) => <TextField variant="outlined" size={'small'} color='primary' style={{ width: '100%' }} {...params} />}
+        />
+      </LocalizationProvider>
     )
   }
 }

@@ -14,6 +14,7 @@ const { WorkSchedule } = require( '../src/components/work_schedule' );
 const { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat } = require( '../src/components/site_sale_2' );
 const { DriveMapStatAll } = require( '../src/components/drive_map_stat_all' );
 const { DriverStat } = require( '../src/components/driver_stat' );
+const { Concenter } = require( '../src/components/concenter' );
 
 //
 
@@ -151,6 +152,13 @@ module.exports = [
         exact: true,
         component: DriverStat,
         title: 'Статистика курьеров',
+        code: 200
+    },
+    {
+        path: '/concenter',
+        exact: true,
+        component: Concenter,
+        title: 'Контакт-центр',
         code: 200
     },
     

@@ -313,6 +313,7 @@ class DriverStat_ extends React.Component {
                     <TableCell>Сдал за период</TableCell>
 
                     <TableCell>Довозы</TableCell>
+                    <TableCell style={{ display: 'none' }}>Ошибки</TableCell>
                     <TableCell>-</TableCell>
                     <TableCell>Заказы</TableCell>
                     <TableCell>Заработал</TableCell>
@@ -336,6 +337,7 @@ class DriverStat_ extends React.Component {
                       <TableCell>{item.give_by_date}</TableCell>
 
                       <TableCell>{item.dop_price ? item.dop_price : 0}</TableCell>
+                      <TableCell style={{ display: 'none' }}>{item.err_summ}</TableCell>
                       <TableCell>{item.my_price ? item.my_price : 0}</TableCell>
                       <TableCell>{item.my_orders}</TableCell>
                       <TableCell>{item.my}</TableCell>
