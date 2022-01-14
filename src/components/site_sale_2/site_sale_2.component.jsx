@@ -12,37 +12,65 @@ import Button from '@mui/material/Button';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableFooter from '@mui/material/TableFooter';
-import Paper from '@mui/material/Paper';
 
 import Divider from '@mui/material/Divider';
+
+import CloseIcon from '@mui/icons-material/Close';
+
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-import CloseIcon from '@mui/icons-material/Close';
-
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyTimePicker, MyTextInput, MyDaterange, MyAutocomplite, MyDatePicker } from '../../stores/elements';
+import { MySelect, MyCheckBox, MyTimePicker, MyTextInput, MyDaterange, MyAutocomplite } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
+
+import DatePicker from "react-multi-date-picker"
+
+class MyDatePicker extends React.PureComponent {
+  constructor(props) {
+    super(props);
+        
+    this.state = {
+      classes: this.props.classes,
+    };
+  }
+  
+  render(){
+    return (
+      <>
+        <Typography>{this.props.label}</Typography>
+        <DatePicker
+          format="YYYY-MM-DD"
+          
+          multiple
+          sort
+          
+          //mask="____/__/__"
+          //multiple={ this.props.multiple && this.props.multiple === true ? true : false }
+          //disableCloseOnSelect={true}
+          //inputFormat="yyyy-MM-dd"
+          style={{ width: '100%' }}
+          label={this.props.label}
+          value={this.props.value}
+          onChange={this.props.func}
+        />
+      </>
+    )
+  }
+}
 
 const queryString = require('query-string');
 
@@ -2038,10 +2066,7 @@ class SiteSale2_ extends React.Component {
   }
   
   async componentDidMount(){
-    
     let data = await this.getData('get_all');
-    
-    console.log( data )
     
     this.setState({
       module_name: data.module_info.name,
@@ -2173,6 +2198,10 @@ class SiteSale2_ extends React.Component {
               
               <Link to={"/site_sale_2/stat"} style={{ zIndex: 10, marginLeft: 20 }}>
                 <Button variant="contained">Статистика</Button>
+              </Link>
+
+              <Link to={"/site_sale_2/stat_list"} style={{ zIndex: 10, marginLeft: 20 }}>
+                <Button variant="contained">Выписанные промокоды</Button>
               </Link>
               
             </Grid>
@@ -2429,6 +2458,191 @@ class SiteSale2_Stat_ extends React.Component {
   }
 }
 
+class SiteSale2_StatList_ extends React.Component {
+  click = false;
+  
+  constructor(props) {
+    super(props);
+        
+    this.state = {
+      classes: this.props.classes,
+      history: this.props.history,
+      module: 'site_sale_2',
+      module_name: '',
+      is_load: false,
+      
+      date_start: formatDate(new Date()),
+      date_end: formatDate(new Date()),
+      rangeDate: [formatDate(new Date()), formatDate(new Date())],
+
+      promo_list: []
+    };
+  }
+  
+  async componentDidMount(){
+    
+    let data = await this.getData('get_spam_list');
+    
+    console.log( data )
+    
+    this.setState({
+      module_name: data.module_info.name,
+      spam_list: data.spam_list
+    })
+    
+    document.title = data.module_info.name;
+  }
+  
+  getData = (method, data = {}) => {
+    
+    this.setState({
+      is_load: true
+    })
+    
+    return fetch('https://jacochef.ru/api/index_new.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type':'application/x-www-form-urlencoded'},
+      body: queryString.stringify({
+        method: method, 
+        module: this.state.module,
+        version: 2,
+        login: localStorage.getItem('token'),
+        data: JSON.stringify( data )
+      })
+    }).then(res => res.json()).then(json => {
+      
+      if( json.st === false && json.type == 'redir' ){
+        this.state.history.push("/");
+        return;
+      }
+      
+      if( json.st === false && json.type == 'auth' ){
+        window.location.pathname = '/auth';
+        return;
+      }
+      
+      setTimeout( () => {
+        this.setState({
+          is_load: false
+        })
+      }, 300 )
+      
+      return json;
+    })
+    .catch(err => { 
+      console.log( err )
+      
+      setTimeout( () => {
+        this.setState({
+          is_load: false
+        })
+      }, 300 )
+    });
+  }
+  
+  async show(){
+    let data = {
+      spam_id: this.state.spam_id
+    }
+    
+    let res = await this.getData('get_spam_data', data);
+    
+    console.log( res )
+    
+    this.setState({
+      spam_list_data: res.spam_list,
+      spam_list_data_stat: res.stat
+    })
+  }
+
+  async getUsers(){
+    let data = {
+      dateStart: this.state.date_start,
+      dateEnd: this.state.date_end,
+    }
+    
+    let res = await this.getData('get_promo_users', data);
+    
+    console.log( res )
+    
+    this.setState({
+      promo_list: res.promo_list
+    })
+  }
+  
+  changeDateRange(data){
+    let dateStart = data[0] ? formatDate(data[0]) : '';
+    let dateEnd = data[1] ? formatDate(data[1]) : '';
+    
+    this.setState({
+      rangeDate: [dateStart, dateEnd],
+      date_start: dateStart,
+      date_end: dateEnd,
+    })
+  }
+
+  render(){
+    return (
+      <>
+        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        
+        <Grid container>
+          <Grid item xs={12} sm={12}>
+            <h1>{this.state.module_name}</h1>
+          </Grid>
+          
+          
+          
+          <Grid container direction="row" style={{ paddingTop: 20 }} spacing={3}>
+            
+            <Grid item xs={12} sm={6} className="MyDaterange">
+              <MyDaterange startText="Дата от" endText="Дата до" value={this.state.rangeDate} func={ this.changeDateRange.bind(this) } />
+            </Grid>
+            
+            <Grid item xs={12} sm={3}>
+              <Button variant="contained" onClick={this.getUsers.bind(this)}>Обновить</Button>
+            </Grid>
+
+          </Grid>  
+          
+          <Grid item xs={12} sm={12} style={{ marginTop: 20 }}>
+            
+            { this.state.promo_list.map( (item, key) => 
+              <Accordion key={key} style={{ width: '100%' }}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                >
+                  <Typography>{item.name}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Table size={'small'} style={{ marginTop: 15 }}>
+                    <TableBody>
+                      { item.promo_list.map( (promo, k) =>
+                        <TableRow key={k}>
+                          <TableCell>{k+1}</TableCell>
+                          <TableCell>{promo.coment}</TableCell>
+                        </TableRow>
+                      ) }
+                    </TableBody>
+                    
+                  </Table>
+                </AccordionDetails>
+              </Accordion>
+            ) }
+            
+             
+          </Grid>
+          
+          
+        </Grid>
+      </>
+    )
+  }
+}
+
 export function SiteSale2_New () {
   const classes = useStyles();
   let history = useHistory();
@@ -2466,3 +2680,13 @@ export function SiteSale2_Stat () {
     <SiteSale2_Stat_ classes={classes} history={history} />
   );
 }
+
+export function SiteSale2_StatList () {
+  const classes = useStyles();
+  let history = useHistory();
+  
+  return (
+    <SiteSale2_StatList_ classes={classes} history={history} />
+  );
+}
+

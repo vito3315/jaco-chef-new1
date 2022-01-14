@@ -32,8 +32,6 @@ import Typography from '@mui/material/Typography';
 
 import DatePicker from '@mui/lab/DatePicker';
 
-//import DatePicker from "react-multi-date-picker"
-
 export class MyDaterange extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -237,6 +235,7 @@ export class MyDatePickerNew extends React.PureComponent {
     return (
       <LocalizationProvider dateAdapter={AdapterDateFns} locale={ruLocale}>
         <DatePicker
+          multiple={true}
           inputFormat="yyyy-MM-dd"
           label={this.props.label}
           value={this.props.value}

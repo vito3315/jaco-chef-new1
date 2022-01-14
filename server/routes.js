@@ -11,7 +11,7 @@ const { VendorItemPrice } = require( '../src/components/vendor_item_price' );
 const { Tender } = require( '../src/components/tender' );
 const { Revizion, RevizionNew } = require( '../src/components/revizion' );
 const { WorkSchedule } = require( '../src/components/work_schedule' );
-const { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat } = require( '../src/components/site_sale_2' );
+const { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat, SiteSale2_StatList } = require( '../src/components/site_sale_2' );
 const { DriveMapStatAll } = require( '../src/components/drive_map_stat_all' );
 const { DriverStat } = require( '../src/components/driver_stat' );
 const { Concenter } = require( '../src/components/concenter' );
@@ -138,6 +138,13 @@ module.exports = [
         exact: true,
         component: SiteSale2_Stat,
         title: 'Промокоды маркетолога',
+        code: 200
+    },
+    {
+        path: '/site_sale_2/stat_list',
+        exact: true,
+        component: SiteSale2_StatList,
+        title: 'Выписанные промики',
         code: 200
     },
     {
