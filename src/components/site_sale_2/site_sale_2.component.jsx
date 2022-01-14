@@ -19,6 +19,7 @@ import TableFooter from '@mui/material/TableFooter';
 import Divider from '@mui/material/Divider';
 
 import CloseIcon from '@mui/icons-material/Close';
+import CheckIcon from '@mui/icons-material/Check';
 
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -336,7 +337,8 @@ class SiteSale2_new_ extends React.Component {
       
       conditionItems: [],
       
-      testDate: []
+      testDate: [],
+      createdPromo: []
     };
   }
   
@@ -380,6 +382,10 @@ class SiteSale2_new_ extends React.Component {
     if( !this.click ){
       this.click = true;  
       
+      this.setState({
+        createdPromo: []
+      });
+
       let count_promo = this.state.promo_sale_list.find( (item) => parseInt(item.id) == parseInt(this.state.promo_sale) )['name'];
       
       let conditionItems = [];
@@ -470,6 +476,10 @@ class SiteSale2_new_ extends React.Component {
       
       console.log( res )
       
+      this.setState({
+        createdPromo: res.promo_text
+      });
+
       //создать
       if( parseInt(this.state.where_promo) == 1 || parseInt(this.state.where_promo) == 8 ){
         this.setState({
@@ -889,6 +899,11 @@ class SiteSale2_new_ extends React.Component {
           <DialogTitle id="alert-dialog-title">Результат операции</DialogTitle>
           <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             <Typography>{this.state.modalText}</Typography>
+
+            <br />
+
+            <Typography>Созданыне промокоды: { this.state.createdPromo.join(', ') }</Typography>
+
             <br />
             { this.state.modalLink == '' ? null :
               <a href={this.state.modalLink} style={{ color: 'red' }}>Скачать</a>
@@ -2564,8 +2579,6 @@ class SiteSale2_StatList_ extends React.Component {
     
     let res = await this.getData('get_promo_users', data);
     
-    console.log( res )
-    
     this.setState({
       promo_list: res.promo_list
     })
@@ -2621,9 +2634,11 @@ class SiteSale2_StatList_ extends React.Component {
                   <Table size={'small'} style={{ marginTop: 15 }}>
                     <TableBody>
                       { item.promo_list.map( (promo, k) =>
-                        <TableRow key={k}>
-                          <TableCell>{k+1}</TableCell>
-                          <TableCell>{promo.coment}</TableCell>
+                        <TableRow key={k} style={{ backgroundColor: parseInt(promo.is_delete) == 1 ? '#c03' : 'white', color: parseInt(promo.is_delete) == 1 ? 'white' : 'black' }}>
+                          <TableCell style={{ color: 'inherit' }}>{k+1}</TableCell>
+                          <TableCell style={{ color: 'inherit', backgroundColor: parseInt(promo.count) == 0 ? 'green' : '#c03' }}>{promo.name}</TableCell>
+                          <TableCell style={{ color: 'inherit' }}>{promo.coment}</TableCell>
+                          <TableCell style={{ color: 'inherit' }}>{ parseInt(promo.count) == 0 ? <CheckIcon /> : <CloseIcon /> }</TableCell>
                         </TableRow>
                       ) }
                     </TableBody>
@@ -2633,10 +2648,8 @@ class SiteSale2_StatList_ extends React.Component {
               </Accordion>
             ) }
             
-             
           </Grid>
-          
-          
+        
         </Grid>
       </>
     )
