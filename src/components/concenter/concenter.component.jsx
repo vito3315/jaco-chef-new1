@@ -42,7 +42,7 @@ import TextField from '@mui/material/TextField';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyDatePickerNew } from '../../stores/elements';
+import { MySelect, MyDatePickerNew, MyTextInput } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
 
 const queryString = require('query-string');
@@ -159,6 +159,7 @@ class Concenter_ extends React.Component {
       indexTab: 0,
 
       orders: [],
+      ordersRender: [],
       showOrder: null,
 
       radiogroup_options: [
@@ -170,6 +171,8 @@ class Concenter_ extends React.Component {
       ],
       textDel: '',
       typeDel: -1,
+
+      number: ''
     };
   }
   
@@ -281,8 +284,12 @@ class Concenter_ extends React.Component {
     console.log( res )
 
     this.setState({
-      orders: res.orders
+      orders: res.orders,
     })
+
+    setTimeout( () => {
+      this.filterNumber();
+    }, 300 )
   }
 
   async showOrder(order_id){
@@ -430,6 +437,37 @@ class Concenter_ extends React.Component {
     setTimeout( () => {
       this.getOrders();
     }, 300 )
+  }
+
+  changeNumber(event){
+    let value = event.target.value;
+    
+    if( isNaN(value) ){
+      return ;
+    }
+
+    this.setState({ number: value })
+
+    setTimeout( () => {
+      this.filterNumber();
+    }, 300 )
+  }
+
+  filterNumber(){
+
+    if( this.state.number.length == 0 ){
+      this.setState({
+        ordersRender: this.state.orders
+      })
+    }else{
+      let renderOrders = this.state.orders.filter( (item) => item.number.indexOf(this.state.number) !== -1 );
+
+      this.setState({
+        ordersRender: renderOrders
+      })
+    }
+
+    
   }
 
   render(){
@@ -633,6 +671,10 @@ class Concenter_ extends React.Component {
             <MyDatePickerNew label={'Дата'} value={this.state.date} func={ this.changeDate.bind(this) } />
           </Grid>
 
+          <Grid item xs={12} sm={3}>
+            <MyTextInput label={'Номер телефона'} value={this.state.number} func={ this.changeNumber.bind(this) } />
+          </Grid>
+
           
           
           
@@ -649,59 +691,59 @@ class Concenter_ extends React.Component {
           </Grid>
 
           <Grid item xs={12}>
-            <TableContainer component={Paper}>
-              <Table>
-                
-                <TableHead>
-                  <TableRow>
-                    <TableCell>#</TableCell>
-                    <TableCell>Заказ</TableCell>
-                    <TableCell>Оформил</TableCell>
-                    <TableCell>Номер клиента</TableCell>
-                    <TableCell>Адрес доставки</TableCell>
-                    <TableCell>Время открытия заказа</TableCell>
-
-                    <TableCell>Ко времени</TableCell>
-                    <TableCell>Получен клиентом</TableCell>
-
-                    <TableCell>До просрочки</TableCell>
-                    <TableCell>Время обещ</TableCell>
-
-                    <TableCell>Тип</TableCell>
-                    <TableCell>Статус</TableCell>
-                    <TableCell>Оплата</TableCell>
-                    <TableCell>Водитель</TableCell>
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  
-                  { this.state.orders.map( (item, key) =>
-                    <TableRow key={key} style={ parseInt(item.is_delete) == 1 ? {backgroundColor: 'red', color: '#fff', fontWeight: 'bold'} : {} }>
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{key+1}</TableCell>
-                      <TableCell style={ parseInt(item.dist) >= 0 ? {backgroundColor: 'yellow', color: '#000', cursor: 'pointer', fontWeight: 'inherit'} : {color: 'inherit', cursor: 'pointer', fontWeight: 'inherit'} } onClick={this.showOrder.bind(this, item.id)}>{item.id}</TableCell>
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.type_user}</TableCell>
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.number}</TableCell>
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.street} {item.home}</TableCell>
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.date_time_order}</TableCell>
-
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit', backgroundColor: parseInt(item.is_preorder) == 1 ? '#bababa' : 'inherit' }}>{item.need_time}</TableCell>
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.close_order}</TableCell>
-
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.to_time}</TableCell>
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.unix_time_to_client == '0' || parseInt(item.is_preorder) == 1 ? '' : item.unix_time_to_client}</TableCell>
-
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.type_order}</TableCell>
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.status}</TableCell>
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.type_pay}</TableCell>
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.driver}</TableCell>
-                    </TableRow>
-                  ) }
-                
-                </TableBody>
+            
+            <Table>
               
-              </Table>
-            </TableContainer>
+              <TableHead>
+                <TableRow>
+                  <TableCell>#</TableCell>
+                  <TableCell>Заказ</TableCell>
+                  <TableCell>Оформил</TableCell>
+                  <TableCell>Номер клиента</TableCell>
+                  <TableCell>Адрес доставки</TableCell>
+                  <TableCell>Время открытия заказа</TableCell>
+
+                  <TableCell>Ко времени</TableCell>
+                  <TableCell>Получен клиентом</TableCell>
+
+                  <TableCell>До просрочки</TableCell>
+                  <TableCell>Время обещ</TableCell>
+
+                  <TableCell>Тип</TableCell>
+                  <TableCell>Статус</TableCell>
+                  <TableCell>Оплата</TableCell>
+                  <TableCell>Водитель</TableCell>
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                
+                { this.state.ordersRender.map( (item, key) =>
+                  <TableRow key={key} style={ parseInt(item.is_delete) == 1 ? {backgroundColor: 'red', color: '#fff', fontWeight: 'bold'} : {} }>
+                    <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{key+1}</TableCell>
+                    <TableCell style={ parseInt(item.dist) >= 0 ? {backgroundColor: 'yellow', color: '#000', cursor: 'pointer', fontWeight: 'inherit'} : {color: 'inherit', cursor: 'pointer', fontWeight: 'inherit'} } onClick={this.showOrder.bind(this, item.id)}>{item.id}</TableCell>
+                    <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.type_user}</TableCell>
+                    <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.number}</TableCell>
+                    <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.street} {item.home}</TableCell>
+                    <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.date_time_order}</TableCell>
+
+                    <TableCell style={{ color: 'inherit', fontWeight: 'inherit', backgroundColor: parseInt(item.is_preorder) == 1 ? '#bababa' : 'inherit' }}>{item.need_time}</TableCell>
+                    <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.close_order}</TableCell>
+
+                    <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.to_time}</TableCell>
+                    <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.unix_time_to_client == '0' || parseInt(item.is_preorder) == 1 ? '' : item.unix_time_to_client}</TableCell>
+
+                    <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.type_order}</TableCell>
+                    <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.status}</TableCell>
+                    <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.type_pay}</TableCell>
+                    <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.driver}</TableCell>
+                  </TableRow>
+                ) }
+              
+              </TableBody>
+            
+            </Table>
+            
           </Grid>
           
         </Grid>
