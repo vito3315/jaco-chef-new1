@@ -241,7 +241,7 @@ class Concenter_ extends React.Component {
   changeCity(event){
     let data = event.target.value;
     
-    let need_points = data.points.filter( (item, key) => parseInt(item.city_id) == parseInt(data) );
+    let need_points = this.state.point_list.filter( (item, key) => parseInt(item.city_id) == parseInt(data) );
 
     this.setState({
       city_id: data,
@@ -671,7 +671,7 @@ class Concenter_ extends React.Component {
                     <TableCell>Ко времени</TableCell>
                     <TableCell>Получен клиентом</TableCell>
 
-                    <TableCell>Время</TableCell>
+                    <TableCell>До просрочки</TableCell>
                     <TableCell>Время обещ</TableCell>
 
                     <TableCell>Тип</TableCell>
@@ -692,11 +692,11 @@ class Concenter_ extends React.Component {
                       <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.street} {item.home}</TableCell>
                       <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.date_time_order}</TableCell>
 
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.date_time_preorder_text == '00:00:00' ? '' : item.date_time_preorder_text}</TableCell>
+                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.need_time}</TableCell>
                       <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.close_order}</TableCell>
 
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.time}</TableCell>
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.unix_time_to_client == '0' ? '' : item.unix_time_to_client}</TableCell>
+                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.to_time}</TableCell>
+                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.unix_time_to_client == '0' || parseInt(item.is_preorder) == 1 ? '' : item.unix_time_to_client}</TableCell>
 
                       <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.type_order}</TableCell>
                       <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.status}</TableCell>
