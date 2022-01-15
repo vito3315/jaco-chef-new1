@@ -274,6 +274,10 @@ class Concenter_ extends React.Component {
   }
 
   async getOrders(){
+    this.setState({
+      number: ''
+    })
+
     let data = {
       point_id: this.state.point_id,
       date: this.state.date
@@ -284,7 +288,7 @@ class Concenter_ extends React.Component {
     console.log( res )
 
     this.setState({
-      orders: res.orders,
+      orders: res.orders
     })
 
     setTimeout( () => {
@@ -454,7 +458,6 @@ class Concenter_ extends React.Component {
   }
 
   filterNumber(){
-
     if( this.state.number.length == 0 ){
       this.setState({
         ordersRender: this.state.orders
@@ -466,8 +469,6 @@ class Concenter_ extends React.Component {
         ordersRender: renderOrders
       })
     }
-
-    
   }
 
   render(){
@@ -693,7 +694,6 @@ class Concenter_ extends React.Component {
           <Grid item xs={12}>
             
             <Table>
-              
               <TableHead>
                 <TableRow>
                   <TableCell>#</TableCell>
