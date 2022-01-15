@@ -507,33 +507,26 @@ class Concenter_ extends React.Component {
                   <span>{this.state.showOrder.order.sum_order} р</span>
                 </Grid>
 
-                <Accordion style={{ width: '100%' }}>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                  >
-                    <Typography>Корзина</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Table size={'small'} style={{ marginTop: 15 }}>
-                      <TableBody>
-                        { this.state.showOrder.order_items.map( (item, key) =>
-                          <TableRow key={key}>
-                            <TableCell>{item.name}</TableCell>
-                            <TableCell>{item.count}</TableCell>
-                            <TableCell>{item.price} р</TableCell>
-                          </TableRow>
-                        ) }
-                      </TableBody>
-                      <TableFooter>
-                        <TableRow>
-                          <TableCell style={{fontWeight: 'bold', color: '#000'}}>Сумма закза</TableCell>
-                          <TableCell></TableCell>
-                          <TableCell style={{fontWeight: 'bold', color: '#000'}}>{this.state.showOrder.order.sum_order} р</TableCell>
+                <Grid item xs={12}>
+                  <Table size={'small'} style={{ marginTop: 15 }}>
+                    <TableBody>
+                      { this.state.showOrder.order_items.map( (item, key) =>
+                        <TableRow key={key}>
+                          <TableCell>{item.name}</TableCell>
+                          <TableCell>{item.count}</TableCell>
+                          <TableCell>{item.price} р</TableCell>
                         </TableRow>
-                      </TableFooter>
-                    </Table>
-                  </AccordionDetails>
-                </Accordion>
+                      ) }
+                    </TableBody>
+                    <TableFooter>
+                      <TableRow>
+                        <TableCell style={{fontWeight: 'bold', color: '#000'}}>Сумма закза</TableCell>
+                        <TableCell></TableCell>
+                        <TableCell style={{fontWeight: 'bold', color: '#000'}}>{this.state.showOrder.order.sum_order} р</TableCell>
+                      </TableRow>
+                    </TableFooter>
+                  </Table>
+                </Grid>
 
                 <Accordion style={{ width: '100%' }}>
                   <AccordionSummary
@@ -692,7 +685,7 @@ class Concenter_ extends React.Component {
                       <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.street} {item.home}</TableCell>
                       <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.date_time_order}</TableCell>
 
-                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.need_time}</TableCell>
+                      <TableCell style={{ color: 'inherit', fontWeight: 'inherit', backgroundColor: parseInt(item.is_preorder) == 1 ? '#bababa' : 'inherit' }}>{item.need_time}</TableCell>
                       <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.close_order}</TableCell>
 
                       <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.to_time}</TableCell>
