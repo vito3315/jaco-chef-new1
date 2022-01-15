@@ -242,6 +242,10 @@ class Concenter_ extends React.Component {
   }
    
   changeCity(event){
+    this.setState({
+      number: ''
+    })
+
     let data = event.target.value;
     
     let need_points = this.state.point_list.filter( (item, key) => parseInt(item.city_id) == parseInt(data) );
@@ -274,10 +278,6 @@ class Concenter_ extends React.Component {
   }
 
   async getOrders(){
-    this.setState({
-      number: ''
-    })
-
     let data = {
       point_id: this.state.point_id,
       date: this.state.date
@@ -294,6 +294,14 @@ class Concenter_ extends React.Component {
     setTimeout( () => {
       this.filterNumber();
     }, 300 )
+  }
+
+  btnGetOrders(){
+    this.setState({
+      number: ''
+    })
+
+    this.getOrders();
   }
 
   async showOrder(order_id){
@@ -432,8 +440,10 @@ class Concenter_ extends React.Component {
   }
 
   changeDate(val){
-    console.log( formatDate(val) )
-
+    this.setState({
+      number: ''
+    })
+    
     this.setState({
       date: formatDate(val)
     })
@@ -680,7 +690,7 @@ class Concenter_ extends React.Component {
           
           
           <Grid item xs={12} sm={3}>
-            <Button variant="contained" onClick={this.getOrders.bind(this)}>Обновить</Button>
+            <Button variant="contained" onClick={this.btnGetOrders.bind(this)}>Обновить</Button>
           </Grid>
           
           <Grid item xs={12}>
@@ -693,10 +703,9 @@ class Concenter_ extends React.Component {
 
           <Grid item xs={12}>
             
-            <Table>
+            <Table size={'small'}>
               <TableHead>
                 <TableRow>
-                  <TableCell>#</TableCell>
                   <TableCell>Заказ</TableCell>
                   <TableCell>Оформил</TableCell>
                   <TableCell>Номер клиента</TableCell>
@@ -712,6 +721,8 @@ class Concenter_ extends React.Component {
 
                   <TableCell>Тип</TableCell>
                   <TableCell>Статус</TableCell>
+
+                  <TableCell>Сумма</TableCell>
                   <TableCell>Оплата</TableCell>
                   <TableCell>Водитель</TableCell>
                 </TableRow>
@@ -721,7 +732,6 @@ class Concenter_ extends React.Component {
                 
                 { this.state.ordersRender.map( (item, key) =>
                   <TableRow key={key} style={ parseInt(item.is_delete) == 1 ? {backgroundColor: 'red', color: '#fff', fontWeight: 'bold'} : {} }>
-                    <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{key+1}</TableCell>
                     <TableCell style={ parseInt(item.dist) >= 0 ? {backgroundColor: 'yellow', color: '#000', cursor: 'pointer', fontWeight: 'inherit'} : {color: 'inherit', cursor: 'pointer', fontWeight: 'inherit'} } onClick={this.showOrder.bind(this, item.id)}>{item.id}</TableCell>
                     <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.type_user}</TableCell>
                     <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.number}</TableCell>
@@ -737,6 +747,8 @@ class Concenter_ extends React.Component {
 
                     <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.type_order}</TableCell>
                     <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.status}</TableCell>
+
+                    <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.order_price}</TableCell>
                     <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.type_pay}</TableCell>
                     <TableCell style={{ color: 'inherit', fontWeight: 'inherit' }}>{item.driver}</TableCell>
                   </TableRow>
