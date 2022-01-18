@@ -341,8 +341,8 @@ class Concenter_ extends React.Component {
   
       let res = await this.getData('close_order_center', data);
 
-      setTimeout(() => {
-        if( res['st'] ){
+      //setTimeout(() => {
+        if( res['st'] === true ){
           this.setState({
             modalDialogDel: false,
             modalDialog: false,
@@ -352,7 +352,7 @@ class Concenter_ extends React.Component {
         }else{
           alert( res['text'] );
         }
-      }, 300);
+      //}, 300);
     }
   }
 
