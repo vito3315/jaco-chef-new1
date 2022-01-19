@@ -172,7 +172,8 @@ class Concenter_ extends React.Component {
       textDel: '',
       typeDel: -1,
 
-      number: ''
+      number: '',
+      addr: ''
     };
   }
   
@@ -243,7 +244,8 @@ class Concenter_ extends React.Component {
    
   changeCity(event){
     this.setState({
-      number: ''
+      number: '',
+      addr: ''
     })
 
     let data = event.target.value;
@@ -298,7 +300,8 @@ class Concenter_ extends React.Component {
 
   btnGetOrders(){
     this.setState({
-      number: ''
+      number: '',
+      addr: ''
     })
 
     this.getOrders();
@@ -393,6 +396,7 @@ class Concenter_ extends React.Component {
   
         if(res['st'] == true){
           alert('Обращение зафиксировано')
+          this.setState({ modalDialog: false })
         }else{
           alert(res['text'])
         }
@@ -419,6 +423,7 @@ class Concenter_ extends React.Component {
 
           if(res['st'] == true){
             alert('Обращение зафиксировано')
+            this.setState({ modalDialog: false })
           }else{
             alert(res['text'])
           }
@@ -441,7 +446,8 @@ class Concenter_ extends React.Component {
 
   changeDate(val){
     this.setState({
-      number: ''
+      number: '',
+      addr: ''
     })
     
     this.setState({
@@ -467,18 +473,30 @@ class Concenter_ extends React.Component {
     }, 300 )
   }
 
-  filterNumber(){
-    if( this.state.number.length == 0 ){
-      this.setState({
-        ordersRender: this.state.orders
-      })
-    }else{
-      let renderOrders = this.state.orders.filter( (item) => item.number.indexOf(this.state.number) !== -1 );
+  changeAddrSt(event){
+    let value = event.target.value;
+    
+    this.setState({ addr: value })
 
-      this.setState({
-        ordersRender: renderOrders
-      })
+    setTimeout( () => {
+      this.filterNumber();
+    }, 300 )
+  }
+
+  filterNumber(){
+    let renderOrders = this.state.orders;
+
+    if( this.state.number.length > 0 ){
+      renderOrders = renderOrders.filter( (item) => item.number.indexOf(this.state.number) !== -1 );
     }
+
+    if( this.state.addr.length > 0 ){
+      renderOrders = renderOrders.filter( (item) => (item.street + ' ' + item.home).toLowerCase() .indexOf(this.state.addr.toLowerCase()) !== -1 );
+    }
+
+    this.setState({
+      ordersRender: renderOrders
+    })
   }
 
   render(){
@@ -555,6 +573,12 @@ class Concenter_ extends React.Component {
                   <b>Сумма заказа: </b>
                   <span>{this.state.showOrder.order.sum_order} р</span>
                 </Grid>
+
+                { this.state.showOrder.order.check_pos_drive == null || !this.state.showOrder.order.check_pos_drive ? null :
+                  <Grid item xs={12}>
+                    <b>Довоз оформлен</b>
+                  </Grid>
+                }
 
                 <Grid item xs={12}>
                   <Table size={'small'} style={{ marginTop: 15 }}>
@@ -684,6 +708,9 @@ class Concenter_ extends React.Component {
 
           <Grid item xs={12} sm={3}>
             <MyTextInput label={'Номер телефона'} value={this.state.number} func={ this.changeNumber.bind(this) } />
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <MyTextInput label={'Адрес'} value={this.state.addr} func={ this.changeAddrSt.bind(this) } />
           </Grid>
 
           
