@@ -576,7 +576,8 @@ class Concenter_ extends React.Component {
 
                 { this.state.showOrder.order.check_pos_drive == null || !this.state.showOrder.order.check_pos_drive ? null :
                   <Grid item xs={12}>
-                    <b>Довоз оформлен</b>
+                    <b>Довоз оформлен: </b>
+                    <span>{this.state.showOrder.order.comment}</span>
                   </Grid>
                 }
 
