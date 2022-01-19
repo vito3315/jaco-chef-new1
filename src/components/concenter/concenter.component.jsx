@@ -389,7 +389,7 @@ class Concenter_ extends React.Component {
           order_id: parseInt(this.state.showOrder.order.order_id),
         };
     
-        let res = await this.getData('get_order_new', data);
+        let res = await this.getData('fake_user', data);
   
         if(res['st'] == true){
           alert('Обращение зафиксировано')
@@ -415,7 +415,7 @@ class Concenter_ extends React.Component {
             order_id: parseInt(this.state.showOrder.order.order_id),
           };
       
-          let res = await this.getData('get_order_new', data);
+          let res = await this.getData('fake_user', data);
 
           if(res['st'] == true){
             alert('Обращение зафиксировано')
