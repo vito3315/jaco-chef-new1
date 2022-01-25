@@ -418,7 +418,7 @@ class SiteSale2_new_ extends React.Component {
       
       let data = {
         spamNameSMS: this.state.spamNameSMS,
-        promo_vk_prize: this.state.promo_vk_prize,
+        promo_vk_prize: this.state.promo_prizw_vk,
         cert_text: this.state.cert_text,
         addr: this.state.numberList,
         where_promo: this.state.where_promo,
