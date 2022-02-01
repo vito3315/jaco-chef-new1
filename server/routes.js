@@ -15,7 +15,7 @@ const { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat, SiteSale2_Stat
 const { DriveMapStatAll } = require( '../src/components/drive_map_stat_all' );
 const { DriverStat } = require( '../src/components/driver_stat' );
 const { Concenter } = require( '../src/components/concenter' );
-
+const { SocialNetwork } = require( '../src/components/socialnetwork' );
 //
 
 module.exports = [
@@ -166,6 +166,13 @@ module.exports = [
         exact: true,
         component: Concenter,
         title: 'Контакт-центр',
+        code: 200
+    },
+    {
+        path: '/socialnetwork',
+        exact: true,
+        component: SocialNetwork,
+        title: 'Социальные сети',
         code: 200
     },
     
