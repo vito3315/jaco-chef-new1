@@ -476,6 +476,19 @@ class SiteSale2_new_ extends React.Component {
       
       console.log( res )
       
+      if( res['st'] == false ){
+        this.setState({
+          modalDialog: true,
+          modalText: res.text_err
+        });
+
+        setTimeout( () => {
+          this.click = false;    
+        }, 300 )
+
+        return ;
+      }
+
       this.setState({
         createdPromo: res.promo_text
       });
