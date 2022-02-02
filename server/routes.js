@@ -16,6 +16,9 @@ const { DriveMapStatAll } = require( '../src/components/drive_map_stat_all' );
 const { DriverStat } = require( '../src/components/driver_stat' );
 const { Concenter } = require( '../src/components/concenter' );
 const { SocialNetwork } = require( '../src/components/socialnetwork' );
+const { CatWork } = require( '../src/components/cat_work' );
+const { AppWorkPoint } = require( '../src/components/app_work_point' );
+
 //
 
 module.exports = [
@@ -173,6 +176,20 @@ module.exports = [
         exact: true,
         component: SocialNetwork,
         title: 'Социальные сети',
+        code: 200
+    },
+    {
+        path: '/cat_work',
+        exact: true,
+        component: CatWork,
+        title: 'Категории уборок',
+        code: 200
+    },
+    {
+        path: '/app_work_point',
+        exact: true,
+        component: AppWorkPoint,
+        title: 'Уборки на точке',
         code: 200
     },
     
