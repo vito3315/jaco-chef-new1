@@ -20,7 +20,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 import { MyTextInput } from '../../stores/elements';
 
-import JoditEditor from "jodit-react";
+//import JoditEditor from "jodit-react";
 
 const queryString = require('query-string');
 
@@ -219,6 +219,18 @@ class CatWork_ extends React.Component {
   }
 
   render(){
+
+    /*
+      <JoditEditor
+                    //ref={editor}
+                    value={this.state.editText}
+                    config={this.state.config}
+                    tabIndex={1} // tabIndex of textarea
+                    //onBlur={newContent => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
+                    onChange={newContent => { this.setState({ editText: newContent }) }}
+                  />
+    */
+
     return (
       <>
         <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
@@ -240,14 +252,7 @@ class CatWork_ extends React.Component {
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
-                  <JoditEditor
-                    //ref={editor}
-                    value={this.state.editText}
-                    config={this.state.config}
-                    tabIndex={1} // tabIndex of textarea
-                    //onBlur={newContent => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
-                    onChange={newContent => { this.setState({ editText: newContent }) }}
-                  />
+                  
                 </Grid>
                 
               </Grid>
@@ -273,14 +278,7 @@ class CatWork_ extends React.Component {
               </Grid>
 
               <Grid item xs={12} sm={12}>
-                <JoditEditor
-                  //ref={editor}
-                  value={this.state.editTextNew}
-                  config={this.state.config}
-                  tabIndex={1} // tabIndex of textarea
-                  //onBlur={newContent => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
-                  onChange={newContent => { this.setState({ editTextNew: newContent }) }}
-                />
+                
               </Grid>
               
             </Grid>
