@@ -55,7 +55,8 @@ module.exports = {
                         limit: 25000
                     }
                 }
-            }
+            },
+            
         ]
     },
 
@@ -121,7 +122,7 @@ module.exports = {
     
     // development server configuration
     devServer: {
-        port: 5088,
+        port: 5089,
         historyApiFallback: true,
     },
 
