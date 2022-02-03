@@ -17,6 +17,7 @@
     "@mui/lab": "^5.0.0-alpha.60",
     "@mui/material": "^5.2.4",
     "@mui/styles": "^5.2.3",
+    "@tinymce/tinymce-react": "^3.13.0",
     "ag-grid-community": "^26.2.1",
     "ag-grid-react": "^26.2.0",
     "axios": "^0.24.0",
