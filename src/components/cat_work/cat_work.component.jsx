@@ -301,6 +301,7 @@ class CatWork_ extends React.Component {
             <tinymce-editor
               apiKey="no-api-key"
               height="500"
+              width="500"
               menubar="true"
               plugins="advlist autolink lists link image charmap print preview anchor
               searchreplace visualblocks code fullscreen
