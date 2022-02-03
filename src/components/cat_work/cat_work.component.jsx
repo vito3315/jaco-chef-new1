@@ -251,9 +251,9 @@ class CatWork_ extends React.Component {
 
                 <Grid item xs={12} sm={12}>
                   <tinymce-editor
-                    apiKey="no-api-key"
+                    apiKey="r0ihgs4ukfpmudzw7aexxgb88tnx5jw26h1xx9x6409ji3gx"
                     height="500"
-                    width="500"
+                    //width="500"
                     menubar="true"
                     plugins="advlist autolink lists link image charmap print preview anchor
                     searchreplace visualblocks code fullscreen
