@@ -138,6 +138,7 @@ export class MyTextInput extends React.PureComponent {
         
     this.state = {
       classes: this.props.classes,
+      type: 'text'
     };
   }
   
@@ -147,11 +148,14 @@ export class MyTextInput extends React.PureComponent {
         label={this.props.label}
         value={this.props.value}
         onChange={this.props.func}
+        onBlur={this.props.onBlur ? this.props.onBlur : null}
         disabled={ this.props.disabled || this.props.disabled === true ? true : false }
-        type={ this.props.type ? this.props.type : 'text' }
         variant="outlined" 
         size={'small'} 
         color='primary'
+        multiline={this.props.multiline ? this.props.multiline : false}
+        maxRows={this.props.maxRows ? this.props.maxRows : 1}
+        type={ this.props.type ? this.props.type : this.state.type }
         style={{ width: '100%' }} 
       />
     )
@@ -164,9 +168,24 @@ export class MyTimePicker extends React.PureComponent {
         
     this.state = {
       classes: this.props.classes,
+      thisVal: ''
     };
   }
   
+  onChange(event){
+    this.setState({
+      thisVal: event.target.value
+    })
+  }
+
+  onBlur(){
+    this.setState({
+      thisVal: ''
+    })
+
+    this.props.onBlur();
+  }
+
   render(){
     return (
       <TextField
@@ -175,9 +194,11 @@ export class MyTimePicker extends React.PureComponent {
         color="primary"
         label={this.props.label}
         type="time"
-        value={ this.props.value }
+        id={ this.props.id ? this.props.id : null }
+        value={ this.props.func ? this.props.value : this.state.thisVal }
         className={this.state.classes.timePicker}
-        onChange={this.props.func}
+        onChange={this.props.func ? this.props.func : this.onChange.bind(this)}
+        onBlur={this.props.onBlur ? this.onBlur.bind(this) : null}
         InputLabelProps={{
           shrink: true,
         }}
@@ -291,6 +312,41 @@ export class MyCheckBox extends React.PureComponent {
           label={this.props.label}
         />
       </FormGroup>
+    )
+  }
+}
+
+export class TextEditor extends React.PureComponent {
+  constructor(props) {
+    super(props);
+        
+    this.state = {
+      classes: this.props.classes,
+    };
+  }
+  
+  render(){
+    return (
+      <tinymce-editor
+        apiKey="r0ihgs4ukfpmudzw7aexxgb88tnx5jw26h1xx9x6409ji3gx"
+        id={this.props.id}
+        menubar={true}
+        plugins="advlist autolink lists link image charmap print preview anchor
+        searchreplace visualblocks code fullscreen
+        insertdatetime media table paste code help wordcount"
+        toolbar="undo redo | formatselect | bold italic backcolor |
+        alignleft aligncenter alignright alignjustify |
+        bullist numlist outdent indent | removeformat | help"
+        content_style="body
+        {
+          font-family:Helvetica,Arial,sans-serif;
+          font-size:14px
+        }"
+        >
+
+        {this.props.text}
+
+      </tinymce-editor>
     )
   }
 }

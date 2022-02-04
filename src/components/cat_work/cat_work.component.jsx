@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { useHistory } from "react-router-dom";
 
 import { makeStyles } from '@mui/styles';
@@ -18,7 +18,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 
-import { MyTextInput } from '../../stores/elements';
+import { MyTextInput, TextEditor } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -168,7 +168,7 @@ class CatWork_ extends React.Component {
     let data = {
       cat_id: this.state.showCat.id,
       name: this.state.nameCat,
-      text: this.state.editText
+      text: document.getElementById('EditorEdit').value
     };
 
     let res = await this.getData('save_edit', data);
@@ -179,9 +179,10 @@ class CatWork_ extends React.Component {
       this.setState({ 
         modalDialog: false, 
         showCat: null, 
-        editText: '', 
         nameCat: '' 
       })
+
+      document.getElementById('EditorEdit').value = '';
 
       res = await this.getData('get_all');
     
@@ -194,7 +195,7 @@ class CatWork_ extends React.Component {
   async saveNew(){
     let data = {
       name: this.state.nameCatNew,
-      text: this.state.editTextNew
+      text: document.getElementById('EditorNew').value
     };
 
     let res = await this.getData('save_new', data);
@@ -208,6 +209,8 @@ class CatWork_ extends React.Component {
         nameCatNew: '' 
       })
 
+      document.getElementById('EditorNew').value = '';
+
       res = await this.getData('get_all');
     
       this.setState({
@@ -217,18 +220,6 @@ class CatWork_ extends React.Component {
   }
 
   render(){
-
-    /*
-      <JoditEditor
-                    //ref={editor}
-                    value={this.state.editText}
-                    config={this.state.config}
-                    tabIndex={1} // tabIndex of textarea
-                    //onBlur={newContent => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
-                    onChange={newContent => { this.setState({ editText: newContent }) }}
-                  />
-    */
-
     return (
       <>
         <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
@@ -250,27 +241,7 @@ class CatWork_ extends React.Component {
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
-                  <tinymce-editor
-                    apiKey="r0ihgs4ukfpmudzw7aexxgb88tnx5jw26h1xx9x6409ji3gx"
-                    height="500"
-                    //width="500"
-                    menubar="true"
-                    plugins="advlist autolink lists link image charmap print preview anchor
-                    searchreplace visualblocks code fullscreen
-                    insertdatetime media table paste code help wordcount"
-                    toolbar="undo redo | formatselect | bold italic backcolor |
-                    alignleft aligncenter alignright alignjustify |
-                    bullist numlist outdent indent | removeformat | help"
-                    content_style="body
-                    {
-                      font-family:Helvetica,Arial,sans-serif;
-                      font-size:14px
-                    }"
-                    >
-
-                    Hello World!
-
-                  </tinymce-editor>
+                  <TextEditor id="EditorEdit" text={this.state.showCat.text} />
                 </Grid>
                 
               </Grid>
@@ -296,7 +267,7 @@ class CatWork_ extends React.Component {
               </Grid>
 
               <Grid item xs={12} sm={12}>
-                
+                <TextEditor id="EditorNew" text={''} />
               </Grid>
               
             </Grid>
@@ -316,12 +287,6 @@ class CatWork_ extends React.Component {
             <Button variant="contained" color="primary" onClick={ () => { this.setState({ modalDialogNew: true }) } }>Добавить категорию</Button>
           </Grid>
           
-          <Grid item xs={12} sm={12}>
-            
-            
-
-          </Grid>
-
           <Grid item xs={12} sm={12}>
             <List style={{ width: '100%' }}>
               { this.state.cats.map( (item, key) =>

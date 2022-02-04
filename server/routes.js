@@ -18,6 +18,7 @@ const { Concenter } = require( '../src/components/concenter' );
 const { SocialNetwork } = require( '../src/components/socialnetwork' );
 const { CatWork } = require( '../src/components/cat_work' );
 const { AppWorkPoint } = require( '../src/components/app_work_point' );
+const { AppWork } = require( '../src/components/app_work' );
 
 //
 
@@ -192,7 +193,13 @@ module.exports = [
         title: 'Уборки на точке',
         code: 200
     },
-    
+    {
+        path: '/app_work',
+        exact: true,
+        component: AppWork,
+        title: 'Время уборок',
+        code: 200
+    },
     
     
 ];
