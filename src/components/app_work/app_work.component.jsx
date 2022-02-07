@@ -680,7 +680,7 @@ class AppWork_ extends React.Component {
                   <TableCell>День недели</TableCell>
                   <TableCell>Время открытия</TableCell>
                   
-                  <TableCell>Время закрытия</TableCell>
+                  <TableCell>Время автоматического удаления</TableCell>
                   <TableCell>Не удалять в конце смены</TableCell>
                   <TableCell>Обязательна к выполнению в особый день</TableCell>
                   <TableCell><VisibilityIcon /></TableCell>
