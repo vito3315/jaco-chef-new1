@@ -17,11 +17,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import TableFooter from '@mui/material/TableFooter';
-import Paper from '@mui/material/Paper';
 
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -29,9 +26,8 @@ import ListItemText from '@mui/material/ListItemText';
 
 import CloseIcon from '@mui/icons-material/Close';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
-import { MyTextInput, MyCheckBox, MySelect, MyTimePicker } from '../../stores/elements';
+import { MyTextInput, MyCheckBox, MySelect, MyTimePicker, MyAutocomplite } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -95,6 +91,7 @@ class AppWork_ extends React.Component {
       is_load: false,
       
       items: [],
+      items_min: [],
       modalDialog: false,
       modalDialogNew: false,
 
@@ -106,15 +103,17 @@ class AppWork_ extends React.Component {
         {id: 5, name: 'Пятница'},
         {id: 6, name: 'Суббота'},
         {id: 7, name: 'Воскресенье'},
+
         {id: 10, name: 'Другое'},
 	      {id: 11, name: 'Каждый день'},
 	      {id: 12, name: 'Каждый день в конце смены'},
+        {id: 13, name: 'Ручное добавление'},
+        {id: 14, name: 'После выполнение уборки'},
       ],
       types: [
         {id: 0, name: 'Другое'},
         {id: 1, name: 'Только 1 активная'},
         {id: 2, name: 'Добавление без ограничений'},
-        {id: 3, name: 'Ручное добавление'},
       ],
 
       itemsEdit: null,
@@ -133,7 +132,8 @@ class AppWork_ extends React.Component {
 
     this.setState({
       module_name: data.module_info.name,
-      items: data.items
+      items: data.items,
+      items_min: data.items_min
     })
     
     document.title = data.module_info.name;
@@ -220,7 +220,8 @@ class AppWork_ extends React.Component {
       } )
 
       this.setState({
-        items: data.items
+        items: data.items,
+        items_min: data.items_min
       })
     }
   }
@@ -251,7 +252,8 @@ class AppWork_ extends React.Component {
       } )
 
       this.setState({
-        items: data.items
+        items: data.items,
+        items_min: data.items_min
       })
     }
   }
@@ -299,6 +301,16 @@ class AppWork_ extends React.Component {
     })
   }
 
+  chengeItem1(type, event, data){
+    let item = this.state.itemsEdit;
+
+    item.item[ [type] ] = data;
+
+    this.setState({
+      itemsEdit: item
+    })
+  }
+
   chengeItemNew(type, event){
     let data = event.target.value;
     let item = this.state.itemsNew;
@@ -309,6 +321,16 @@ class AppWork_ extends React.Component {
       item.times_add = [{ time_action: '19:00' }];
       item.times_close = '23:00';
     }
+
+    this.setState({
+      itemsNew: item
+    })
+  }
+
+  chengeItemNew1(type, event, data){
+    let item = this.state.itemsNew;
+
+    item.item[ [type] ] = data;
 
     this.setState({
       itemsNew: item
@@ -496,6 +518,15 @@ class AppWork_ extends React.Component {
                   <MySelect classes={this.state.classes} data={this.state.types} value={this.state.itemsEdit.item.type_time} func={ this.chengeItem.bind(this, 'type_time') } label='Тип добавления' />
                 </Grid>
                 
+                { parseInt(this.state.itemsEdit.item.dow) != 14 ? null :
+                  <Grid item xs={12}>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={6}>
+                        <MyAutocomplite classes={this.state.classes} data={this.state.items_min} value={this.state.itemsEdit.item.work_id} func={ this.chengeItem1.bind(this, 'work_id') } multiple={false} label='Если эта уборка завершена' />
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                }
 
                 <Grid item xs={12} sm={6}>
                   <List>
@@ -580,6 +611,15 @@ class AppWork_ extends React.Component {
                   <MySelect classes={this.state.classes} data={this.state.types} value={this.state.itemsNew.item.type_time} func={ this.chengeItemNew.bind(this, 'type_time') } label='Тип добавления' />
                 </Grid>
                 
+                { parseInt(this.state.itemsNew.item.dow) != 14 ? null :
+                  <Grid item xs={12}>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={6}>
+                        <MyAutocomplite classes={this.state.classes} data={this.state.items_min} value={this.state.itemsNew.item.work_id} func={ this.chengeItemNew1.bind(this, 'work_id') } multiple={false} label='Если эта уборка завершена' />
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                }
 
                 <Grid item xs={12} sm={6}>
                   <List>

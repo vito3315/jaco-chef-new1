@@ -81,7 +81,7 @@ export class MyAutocomplite extends React.PureComponent {
         <Autocomplete
           size="small"
           disableCloseOnSelect={true}
-          multiple={true}
+          //multiple={true}
           id={ this.props.id ?? null }
           options={this.props.data}
           getOptionLabel={(option) => option.name}
@@ -89,7 +89,7 @@ export class MyAutocomplite extends React.PureComponent {
           onChange={this.props.func}
           filterSelectedOptions
           multiple={ this.props.multiple && this.props.multiple === true ? true : false }
-          isOptionEqualToValue={(option, value) => option.id === value.id}
+          isOptionEqualToValue={(option, value) => parseInt(option.id) === parseInt(value.id) }
           renderInput={(params) => (
             <TextField
               {...params}

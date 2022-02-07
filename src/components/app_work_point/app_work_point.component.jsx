@@ -16,6 +16,15 @@ import ListItemText from '@mui/material/ListItemText';
 import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
 
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+
+
+import VisibilityIcon from '@mui/icons-material/Visibility';
+
 import { MyTextInput, MySelect } from '../../stores/elements';
 
 const queryString = require('query-string');
@@ -217,7 +226,7 @@ class AppWorkPoint_ extends React.Component {
 		})
 
 		if( !check ){
-			thisList.push({id: id, name: name, time_min: 0})
+			thisList.push({id: id, name: name, time_min: 0, dop_time: 0})
 		}
 
 		this.setState({
@@ -255,11 +264,40 @@ class AppWorkPoint_ extends React.Component {
       items: this.state.thisList
     };
 
+    let fake_item = null;
+
+    this.state.thisList.map( (item, key) => {
+      if( item.dop_time.length == 0 ){
+        fake_item = item;
+      }
+    } )
+
+    console.log(fake_item  )
+
+    if( fake_item ){
+      alert('У позиции "'+fake_item.name+'" не указано доп время');
+
+      return ;
+    }
+
     let res = await this.getData('save', data);
 
     console.log( res )
 
     alert(res.text)
+  }
+
+  changeDopTime(key, event){
+    let data = event.target.value;
+    let list = this.state.thisList;
+
+    if( !isNaN(data) || data == ''  ){
+      list[ key ]['dop_time'] = data == '' ? '' : parseInt(data);
+
+      this.setState({
+        thisList: list
+      })
+    }
   }
 
   render(){
@@ -297,14 +335,33 @@ class AppWorkPoint_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <List style={{ width: '100%' }}>
-              { this.state.thisList.map( (item, key) =>
-                <ListItem key={key} style={{ borderBottom: '1px solid #e5e5e5' }}>
-                  <ListItemText primary={ item.name } />
-                  <CloseIcon onClick={this.del.bind(this, item.id, item.name)}/>
-                </ListItem>
-              ) }
-            </List>
+            <Table size='small'>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Наименование</TableCell>
+                  <TableCell>Доп время (в минутах)</TableCell>
+                  <TableCell><CloseIcon /></TableCell>
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                
+                { this.state.thisList.map( (item, key) =>
+                  <TableRow key={key}>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>
+                      <MyTextInput classes={this.state.classes} value={ item.dop_time } func={ this.changeDopTime.bind(this, key) } label='' />
+                    </TableCell>
+                    <TableCell>
+                      <CloseIcon onClick={this.del.bind(this, item.id, item.name)} style={{cursor: 'pointer'}} />
+                    </TableCell>
+                  </TableRow>
+                ) }
+              
+              </TableBody>
+            
+            </Table>
+
           </Grid>
         
           <Grid item xs={12} sm={3}>
