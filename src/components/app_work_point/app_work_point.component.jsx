@@ -215,18 +215,14 @@ class AppWorkPoint_ extends React.Component {
   }
 
   add(id, name){
-    let check = false;
-
     let thisList = this.state.thisList;
+    let allList = this.state.allList;
 
-		thisList.map(function(item, key){
-			if( parseInt(item['id']) == parseInt(id) ){
-				check = true;
-			}
-		})
+    let check = thisList.find( (item, key) => parseInt(item['id']) == parseInt(id) );
+    let thisItem = allList.find( (item, key) => parseInt(item['id']) == parseInt(id) );
 
 		if( !check ){
-			thisList.push({id: id, name: name, time_min: 0, dop_time: 0})
+			thisList.push({id: id, name: name, time_min: 0, dop_time: 0, time_min: thisItem.time_min})
 		}
 
 		this.setState({
@@ -339,6 +335,7 @@ class AppWorkPoint_ extends React.Component {
               <TableHead>
                 <TableRow>
                   <TableCell>Наименование</TableCell>
+                  <TableCell>Основное время</TableCell>
                   <TableCell>Доп время (в минутах)</TableCell>
                   <TableCell><CloseIcon /></TableCell>
                 </TableRow>
@@ -349,6 +346,7 @@ class AppWorkPoint_ extends React.Component {
                 { this.state.thisList.map( (item, key) =>
                   <TableRow key={key}>
                     <TableCell>{item.name}</TableCell>
+                    <TableCell>{item.time_min} мин.</TableCell>
                     <TableCell>
                       <MyTextInput classes={this.state.classes} value={ item.dop_time } func={ this.changeDopTime.bind(this, key) } label='' />
                     </TableCell>
