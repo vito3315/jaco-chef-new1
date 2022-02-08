@@ -304,7 +304,7 @@ class AppWork_ extends React.Component {
   chengeItem1(type, event, data){
     let item = this.state.itemsEdit;
 
-    item.item[ [type] ] = data;
+    item.item[ [type] ] = data.id;
 
     this.setState({
       itemsEdit: item
@@ -330,7 +330,7 @@ class AppWork_ extends React.Component {
   chengeItemNew1(type, event, data){
     let item = this.state.itemsNew;
 
-    item.item[ [type] ] = data;
+    item.item[ [type] ] = data.id;
 
     this.setState({
       itemsNew: item
