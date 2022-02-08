@@ -119,7 +119,9 @@ class AppWork_ extends React.Component {
       itemsEdit: null,
       nameWork: '',
 
-      itemsNew: null
+      itemsNew: null,
+      chengeItem1: null,
+      chengeItemNew1: null
     };
   }
   
@@ -270,7 +272,8 @@ class AppWork_ extends React.Component {
     this.setState({
       itemsEdit: res,
       modalDialog: true,
-      nameWork: res.item.name
+      nameWork: res.item.name,
+      chengeItem1: this.state.items_min.find( (item, key) => parseInt( item.id ) == parseInt( res.item.work_id ) )
     })
   }
 
@@ -307,7 +310,8 @@ class AppWork_ extends React.Component {
     item.item[ [type] ] = data.id;
 
     this.setState({
-      itemsEdit: item
+      itemsEdit: item,
+      chengeItem1: data
     })
   }
 
@@ -333,7 +337,8 @@ class AppWork_ extends React.Component {
     item.item[ [type] ] = data.id;
 
     this.setState({
-      itemsNew: item
+      itemsNew: item,
+      chengeItemNew1: data
     })
   }
 
@@ -522,7 +527,7 @@ class AppWork_ extends React.Component {
                   <Grid item xs={12}>
                     <Grid container spacing={3}>
                       <Grid item xs={12} sm={6}>
-                        <MyAutocomplite classes={this.state.classes} data={this.state.items_min} value={this.state.itemsEdit.item.work_id} func={ this.chengeItem1.bind(this, 'work_id') } multiple={false} label='Если эта уборка завершена' />
+                        <MyAutocomplite classes={this.state.classes} data={this.state.items_min} value={this.state.chengeItem1} func={ this.chengeItem1.bind(this, 'work_id') } multiple={false} label='Если эта уборка завершена' />
                       </Grid>
                     </Grid>
                   </Grid>
@@ -615,7 +620,7 @@ class AppWork_ extends React.Component {
                   <Grid item xs={12}>
                     <Grid container spacing={3}>
                       <Grid item xs={12} sm={6}>
-                        <MyAutocomplite classes={this.state.classes} data={this.state.items_min} value={this.state.itemsNew.item.work_id} func={ this.chengeItemNew1.bind(this, 'work_id') } multiple={false} label='Если эта уборка завершена' />
+                        <MyAutocomplite classes={this.state.classes} data={this.state.items_min} value={this.state.chengeItemNew1} func={ this.chengeItemNew1.bind(this, 'work_id') } multiple={false} label='Если эта уборка завершена' />
                       </Grid>
                     </Grid>
                   </Grid>
