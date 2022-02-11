@@ -19,6 +19,7 @@ const { SocialNetwork } = require( '../src/components/socialnetwork' );
 const { CatWork } = require( '../src/components/cat_work' );
 const { AppWorkPoint } = require( '../src/components/app_work_point' );
 const { AppWork } = require( '../src/components/app_work' );
+const { AppWorkShow } = require( '../src/components/app_work_show' );
 
 //
 
@@ -200,6 +201,15 @@ module.exports = [
         title: 'Время уборок',
         code: 200
     },
+    {
+        path: '/app_work_show',
+        exact: true,
+        component: AppWorkShow,
+        title: 'Просмотр уборок',
+        code: 200
+    },
+    
+
     
     
 ];
