@@ -386,7 +386,15 @@ class SiteSale2_new_ extends React.Component {
         createdPromo: []
       });
 
-      let count_promo = this.state.promo_sale_list.find( (item) => parseInt(item.id) == parseInt(this.state.promo_sale) )['name'];
+      let count_promo = 0;
+
+      if( parseInt( this.state.sale_type ) == 2 ){
+        count_promo = this.state.promo_sale_list.find( (item) => parseInt(item.id) == parseInt(this.state.promo_sale) )['name'];
+      }else{
+        count_promo = parseInt(this.state.promo_sale);
+      }
+
+      
       
       let conditionItems = [];
       
@@ -664,8 +672,16 @@ class SiteSale2_new_ extends React.Component {
     
     if(parseInt(promo_action) == 1){//скидка
       var promo_type_sale = this.state.type_sale,
-        count_promo = this.state.promo_sale_list.find( (item) => parseInt(item.id) == parseInt(this.state.promo_sale) )['name'],//размер скидки
+        //count_promo = this.state.promo_sale_list.find( (item) => parseInt(item.id) == parseInt(this.state.promo_sale) )['name'],//размер скидки
         promo_type = this.state.sale_type; //1 - рубли 2 %
+
+      let count_promo = 0;
+
+      if( parseInt( this.state.sale_type ) == 2 ){
+        count_promo = count_promo = this.state.promo_sale_list.find( (item) => parseInt(item.id) == parseInt(this.state.promo_sale) )['name'];//размер скидки
+      }else{
+        count_promo = parseInt(this.state.promo_sale);
+      }
 
       if(parseInt(promo_type_sale) == 1){//товары
         var promo_items = this.state.saleItem,
@@ -988,9 +1004,15 @@ class SiteSale2_new_ extends React.Component {
                 </Grid>
               }
             
-              <Grid item xs={12} sm={3}>
-                <MySelect classes={this.state.classes} data={this.state.promo_sale_list} value={this.state.promo_sale} func={ this.changeData.bind(this, 'promo_sale') } label='Размер скидки' />
-              </Grid>
+              { parseInt( this.state.sale_type ) == 1 ?
+                <Grid item xs={12} sm={3}>
+                  <MyTextInput classes={this.state.classes} value={this.state.promo_sale} func={ this.changeData.bind(this, 'promo_sale') } label='Размер скидки' />
+                </Grid>
+                  :
+                <Grid item xs={12} sm={3}>
+                  <MySelect classes={this.state.classes} data={this.state.promo_sale_list} value={this.state.promo_sale} func={ this.changeData.bind(this, 'promo_sale') } label='Размер скидки' />
+                </Grid>
+              }
             
               <Grid item xs={12} sm={3}>
                 <MySelect classes={this.state.classes} data={this.state.type_sale_list} value={this.state.sale_type} func={ this.changeData.bind(this, 'sale_type') } label='Какая скидка' />
