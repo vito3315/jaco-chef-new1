@@ -877,7 +877,7 @@ class SiteSale2_new_ extends React.Component {
       thisItems.push({
         item_id: this.state.priceItem.id,
         name: thisItem.name,
-        price: this.state.addItemPrice,
+        price: this.state.addItemCount,
       })
       
       this.setState({
@@ -1908,7 +1908,7 @@ class SiteSale2_edit_ extends React.Component {
       thisItems.push({
         item_id: this.state.priceItem,
         name: thisItem.name,
-        price: this.state.addItemPrice,
+        price: this.state.addItemCount,
       })
       
       this.setState({
