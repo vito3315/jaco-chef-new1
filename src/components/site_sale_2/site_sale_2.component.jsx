@@ -253,6 +253,8 @@ class SiteSale2_new_ extends React.Component {
         {id: 1, name: 'В определенные даты'},
         {id: 2, name: '14 дней с 10:00 до 21:40'},
         {id: 3, name: '14 дней с 00:00 до 23:59'},
+        {id: 4, name: '30 дней с 10:00 до 21:40'},
+        {id: 5, name: '30 дней с 00:00 до 23:59'},
       ],
       type_order_list: [
         {id: 1, name: 'Все'},
@@ -617,6 +619,21 @@ class SiteSale2_new_ extends React.Component {
       })
     }
     
+    if( type == 'date_promo' && (event.target.value == 4 || event.target.value == 5) ){
+      let thisDay = new Date();
+      let nextDay = new Date();
+      nextDay.setDate(nextDay.getDate() + 30);
+      
+      this.setState({
+        rangeDate: [formatDate(thisDay), formatDate(nextDay)],
+        date_start: formatDate(thisDay),
+        date_end: formatDate(nextDay),
+        
+        time_start: event.target.value == 4 ? '10:00' : '00:00',
+        time_end: event.target.value == 4 ? '21:40' : '23:59',
+      })
+    }
+
     setTimeout( () => {
       this.generateTextDescFalse();   
       this.generateTextDescTrue();   
@@ -1384,6 +1401,8 @@ class SiteSale2_edit_ extends React.Component {
         {id: 1, name: 'В определенные даты'},
         {id: 2, name: '14 дней с 10:00 до 21:40'},
         {id: 3, name: '14 дней с 00:00 до 23:59'},
+        {id: 4, name: '30 дней с 10:00 до 21:40'},
+        {id: 5, name: '30 дней с 00:00 до 23:59'},
       ],
       type_order_list: [
         {id: 1, name: 'Все'},
@@ -1706,6 +1725,21 @@ class SiteSale2_edit_ extends React.Component {
         
         time_start: event.target.value == 2 ? '10:00' : '00:00',
         time_end: event.target.value == 2 ? '21:40' : '23:59',
+      })
+    }
+
+    if( type == 'date_promo' && (event.target.value == 4 || event.target.value == 5) ){
+      let thisDay = new Date();
+      let nextDay = new Date();
+      nextDay.setDate(nextDay.getDate() + 30);
+      
+      this.setState({
+        rangeDate: [formatDate(thisDay), formatDate(nextDay)],
+        date_start: formatDate(thisDay),
+        date_end: formatDate(nextDay),
+        
+        time_start: event.target.value == 4 ? '10:00' : '00:00',
+        time_end: event.target.value == 4 ? '21:40' : '23:59',
       })
     }
     
