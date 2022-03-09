@@ -91,7 +91,6 @@ class VendorModule_ extends React.Component {
       module_name: '',
       is_load: false,
       
-      modalDialog: false,
       modalItems: false,
       modalVendor: false,
       modalVendorNew: false,
@@ -393,26 +392,6 @@ class VendorModule_ extends React.Component {
         </Backdrop>
         
         <Dialog
-          open={this.state.modalDialog}
-          onClose={ () => { this.setState({ modalDialog: false }) } }
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title"></DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              
-              
-              
-              
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button color="primary">Сохранить</Button>
-          </DialogActions>
-        </Dialog>
-        
-        <Dialog
           open={this.state.modalItems}
           fullWidth={true}
           maxWidth={'md'}
@@ -532,7 +511,7 @@ class VendorModule_ extends React.Component {
                   </Grid>
                   
                   <Grid item xs={12} sm={6}>
-                    <MyAutocomplite label='Города' data={this.state.allCities} value={this.state.vendorCities} func={ (event, value) => { this.setState({ vendorCities: value }) } } />
+                    <MyAutocomplite multiple={true} label='Города' data={this.state.allCities} value={this.state.vendorCities} func={ (event, value) => { console.log(value); this.setState({ vendorCities: value }) } } />
                   </Grid>
                 </>
                   :

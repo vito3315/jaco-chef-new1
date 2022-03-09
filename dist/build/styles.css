@@ -14,7 +14,14 @@ ag-grid,ag-grid-angular,ag-grid-ng2,ag-grid-polymer,ag-grid-aurelia{display:bloc
 
 #revTable .MuiBox-root{padding-left:0 !important;padding-right:0 !important}
 
-#table_graph_one td,#table_graph_one th{padding:3px !important;border-left:1px solid #e5e5e5 !important;max-width:110px !important}.min_block{width:50px !important;text-align:center !important}.min_size{font-size:0.6rem !important}
+#table_graph_one td,#table_graph_one th,#table_graph_two td,#table_graph_two th{padding:3px !important;border-left:1px solid #e5e5e5 !important;max-width:110px !important;min-height:38px !important}.min_block{width:50px !important;text-align:center !important}.min_size{font-size:0.6rem !important}div.css-19kzrtu{padding-right:0px !important}
+
+
+
+
+
+
+
 
 
 

@@ -11,9 +11,17 @@ const { VendorItemPrice } = require( '../src/components/vendor_item_price' );
 const { Tender } = require( '../src/components/tender' );
 const { Revizion, RevizionNew } = require( '../src/components/revizion' );
 const { WorkSchedule } = require( '../src/components/work_schedule' );
-const { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat } = require( '../src/components/site_sale_2' );
+const { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat, SiteSale2_StatList } = require( '../src/components/site_sale_2' );
 const { DriveMapStatAll } = require( '../src/components/drive_map_stat_all' );
+const { DriverStat } = require( '../src/components/driver_stat' );
+const { Concenter } = require( '../src/components/concenter' );
+const { SocialNetwork } = require( '../src/components/socialnetwork' );
+const { CatWork } = require( '../src/components/cat_work' );
+const { AppWorkPoint } = require( '../src/components/app_work_point' );
+const { AppWork } = require( '../src/components/app_work' );
+const { AppWorkShow } = require( '../src/components/app_work_show' );
 
+//
 
 module.exports = [
     {
@@ -138,13 +146,70 @@ module.exports = [
         code: 200
     },
     {
+        path: '/site_sale_2/stat_list',
+        exact: true,
+        component: SiteSale2_StatList,
+        title: 'Выписанные промики',
+        code: 200
+    },
+    {
         path: '/drive_map_stat_all',
         exact: true,
         component: DriveMapStatAll,
         title: 'Курьеры на карте',
         code: 200
     },
+    {
+        path: '/driver_stat',
+        exact: true,
+        component: DriverStat,
+        title: 'Статистика курьеров',
+        code: 200
+    },
+    {
+        path: '/concenter',
+        exact: true,
+        component: Concenter,
+        title: 'Контакт-центр',
+        code: 200
+    },
+    {
+        path: '/socialnetwork',
+        exact: true,
+        component: SocialNetwork,
+        title: 'Социальные сети',
+        code: 200
+    },
+    {
+        path: '/cat_work',
+        exact: true,
+        component: CatWork,
+        title: 'Категории уборок',
+        code: 200
+    },
+    {
+        path: '/app_work_point',
+        exact: true,
+        component: AppWorkPoint,
+        title: 'Уборки на точке',
+        code: 200
+    },
+    {
+        path: '/app_work',
+        exact: true,
+        component: AppWork,
+        title: 'Время уборок',
+        code: 200
+    },
+    {
+        path: '/app_work_show',
+        exact: true,
+        component: AppWorkShow,
+        title: 'Просмотр уборок',
+        code: 200
+    },
     
+
     
     
 ];

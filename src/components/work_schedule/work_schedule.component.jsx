@@ -56,6 +56,7 @@ import LooksTwoIcon from '@mui/icons-material/LooksTwo';
 import Looks3Icon from '@mui/icons-material/Looks3';
 
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import CheckIcon from '@mui/icons-material/Check';
 
 import { MySelect, MyCheckBox, MyTimePicker } from '../../stores/elements';
 
@@ -163,42 +164,68 @@ class HeaderItem extends React.Component {
     return (
       <>
         <TableRow>
-          <TableCell></TableCell>
-          <TableCell>Число месяца</TableCell>
-          <TableCell></TableCell>
+          <TableCell style={{ minWidth: 140, minHeight: 38 }}>Ур. кафе: {this.props.lv_cafe}</TableCell>
+          <TableCell style={{ minWidth: 165, minHeight: 38 }}>Число месяца</TableCell>
+
+          { this.props.kind == 'manager' ? null :
+            <TableCell></TableCell>
+          }
           
           {this.props.days.map( (item, key) => 
             <TableCell className="min_block" style={{ backgroundColor: item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс' ? '#ffe9bd' : '#fff' }} key={key}>{item.date}</TableCell>
           )}
           
-          <TableCell></TableCell>
-          
-          <TableCell style={{ textAlign: 'center' }}>+ / -</TableCell>
-          <TableCell style={{ textAlign: 'center' }}>Ур дира: 9</TableCell>
+          { this.props.kind == 'manager' ? null :
+            <>
+              <TableCell></TableCell>
               
-          <TableCell></TableCell>
-          <TableCell></TableCell>
-          <TableCell></TableCell>
-          <TableCell></TableCell>
+              { this.props.dataKey > 0 ? 
+                <>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                </>
+                  :
+                <>
+                  <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.props.changeDopBonus}>{ !this.props.bonus_other ? '+ / -' : parseInt(this.props.bonus_other) == 1 ? <AddIcon style={{ fontSize: 30, color: 'green' }} /> : <CloseIcon style={{ fontSize: 30, color: 'red' }} /> }</TableCell>
+                  <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.props.changeLVDir}>Ур. дира: {this.props.lv_dir}</TableCell>
+                </>
+              }
+                  
+              <TableCell></TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
+            </>
+          }
 
         </TableRow>
         <TableRow>
-          <TableCell>Сотрудник</TableCell>
-          <TableCell>Должность</TableCell>
-          <TableCell></TableCell>
+          <TableCell style={{ minWidth: 140, minHeight: 38 }}>Сотрудник</TableCell>
+          <TableCell style={{ minWidth: 165, minHeight: 38 }}>Должность</TableCell>
+          
+          { this.props.kind == 'manager' ? null :
+            <TableCell></TableCell>
+          }
           
           {this.props.days.map( (item, key) => 
             <TableCell className="min_block" style={{ backgroundColor: item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс' ? '#ffe9bd' : '#fff' }} key={key}>{item.day}</TableCell>
           )}
           
-          <TableCell style={{ textAlign: 'center' }}>За 1ч</TableCell>
-          <TableCell style={{ textAlign: 'center' }}>Командный бонус</TableCell>
-          <TableCell style={{ textAlign: 'center' }}>За часы</TableCell>
-          <TableCell style={{ textAlign: 'center' }}>Ошибки</TableCell>
-          <TableCell style={{ textAlign: 'center' }}>Бонус</TableCell>
-          <TableCell style={{ textAlign: 'center' }}>Всего</TableCell>
-          <TableCell style={{ textAlign: 'center' }}>Выдано</TableCell>
-
+          { this.props.kind == 'manager' ? null :
+            <>
+              <TableCell style={{ textAlign: 'center' }}>За 1ч</TableCell>
+              <TableCell style={{ textAlign: 'center' }}>Командный бонус</TableCell>
+              <TableCell style={{ textAlign: 'center' }}>За часы</TableCell>
+              <TableCell style={{ textAlign: 'center' }}>Ошибки</TableCell>
+              <TableCell style={{ textAlign: 'center' }}>Бонус</TableCell>
+              { this.props.show_zp == 1 || this.props.show_zp == 0 ?
+                <TableCell style={{ textAlign: 'center' }}>Всего</TableCell>
+                  :
+                null
+              }
+              <TableCell style={{ textAlign: 'center' }}>Выдано</TableCell>
+            </>
+          }
         </TableRow>
         
         <TableRow style={{ backgroundColor: '#e5e5e5' }}>
@@ -251,12 +278,24 @@ class WorkSchedule_ extends React.Component {
       mainMenu: false,
       mainMenuH: false,
       mainMenuSmena: false,
+      show_bonus: false,
+      mainMenuPrice: false,
+      mainMenuLVDIR: false,
+      mainMenuDopBonus: false,
+
+      show_zp_one: 0,
+      show_zp_two: 0,
+      kind: '',
 
       myOtherSmens: [],
       
       chooseUser: null,
 
-      tabTable: 1
+      tabTable: 1,
+
+      lv_cafe: 0,
+      lv_dir: 0,
+      arr_dir_lv: []
     };
   }
   
@@ -299,8 +338,18 @@ class WorkSchedule_ extends React.Component {
     
     document.title = res.module_info.name;
     
+    let arr_dir_lv = [];
+
+    for(let i = 1; i <= 20; i ++){
+      arr_dir_lv.push(i);
+    }
+
+    this.setState({
+      arr_dir_lv: arr_dir_lv
+    })
+
     setTimeout( () => {
-      //this.updateData();
+      this.updateData();
     }, 100 )
   }
   
@@ -375,6 +424,13 @@ class WorkSchedule_ extends React.Component {
       
       test_one: res.one,
       test_two: res.two,
+
+      show_zp_one: res.show_zp_one,
+      show_zp_two: res.show_zp_two,
+      kind: res.kind,
+
+      lv_cafe: res.lv_cafe,
+      lv_dir: res.lv_dir
     })
   }
   
@@ -396,7 +452,8 @@ class WorkSchedule_ extends React.Component {
     this.setState({
       isOpenModalH: true,
       userInfo: res.h_info,
-      otherAppList: res.other_app
+      otherAppList: res.other_app,
+      show_bonus: res.show_bonus
     })
   }
   
@@ -433,7 +490,17 @@ class WorkSchedule_ extends React.Component {
     
     let res = await this.getData('save_user_day', data);
     
-    console.log( res )
+    if( res['st'] == true ){
+      this.setState({
+        mainMenu: false,
+        mainMenuH: false,
+        mainMenuSmena: false
+      })
+
+      this.updateData();
+    }else{
+      alert(res['text'])
+    }
   }
   
   addTime(){
@@ -472,6 +539,18 @@ class WorkSchedule_ extends React.Component {
     let res = await this.getData('save_fastTime', data);
     
     console.log( res );
+
+    if( res['st'] == true ){
+      this.setState({
+        mainMenu: false,
+        mainMenuH: false,
+        mainMenuSmena: false
+      })
+
+      this.updateData();
+    }else{
+      alert(res['text'])
+    }
   }
 
   async fastSmena(smena_id){
@@ -487,9 +566,105 @@ class WorkSchedule_ extends React.Component {
     let res = await this.getData('save_fastSmena', data);
     
     console.log( res );
+
+    if( res['st'] == true ){
+      this.setState({
+        mainMenu: false,
+        mainMenuH: false,
+        mainMenuSmena: false
+      })
+
+      this.updateData();
+    }else{
+      alert(res['text'])
+    }
   }
 
-  render(){
+  async changePriceH(price){
+    let data = {
+      price: price,
+      user_id: this.state.chooseUser.id,
+      app_id: this.state.chooseUser.app_id,
+      smena_id: this.state.chooseUser.smena_id,
+      date: this.state.mounth,
+      part: this.state.tabTable
+    }
+    
+    let res = await this.getData('save_userPriceH', data);
+    
+    console.log( res );
+
+    if( res['st'] == true ){
+      this.setState({
+        mainMenu: false,
+        mainMenuH: false,
+        mainMenuPrice: false
+      })
+
+      this.updateData();
+    }else{
+      alert(res['text'])
+    }
+  }
+
+  changeLVDir(){
+    this.setState({
+      mainMenuLVDIR: true
+    })
+  }
+
+  async newLvDir(LV){
+    let data = {
+      date: this.state.mounth,
+      point_id: this.state.point,
+      dir_lv: LV
+    }
+    
+    let res = await this.getData('save_dir_lv', data);
+    
+    console.log( res );
+
+    if( res['st'] == true ){
+      this.setState({
+        mainMenuLVDIR: false
+      })
+
+      this.updateData();
+    }else{
+      alert(res['text'])
+    }
+  }
+
+  changeDopBonus(){
+    this.setState({
+      mainMenuDopBonus: true
+    })
+  }
+
+  async dop_bonus(type){
+    let data = {
+      date: this.state.mounth,
+      part: this.state.tabTable,
+      point_id: this.state.point,
+      type: type
+    }
+    
+    let res = await this.getData('save_dop_bonus', data);
+    
+    console.log( res );
+
+    if( res['st'] == true ){
+      this.setState({
+        mainMenuDopBonus: false
+      })
+
+      this.updateData();
+    }else{
+      alert(res['text'])
+    }
+  }
+
+  render(){ 
     return (
       <>
         <Backdrop open={this.state.is_load}>
@@ -600,6 +775,76 @@ class WorkSchedule_ extends React.Component {
           </List>
         </Dialog>
         
+        <Dialog onClose={ () => { this.setState({ mainMenuPrice: false }) } } open={this.state.mainMenuPrice}>
+          
+          { !this.state.chooseUser ? null :
+            <DialogTitle>{this.state.chooseUser.user_name} {this.state.mounth} Часовая ставка</DialogTitle>
+          }
+          
+          { !this.state.chooseUser ? null :
+            <List sx={{ pt: 0 }}>
+              
+              { this.state.chooseUser.price_arr.map( (item, key) =>
+                <ListItem key={key} button onClick={this.changePriceH.bind(this, item)} style={ parseFloat(this.state.chooseUser.price_p_h) == parseFloat(item) ? { backgroundColor: 'green', color: '#fff' } : {} }>
+                  <ListItemAvatar>
+                    <Avatar>
+                      <AssessmentIcon />
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText primary={item} />
+                </ListItem>
+              ) }
+          
+            </List>
+          }
+        </Dialog>
+
+        <Dialog onClose={ () => { this.setState({ mainMenuLVDIR: false }) } } open={this.state.mainMenuLVDIR}>
+          
+          <DialogTitle>{this.state.mounth} Уровень директора</DialogTitle>
+          
+          <List sx={{ pt: 0 }}>
+            
+            { this.state.arr_dir_lv.map( (item, key) =>
+              <ListItem key={key} button style={ parseFloat(this.state.lv_dir) == parseFloat(item) ? { backgroundColor: 'green', color: '#fff' } : {} } onClick={this.newLvDir.bind(this, item)}>
+                <ListItemAvatar>
+                  <Avatar>
+                    <AssessmentIcon />
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText primary={item+' уровень'} />
+              </ListItem>
+            ) }
+          </List>
+          
+        </Dialog>
+
+        <Dialog onClose={ () => { this.setState({ mainMenuDopBonus: false }) } } open={this.state.mainMenuDopBonus}>
+          
+          <DialogTitle>{this.state.mounth} Командный бонус</DialogTitle>
+          
+          <List sx={{ pt: 0 }}>
+            
+            <ListItem button>
+              <ListItemAvatar>
+                <Avatar style={{ backgroundColor: 'green' }}>
+                  <CheckIcon style={{ color: '#fff' }} />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary={'Выдать'} />
+            </ListItem>
+            <ListItem button>
+              <ListItemAvatar>
+                <Avatar style={{ backgroundColor: 'red' }}>
+                  <CloseIcon style={{ color: '#fff' }} />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary={'Отказать'} />
+            </ListItem>
+            
+          </List>
+          
+        </Dialog>
         
         { !this.state.userInfo ? null :
           <Dialog
@@ -612,8 +857,10 @@ class WorkSchedule_ extends React.Component {
             <DialogTitle id="scroll-dialog-title">{this.state.userInfo.user.app_name + ' ' + this.state.userInfo.user.user_name + ' ' + this.state.userInfo.date}</DialogTitle>
             <DialogContent dividers={true}>
               
-              <Typography>{'Моя нагрузка: ' + this.state.userInfo.user.my_load_h + ' / Средняя нагрузка: ' + this.state.userInfo.user.all_load_h}</Typography>
-              <Typography style={{ marginBottom: 10 }}>{'Бонус: ' + this.state.userInfo.user.bonus}</Typography>
+              <Typography style={{ marginBottom: 10 }}>{'Моя нагрузка: ' + this.state.userInfo.user.my_load_h + ' / Средняя нагрузка: ' + this.state.userInfo.user.all_load_h}</Typography>
+              { this.state.show_bonus === false ? null :
+                <Typography style={{ marginBottom: 20 }}>{'Бонус: ' + this.state.userInfo.user.bonus}</Typography>
+              }
               
               { this.state.otherAppList.length == 0 ? null :
                 <MySelect data={this.state.otherAppList} value={this.state.userInfo.new_app} func={ (event) => { let userInfo = this.state.userInfo; userInfo.new_app = event.target.value; this.setState({ userInfo: userInfo }) } } label='Кем работает' />
@@ -722,25 +969,37 @@ class WorkSchedule_ extends React.Component {
                       
                       { this.state.test_one.map( (item, key) =>
                         item.row == 'header' ?
-                          <HeaderItem key={key} dataKey={key} days={this.state.one.days} item={item} />
+                          <HeaderItem key={key} bonus_other={this.state.one.bonus_other} changeLVDir={this.changeLVDir.bind(this)} changeDopBonus={this.changeDopBonus.bind(this)} kind={this.state.kind} show_zp={this.state.show_zp_one} lv_dir={this.state.lv_dir} lv_cafe={this.state.lv_cafe} dataKey={key} days={this.state.one.days} item={item} />
                             :
                           <TableRow key={key}>
-                            <TableCell>{item.data.user_name}</TableCell>
-                            <TableCell>{item.data.app_name}</TableCell>
-                            <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer' }} onClick={ () => { this.setState({ mainMenu: true, chooseUser: item.data }) } } /> </TableCell>
-                            
+                            <TableCell style={{ minWidth: 140, minHeight: 38, position: 'absolute', backgroundColor: '#fff', marginLeft: '-1px', borderBottom: '2px solid #e5e5e5' }}>{item.data.user_name}</TableCell>
+                            <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
+
+                            { this.state.kind == 'manager' ? null :
+                              <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer' }} onClick={ () => { this.setState({ mainMenu: true, chooseUser: item.data }) } } /> </TableCell>
+                            }
+
                             { item.data.dates.map( (date, date_k) =>
                               <TableCell onClick={ this.openH.bind(this, item.data, date.date) } className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff', cursor: 'pointer' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
                             ) }
                             
-                            <TableCell style={{textAlign: 'center'}}>{item.data.price_p_h}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{item.data.given}</TableCell>
+                            { this.state.kind == 'manager' ? null :
+                              <>
+                                <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}} onClick={ () => {this.setState({ mainMenuPrice: true, chooseUser: item.data }) } }>{item.data.price_p_h}</TableCell>
+                                <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
+                                <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
+                                <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
+                                <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
 
+                                { this.state.show_zp_one == 1 || this.state.show_zp_one == 0 ?
+                                  <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
+                                    :
+                                  null
+                                }
+
+                                <TableCell style={{textAlign: 'center'}}>{item.data.given}</TableCell>
+                              </>
+                            }
                           </TableRow>
                       ) }
                       
@@ -751,7 +1010,10 @@ class WorkSchedule_ extends React.Component {
                       <TableRow>
                         <TableCell></TableCell>
                         <TableCell></TableCell>
-                        <TableCell></TableCell>
+
+                        { this.state.kind == 'manager' ? null :
+                          <TableCell></TableCell>
+                        }
                         
                         {this.state.one.bonus.map( (item, key) => 
                           <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
@@ -762,7 +1024,10 @@ class WorkSchedule_ extends React.Component {
                       <TableRow>
                         <TableCell></TableCell>
                         <TableCell>Роллов</TableCell>
-                        <TableCell></TableCell>
+                        
+                        { this.state.kind == 'manager' ? null :
+                          <TableCell></TableCell>
+                        }
                         
                         {this.state.one.bonus.map( (item, key) => 
                           <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
@@ -773,7 +1038,10 @@ class WorkSchedule_ extends React.Component {
                       <TableRow>
                         <TableCell></TableCell>
                         <TableCell>Пиццы</TableCell>
-                        <TableCell></TableCell>
+                        
+                        { this.state.kind == 'manager' ? null :
+                          <TableCell></TableCell>
+                        }
                         
                         {this.state.one.bonus.map( (item, key) => 
                           <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
@@ -784,7 +1052,10 @@ class WorkSchedule_ extends React.Component {
                       <TableRow>
                         <TableCell></TableCell>
                         <TableCell className="min_size">Заказы готовились больше 40 минут</TableCell>
-                        <TableCell></TableCell>
+                        
+                        { this.state.kind == 'manager' ? null :
+                          <TableCell></TableCell>
+                        }
                         
                         {this.state.one.order_stat.map( (item, key) => 
                           <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
@@ -808,25 +1079,37 @@ class WorkSchedule_ extends React.Component {
                       
                       { this.state.test_two.map( (item, key) =>
                         item.row == 'header' ?
-                          <HeaderItem key={key} days={this.state.two.days} item={item} />
+                          <HeaderItem bonus_other={this.state.two.bonus_other} changeLVDir={this.changeLVDir.bind(this)} changeDopBonus={this.changeDopBonus.bind(this)} key={key} kind={this.state.kind} show_zp={this.state.show_zp_two} lv_dir={this.state.lv_dir} lv_cafe={this.state.lv_cafe} dataKey={key} days={this.state.two.days} item={item} />
                             :
                           <TableRow key={key}>
-                            <TableCell>{item.data.user_name}</TableCell>
-                            <TableCell>{item.data.app_name}</TableCell>
-                            <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer' }} onClick={ () => { this.setState({ mainMenu: true, chooseUser: item.data }) } } /> </TableCell>
-                            
+                            <TableCell style={{ minWidth: 140, minHeight: 38, position: 'absolute', backgroundColor: '#fff', marginLeft: '-1px', borderBottom: '2px solid #e5e5e5' }}>{item.data.user_name}</TableCell>
+                            <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
+
+                            { this.state.kind == 'manager' ? null :
+                              <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer' }} onClick={ () => { this.setState({ mainMenu: true, chooseUser: item.data }) } } /> </TableCell>
+                            }
+
                             { item.data.dates.map( (date, date_k) =>
                               <TableCell onClick={ this.openH.bind(this, item.data, date.date) } className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff', cursor: 'pointer' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
                             ) }
                             
-                            <TableCell style={{textAlign: 'center'}} >{item.data.price_p_h}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{item.data.given}</TableCell>
+                            { this.state.kind == 'manager' ? null :
+                              <>
+                                <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}} onClick={ () => {this.setState({ mainMenuPrice: true, chooseUser: item.data }) } }>{item.data.price_p_h}</TableCell>
+                                <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
+                                <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
+                                <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
+                                <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
+                                
+                                { this.state.show_zp_two == 1 || this.state.show_zp_two == 0 ?
+                                  <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
+                                    :
+                                  null
+                                }
 
+                                <TableCell style={{textAlign: 'center'}}>{item.data.given}</TableCell>
+                              </>
+                            }
                           </TableRow>
                       ) }
                       
@@ -837,7 +1120,10 @@ class WorkSchedule_ extends React.Component {
                       <TableRow>
                         <TableCell></TableCell>
                         <TableCell></TableCell>
-                        <TableCell></TableCell>
+                        
+                        { this.state.kind == 'manager' ? null :
+                          <TableCell></TableCell>
+                        }
                         
                         {this.state.two.bonus.map( (item, key) => 
                           <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
@@ -848,7 +1134,10 @@ class WorkSchedule_ extends React.Component {
                       <TableRow>
                         <TableCell></TableCell>
                         <TableCell>Роллов</TableCell>
-                        <TableCell></TableCell>
+                        
+                        { this.state.kind == 'manager' ? null :
+                          <TableCell></TableCell>
+                        }
                         
                         {this.state.two.bonus.map( (item, key) => 
                           <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
@@ -859,7 +1148,10 @@ class WorkSchedule_ extends React.Component {
                       <TableRow>
                         <TableCell></TableCell>
                         <TableCell>Пиццы</TableCell>
-                        <TableCell></TableCell>
+                        
+                        { this.state.kind == 'manager' ? null :
+                          <TableCell></TableCell>
+                        }
                         
                         {this.state.two.bonus.map( (item, key) => 
                           <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
@@ -870,7 +1162,10 @@ class WorkSchedule_ extends React.Component {
                       <TableRow>
                         <TableCell></TableCell>
                         <TableCell className="min_size">Заказы готовились больше 40 минут</TableCell>
-                        <TableCell></TableCell>
+                        
+                        { this.state.kind == 'manager' ? null :
+                          <TableCell></TableCell>
+                        }
                         
                         {this.state.two.order_stat.map( (item, key) => 
                           <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>

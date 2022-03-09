@@ -12,37 +12,66 @@ import Button from '@mui/material/Button';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableFooter from '@mui/material/TableFooter';
-import Paper from '@mui/material/Paper';
 
 import Divider from '@mui/material/Divider';
+
+import CloseIcon from '@mui/icons-material/Close';
+import CheckIcon from '@mui/icons-material/Check';
+
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-import CloseIcon from '@mui/icons-material/Close';
-
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyTimePicker, MyTextInput, MyDaterange, MyAutocomplite, MyDatePicker } from '../../stores/elements';
+import { MySelect, MyCheckBox, MyTimePicker, MyTextInput, MyDaterange, MyAutocomplite } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
+
+import DatePicker from "react-multi-date-picker"
+
+class MyDatePicker extends React.PureComponent {
+  constructor(props) {
+    super(props);
+        
+    this.state = {
+      classes: this.props.classes,
+    };
+  }
+  
+  render(){
+    return (
+      <>
+        <Typography>{this.props.label}</Typography>
+        <DatePicker
+          format="YYYY-MM-DD"
+          
+          multiple
+          sort
+          
+          //mask="____/__/__"
+          //multiple={ this.props.multiple && this.props.multiple === true ? true : false }
+          //disableCloseOnSelect={true}
+          //inputFormat="yyyy-MM-dd"
+          style={{ width: '100%' }}
+          label={this.props.label}
+          value={this.props.value}
+          onChange={this.props.func}
+        />
+      </>
+    )
+  }
+}
 
 const queryString = require('query-string');
 
@@ -224,6 +253,8 @@ class SiteSale2_new_ extends React.Component {
         {id: 1, name: 'В определенные даты'},
         {id: 2, name: '14 дней с 10:00 до 21:40'},
         {id: 3, name: '14 дней с 00:00 до 23:59'},
+        {id: 4, name: '30 дней с 10:00 до 21:40'},
+        {id: 5, name: '30 дней с 00:00 до 23:59'},
       ],
       type_order_list: [
         {id: 1, name: 'Все'},
@@ -308,7 +339,8 @@ class SiteSale2_new_ extends React.Component {
       
       conditionItems: [],
       
-      testDate: []
+      testDate: [],
+      createdPromo: []
     };
   }
   
@@ -352,7 +384,19 @@ class SiteSale2_new_ extends React.Component {
     if( !this.click ){
       this.click = true;  
       
-      let count_promo = this.state.promo_sale_list.find( (item) => parseInt(item.id) == parseInt(this.state.promo_sale) )['name'];
+      this.setState({
+        createdPromo: []
+      });
+
+      let count_promo = 0;
+
+      if( parseInt( this.state.sale_type ) == 2 ){
+        count_promo = this.state.promo_sale_list.find( (item) => parseInt(item.id) == parseInt(this.state.promo_sale) )['name'];
+      }else{
+        count_promo = parseInt(this.state.promo_sale);
+      }
+
+      
       
       let conditionItems = [];
       
@@ -384,7 +428,7 @@ class SiteSale2_new_ extends React.Component {
       
       let data = {
         spamNameSMS: this.state.spamNameSMS,
-        promo_vk_prize: this.state.promo_vk_prize,
+        promo_vk_prize: this.state.promo_prizw_vk,
         cert_text: this.state.cert_text,
         addr: this.state.numberList,
         where_promo: this.state.where_promo,
@@ -442,6 +486,23 @@ class SiteSale2_new_ extends React.Component {
       
       console.log( res )
       
+      if( res['st'] == false ){
+        this.setState({
+          modalDialog: true,
+          modalText: res.text_err
+        });
+
+        setTimeout( () => {
+          this.click = false;    
+        }, 300 )
+
+        return ;
+      }
+
+      this.setState({
+        createdPromo: res.promo_text
+      });
+
       //создать
       if( parseInt(this.state.where_promo) == 1 || parseInt(this.state.where_promo) == 8 ){
         this.setState({
@@ -558,6 +619,21 @@ class SiteSale2_new_ extends React.Component {
       })
     }
     
+    if( type == 'date_promo' && (event.target.value == 4 || event.target.value == 5) ){
+      let thisDay = new Date();
+      let nextDay = new Date();
+      nextDay.setDate(nextDay.getDate() + 30);
+      
+      this.setState({
+        rangeDate: [formatDate(thisDay), formatDate(nextDay)],
+        date_start: formatDate(thisDay),
+        date_end: formatDate(nextDay),
+        
+        time_start: event.target.value == 4 ? '10:00' : '00:00',
+        time_end: event.target.value == 4 ? '21:40' : '23:59',
+      })
+    }
+
     setTimeout( () => {
       this.generateTextDescFalse();   
       this.generateTextDescTrue();   
@@ -613,8 +689,16 @@ class SiteSale2_new_ extends React.Component {
     
     if(parseInt(promo_action) == 1){//скидка
       var promo_type_sale = this.state.type_sale,
-        count_promo = this.state.promo_sale_list.find( (item) => parseInt(item.id) == parseInt(this.state.promo_sale) )['name'],//размер скидки
+        //count_promo = this.state.promo_sale_list.find( (item) => parseInt(item.id) == parseInt(this.state.promo_sale) )['name'],//размер скидки
         promo_type = this.state.sale_type; //1 - рубли 2 %
+
+      let count_promo = 0;
+
+      if( parseInt( this.state.sale_type ) == 2 ){
+        count_promo = count_promo = this.state.promo_sale_list.find( (item) => parseInt(item.id) == parseInt(this.state.promo_sale) )['name'];//размер скидки
+      }else{
+        count_promo = parseInt(this.state.promo_sale);
+      }
 
       if(parseInt(promo_type_sale) == 1){//товары
         var promo_items = this.state.saleItem,
@@ -810,7 +894,7 @@ class SiteSale2_new_ extends React.Component {
       thisItems.push({
         item_id: this.state.priceItem.id,
         name: thisItem.name,
-        price: this.state.addItemPrice,
+        price: this.state.addItemCount,
       })
       
       this.setState({
@@ -861,6 +945,11 @@ class SiteSale2_new_ extends React.Component {
           <DialogTitle id="alert-dialog-title">Результат операции</DialogTitle>
           <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             <Typography>{this.state.modalText}</Typography>
+
+            <br />
+
+            <Typography>Созданыне промокоды: { this.state.createdPromo.join(', ') }</Typography>
+
             <br />
             { this.state.modalLink == '' ? null :
               <a href={this.state.modalLink} style={{ color: 'red' }}>Скачать</a>
@@ -932,9 +1021,15 @@ class SiteSale2_new_ extends React.Component {
                 </Grid>
               }
             
-              <Grid item xs={12} sm={3}>
-                <MySelect classes={this.state.classes} data={this.state.promo_sale_list} value={this.state.promo_sale} func={ this.changeData.bind(this, 'promo_sale') } label='Размер скидки' />
-              </Grid>
+              { parseInt( this.state.sale_type ) == 1 ?
+                <Grid item xs={12} sm={3}>
+                  <MyTextInput classes={this.state.classes} value={this.state.promo_sale} func={ this.changeData.bind(this, 'promo_sale') } label='Размер скидки' />
+                </Grid>
+                  :
+                <Grid item xs={12} sm={3}>
+                  <MySelect classes={this.state.classes} data={this.state.promo_sale_list} value={this.state.promo_sale} func={ this.changeData.bind(this, 'promo_sale') } label='Размер скидки' />
+                </Grid>
+              }
             
               <Grid item xs={12} sm={3}>
                 <MySelect classes={this.state.classes} data={this.state.type_sale_list} value={this.state.sale_type} func={ this.changeData.bind(this, 'sale_type') } label='Какая скидка' />
@@ -1306,6 +1401,8 @@ class SiteSale2_edit_ extends React.Component {
         {id: 1, name: 'В определенные даты'},
         {id: 2, name: '14 дней с 10:00 до 21:40'},
         {id: 3, name: '14 дней с 00:00 до 23:59'},
+        {id: 4, name: '30 дней с 10:00 до 21:40'},
+        {id: 5, name: '30 дней с 00:00 до 23:59'},
       ],
       type_order_list: [
         {id: 1, name: 'Все'},
@@ -1630,6 +1727,21 @@ class SiteSale2_edit_ extends React.Component {
         time_end: event.target.value == 2 ? '21:40' : '23:59',
       })
     }
+
+    if( type == 'date_promo' && (event.target.value == 4 || event.target.value == 5) ){
+      let thisDay = new Date();
+      let nextDay = new Date();
+      nextDay.setDate(nextDay.getDate() + 30);
+      
+      this.setState({
+        rangeDate: [formatDate(thisDay), formatDate(nextDay)],
+        date_start: formatDate(thisDay),
+        date_end: formatDate(nextDay),
+        
+        time_start: event.target.value == 4 ? '10:00' : '00:00',
+        time_end: event.target.value == 4 ? '21:40' : '23:59',
+      })
+    }
     
     setTimeout( () => {
       this.generateTextDescFalse();   
@@ -1830,7 +1942,7 @@ class SiteSale2_edit_ extends React.Component {
       thisItems.push({
         item_id: this.state.priceItem,
         name: thisItem.name,
-        price: this.state.addItemPrice,
+        price: this.state.addItemCount,
       })
       
       this.setState({
@@ -2038,10 +2150,7 @@ class SiteSale2_ extends React.Component {
   }
   
   async componentDidMount(){
-    
     let data = await this.getData('get_all');
-    
-    console.log( data )
     
     this.setState({
       module_name: data.module_info.name,
@@ -2173,6 +2282,10 @@ class SiteSale2_ extends React.Component {
               
               <Link to={"/site_sale_2/stat"} style={{ zIndex: 10, marginLeft: 20 }}>
                 <Button variant="contained">Статистика</Button>
+              </Link>
+
+              <Link to={"/site_sale_2/stat_list"} style={{ zIndex: 10, marginLeft: 20 }}>
+                <Button variant="contained">Выписанные промокоды</Button>
               </Link>
               
             </Grid>
@@ -2429,6 +2542,189 @@ class SiteSale2_Stat_ extends React.Component {
   }
 }
 
+class SiteSale2_StatList_ extends React.Component {
+  click = false;
+  
+  constructor(props) {
+    super(props);
+        
+    this.state = {
+      classes: this.props.classes,
+      history: this.props.history,
+      module: 'site_sale_2',
+      module_name: '',
+      is_load: false,
+      
+      date_start: formatDate(new Date()),
+      date_end: formatDate(new Date()),
+      rangeDate: [formatDate(new Date()), formatDate(new Date())],
+
+      promo_list: []
+    };
+  }
+  
+  async componentDidMount(){
+    
+    let data = await this.getData('get_spam_list');
+    
+    console.log( data )
+    
+    this.setState({
+      module_name: data.module_info.name,
+      spam_list: data.spam_list
+    })
+    
+    document.title = data.module_info.name;
+  }
+  
+  getData = (method, data = {}) => {
+    
+    this.setState({
+      is_load: true
+    })
+    
+    return fetch('https://jacochef.ru/api/index_new.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type':'application/x-www-form-urlencoded'},
+      body: queryString.stringify({
+        method: method, 
+        module: this.state.module,
+        version: 2,
+        login: localStorage.getItem('token'),
+        data: JSON.stringify( data )
+      })
+    }).then(res => res.json()).then(json => {
+      
+      if( json.st === false && json.type == 'redir' ){
+        this.state.history.push("/");
+        return;
+      }
+      
+      if( json.st === false && json.type == 'auth' ){
+        window.location.pathname = '/auth';
+        return;
+      }
+      
+      setTimeout( () => {
+        this.setState({
+          is_load: false
+        })
+      }, 300 )
+      
+      return json;
+    })
+    .catch(err => { 
+      console.log( err )
+      
+      setTimeout( () => {
+        this.setState({
+          is_load: false
+        })
+      }, 300 )
+    });
+  }
+  
+  async show(){
+    let data = {
+      spam_id: this.state.spam_id
+    }
+    
+    let res = await this.getData('get_spam_data', data);
+    
+    console.log( res )
+    
+    this.setState({
+      spam_list_data: res.spam_list,
+      spam_list_data_stat: res.stat
+    })
+  }
+
+  async getUsers(){
+    let data = {
+      dateStart: this.state.date_start,
+      dateEnd: this.state.date_end,
+    }
+    
+    let res = await this.getData('get_promo_users', data);
+    
+    this.setState({
+      promo_list: res.promo_list
+    })
+  }
+  
+  changeDateRange(data){
+    let dateStart = data[0] ? formatDate(data[0]) : '';
+    let dateEnd = data[1] ? formatDate(data[1]) : '';
+    
+    this.setState({
+      rangeDate: [dateStart, dateEnd],
+      date_start: dateStart,
+      date_end: dateEnd,
+    })
+  }
+
+  render(){
+    return (
+      <>
+        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        
+        <Grid container>
+          <Grid item xs={12} sm={12}>
+            <h1>{this.state.module_name}</h1>
+          </Grid>
+          
+          
+          
+          <Grid container direction="row" style={{ paddingTop: 20 }} spacing={3}>
+            
+            <Grid item xs={12} sm={6} className="MyDaterange">
+              <MyDaterange startText="Дата от" endText="Дата до" value={this.state.rangeDate} func={ this.changeDateRange.bind(this) } />
+            </Grid>
+            
+            <Grid item xs={12} sm={3}>
+              <Button variant="contained" onClick={this.getUsers.bind(this)}>Обновить</Button>
+            </Grid>
+
+          </Grid>  
+          
+          <Grid item xs={12} sm={12} style={{ marginTop: 20 }}>
+            
+            { this.state.promo_list.map( (item, key) => 
+              <Accordion key={key} style={{ width: '100%' }}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                >
+                  <Typography>{item.name}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Table size={'small'} style={{ marginTop: 15 }}>
+                    <TableBody>
+                      { item.promo_list.map( (promo, k) =>
+                        <TableRow key={k} style={{ backgroundColor: parseInt(promo.is_delete) == 1 ? '#c03' : 'white', color: parseInt(promo.is_delete) == 1 ? 'white' : 'black' }}>
+                          <TableCell style={{ color: 'inherit' }}>{k+1}</TableCell>
+                          <TableCell style={{ color: 'inherit', backgroundColor: parseInt(promo.count) == 0 ? 'green' : '#c03' }}>{promo.name}</TableCell>
+                          <TableCell style={{ color: 'inherit' }}>{promo.coment}</TableCell>
+                          <TableCell style={{ color: 'inherit' }}>{ parseInt(promo.count) == 0 ? <CheckIcon /> : <CloseIcon /> }</TableCell>
+                        </TableRow>
+                      ) }
+                    </TableBody>
+                    
+                  </Table>
+                </AccordionDetails>
+              </Accordion>
+            ) }
+            
+          </Grid>
+        
+        </Grid>
+      </>
+    )
+  }
+}
+
 export function SiteSale2_New () {
   const classes = useStyles();
   let history = useHistory();
@@ -2466,3 +2762,13 @@ export function SiteSale2_Stat () {
     <SiteSale2_Stat_ classes={classes} history={history} />
   );
 }
+
+export function SiteSale2_StatList () {
+  const classes = useStyles();
+  let history = useHistory();
+  
+  return (
+    <SiteSale2_StatList_ classes={classes} history={history} />
+  );
+}
+
