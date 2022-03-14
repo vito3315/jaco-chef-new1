@@ -892,7 +892,7 @@ class SiteSale2_new_ extends React.Component {
       let thisItem = this.state.items.find( (item) => parseInt(item.id) == parseInt(this.state.priceItem.id) );
       
       thisItems.push({
-        item_id: this.state.priceItem.id,
+        id: this.state.priceItem.id,
         name: thisItem.name,
         price: this.state.addItemCount,
       })
@@ -1940,7 +1940,7 @@ class SiteSale2_edit_ extends React.Component {
       let thisItem = this.state.items.find( (item) => parseInt(item.id) == parseInt(this.state.priceItem) );
       
       thisItems.push({
-        item_id: this.state.priceItem,
+        id: this.state.priceItem,
         name: thisItem.name,
         price: this.state.addItemCount,
       })

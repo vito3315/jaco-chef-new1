@@ -88,6 +88,8 @@ function formatDate(date) {
 }
 
 class DriverStat_ extends React.Component {
+  click = false;
+
   constructor(props) {
     super(props);
         
@@ -111,7 +113,17 @@ class DriverStat_ extends React.Component {
       drive_stat_date: null,
       summ: 0,
       choose_driver_id: 0,
-      check_cash: 0
+      check_cash: 0,
+
+      getSumm: 0,
+      modalDialogGetSumm: false,
+      getSummDriverId: null,
+      getSummComment: '',
+
+      modalDialogStatSumm: false,
+      modalDialogStatSummMain: false,
+      statSumm: [],
+      statSummMain: [],
     };
   }
   
@@ -225,9 +237,17 @@ class DriverStat_ extends React.Component {
   }
 
   async saveGivePrice(){
+    if( this.click ){
+      return ;
+    }
+
+    this.click = true;
 
     if( parseInt( this.state.summ ) > parseInt( this.state.check_cash ) ){
       alert('Нельзя сдать денег больше, чем есть у курьера');
+      setTimeout( () => {
+        this.click = false;
+      }, 300 )
       return;
     }
 
@@ -254,6 +274,102 @@ class DriverStat_ extends React.Component {
     }else{
       alert(res['text'])
     }
+
+    setTimeout( () => {
+      this.click = false;
+    }, 300 )
+  }
+
+  getCash(driver){
+    this.setState({
+      modalDialogGetSumm: true,
+      getSumm: 0,
+      getSummDriverId: driver,
+      getSummComment: ''
+    })
+  }
+
+  async saveGetPrice(){
+    if( this.click ){
+      return ;
+    }
+
+    this.click = true;
+
+    if( parseInt( this.state.getSumm ) > 1000 ){
+      alert('Нельзя выдать больше 1000р за раз');
+      setTimeout( () => {
+        this.click = false;
+      }, 300 )
+      return;
+    }
+
+
+    let data = {
+      point_id: this.state.point,
+      price: this.state.getSumm,
+      driver_id: this.state.getSummDriverId.driver_id,
+      comment: this.state.getSummComment
+    };
+    
+    let res = await this.getData('save_get', data);
+
+    console.log( res )
+
+    if( res['st'] == true ){
+      this.setState({
+        modalDialogGetSumm: false,
+        getSumm: 0,
+        getSummDriverId: null,
+        getSummComment: ''  
+      })
+
+      this.updateData();
+    }else{
+      alert(res['text'])
+    }
+
+    setTimeout( () => {
+      this.click = false;
+    }, 300 )
+  }
+
+  async getStatDop(driver){
+    let data = {
+      point_id: this.state.point,
+      driver_id: driver.driver_id,
+      date_start: this.state.rangeDate[0],
+      date_end: this.state.rangeDate[1],
+    };
+    
+    let res = await this.getData('getStatDop', data);
+
+    console.log( res )
+
+    this.setState({
+      modalDialogStatSumm: true,
+      statSumm: res,
+      getSummDriverId: driver 
+    })
+  }
+
+  async getStatDopMain(driver){
+    let data = {
+      point_id: this.state.point,
+      driver_id: driver.driver_id,
+      date_start: this.state.rangeDate[0],
+      date_end: this.state.rangeDate[1],
+    };
+    
+    let res = await this.getData('getStatDopMain', data);
+
+    console.log( res )
+
+    this.setState({
+      modalDialogStatSummMain: true,
+      statSummMain: res,
+      getSummDriverId: driver 
+    })
   }
 
   render(){
@@ -278,6 +394,119 @@ class DriverStat_ extends React.Component {
           <DialogActions>
             <Button color="primary" onClick={this.saveGivePrice.bind(this)}>Сохранить</Button>
           </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={this.state.modalDialogGetSumm}
+          onClose={ () => { this.setState({ modalDialogGetSumm: false }) } }
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle>Дополнительная выплата курьеру "{this.state.getSummDriverId ? this.state.getSummDriverId.name : ''}"</DialogTitle>
+          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+            
+            <Grid container spacing={3}>
+              
+              <Grid item xs={12} sm={12}>
+                <MyTextInput classes={this.state.classes} type='number' value={ this.state.getSumm } func={ (event) => { this.setState({ getSumm: event.target.value }) } } label='Сумма' />
+              </Grid>
+
+              <Grid item xs={12} sm={12}>
+                <MyTextInput classes={this.state.classes} maxRows={2} value={ this.state.getSummComment } func={ (event) => { this.setState({ getSummComment: event.target.value }) } } label='Комментарий' />
+              </Grid>
+
+            </Grid>
+
+            
+
+          </DialogContent>
+          <DialogActions>
+            <Button color="primary" onClick={this.saveGetPrice.bind(this)}>Сохранить</Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={this.state.modalDialogStatSumm}
+          onClose={ () => { this.setState({ modalDialogStatSumm: false, getSummDriverId: null }) } }
+          fullWidth={true}
+          maxWidth={'md'}
+        >
+          <DialogTitle>Доп выплаты "{this.state.getSummDriverId ? this.state.getSummDriverId.name : ''}"</DialogTitle>
+          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+            
+            <Table size={'small'}>
+                
+              <TableHead>
+                <TableRow>
+                  <TableCell>Дата</TableCell>
+                  <TableCell>Кто назначил</TableCell>
+                  <TableCell>Сумма</TableCell>
+                  <TableCell>Комментарий</TableCell>
+                  <TableCell>Тип</TableCell>
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                
+                { this.state.statSumm.map( (item, key) =>
+                  <TableRow key={key}>
+                    <TableCell>{item.date_time}</TableCell>
+                    <TableCell>{item.user_name}</TableCell>
+                    <TableCell>{item.price}</TableCell>
+                    <TableCell>{item.comment}</TableCell>
+                    <TableCell>{ parseInt(item.order_id) > 0 ? 'Довоз' : 'Доп выплата' }</TableCell>
+                  </TableRow>
+                ) }
+              
+              </TableBody>
+            
+            </Table>
+
+            
+
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={this.state.modalDialogStatSummMain}
+          onClose={ () => { this.setState({ modalDialogStatSummMain: false, getSummDriverId: null }) } }
+          fullWidth={true}
+          maxWidth={'md'}
+        >
+          <DialogTitle>Выплаты "{this.state.getSummDriverId ? this.state.getSummDriverId.name : ''}"</DialogTitle>
+          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+            
+            <Table size={'small'}>
+                
+              <TableHead>
+                <TableRow>
+                  <TableCell>Заказ</TableCell>
+                  <TableCell>Дата</TableCell>
+                  <TableCell>Сумма</TableCell>
+                  <TableCell>Пользователь</TableCell>
+                  <TableCell>Тип</TableCell>
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                
+                { this.state.statSummMain.map( (item, key) =>
+                  <TableRow key={key}>
+                    <TableCell>{ parseInt(item.order_id) == 0 ? '' : item.order_id }</TableCell>
+                    <TableCell>{item.date_time}</TableCell>
+                    <TableCell>{ parseInt(item.my_cash) == 0 ? item.give : item.my_cash }</TableCell>
+                    <TableCell>{ parseInt(item.order_id) == 0 ? item.user_name : '' }</TableCell>
+                    <TableCell>{ parseInt(item.order_id) == 0 ? 'Сдал' : 'С заказа' }</TableCell>
+                  </TableRow>
+                ) }
+              
+              </TableBody>
+            
+            </Table>
+
+            
+
+          </DialogContent>
         </Dialog>
         
         <Grid container spacing={3}>
@@ -319,6 +548,7 @@ class DriverStat_ extends React.Component {
                     <TableCell>Заработал</TableCell>
                     <TableCell>Налички на руках</TableCell>
                     <TableCell></TableCell>
+                    <TableCell></TableCell>
                   </TableRow>
                 </TableHead>
 
@@ -336,14 +566,26 @@ class DriverStat_ extends React.Component {
 
                       <TableCell>{item.give_by_date}</TableCell>
 
-                      <TableCell>{item.dop_price ? item.dop_price : 0}</TableCell>
+                      <TableCell>
+                        <Button variant="contained" onClick={this.getStatDop.bind(this, item)} style={{ fontWeight: 'bolder' }}>{item.dop_price ? item.dop_price : 0}</Button>
+                      </TableCell>
+
                       <TableCell style={{ display: 'none' }}>{item.err_summ}</TableCell>
                       <TableCell>{item.my_price ? item.my_price : 0}</TableCell>
-                      <TableCell>{item.my_orders}</TableCell>
+
+                      
+                      <TableCell>
+                        <Button variant="contained" onClick={this.getStatDopMain.bind(this, item)} style={{ fontWeight: 'bolder' }}>{item.my_orders}</Button>
+                      </TableCell>
+
+                      
                       <TableCell>{item.my}</TableCell>
                       <TableCell>{item.ost_cash}</TableCell>
                       <TableCell>
                         <Button variant="contained" onClick={this.giveCash.bind(this, item.driver_id, item.ost_cash)}>Сдать</Button>
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="contained" onClick={this.getCash.bind(this, item)}>Доп выплата</Button>
                       </TableCell>
                     </TableRow>
                   ) }
