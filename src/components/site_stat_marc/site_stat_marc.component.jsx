@@ -210,7 +210,7 @@ class SiteStatMarc_ extends React.Component {
     }
 
     setTimeout( () => {
-      this.testData();
+      //this.testData();
     }, 300 )
     
 
