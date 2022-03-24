@@ -17,9 +17,9 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-import * as am5 from "@amcharts/amcharts5";
+/*import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
-import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";*/
 
 import { MyTextInput, MySelect, MyAutocomplite, MyDaterange } from '../../stores/elements';
 
@@ -206,7 +206,7 @@ class SiteStatMarc_ extends React.Component {
       })
     }
 
-    if( parseInt( this.state.typeShow ) == 2 ){
+    /*if( parseInt( this.state.typeShow ) == 2 ){
       this.renderGraphNewUsers(res.new_users);
       this.renderGraphOrders(res.count_orders);
       this.renderGraphAvgSumm(res.avg_summ);
@@ -218,10 +218,10 @@ class SiteStatMarc_ extends React.Component {
       this.renderGraphOrdersD(res.count_orders);
       this.renderGraphAvgSummD(res.avg_summ);
       this.renderCountPosD(res.count_pos);
-    }
+    }*/
   }
 
-  renderGraphNewUsers(MyData){
+  /*renderGraphNewUsers(MyData){
     if( this.chartnewusers ){
       this.chartnewusers.dispose();
     }
@@ -1257,7 +1257,7 @@ class SiteStatMarc_ extends React.Component {
     yAxis.set("tooltip", am5.Tooltip.new(root, {
       themeTags: ["axis"]
     }));
-  }
+  }*/
 
   changeDateRange(data){
     let dateStart = data[0] ? formatDate(data[0]) : '';
