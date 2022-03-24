@@ -23,9 +23,6 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";*/
 
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
-import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-
-am4core.useTheme(am4themes_animated);
 
 import { MyTextInput, MySelect, MyAutocomplite, MyDaterange } from '../../stores/elements';
 
@@ -212,7 +209,10 @@ class SiteStatMarc_ extends React.Component {
       })
     }
 
-    this.testData();
+    setTimeout( () => {
+      this.testData();
+    }, 300 )
+    
 
     /*if( parseInt( this.state.typeShow ) == 2 ){
       this.renderGraphNewUsers(res.new_users);
@@ -230,70 +230,69 @@ class SiteStatMarc_ extends React.Component {
   }
 
   testData(){
-    var chart = am4core.create("chartnewusers", am4charts.XYChart);
+    let chart = am4core.create("chartnewusers", am4charts.XYChart);
 
     // Add data
     chart.data = [{
-      "date": new Date(2018, 0, 1),
-      "value": 450,
-      "value2": 162,
-      "value3": 1100
+      "country": "Lithuania",
+      "litres": 501.9,
+      "units": 250
     }, {
-      "date": new Date(2018, 0, 2),
-      "value": 669,
-      "value3": 841
+      "country": "Czech Republic",
+      "litres": 301.9,
+      "units": 222
     }, {
-      "date": new Date(2018, 0, 3),
-      "value": 1200,
-      "value3": 199
+      "country": "Ireland",
+      "litres": 201.1,
+      "units": 170
     }, {
-      "date": new Date(2018, 0, 4),
-      "value2": 867
+      "country": "Germany",
+      "litres": 165.8,
+      "units": 122
     }, {
-      "date": new Date(2018, 0, 5),
-      "value2": 185,
-      "value3": 669
+      "country": "Australia",
+      "litres": 139.9,
+      "units": 99
     }, {
-      "date": new Date(2018, 0, 6),
-      "value": 150
+      "country": "Austria",
+      "litres": 128.3,
+      "units": 85
     }, {
-      "date": new Date(2018, 0, 7),
-      "value": 1220,
-      "value2": 350,
-      "value3": 600
+      "country": "UK",
+      "litres": 99,
+      "units": 93
+    }, {
+      "country": "Belgium",
+      "litres": 60,
+      "units": 50
+    }, {
+      "country": "The Netherlands",
+      "litres": 50,
+      "units": 42
     }];
 
     // Create axes
-    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-    dateAxis.renderer.grid.template.location = 0;
-    dateAxis.renderer.minGridDistance = 30;
+    let categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+    categoryAxis.dataFields.category = "country";
+    categoryAxis.title.text = "Countries";
 
-    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.title.text = "Litres sold (M)";
 
     // Create series
-    function createSeries(field, name) {
-      var series = chart.series.push(new am4charts.LineSeries());
-      series.dataFields.valueY = field;
-      series.dataFields.dateX = "date";
-      series.name = name;
-      series.tooltipText = "{dateX}: [b]{valueY}[/]";
-      series.strokeWidth = 2;
-      
-      series.smoothing = "monotoneX";
-      
-      var bullet = series.bullets.push(new am4charts.CircleBullet());
-      bullet.circle.stroke = am4core.color("#fff");
-      bullet.circle.strokeWidth = 2;
-      
-      return series;
-    }
+    let series = chart.series.push(new am4charts.ColumnSeries());
+    series.dataFields.valueY = "litres";
+    series.dataFields.categoryX = "country";
+    series.name = "Sales";
+    series.columns.template.tooltipText = "Series: {name}\nCategory: {categoryX}\nValue: {valueY}";
+    series.columns.template.fill = am4core.color("#104547"); // fill
 
-    createSeries("value", "Series #1");
-    createSeries("value2", "Series #2");
-    createSeries("value3", "Series #3");
-
-    chart.legend = new am4charts.Legend();
-    chart.cursor = new am4charts.XYCursor();
+    var series2 = chart.series.push(new am4charts.LineSeries());
+    series2.name = "Units";
+    series2.stroke = am4core.color("#CDA2AB");
+    series2.strokeWidth = 3;
+    series2.dataFields.valueY = "units";
+    series2.dataFields.categoryX = "country";
   }
 
   /*renderGraphNewUsers(MyData){
