@@ -212,7 +212,7 @@ class SiteStatMarc_ extends React.Component {
    
     
 
-    /*if( parseInt( this.state.typeShow ) == 2 ){
+    if( parseInt( this.state.typeShow ) == 2 ){
       this.renderGraphNewUsers(res.new_users);
       this.renderGraphOrders(res.count_orders);
       this.renderGraphAvgSumm(res.avg_summ);
@@ -224,7 +224,7 @@ class SiteStatMarc_ extends React.Component {
       this.renderGraphOrdersD(res.count_orders);
       this.renderGraphAvgSummD(res.avg_summ);
       this.renderCountPosD(res.count_pos);
-    }*/
+    }
   }
 
   
@@ -1415,7 +1415,7 @@ class SiteStatMarc_ extends React.Component {
             </Grid>
           }
 
-          { this.state.typeShow != 1 ? null :
+          { this.state.typeShow != 2 ? null :
             <Grid item xs={12}>
               <h2 style={{ textAlign: 'center' }}>Новые клиенты по месяцам</h2>
               <div id="chartnewusers" style={{ width: "100%", height: "500px" }} />
