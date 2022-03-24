@@ -21,6 +21,12 @@ import Paper from '@mui/material/Paper';
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";*/
 
+import * as am4core from "@amcharts/amcharts4/core";
+import * as am4charts from "@amcharts/amcharts4/charts";
+import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+
+am4core.useTheme(am4themes_animated);
+
 import { MyTextInput, MySelect, MyAutocomplite, MyDaterange } from '../../stores/elements';
 
 const queryString = require('query-string');
@@ -206,6 +212,8 @@ class SiteStatMarc_ extends React.Component {
       })
     }
 
+    this.testData();
+
     /*if( parseInt( this.state.typeShow ) == 2 ){
       this.renderGraphNewUsers(res.new_users);
       this.renderGraphOrders(res.count_orders);
@@ -219,6 +227,73 @@ class SiteStatMarc_ extends React.Component {
       this.renderGraphAvgSummD(res.avg_summ);
       this.renderCountPosD(res.count_pos);
     }*/
+  }
+
+  testData(){
+    var chart = am4core.create("chartnewusers", am4charts.XYChart);
+
+    // Add data
+    chart.data = [{
+      "date": new Date(2018, 0, 1),
+      "value": 450,
+      "value2": 162,
+      "value3": 1100
+    }, {
+      "date": new Date(2018, 0, 2),
+      "value": 669,
+      "value3": 841
+    }, {
+      "date": new Date(2018, 0, 3),
+      "value": 1200,
+      "value3": 199
+    }, {
+      "date": new Date(2018, 0, 4),
+      "value2": 867
+    }, {
+      "date": new Date(2018, 0, 5),
+      "value2": 185,
+      "value3": 669
+    }, {
+      "date": new Date(2018, 0, 6),
+      "value": 150
+    }, {
+      "date": new Date(2018, 0, 7),
+      "value": 1220,
+      "value2": 350,
+      "value3": 600
+    }];
+
+    // Create axes
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.renderer.grid.template.location = 0;
+    dateAxis.renderer.minGridDistance = 30;
+
+    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+
+    // Create series
+    function createSeries(field, name) {
+      var series = chart.series.push(new am4charts.LineSeries());
+      series.dataFields.valueY = field;
+      series.dataFields.dateX = "date";
+      series.name = name;
+      series.tooltipText = "{dateX}: [b]{valueY}[/]";
+      series.strokeWidth = 2;
+      
+      series.smoothing = "monotoneX";
+      
+      var bullet = series.bullets.push(new am4charts.CircleBullet());
+      bullet.circle.stroke = am4core.color("#fff");
+      bullet.circle.strokeWidth = 2;
+      
+      return series;
+    }
+
+    createSeries("value", "Series #1");
+    createSeries("value2", "Series #2");
+    createSeries("value3", "Series #3");
+
+    chart.legend = new am4charts.Legend();
+    chart.cursor = new am4charts.XYCursor();
   }
 
   /*renderGraphNewUsers(MyData){
@@ -1407,7 +1482,7 @@ class SiteStatMarc_ extends React.Component {
             </Grid>
           }
 
-          { this.state.typeShow != 2 ? null :
+          { this.state.typeShow != 1 ? null :
             <Grid item xs={12}>
               <h2 style={{ textAlign: 'center' }}>Новые клиенты по месяцам</h2>
               <div id="chartnewusers" style={{ width: "100%", height: "500px" }} />
