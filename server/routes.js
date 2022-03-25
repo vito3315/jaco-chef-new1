@@ -220,7 +220,7 @@ module.exports = [
     {
         path: '/advertising_company',
         exact: true,
-        component: SiteStatMarc,
+        component: AdvertisingCompany,
         title: 'Рекламные компании',
         code: 200
     },
