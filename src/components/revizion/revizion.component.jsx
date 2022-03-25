@@ -6,6 +6,12 @@ import { makeStyles } from '@mui/styles';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -38,6 +44,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import RestoreIcon from '@mui/icons-material/Restore';
+import SaveIcon from '@mui/icons-material/SaveAs';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import Paper from '@mui/material/Paper';
@@ -90,7 +97,9 @@ const useStyles = makeStyles((theme) => ({
   
 }));
 
+// главная страница
 class Revizion_ extends React.Component {
+  
   constructor(props) {
     super(props);
         
@@ -106,15 +115,22 @@ class Revizion_ extends React.Component {
       
       revList: [],
       chooseRev: '',
-      
+      search: '',
+
       items: [],
       pf: [],
+      rec: [],
+      items_b: [],
+      pf_b: [],
+      rec_b: [],
       all_data: [],
+        
       chooseTab: 0,
       
     };
-  }
-  
+    }
+
+  // переменные для фильтра
   async componentDidMount(){
     
     let data = await this.getData('get_all');
@@ -174,31 +190,36 @@ class Revizion_ extends React.Component {
       console.log( err )
     });
   }
-   
+
+   // смена точки
   changePoint(event){
     let data = event.target.value;
     
     this.setState({
-      point: data
+       point: data,
+       search: ''
     })
     
     setTimeout( () => {
       this.getRevList();
     }, 50 )
-  }
-  
+    }
+
+  // смена ревизии
   changeRev(event){
     let data = event.target.value;
     
     this.setState({
-      chooseRev: data
+        chooseRev: data,
+        search : ''
     })
     
     setTimeout( () => {
       this.getDataRev();
     }, 300 )
   }
-  
+
+   // поиск
    async search(event){
 	    
 		let data = {
@@ -206,50 +227,48 @@ class Revizion_ extends React.Component {
 			showReady: this.state.showReady === true ? 1 : 0
 		};
     
-		// let res =  this.getData('get_orders', data);	
-		let res2 = this.state;
-		// let res3 = await this.getData('all_items_list', data);
-		// let word = event.target.value;
-   
-		console.log('res2');
-		console.log(res2);
-		//res2.forEach(element => console.log(element));
-		
-		
-		// data
-		// d.forEach(item => { 
-			// console.log(item);
-		// })
+        // дергаем товары, полуфабрикаты, рецпеты
+        let res = this.state;
+        let items, rec, pf, text;
+        text = event.target.value.toLowerCase();
+
+        // Фильтрация
+        items = this.state.items_b.filter((item) => item.name.toLowerCase().includes(text));
+        rec = this.state.rec_b.filter((item) => item.name.toLowerCase().includes(text));
+        pf = this.state.pf_b.filter((item) => item.name.toLowerCase().includes(text));
+
+        this.setState({
+            items  : items,
+            rec    : rec,
+            pf     : pf,
+            search : text
+         })
+	
   }
-  
+
+   // метод обновления данных
   async updateData(){
 	  
     let data = {
       rev_id	: this.state.chooseRev,
       point_id	: this.state.point,
     };
-    
-	console.log('data=');
-	console.log(data);
 	
 	// to do переписать
     let res = await this.getData('get_data_rev', data);
-	
+          
 	// отрисовка
 	this.setState({
-      items: 	res.item,
-      rec: 		res.rec,
-      pf: 		res.pf
+      items     : res.item,
+      rec       : res.rec,
+      pf        : res.pf,
+      items_b   : res.item,
+      rec_b     : res.rec,
+      pf_b      : res.pf,
     })
-	console.log('res=');
-    console.log(res);
-    // this.setState({
-      // read: res.read,
-      // onstol: res.onstol,
-      // ordersQueue: res.prestol_new
-    // })
   }
-  
+
+   // получение списка ревизий
   async getRevList(){
     let data = {
       point_id: this.state.point,
@@ -268,7 +287,8 @@ class Revizion_ extends React.Component {
       }, 300 )
     }
   }
-  
+
+   // получение данных ревизии
   async getDataRev(){
     let data = {
       point_id: this.state.point,
@@ -278,11 +298,17 @@ class Revizion_ extends React.Component {
     let res = await this.getData('get_data_rev', data);
     
     this.setState({
-      items: res['items'],
-      pf: res['pf'],
+        items: res.item,
+        rec: res.rec,
+        pf: res.pf,
+        items_b: res.item,
+        rec_b: res.rec,
+        pf_b: res.pf,
     })
-  }
-  
+    }
+
+
+   // рендер главная
   render(){
     return (
       <>
@@ -296,7 +322,7 @@ class Revizion_ extends React.Component {
           </Grid>
           
           <Grid item xs={12}>
-            <Link to={"/revizion/new"}>Новая ревизия2</Link>
+            <Link to={"/revizion/new"}>Новая ревизия</Link>
           </Grid>
           
           <Grid item xs={12} sm={6}>
@@ -306,15 +332,11 @@ class Revizion_ extends React.Component {
             <MySelect data={this.state.revList} value={this.state.chooseRev} func={ this.changeRev.bind(this) } label='Ревизия' />
           </Grid>
 		  <Grid item xs={12} sm={6}>
-			<MyTextInput classes={this.state.classes} func={ this.search.bind(this) } label='Поиск' />
+			<MyTextInput  classes={this.state.classes} func={ this.search.bind(this) } label='Поиск' value={this.state.search} />
           </Grid>
           <Grid item xs={12} sm={6}>
             <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
           </Grid>
-          
-            
-          
-          
           
           <Grid item xs={12} sm={12} id="revTable">
             
@@ -375,22 +397,33 @@ class Revizion_ extends React.Component {
   }
 }
 
+// Данные для страницы новая ревизия
 class RevizionNewItem extends React.Component{
   constructor(props) {
-    super(props);
-        
-    this.state = {
-      item: this.props.item,
-      change: this.props.change
+      super(props);
+
+      this.state = {
+        item    : this.props.item,
+        pf      : this.props.pf,
+        change  : this.props.change,
+        type    : this.props.type,
     };
-  }
-  
-  shouldComponentUpdate(nextProps, nextState) {
+   }
+
+    // to do del
+    componentWillMount() {
+        //console.log('Will type=' + this.state.type);
+    }
+    componentDidMount() {
+        //console.log('type=' + this.state.type);
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
     return (
-      this.state.change !== nextState.change ||
-      this.state.change !== nextProps.change
+        this.state.change !== nextState.change ||
+        this.state.change !== nextProps.change
     );
-  }
+    }
   
   render(){
     return (
@@ -400,40 +433,52 @@ class RevizionNewItem extends React.Component{
           //aria-controls="panel1a-content"
           //id="panel1a-header"
         >
-          <Typography style={{ width: '60%' }}>{this.state.item.name}</Typography>
-          <Typography style={{ width: '40%' }}>{this.state.item.value} {this.state.item.ei_name}</Typography>
+          <Typography style={{ width: '60%' }}>{this.state.item.name} </Typography>
+          <Typography style={{ width: '40%' }}>{this.state.item.value} {this.state.item.ei_name} </Typography>
         </AccordionSummary>
-        <AccordionDetails>
+
+            {/* Товары */}
+            {this.state.type != 'item'  ? null :
+                <AccordionDetails>
+                    {this.state.item.counts.map((it, k) =>
+                        
+                        <Grid container spacing={3} key={k} style={{ paddingTop: 10, paddingBottom: 10 }}>
+                            <Grid item xs={12} sm={6}>
+                                <MySelect data={this.state.item.size} value={it.need_pq} func={this.props.func.bind(this, 'item', this.props.itemKey, 'need_pq', k)} label='Объем упаковки' />
+                            </Grid>
+                            <Grid item xs={k == 0 ? 12 : 9} sm={5}>
+                                <TextField value={it.value} onChange={this.props.func.bind(this, 'item', this.props.itemKey, 'value', k)} fullWidth variant="outlined" size="small" label="Количество" />
+                            </Grid>
+                            {k == 0 ? null :
+                                <Grid item xs={3} sm={1}>
+                                    <Button onClick={this.props.clear.bind(this, 'item', this.props.itemKey, k)} variant="contained"> <CloseIcon /> </Button>
+                                </Grid>
+                            }
+                        </Grid>
+                        
+                    ) }
           
-          
-            { this.state.item.counts.map( (it, k) =>
-              <Grid container spacing={3} key={k} style={{ paddingTop: 10, paddingBottom: 10 }}>
-                <Grid item xs={12} sm={6}>
-                  <MySelect data={ this.state.item.size } value={ it.need_pq } func={ this.props.func.bind(this, 'item', this.props.itemKey, 'need_pq', k) } label='Объем упаковки' />
-                </Grid>
-                <Grid item xs={ k == 0 ? 12 : 9 } sm={5}>
-                  <TextField value={ it.value } onChange={ this.props.func.bind(this, 'item', this.props.itemKey, 'value', k) } fullWidth variant="outlined" size="small" label="Количество" />
-                </Grid>
-                { k == 0 ? null :
-                  <Grid item xs={3} sm={1}>
-                    <Button onClick={this.props.clear.bind(this, 'item', this.props.itemKey, k)} variant="contained"> <CloseIcon /> </Button>
-                  </Grid>
-                }
-                
-              </Grid>
-            ) }
-          
-          
-          <Grid item xs={12} sm={6}>
-            <Button variant="contained" onClick={this.props.copy.bind(this, 'item', this.props.itemKey)}>Дублировать</Button>
-          </Grid>
-          
-        </AccordionDetails>
+                    <Grid item xs={12} sm={6}>
+                        <Button variant="contained" onClick={this.props.copy.bind(this, 'item', this.props.itemKey)}>Дублировать</Button>
+                    </Grid>
+                </AccordionDetails>
+            }
+
+            { /* Заготовки */}
+            {this.state.type != 'pf' ? null :
+                <AccordionDetails> 
+                    <Grid item sm={5}> 
+                        <TextField value={this.state.pf.value} onChange={ this.props.func.bind(this, 'pf', this.props.itemKey, 'value', 0) }  fullWidth variant="outlined" size="small" label="Количество" />
+                    </Grid>
+                </AccordionDetails>
+            }
+
       </Accordion>
     )
   }
 }
 
+// Новая ревизия
 class RevizionNew_ extends React.Component {
   constructor(props) {
     super(props);
@@ -457,11 +502,12 @@ class RevizionNew_ extends React.Component {
       pf: [],
       
       chooseTab: 0,
-      
+      modalDialog: false,
       open: false
     };
-  }
-  
+    }
+
+
   async componentDidMount(){
     
     let data = await this.getData('get_all');
@@ -478,7 +524,8 @@ class RevizionNew_ extends React.Component {
       //this.updateData();
     }, 100 )
   }
-  
+
+    // измение точки подгрузка данных
   changePoint(event){
     let data = event.target.value;
     
@@ -488,9 +535,11 @@ class RevizionNew_ extends React.Component {
     
     setTimeout( () => {
       this.getDataRev();
-    }, 300 )
-  }
-  
+    }, 300)
+
+    }
+
+  // метод получения данных
   getData = (method, data = {}) => {
     
     this.setState({
@@ -519,7 +568,6 @@ class RevizionNew_ extends React.Component {
         window.location.pathname = '/auth';
         return;
       }
-      
 	  
       setTimeout( () => {
         this.setState({
@@ -533,24 +581,28 @@ class RevizionNew_ extends React.Component {
       console.log( err )
     });
   }
-  
+
+    // получаем данные
   async getDataRev(){
     let data = {
       point_id: this.state.point
     };
     
     let res = await this.getData('get_data_for_new_rev', data);
-    
+      
     this.setState({
       storages: res['storages'],
       items: res['items'],
       rec: res['rec'],
       pf: res['pf']
     })
+
   }
-  
+
+  // предварительное сохранение
   saveData(type, key_item, data, key_data, event){
-    
+      console.log('saveData');
+
     if( type == 'item' ){
       let items = this.state.items;
       
@@ -568,11 +620,56 @@ class RevizionNew_ extends React.Component {
       this.setState({
         items: items
       })
-    }
-    
+      }
+
+      if (type == 'pf') {
+
+          let pf = this.state.pf;
+         
+          pf[key_item]['value'] = event.target.value;
+          pf[key_item]['change']++;
+
+          this.setState({
+              pf: pf
+          })
+          console.log('pf', pf);
+      }
     
   }
-  
+
+   // проверка полей, отображения модального окна
+   checkData() {
+       console.log('checkData');
+       let items = this.state.items;
+       let pf = this.state.pf;
+
+       // проверка заполнения полей товаров, скрываем не заполненные
+       items.map((item, key) =>  {
+            if(item.value != 0){
+                item.is_show = 0;
+            }
+           //console.log('item=', item, ' key ', key);
+       })
+
+       pf.map((item, key) => {
+            if (item.value != 0) {
+                item.is_show = 0;
+            }
+           //console.log('pf=', item, ' pf ', key);
+       })
+
+       this.setState({
+           items: items,
+           pf   : pf
+       })
+
+       this.setState({
+           modalDialog: true,
+           titleDialog: 'Ты уверен в правильности этих позиций ?'
+       })
+   }
+
+  // копируем
   copyData(type, key_item){
     if( type == 'item' ){
       let items = this.state.items;
@@ -585,7 +682,8 @@ class RevizionNew_ extends React.Component {
       })
     }
   }
-  
+
+  // очищаем
   clearData(type, key_item, key_data){
     
     if( type == 'item' ){
@@ -615,7 +713,18 @@ class RevizionNew_ extends React.Component {
     }
     
   }
-  
+
+  // получение данных ревизии
+  async saveRev() {
+    let data = {
+        point_id: this.state.point,
+        item: this.state.item,
+        rec: this.state.rec,
+        pf: this.state.pf,
+    };
+    console.log('saveRev ', data);
+  }
+
   render(){
     return (
       <>
@@ -625,35 +734,43 @@ class RevizionNew_ extends React.Component {
         
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
-            <h1>{this.state.module_name}</h1>
+            <h1>Новая ревизии</h1>
           </Grid>
-          
-          
           
           <Grid item xs={12} sm={6}>
             <MySelect data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
           </Grid>
-          
+
+           <Grid item xs={12} sm={3}>
+                <Button variant="contained" onClick={this.checkData.bind(this)} >Сохранить</Button>
+           </Grid>
+
           <Grid item xs={12} sm={12} id="revTable">
             
             <Tabs value={this.state.chooseTab} onChange={ (item, key) => { this.setState({ chooseTab: key }) } } textColor="primary" indicatorColor="primary" centered>
               <Tab label="Товары" {...a11yProps(0)} />
               <Tab label="Заготовки" {...a11yProps(1)} />
             </Tabs>
-            
-            <TabPanel value={this.state.chooseTab} index={0}>
+
+            {/* Товары * to do меняем TabPanel на div и в стилях скрываем style: this.state.chooseTab == 1 ? {display: blovk} : {display: monr} */}
+            <div style = { this.state.chooseTab == 0 ? {display: 'block'} : {display: 'none'} } >
               
-              { this.state.items.map( (item, key) =>
-                <RevizionNewItem key={key} itemKey={key} item={item} change={item.change} func={ this.saveData.bind(this) } copy={ this.copyData.bind(this) } clear={ this.clearData.bind(this) } />
-              ) }
+              {this.state.items.map((item, key) => 
+                parseInt(item.is_show) == 0 ? null :
+                   <RevizionNewItem key={key} type="item" itemKey={key} item={item} change={item.change} func={this.saveData.bind(this)} copy={this.copyData.bind(this)} clear={this.clearData.bind(this)} />
+              )} 
               
+            </div>
+
+            {/* Заготовки */}
+            <div style={this.state.chooseTab == 1 ? { display: 'block' } : { display: 'none' }} >
+
+                {this.state.pf.map((item, key) =>
+                   parseInt(item.is_show) == 0 ? null :
+                    <RevizionNewItem key={key} type="pf" itemKey={key} item={item} pf={item} change={item.change} func={this.saveData.bind(this)} copy={this.copyData.bind(this)} clear={this.clearData.bind(this) } />
+                )}
               
-            </TabPanel>
-            <TabPanel value={this.state.chooseTab} index={1}>
-              
-              
-              
-            </TabPanel>
+            </div>
             
           </Grid>
         </Grid>
@@ -679,14 +796,43 @@ class RevizionNew_ extends React.Component {
           <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
             <BottomNavigation
               showLabels
-              onChange={(event, newValue) => {
-                this.setState({ open: true })
-              }}
+             
             >
-              <BottomNavigationAction label="Recents" icon={<RestoreIcon />} />
+              <BottomNavigationAction onClick={(event, newValue) => {
+                            this.setState({ open: true })
+                        }}  label="Recents" icon={<RestoreIcon />} />
+                        <BottomNavigationAction onClick={this.checkData.bind(this)} label="Save" icon={<SaveIcon />} />
             </BottomNavigation>
           </Paper>
-        }
+         }
+
+        <Dialog
+            open={this.state.modalDialog}
+            onClose={() => { this.setState({ modalDialog: false }) }}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+        >
+            <DialogTitle id="alert-dialog-title">{this.state.titleDialog}</DialogTitle>
+                <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+                    <DialogContentText id="alert-dialog-description">
+                        <Grid container spacing={3}>Не все поля заполнены </Grid>
+                    </DialogContentText>
+
+                    <Grid container spacing={3}>
+                        <Grid item>Позиция </Grid>
+                        <Grid item>Кол-во </Grid>
+                        <Grid item>Ед. измер. </Grid>
+                    </Grid>
+                        
+                    
+                
+            </DialogContent>
+            <DialogActions>
+                <Button color="primary">Хорошо</Button>
+                <Button color="primary">Сохранить</Button>
+            </DialogActions>
+        </Dialog>
+        
       </>
     )
   }
