@@ -121,6 +121,7 @@ class SiteStatMarc_ extends React.Component {
       countOrdersTable: [],
       avgSumm: [],
       countPos: [],
+      fakeUsers: [],
 
       typesShow: [
         {id: 1, name: 'Итоговый результат'},
@@ -205,7 +206,8 @@ class SiteStatMarc_ extends React.Component {
         newUsersTable: res.new_users,
         countOrdersTable: res.count_orders,
         avgSumm: res.avg_summ,
-        countPos: res.count_pos
+        countPos: res.count_pos,
+        fakeUsers: res.fake_users,
       })
     }
 
@@ -1406,6 +1408,33 @@ class SiteStatMarc_ extends React.Component {
                     <TableRow>
                       <TableCell style={{ textAlign: 'center' }}>{this.state.countPos.count_rolls ? this.state.countPos.count_rolls : 0}</TableCell>
                       <TableCell style={{ textAlign: 'center' }}>{this.state.countPos.count_pizza ? this.state.countPos.count_pizza : 0}</TableCell>
+                    </TableRow>
+
+                    
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          }
+
+          { this.state.typeShow != 1 ? null :
+            <Grid item xs={12}>
+              <h2 style={{ textAlign: 'center' }}>Ушедшие клиенты</h2>
+              <h5 style={{ textAlign: 'center' }}>ушли - заказывали за 90 дней до указанного периода и больше не заказывали</h5>
+              <h5 style={{ textAlign: 'center' }}>вернулись - не заказывали 90 дней до указанного периода, сделали заказ в указанный период</h5>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell style={{ textAlign: 'center' }}>Ушли</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>Вернулись</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                  
+                    <TableRow>
+                      <TableCell style={{ textAlign: 'center' }}>{this.state.fakeUsers.lost_users ? this.state.fakeUsers.lost_users : 0}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{this.state.fakeUsers.ret_users ? this.state.fakeUsers.ret_users : 0}</TableCell>
                     </TableRow>
 
                     
