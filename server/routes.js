@@ -20,8 +20,10 @@ const { CatWork } = require( '../src/components/cat_work' );
 const { AppWorkPoint } = require( '../src/components/app_work_point' );
 const { AppWork } = require( '../src/components/app_work' );
 const { AppWorkShow } = require( '../src/components/app_work_show' );
+const { SiteStatMarc } = require( '../src/components/site_stat_marc' );
+const { AdvertisingCompany } = require( '../src/components/advertising_company' );
 
-//
+//AdvertisingCompany_
 
 module.exports = [
     {
@@ -206,6 +208,20 @@ module.exports = [
         exact: true,
         component: AppWorkShow,
         title: 'Просмотр уборок',
+        code: 200
+    },
+    {
+        path: '/site_stat_marc',
+        exact: true,
+        component: SiteStatMarc,
+        title: 'Статистика маркетолога',
+        code: 200
+    },
+    {
+        path: '/advertising_company',
+        exact: true,
+        component: AdvertisingCompany,
+        title: 'Рекламные компании',
         code: 200
     },
     
