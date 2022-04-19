@@ -23,6 +23,8 @@ const { AppWorkShow } = require( '../src/components/app_work_show' );
 const { SiteStatMarc } = require( '../src/components/site_stat_marc' );
 const { AdvertisingCompany } = require( '../src/components/advertising_company' );
 const { RasBillAndCook } = require( '../src/components/ras_bill_and_cook' );
+const { SkladItemsModule } = require( '../src/components/sklad_items_module' );
+
 
 
 //AdvertisingCompany_
@@ -230,6 +232,13 @@ module.exports = [
         path: '/ras_bill_and_cook',
         exact: true,
         component: RasBillAndCook,
+        title: 'Расход от ревизии до числа',
+        code: 200
+    },
+    {
+        path: '/sklad_items_module',
+        exact: true,
+        component: SkladItemsModule,
         title: 'Расход от ревизии до числа',
         code: 200
     },

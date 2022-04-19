@@ -7,20 +7,11 @@ import { createTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
-
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import TableFooter from '@mui/material/TableFooter';
 import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -31,7 +22,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyTextInput, MyDaterange, MyDatePickerNew } from '../../stores/elements';
+import { MySelect, MyDatePickerNew } from '../../stores/elements';
 
 const queryString = require('query-string');
 
