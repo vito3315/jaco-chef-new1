@@ -29,7 +29,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyAutocomplite, MyDaterange } from '../../stores/elements';
+import { MySelect, MyAutocomplite, MyDaterange, MyDatePickerNew } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
 
 const queryString = require('query-string');
@@ -200,8 +200,8 @@ class RasByBill_ extends React.Component {
       points: this.state.point,
       items: this.state.myItems,
       item_cat: this.state.item_cat,
-      start_date: this.state.rangeDate[0],
-      end_date: this.state.rangeDate[1],
+      start_date: this.state.date_start,
+      end_date: this.state.date_end,
     };
     
     let res = await this.getData('get_this_rev', data);
@@ -227,8 +227,8 @@ class RasByBill_ extends React.Component {
     let data = {
       points: this.state.point,
       items: this.state.myItems,
-      start_date: this.state.rangeDate[0],
-      end_date: this.state.rangeDate[1],
+      start_date: this.state.date_start,
+      end_date: this.state.date_end,
     };
     
     let res = await this.getData('get_this_rev_cat', data);
@@ -251,12 +251,9 @@ class RasByBill_ extends React.Component {
     })
   }
   
-  changeDateRange(data){
-    let dateStart = data[0] ? formatDate(data[0]) : '';
-    let dateEnd = data[1] ? formatDate(data[1]) : '';
-    
+  changeDateRange(data, event){
     this.setState({
-      rangeDate: [dateStart, dateEnd]
+      [data]: formatDate(event)
     })
   }
   
@@ -294,14 +291,18 @@ class RasByBill_ extends React.Component {
             <MySelect classes={this.state.classes} data={this.state.points} multiple={true} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
           </Grid>
           
-          <Grid item xs={12} sm={4} className="MyDaterange">
-            <MyDaterange startText="Дата от" endText="Дата до" value={this.state.rangeDate} func={ this.changeDateRange.bind(this) } />
+          <Grid item xs={12} sm={3}>
+            <MyDatePickerNew label="Дата от" value={ this.state.date_start } func={ this.changeDateRange.bind(this, 'date_start') } />
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <MyDatePickerNew label="Дата до" value={ this.state.date_end } func={ this.changeDateRange.bind(this, 'date_end') } />
           </Grid>
           
-          <Grid item xs={12} sm={5}>
+          <Grid item xs={12} sm={3}>
             <MySelect classes={this.state.classes} data={this.state.items_cat} multiple={false} value={this.state.item_cat} func={ (event) => {this.setState({ item_cat: event.target.value })} } label='Категория товара' />
           </Grid>
           
+
           <Grid item xs={12} sm={12}>
             <MyAutocomplite classes={this.state.classes} data={this.state.items} multiple={true} value={this.state.myItems} func={ this.changeItems.bind(this) } label='Заготовки' />
           </Grid>

@@ -264,9 +264,9 @@ class Concenter_ extends React.Component {
     }, 300 )
   }
   
-  async changePoint(event, index){
-    let point_id = event.target.id;
-    point_id = point_id.split('-')[2]
+  async changePoint(point_id, index){
+    //let point_id = event.target.id;
+    //point_id = point_id.split('-')[2]
 
     this.setState({
       point_id: point_id,
@@ -722,9 +722,9 @@ class Concenter_ extends React.Component {
           </Grid>
           
           <Grid item xs={12}>
-            <Tabs value={this.state.indexTab} onChange={this.changePoint.bind(this)}>
+            <Tabs value={this.state.indexTab}>
               { this.state.need_point_list.map( (item, key) =>
-                <Tab key={key} label={item.name} onClick={this.getOrders.bind(this)} {...a11yProps(parseInt(item.id))} />
+                <Tab key={key} label={item.name} onClick={this.changePoint.bind(this, item.id, key)} {...a11yProps(parseInt(item.id))} />
               ) }
             </Tabs>
           </Grid>

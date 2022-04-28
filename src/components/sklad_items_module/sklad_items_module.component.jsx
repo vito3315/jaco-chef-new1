@@ -359,6 +359,25 @@ class SkladItemsModule_ extends React.Component {
     };
 
     let res = await this.getData('saveItem', data, false);
+
+    if( res.st === false ){
+      alert(res.text);
+    }else{
+      this.setState({ 
+        modalItemNew: false,
+        modalItemEdit: false, 
+        itemEdit: null,
+        checkArtDialog: false,
+        checkArtList: []
+      })
+
+      res = await this.getData('get_all');
+    
+      this.setState({
+        cats: res.cats,
+        freeItems: res.items_free
+      })
+    }
   }
 
   changeTableItem(item_id, type, event){

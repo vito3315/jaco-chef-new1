@@ -6,6 +6,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
 
+
 import TextField from '@mui/material/TextField';
 
 import FormGroup from '@mui/material/FormGroup';
@@ -24,13 +25,36 @@ import {
   KeyboardDatePicker,
 } from '@material-ui/pickers';*/
 
-import DateRangePicker from '@mui/lab/DateRangePicker';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
+//"@date-io/date-fns": "^1.3.13",
+
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
+import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+
+
+//import DateRangePicker from '@mui/lab/DateRangePicker';
+//import AdapterDateFns from '@mui/lab/AdapterDateFns';
+//import LocalizationProvider from '@mui/lab/LocalizationProvider';
 //import DatePicker from '@mui/lab/DatePicker';
 import Typography from '@mui/material/Typography';
 
-import DatePicker from '@mui/lab/DatePicker';
+//import DatePicker from '@mui/lab/DatePicker';
+
+function formatDate(date) {
+  var d = new Date(date),
+      month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear();
+
+  if (month.length < 2) 
+      month = '0' + month;
+  if (day.length < 2) 
+      day = '0' + day;
+
+  return [year, month, day].join('-');
+}
 
 export class MyDaterange extends React.PureComponent {
   constructor(props) {
@@ -52,7 +76,7 @@ export class MyDaterange extends React.PureComponent {
           endText={this.props.endText}
           value={this.props.value}
           inputFormat="yyyy-MM-dd"
-          //mask="____-__-__"
+          mask="____-__-__"
           onChange={this.props.func}
           renderInput={(startProps, endProps) => (
             <React.Fragment>
@@ -249,7 +273,7 @@ export class MyDatePickerNew extends React.PureComponent {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
+      classes: this.props.classes
     };
   }
   
@@ -258,33 +282,14 @@ export class MyDatePickerNew extends React.PureComponent {
       <LocalizationProvider dateAdapter={AdapterDateFns} locale={ruLocale}>
         <DatePicker
           multiple={true}
+          mask="____-__-__"
           inputFormat="yyyy-MM-dd"
           label={this.props.label}
-          value={this.props.value}
+          value={formatDate(this.props.value)}
           onChange={this.props.func}
           renderInput={(params) => <TextField variant="outlined" size={'small'} color='primary' style={{ width: '100%' }} {...params} />}
         />
       </LocalizationProvider>
-    )
-  }
-}
-
-export class MyDatePickerTest extends React.PureComponent {
-  constructor(props) {
-    super(props);
-        
-    this.state = {
-      classes: this.props.classes,
-    };
-  }
-  
-  render(){
-    return (
-      <DatePicker 
-        multiple
-        value={this.props.value}
-        onChange={this.props.func}
-      />
     )
   }
 }

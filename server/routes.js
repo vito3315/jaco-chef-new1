@@ -24,7 +24,7 @@ const { SiteStatMarc } = require( '../src/components/site_stat_marc' );
 const { AdvertisingCompany } = require( '../src/components/advertising_company' );
 const { RasBillAndCook } = require( '../src/components/ras_bill_and_cook' );
 const { SkladItemsModule } = require( '../src/components/sklad_items_module' );
-
+const { SiteUserManager } = require( '../src/components/site_user_manager' );
 
 
 //AdvertisingCompany_
@@ -239,10 +239,16 @@ module.exports = [
         path: '/sklad_items_module',
         exact: true,
         component: SkladItemsModule,
-        title: 'Расход от ревизии до числа',
+        title: 'Товары склада',
         code: 200
     },
-
+    {
+        path: '/site_user_manager',
+        exact: true,
+        component: SiteUserManager,
+        title: 'Сотрудники',
+        code: 200
+    },
     
     
 ];

@@ -98,10 +98,10 @@ class RasBillAndCook_ extends React.Component {
       is_load: false,
       
       points: [],
-      point: null,
+      point: 0,
       
       rev_list: [],
-      rev: null,
+      rev: 0,
       cats: [],
       
       date_end: formatDate(new Date())
@@ -193,7 +193,8 @@ class RasBillAndCook_ extends React.Component {
 
     this.setState({
       point: point,
-      rev_list: res
+      rev_list: res,
+      rev: res[0].id
     })
   }
 
