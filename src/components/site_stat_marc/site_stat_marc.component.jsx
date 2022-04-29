@@ -24,7 +24,7 @@ import Paper from '@mui/material/Paper';
 //import * as am4core from "@amcharts/amcharts4/core";
 //import * as am4charts from "@amcharts/amcharts4/charts";
 
-import { MyTextInput, MySelect, MyAutocomplite, MyDaterange, MyCheckBox } from '../../stores/elements';
+import { MyTextInput, MySelect, MyAutocomplite, MyDaterange, MyCheckBox, MyDatePickerNew } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -120,6 +120,8 @@ class SiteStatMarc_ extends React.Component {
       choosePoint: [],
       points: [],
       rangeDate: [formatDate(new Date()), formatDate(new Date())],
+      date_start: formatDate(new Date()),
+      date_end: formatDate(new Date()),
       promoName: '',
 
       newUsersTable: [],
@@ -208,8 +210,8 @@ class SiteStatMarc_ extends React.Component {
   async show() {
     let data = {
       points: this.state.choosePoint,
-      dateStart: this.state.rangeDate[0],
-      dateEnd: this.state.rangeDate[1],
+      dateStart: this.state.date_start,
+      dateEnd: this.state.date_end,
       typeShow: this.state.typeShow,
       promoName: this.state.promoName,
       advData: this.state.advData,
@@ -1718,33 +1720,30 @@ class SiteStatMarc_ extends React.Component {
     }));
   }
 
-  changeDateRange(data){
-    let dateStart = data[0] ? formatDate(data[0]) : '';
-    let dateEnd = data[1] ? formatDate(data[1]) : '';
-    
+  changeDateRange(data, val) {
     this.setState({
-      rangeDate: [dateStart, dateEnd]
+      [data]: formatDate(val)
     })
   }
 
-    showStat(type) {
-        let val;
-        switch (type) {
-            case 'roll':
-                val = this.state.show_stat_roll ? false : true;
-                this.setState({ show_stat_roll: val })
-            break;
-            case 'set':
-                val = this.state.show_stat_set ? false : true;
-                this.setState({ show_stat_set: val });
-                
-            break;
-            case 'pizza':
-                val = this.state.show_stat_pizza ? false : true;
-                this.setState({ show_stat_pizza: val });
-            break;
-        }
-    }
+  showStat(type) {
+      let val;
+      switch (type) {
+          case 'roll':
+              val = this.state.show_stat_roll ? false : true;
+              this.setState({ show_stat_roll: val })
+          break;
+          case 'set':
+              val = this.state.show_stat_set ? false : true;
+              this.setState({ show_stat_set: val });
+              
+          break;
+          case 'pizza':
+              val = this.state.show_stat_pizza ? false : true;
+              this.setState({ show_stat_pizza: val });
+          break;
+      }
+  }
 
   render(){
     return (
@@ -1758,23 +1757,28 @@ class SiteStatMarc_ extends React.Component {
             <h1>{this.state.module_name}</h1>
           </Grid>
 
-          <Grid item xs={12} sm={6} className="MyDaterange">
-            <MyDaterange startText="Дата от" endText="Дата до" value={this.state.rangeDate} func={ this.changeDateRange.bind(this) } />
+          <Grid item xs={12} sm={3}>
+            <MyDatePickerNew label="Дата от" value={ this.state.date_start } func={ this.changeDateRange.bind(this, 'date_start') } />
           </Grid>
+          <Grid item xs={12} sm={3}>
+            <MyDatePickerNew label="Дата от" value={ this.state.date_end } func={ this.changeDateRange.bind(this, 'date_end') } />
+          </Grid>
+
+
           <Grid item xs={12} sm={3}>
             <MyAutocomplite classes={this.state.classes} data={this.state.points} value={this.state.choosePoint} func={ (event, data) => { this.setState({ choosePoint: data }) } } multiple={true} label='Точка' />
           </Grid>
           <Grid item xs={6} sm={3}>
             <MyTextInput value={this.state.promoName} func={ (event) => { this.setState({ promoName: event.target.value }) } } label='Промокод' />
           </Grid>
-                <Grid item xs={6} sm={3}> 
-              <MySelect data={this.state.typesShow} value={this.state.typeShow} func={ (event) => { this.setState({ typeShow: event.target.value }) } } label='Как показать' />
-            </Grid>
-                <Grid item xs={12} sm={1}> 
-                    <MyCheckBox label='Показать акции' value={this.state.is_show_adv} func={this.changeChekBox.bind(this, 'is_show_adv') }   />
-            </Grid>
+          <Grid item xs={6} sm={3}> 
+            <MySelect data={this.state.typesShow} value={this.state.typeShow} func={ (event) => { this.setState({ typeShow: event.target.value }) } } label='Как показать' />
+          </Grid>
+          <Grid item xs={12} sm={1}> 
+            <MyCheckBox label='Показать акции' value={this.state.is_show_adv} func={this.changeChekBox.bind(this, 'is_show_adv') }   />
+          </Grid>
+
           <Grid item xs={12} sm={3}>
-           
             <Button variant="contained" onClick={this.show.bind(this)}>Обновить данные</Button>
           </Grid>
         
