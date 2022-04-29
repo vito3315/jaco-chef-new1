@@ -25,7 +25,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyTextInput, MyDaterange } from '../../stores/elements';
+import { MySelect, MyTextInput, MyDaterange, MyDatePickerNew } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -191,8 +191,8 @@ class DriverStat_ extends React.Component {
   async updateData(){
     let data = {
       point_id: this.state.point,
-      date_start: this.state.rangeDate[0],
-      date_end: this.state.rangeDate[1],
+      date_start: this.state.date_start,
+      date_end: this.state.date_end,
     };
     
     let res = await this.getData('get_data', data);
@@ -211,6 +211,12 @@ class DriverStat_ extends React.Component {
     
     this.setState({
       rangeDate: [dateStart, dateEnd]
+    })
+  }
+
+  changeDate(data, event){
+    this.setState({
+      [data]: formatDate(event)
     })
   }
 
@@ -514,8 +520,11 @@ class DriverStat_ extends React.Component {
             <h1>{this.state.module_name}</h1>
           </Grid>
           
-          <Grid item xs={12} sm={6} className="MyDaterange">
-            <MyDaterange startText="Дата от" endText="Дата до" value={this.state.rangeDate} func={ this.changeDateRange.bind(this) } />
+          <Grid item xs={12} sm={3}>
+            <MyDatePickerNew label="Дата от" value={ this.state.date_start } func={ this.changeDate.bind(this, 'date_start') } />
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <MyDatePickerNew label="Дата до" value={ this.state.date_end } func={ this.changeDate.bind(this, 'date_end') } />
           </Grid>
 
           <Grid item xs={12} sm={6}>
@@ -613,12 +622,12 @@ class DriverStat_ extends React.Component {
                       <TableCell></TableCell>
 
                       { this.state.drive_stat_date.orders.map( (item, key) =>
-                        <>
-                          <TableCell key={key+'_1'} style={{textAlign: 'center'}}>Наличка</TableCell>
-                          <TableCell key={key+'_2'} style={{textAlign: 'center'}}>Безнал</TableCell>
-                          <TableCell key={key+'_3'} style={{textAlign: 'center'}}>Сдача</TableCell>
-                          <TableCell key={key+'_4'} style={{textAlign: 'center'}}>Заработал</TableCell>
-                        </>
+                        <React.Fragment key={key}>
+                          <TableCell style={{textAlign: 'center'}}>Наличка</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>Безнал</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>Сдача</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>Заработал</TableCell>
+                        </React.Fragment>
                       ) }
 
                     </TableRow>
@@ -648,12 +657,12 @@ class DriverStat_ extends React.Component {
                             )
                           }else{
                             return (
-                              <>
-                                <TableCell key={order_k+'_1'} style={{textAlign: 'center'}}>{data.full_cash}</TableCell>
-                                <TableCell key={order_k+'_2'} style={{textAlign: 'center'}}>{data.full_bank}</TableCell>
-                                <TableCell key={order_k+'_3'} style={{textAlign: 'center'}}>{data.sdacha}</TableCell>
-                                <TableCell key={order_k+'_4'} style={{borderRight: '1px solid #eee', textAlign: 'center'}}>{data.my}</TableCell>
-                              </>
+                              <React.Fragment key={key}>
+                                <TableCell style={{textAlign: 'center'}}>{data.full_cash}</TableCell>
+                                <TableCell style={{textAlign: 'center'}}>{data.full_bank}</TableCell>
+                                <TableCell style={{textAlign: 'center'}}>{data.sdacha}</TableCell>
+                                <TableCell style={{borderRight: '1px solid #eee', textAlign: 'center'}}>{data.my}</TableCell>
+                              </React.Fragment>
                             )
                           }
 
@@ -669,12 +678,12 @@ class DriverStat_ extends React.Component {
                       <TableCell style={{borderRight: '1px solid #eee'}}></TableCell>
 
                       { this.state.drive_stat_date.orders.map( (item, key) =>
-                        <>
+                        <React.Fragment key={key}>
                           <TableCell key={key+'_1'} style={{textAlign: 'center'}}>{item.full_cash}</TableCell>
                           <TableCell key={key+'_2'} style={{textAlign: 'center'}}>{item.full_bank}</TableCell>
                           <TableCell key={key+'_3'} style={{textAlign: 'center'}}>{item.sdacha}</TableCell>
                           <TableCell key={key+'_4'} style={{borderRight: '1px solid #eee', textAlign: 'center'}}>{item.my}</TableCell>
-                        </>
+                        </React.Fragment>
                       )}
                         
 

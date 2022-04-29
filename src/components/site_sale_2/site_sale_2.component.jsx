@@ -34,7 +34,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyTimePicker, MyTextInput, MyDaterange, MyAutocomplite } from '../../stores/elements';
+import { MySelect, MyCheckBox, MyTimePicker, MyTextInput, MyDaterange, MyAutocomplite, MyDatePickerNew } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 
@@ -651,14 +651,9 @@ class SiteSale2_new_ extends React.Component {
     }, 300 )
   }
   
-  changeDateRange(data){
-    let dateStart = data[0] ? formatDate(data[0]) : '';
-    let dateEnd = data[1] ? formatDate(data[1]) : '';
-    
+  changeDateRange(data, event){
     this.setState({
-      rangeDate: [dateStart, dateEnd],
-      date_start: dateStart,
-      date_end: dateEnd,
+      [data]: formatDate(event)
     })
     
     setTimeout( () => {
@@ -1188,8 +1183,11 @@ class SiteSale2_new_ extends React.Component {
           
           <Grid container direction="row" justifyContent="center" style={{ paddingTop: 20 }} spacing={3}>
             
-            <Grid item xs={12} sm={6} className="MyDaterange">
-              <MyDaterange startText="Дата от" endText="Дата до" value={this.state.rangeDate} func={ this.changeDateRange.bind(this) } />
+            <Grid item xs={12} sm={3}>
+              <MyDatePickerNew label="Дата от" value={ this.state.date_start } func={ this.changeDateRange.bind(this, 'date_start') } />
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <MyDatePickerNew label="Дата до" value={ this.state.date_end } func={ this.changeDateRange.bind(this, 'date_end') } />
             </Grid>
            
             <Grid item xs={12} sm={3}>
@@ -1760,14 +1758,9 @@ class SiteSale2_edit_ extends React.Component {
     }, 300 )
   }
   
-  changeDateRange(data){
-    let dateStart = data[0] ? formatDate(data[0]) : '';
-    let dateEnd = data[1] ? formatDate(data[1]) : '';
-    
+  changeDateRange(data, event){
     this.setState({
-      rangeDate: [dateStart, dateEnd],
-      date_start: dateStart,
-      date_end: dateEnd,
+      [data]: formatDate(event)
     })
     
     setTimeout( () => {
@@ -2036,8 +2029,11 @@ class SiteSale2_edit_ extends React.Component {
           
           <Grid container direction="row" justifyContent="center" style={{ paddingTop: 20 }} spacing={3}>
             
-            <Grid item xs={12} sm={6} className="MyDaterange">
-              <MyDaterange startText="Дата от" endText="Дата до" value={this.state.rangeDate} func={ this.changeDateRange.bind(this) } />
+            <Grid item xs={12} sm={3}>
+              <MyDatePickerNew label="Дата от" value={ this.state.date_start } func={ this.changeDateRange.bind(this, 'date_start') } />
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <MyDatePickerNew label="Дата до" value={ this.state.date_end } func={ this.changeDateRange.bind(this, 'date_end') } />
             </Grid>
            
             <Grid item xs={12} sm={3}>

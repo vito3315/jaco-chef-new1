@@ -22,6 +22,10 @@ const { AppWork } = require( '../src/components/app_work' );
 const { AppWorkShow } = require( '../src/components/app_work_show' );
 const { SiteStatMarc } = require( '../src/components/site_stat_marc' );
 const { AdvertisingCompany } = require( '../src/components/advertising_company' );
+const { RasBillAndCook } = require( '../src/components/ras_bill_and_cook' );
+const { SkladItemsModule } = require( '../src/components/sklad_items_module' );
+const { SiteUserManager } = require( '../src/components/site_user_manager' );
+
 
 //AdvertisingCompany_
 
@@ -224,8 +228,27 @@ module.exports = [
         title: 'Рекламные компании',
         code: 200
     },
-    
-
+    {
+        path: '/ras_bill_and_cook',
+        exact: true,
+        component: RasBillAndCook,
+        title: 'Расход от ревизии до числа',
+        code: 200
+    },
+    {
+        path: '/sklad_items_module',
+        exact: true,
+        component: SkladItemsModule,
+        title: 'Товары склада',
+        code: 200
+    },
+    {
+        path: '/site_user_manager',
+        exact: true,
+        component: SiteUserManager,
+        title: 'Сотрудники',
+        code: 200
+    },
     
     
 ];

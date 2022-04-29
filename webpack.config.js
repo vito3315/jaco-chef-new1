@@ -10,7 +10,6 @@ const webpack = require('webpack');
 /*-------------------------------------------------*/
 
 module.exports = {
-
     // webpack optimization mode
     mode: ( 'development' === process.env.NODE_ENV ? 'development' : 'production' ),
 
@@ -27,6 +26,7 @@ module.exports = {
         publicPath: '/',
         filename: '[name].[contenthash].js',
         clean: true,
+        asyncChunks: true,
     },
 
     
@@ -83,6 +83,7 @@ module.exports = {
         // prepare HTML file with assets
         new HTMLWebpackPlugin( {
             filename: 'index.html',
+            title: 'Caching',
             template: path.resolve( __dirname, 'src/index.html' ),
             minify: false,
         } ),
@@ -127,7 +128,7 @@ module.exports = {
     },
 
     // generate source map
-    //devtool: ( 'development' === process.env.NODE_ENV ? 'eval-source-map' : 'eval' ),
+    //devtool: ( process.env.NODE_ENV === 'development' ? 'eval' : 'source-map' ),
     devtool: 'source-map'
 
 };
