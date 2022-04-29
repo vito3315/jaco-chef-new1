@@ -24,7 +24,7 @@ import Paper from '@mui/material/Paper';
 //import * as am4core from "@amcharts/amcharts4/core";
 //import * as am4charts from "@amcharts/amcharts4/charts";
 
-import { MyTextInput, MySelect, MyAutocomplite, MyDaterange } from '../../stores/elements';
+import { MyTextInput, MySelect, MyAutocomplite, MyDaterange, MyCheckBox } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -111,6 +111,11 @@ class SiteStatMarc_ extends React.Component {
       module: 'site_stat_marc',
       module_name: '',
       is_load: false,
+      is_show_adv: false,
+
+      show_stat_roll:   false,
+      show_stat_set:    false,
+      show_stat_pizza:  false,
       
       choosePoint: [],
       points: [],
@@ -123,6 +128,10 @@ class SiteStatMarc_ extends React.Component {
       countPos: [],
       fakeUsers: [],
 
+      roll_stat:    [],
+      set_stat:     [],
+      pizza_stat:   [],
+
       typesShow: [
         {id: 1, name: 'Итоговый результат'},
         {id: 2, name: 'График по месяцам'},
@@ -130,8 +139,10 @@ class SiteStatMarc_ extends React.Component {
       ],
       typeShow: 1
     };
-  }
-  
+    }
+
+   
+
   async componentDidMount(){
     let data = await this.getData('get_all');
     
@@ -188,44 +199,56 @@ class SiteStatMarc_ extends React.Component {
     });
   }
    
-  async show(){
+    changeChekBox(type, event) {
+        this.setState({
+            [type]: event.target.checked
+        })
+    }
+
+  async show() {
     let data = {
       points: this.state.choosePoint,
       dateStart: this.state.rangeDate[0],
       dateEnd: this.state.rangeDate[1],
       typeShow: this.state.typeShow,
-      promoName: this.state.promoName
+      promoName: this.state.promoName,
+      advData: this.state.advData,
     };
 
     let res = await this.getData('show', data);
 
-    console.log( res )
+      console.log(res);
 
-    if( parseInt( this.state.typeShow ) == 1 ){
-      this.setState({
-        newUsersTable: res.new_users,
-        countOrdersTable: res.count_orders,
-        avgSumm: res.avg_summ,
-        countPos: res.count_pos,
-        fakeUsers: res.fake_users,
-      })
-    }
+    // Итоговый результат
+      if (parseInt(this.state.typeShow) == 1) {
+         
+          this.setState({
+            newUsersTable: res.new_users,
+            countOrdersTable: res.count_orders,
+            avgSumm: res.avg_summ,
+            countPos: res.count_pos,
+            fakeUsers: res.fake_users,
+            roll_stat: res.roll_stat,
+            set_stat: res.set_stat,
+            pizza_stat: res.pizza_stat,
+          })
+      }
 
-   
-    
-
+    // графики по месяцам
     if( parseInt( this.state.typeShow ) == 2 ){
       this.renderGraphNewUsers(res.new_users);
       this.renderGraphOrders(res.count_orders);
       this.renderGraphAvgSumm(res.avg_summ);
       this.renderCountPos(res.count_pos);
-    }
+      }
 
-    if( parseInt( this.state.typeShow ) == 3 ){
-      this.renderGraphNewUsersD(res.new_users);
-      this.renderGraphOrdersD(res.count_orders);
-      this.renderGraphAvgSummD(res.avg_summ);
-      this.renderCountPosD(res.count_pos);
+     // графики по дням
+      if (parseInt(this.state.typeShow) == 3) {
+          console.log('res.count_orders',res.count_orders);
+        this.renderGraphNewUsersD(res.new_users);
+        this.renderGraphOrdersD(res.count_orders);
+        this.renderGraphAvgSummD(res.avg_summ);
+        this.renderCountPosD(res.count_pos);
     }
   }
 
@@ -248,7 +271,7 @@ class SiteStatMarc_ extends React.Component {
         panY: false,
         wheelY: "zoomX",
         layout: root.verticalLayout,
-        maxTooltipDistance: 0
+        //maxTooltipDistance: 0
       }) 
     );
 
@@ -309,10 +332,10 @@ class SiteStatMarc_ extends React.Component {
     xAxis.get("dateFormats")["day"] = "MM/dd";
     xAxis.get("periodChangeDateFormats")["day"] = "MM/dd";
 
-    // Create series
+    // Create series правка 1 Новые клиенты по месяцам
     function createSeries(name, field, data) {
       var series = chart.series.push( 
-        am5xy.LineSeries.new(root, { 
+      am5xy.SmoothedXLineSeries.new(root, {
           name: name,
           xAxis: xAxis, 
           yAxis: yAxis, 
@@ -322,11 +345,12 @@ class SiteStatMarc_ extends React.Component {
           maskBullets: false
         }) 
       );
-      
+
+      // правка radius: 5->3
       series.bullets.push(function() {
         return am5.Bullet.new(root, {
           sprite: am5.Circle.new(root, {
-            radius: 5,
+            radius: 2,
             fill: series.get("fill")
           })
         });
@@ -374,18 +398,17 @@ class SiteStatMarc_ extends React.Component {
         panY: false,
         wheelY: "zoomX",
         layout: root.verticalLayout,
-        maxTooltipDistance: 0
+        //maxTooltipDistance: 0
       }) 
     );
 
     var data_site = [];
     var data_center = [];
     var data_all = [];
+   
 
     MyData.site.map( (item) => {
-
       let date = item.date_new.split('-');
-
       data_site.push({
         date: new Date(date[0], parseInt(date[1])-1, parseInt(date[2])).getTime(),
         value: parseInt(item.count)
@@ -393,9 +416,7 @@ class SiteStatMarc_ extends React.Component {
     } )
 
     MyData.center.map( (item) => {
-
       let date = item.date_new.split('-');
-
       data_center.push({
         date: new Date(date[0], parseInt(date[1])-1, parseInt(date[2])).getTime(),
         value: parseInt(item.count)
@@ -403,14 +424,13 @@ class SiteStatMarc_ extends React.Component {
     } )
 
     MyData.all.map( (item) => {
-
       let date = item.date_new.split('-');
-
       data_all.push({
         date: new Date(date[0], parseInt(date[1])-1, parseInt(date[2])).getTime(),
         value: parseInt(item.count)
       })
-    } )
+    })
+
 
     // Create Y-axis
     var yAxis = chart.yAxes.push(
@@ -437,9 +457,12 @@ class SiteStatMarc_ extends React.Component {
 
     // Create series
     function createSeries(name, field, data) {
+
+      // новые клиенты по дням правка 2
       var series = chart.series.push( 
-        am5xy.LineSeries.new(root, { 
+      am5xy.SmoothedXLineSeries.new(root, {
           name: name,
+         //stacked: true,
           xAxis: xAxis, 
           yAxis: yAxis, 
           valueYField: field, 
@@ -448,27 +471,29 @@ class SiteStatMarc_ extends React.Component {
           maskBullets: false
         }) 
       );
-      
+
       series.bullets.push(function() {
         return am5.Bullet.new(root, {
           sprite: am5.Circle.new(root, {
-            radius: 5,
+            radius: 2,
             fill: series.get("fill")
           })
         });
       });
       
-      series.strokes.template.set("strokeWidth", 2);
-      
-      series.get("tooltip").label.set("text", "[bold]{name}[/]\n{valueX.formatDate()}: {valueY}")
-      series.data.setAll(data);
-    }
+        series.strokes.template.set("strokeWidth", 2);
+
+        series.get("tooltip").label.set("text", "[bold]{name}[/]\n{valueX.formatDate()}: {valueY}")
+        series.data.setAll(data);
+      }
 
     createSeries("Сайт", "value", data_site);
     createSeries("Контакт-центр", "value", data_center);
     createSeries("Всего", "value", data_all);
+   
 
     // Add cursor
+    
     chart.set("cursor", am5xy.XYCursor.new(root, {
       behavior: "zoomXY",
       xAxis: xAxis
@@ -481,6 +506,7 @@ class SiteStatMarc_ extends React.Component {
     yAxis.set("tooltip", am5.Tooltip.new(root, {
       themeTags: ["axis"]
     }));
+    
   }
 
   renderGraphOrders(MyData){
@@ -501,7 +527,7 @@ class SiteStatMarc_ extends React.Component {
         panY: false,
         wheelY: "zoomX",
         layout: root.verticalLayout,
-        maxTooltipDistance: 0
+        //maxTooltipDistance: 0
       }) 
     );
 
@@ -509,7 +535,8 @@ class SiteStatMarc_ extends React.Component {
     var data_pic = [];
     var data_dev = [];
     var data_hall = [];
-
+    var data_adv = [];
+     
     MyData.all.map( (item) => {
 
       let date = item.date_new.split('-');
@@ -548,7 +575,17 @@ class SiteStatMarc_ extends React.Component {
         date: new Date(date[0], parseInt(date[1])-1, 1).getTime(),
         value: parseInt(item.count)
       })
-    } )
+    })
+
+    console.log('adv_data=', MyData.adv_data);
+    //MyData.adv_data.map((item) => {
+    //    let date = item.date.split('-');
+    //    data_adv.push({
+    //        date: new Date(date[0], parseInt(date[1]) - 1, parseInt(date[2])).getTime(),
+    //        value: parseInt(item.count),
+    //        name: item.name
+    //    })
+    //})
 
     // Create Y-axis
     var yAxis = chart.yAxes.push(
@@ -573,10 +610,10 @@ class SiteStatMarc_ extends React.Component {
     xAxis.get("dateFormats")["day"] = "MM/dd";
     xAxis.get("periodChangeDateFormats")["day"] = "MM/dd";
 
-    // Create series
+    // Create series Правка 3 Заказы по месяцам
     function createSeries(name, field, data) {
       var series = chart.series.push( 
-        am5xy.LineSeries.new(root, { 
+      am5xy.SmoothedXLineSeries.new(root, {
           name: name,
           xAxis: xAxis, 
           yAxis: yAxis, 
@@ -590,7 +627,7 @@ class SiteStatMarc_ extends React.Component {
       series.bullets.push(function() {
         return am5.Bullet.new(root, {
           sprite: am5.Circle.new(root, {
-            radius: 5,
+            radius: 2,
             fill: series.get("fill")
           })
         });
@@ -602,11 +639,103 @@ class SiteStatMarc_ extends React.Component {
       series.data.setAll(data);
     }
 
+    function createSeries2(name, field, data) {
+
+        // вытаскиваем название акции
+        let adv1 = [], adv2 = [];
+        let lKey = 0, newArr = false;
+
+        // разделяем на два массива
+        for (const [key, value] of data.entries()) {
+            lKey = key == 0 ? 1 : key - 1;
+            if (key == 0) {
+                adv1.push(value);
+            } else if (data[lKey]['name'] != value['name']) {
+                adv2.push(value);
+                newArr = true;
+            } else if (newArr) {
+                adv2.push(value);
+            } else {
+                adv1.push(value);
+            }
+        }
+
+        // инцилизация первого массива на графике
+        if (adv1.length != 0) {
+            var series2 = chart.series.push(
+                am5xy.ColumnSeries.new(root, {
+                    name: adv1[0]['name'],
+                    xAxis: xAxis,
+                    yAxis: yAxis,
+                    valueYField: field,
+                    valueXField: "date",
+                    categoryXField: "date",
+                    color: '0x6794DC',
+                    clustered: false,
+                    tooltip: am5.Tooltip.new(root, {
+                        pointerOrientation: "horizontal",
+                        labelText: adv1[0]['name']
+                    })
+                })
+            );
+
+            series2.columns.template.setAll({
+                opacity: 0.5,
+                width: am5.percent(80),
+                templateField: "columnSettings",
+            });
+
+            chart.get("colors").set("colors", [
+                am5.color(0x6794DC),
+            ]);
+
+            // меняем цвет
+            series2.set("fill", am5.color(0x6794DC));
+            series2.data.setAll(adv1);
+        }
+
+        // инцилизация второго массива на графике
+        if (adv2.length != 0) {
+            var series3 = chart.series.push(
+                am5xy.ColumnSeries.new(root, {
+                    name: adv2[0]['name'],
+                    xAxis: xAxis,
+                    yAxis: yAxis,
+                    valueYField: field,
+                    valueXField: "date",
+                    categoryXField: "date",
+                    color: '0x6794DC',
+                    clustered: false,
+                    tooltip: am5.Tooltip.new(root, {
+                        pointerOrientation: "horizontal",
+                        labelText: adv2[0]['name']
+                    })
+                })
+            );
+
+            series3.columns.template.setAll({
+                opacity: 0.5,
+                width: am5.percent(80),
+                templateField: "columnSettings",
+            });
+
+            chart.get("colors").set("colors", [
+                am5.color(0x6794DA),
+            ]);
+
+            // меняем цвет
+            series3.set("fill", am5.color(0x6794DA));
+            series3.data.setAll(adv2);
+        }
+    }
+
     createSeries("Всего", "value", data_all);
     createSeries("Самовывозов", "value", data_pic);
     createSeries("Доставок", "value", data_dev);
     createSeries("Зал", "value", data_hall);
-
+    if (this.state.is_show_adv) {
+        createSeries2("Акция", "value", data_adv)
+    }
     // Add cursor
     chart.set("cursor", am5xy.XYCursor.new(root, {
       behavior: "zoomXY",
@@ -622,6 +751,7 @@ class SiteStatMarc_ extends React.Component {
     }));
   }
 
+   // заказы по дням
   renderGraphOrdersD(MyData){
     if( this.chartordersD ){
       this.chartordersD.dispose();
@@ -635,12 +765,17 @@ class SiteStatMarc_ extends React.Component {
       am5themes_Animated.new(root)
     ]);
 
+      root.dateFormatter.setAll({
+          dateFormat: "yyyy-MM-dd", // not-ok
+          dateFields: ["valueX", "openValueX"] // no
+      });
+
     var chart = root.container.children.push( 
       am5xy.XYChart.new(root, {
         panY: false,
         wheelY: "zoomX",
         layout: root.verticalLayout,
-        maxTooltipDistance: 0
+        //maxTooltipDistance: 0
       }) 
     );
 
@@ -648,11 +783,9 @@ class SiteStatMarc_ extends React.Component {
     var data_pic = [];
     var data_dev = [];
     var data_hall = [];
-
+ 
     MyData.all.map( (item) => {
-
       let date = item.date_new.split('-');
-
       data_all.push({
         date: new Date(date[0], parseInt(date[1])-1, parseInt(date[2])).getTime(),
         value: parseInt(item.count)
@@ -660,9 +793,7 @@ class SiteStatMarc_ extends React.Component {
     } )
 
     MyData.pic.map( (item) => {
-
       let date = item.date_new.split('-');
-
       data_pic.push({
         date: new Date(date[0], parseInt(date[1])-1, parseInt(date[2])).getTime(),
         value: parseInt(item.count)
@@ -670,9 +801,7 @@ class SiteStatMarc_ extends React.Component {
     } )
 
     MyData.dev.map( (item) => {
-
       let date = item.date_new.split('-');
-
       data_dev.push({
         date: new Date(date[0], parseInt(date[1])-1, parseInt(date[2])).getTime(),
         value: parseInt(item.count)
@@ -680,65 +809,118 @@ class SiteStatMarc_ extends React.Component {
     } )
 
     MyData.hall.map( (item) => {
-
       let date = item.date_new.split('-');
-
       data_hall.push({
         date: new Date(date[0], parseInt(date[1])-1, parseInt(date[2])).getTime(),
         value: parseInt(item.count)
       })
-    } )
-
-    // Create Y-axis
-    var yAxis = chart.yAxes.push(
-      am5xy.ValueAxis.new(root, {
-        extraTooltipPrecision: 1,
-        renderer: am5xy.AxisRendererY.new(root, {})
-      })
-    );
+    })
+     
+     // Create Y-axis
+      var yAxis = chart.yAxes.push(
+          am5xy.ValueAxis.new(root, {
+              extraTooltipPrecision: 1,
+              renderer: am5xy.AxisRendererY.new(root, {})
+          })
+      );
 
     // Create X-Axis
-    let xAxis = chart.xAxes.push(
-      am5xy.DateAxis.new(root, {
-        baseInterval: { timeUnit: "day", count: 1 },
-        startLocation: 0.5,
-        endLocation: 0.5,
-        renderer: am5xy.AxisRendererX.new(root, {
-          minGridDistance: 30
-        })
-      })
-    );
+      let xAxis = chart.xAxes.push(
+          am5xy.DateAxis.new(root, {
+            baseInterval: { timeUnit: "day", count: 1 },
+            startLocation: 0.5,
+            endLocation: 0.5,
+            renderer: am5xy.AxisRendererX.new(root, {})
+          })
+      );
 
-    xAxis.get("dateFormats")["day"] = "MM/dd";
-    xAxis.get("periodChangeDateFormats")["day"] = "MM/dd";
+      xAxis.get("dateFormats")["day"] = "MM/dd";
+      xAxis.get("periodChangeDateFormats")["day"] = "MM/dd";
 
-    // Create series
+      var yAxis2 = chart.yAxes.push(
+          am5xy.CategoryAxis.new(root, {
+              categoryField: "category",
+              extraTooltipPrecision: 1,
+              renderer: am5xy.AxisRendererY.new(root, { inversed: true }),
+              tooltip: am5.Tooltip.new(root, {
+                  themeTags: ["axis"],
+                  animationDuration: 200
+              })
+          })
+      );
+
+    // Create series правка 4 Заказы по дням
     function createSeries(name, field, data) {
+     
       var series = chart.series.push( 
-        am5xy.LineSeries.new(root, { 
+      am5xy.SmoothedXLineSeries.new(root, {
           name: name,
           xAxis: xAxis, 
           yAxis: yAxis, 
-          valueYField: field, 
+          valueYField: field,
+          //fill: chart.get("colors").getIndex(13),
+          strokeWidth: 5,
           valueXField: "date",
           tooltip: am5.Tooltip.new(root, {}),
           maskBullets: false
         }) 
-      );
-      
+        );
+
+      series.strokes.template.set("strokeWidth", 2);
+
+      if (name == 'Всего') {
+          //series.strokes.template.set("stroke", 'red');
+          series.strokes.template.set("strokeWidth", 8)
+      }
+       
       series.bullets.push(function() {
         return am5.Bullet.new(root, {
           sprite: am5.Circle.new(root, {
-            radius: 5,
+            radius: 2,
             fill: series.get("fill")
           })
         });
       });
       
-      series.strokes.template.set("strokeWidth", 2);
-      
       series.get("tooltip").label.set("text", "[bold]{name}[/]\n{valueX.formatDate()}: {valueY}")
       series.data.setAll(data);
+    }
+
+    // Новый графи со столбиками 
+    function createSeries2(name, field, data) {
+        let cat = [];
+        data.map((item) => {
+            cat.push( { 'category': item['category'] } );
+        })
+       
+        yAxis2.data.setAll(cat);
+         
+        // проверка  на пустой массив
+        if (data.length != 0) {
+            console.log('data=', data);
+            var series2 = chart.series.push(
+                am5xy.ColumnSeries.new(root, {
+                    xAxis: xAxis,
+                    yAxis: yAxis2,
+                    openValueXField: "fromDate",
+                    valueXField: "toDate",
+                    categoryYField: "category",
+                    sequencedInterpolation: true,
+                    fill: am5.color(0x6794DA)
+                })
+            );
+
+            series2.columns.template.setAll({
+                opacity: 0.5,
+            });
+
+            series2.data.processor = am5.DataProcessor.new(root, {
+                dateFields: ["fromDate", "toDate"],
+                dateFormat: "yyyy-MM-dd HH:mm"
+            });
+
+            series2.data.setAll(data);
+        }
     }
 
     createSeries("Всего", "value", data_all);
@@ -746,6 +928,11 @@ class SiteStatMarc_ extends React.Component {
     createSeries("Доставок", "value", data_dev);
     createSeries("Зал", "value", data_hall);
 
+    // правка от 08.04 показываем столбики
+    if (this.state.is_show_adv) {
+        console.log('adv_data=', MyData.adv_data);;
+        createSeries2("Акция", "value", MyData.adv_data);
+    }
     // Add cursor
     chart.set("cursor", am5xy.XYCursor.new(root, {
       behavior: "zoomXY",
@@ -779,7 +966,7 @@ class SiteStatMarc_ extends React.Component {
         panY: false,
         wheelY: "zoomX",
         layout: root.verticalLayout,
-        maxTooltipDistance: 0
+        //maxTooltipDistance: 0
       }) 
     );
 
@@ -789,9 +976,7 @@ class SiteStatMarc_ extends React.Component {
     var data_hall = [];
 
     MyData.all.map( (item) => {
-
       let date = item.date_new.split('-');
-
       data_all.push({
         date: new Date(date[0], parseInt(date[1])-1, 1).getTime(),
         value: parseInt(item.count)
@@ -799,9 +984,7 @@ class SiteStatMarc_ extends React.Component {
     } )
 
     MyData.pic.map( (item) => {
-
       let date = item.date_new.split('-');
-
       data_pic.push({
         date: new Date(date[0], parseInt(date[1])-1, 1).getTime(),
         value: parseInt(item.count)
@@ -809,9 +992,7 @@ class SiteStatMarc_ extends React.Component {
     } )
 
     MyData.dev.map( (item) => {
-
       let date = item.date_new.split('-');
-
       data_dev.push({
         date: new Date(date[0], parseInt(date[1])-1, 1).getTime(),
         value: parseInt(item.count)
@@ -819,9 +1000,7 @@ class SiteStatMarc_ extends React.Component {
     } )
 
     MyData.hall.map( (item) => {
-
       let date = item.date_new.split('-');
-
       data_hall.push({
         date: new Date(date[0], parseInt(date[1])-1, 1).getTime(),
         value: parseInt(item.count)
@@ -851,40 +1030,101 @@ class SiteStatMarc_ extends React.Component {
     xAxis.get("dateFormats")["day"] = "MM/dd";
     xAxis.get("periodChangeDateFormats")["day"] = "MM/dd";
 
-    // Create series
-    function createSeries(name, field, data) {
-      var series = chart.series.push( 
-        am5xy.LineSeries.new(root, { 
-          name: name,
-          xAxis: xAxis, 
-          yAxis: yAxis, 
-          valueYField: field, 
-          valueXField: "date",
-          tooltip: am5.Tooltip.new(root, {}),
-          maskBullets: false
-        }) 
-      );
-      
-      series.bullets.push(function() {
-        return am5.Bullet.new(root, {
-          sprite: am5.Circle.new(root, {
-            radius: 5,
-            fill: series.get("fill")
+      var yAxis2 = chart.yAxes.push(
+          am5xy.CategoryAxis.new(root, {
+              categoryField: "category",
+              extraTooltipPrecision: 1,
+              renderer: am5xy.AxisRendererY.new(root, { inversed: true }),
+              tooltip: am5.Tooltip.new(root, {
+                  themeTags: ["axis"],
+                  animationDuration: 200
+              })
           })
-        });
-      });
-      
-      series.strokes.template.set("strokeWidth", 2);
-      
-      series.get("tooltip").label.set("text", "[bold]{name}[/]\n{valueX.formatDate()}: {valueY}")
-      series.data.setAll(data);
-    }
+      );
+
+      // Create series правка 4 Заказы по дням
+      function createSeries(name, field, data) {
+
+          var series = chart.series.push(
+              am5xy.SmoothedXLineSeries.new(root, {
+                  name: name,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  valueYField: field,
+                  //fill: chart.get("colors").getIndex(13),
+                  strokeWidth: 5,
+                  valueXField: "date",
+                  tooltip: am5.Tooltip.new(root, {}),
+                  maskBullets: false
+              })
+          );
+
+          series.strokes.template.set("strokeWidth", 2);
+
+          //if (name == 'Всего') {
+          //    series.strokes.template.set("strokeWidth", 8)
+          //}
+
+          series.bullets.push(function () {
+              return am5.Bullet.new(root, {
+                  sprite: am5.Circle.new(root, {
+                      radius: 2,
+                      fill: series.get("fill")
+                  })
+              });
+          });
+
+          series.get("tooltip").label.set("text", "[bold]{name}[/]\n{valueX.formatDate()}: {valueY}");
+         
+          series.data.setAll(data);
+      }
+
+      // Новый графи со столбиками 
+      function createSeries2(name, field, data) {
+          let cat = [];
+          data.map((item) => {
+              cat.push({ 'category': item['category'] });
+          })
+
+          yAxis2.data.setAll(cat);
+
+          // проверка  на пустой массив
+          if (data.length != 0) {
+              console.log('data=', data);
+              var series2 = chart.series.push(
+                  am5xy.ColumnSeries.new(root, {
+                      xAxis: xAxis,
+                      yAxis: yAxis2,
+                      openValueXField: "fromDate",
+                      valueXField: "toDate",
+                      categoryYField: "category",
+                      sequencedInterpolation: true,
+                      fill: am5.color(0x6794DA)
+                  })
+              );
+
+              series2.columns.template.setAll({
+                  opacity: 0.5,
+              });
+
+              series2.data.processor = am5.DataProcessor.new(root, {
+                  dateFields: ["fromDate", "toDate"],
+                  dateFormat: "yyyy-MM-dd HH:mm"
+              });
+              console.log('series2 setAll- ', data);
+              series2.data.setAll(data);
+          }
+      }
 
     createSeries("Всего", "value", data_all);
     createSeries("Самовывозов", "value", data_pic);
     createSeries("Доставок", "value", data_dev);
     createSeries("Зал", "value", data_hall);
 
+     // правка от 08.04 показываем столбики
+    if (this.state.is_show_adv) {
+       // createSeries2("Акция", "value", MyData.adv_data)
+    }
     // Add cursor
     chart.set("cursor", am5xy.XYCursor.new(root, {
       behavior: "zoomXY",
@@ -899,7 +1139,7 @@ class SiteStatMarc_ extends React.Component {
       themeTags: ["axis"]
     }));
   }
-
+   // график средний суммы за день
   renderGraphAvgSummD(MyData){
     if( this.chartavgsummD ){
       this.chartavgsummD.dispose();
@@ -918,7 +1158,7 @@ class SiteStatMarc_ extends React.Component {
         panY: false,
         wheelY: "zoomX",
         layout: root.verticalLayout,
-        maxTooltipDistance: 0
+        //maxTooltipDistance: 0
       }) 
     );
 
@@ -965,7 +1205,7 @@ class SiteStatMarc_ extends React.Component {
         date: new Date(date[0], parseInt(date[1])-1, parseInt(date[2])).getTime(),
         value: parseInt(item.count)
       })
-    } )
+    })
 
     // Create Y-axis
     var yAxis = chart.yAxes.push(
@@ -989,40 +1229,99 @@ class SiteStatMarc_ extends React.Component {
 
     xAxis.get("dateFormats")["day"] = "MM/dd";
     xAxis.get("periodChangeDateFormats")["day"] = "MM/dd";
-
-    // Create series
-    function createSeries(name, field, data) {
-      var series = chart.series.push( 
-        am5xy.LineSeries.new(root, { 
-          name: name,
-          xAxis: xAxis, 
-          yAxis: yAxis, 
-          valueYField: field, 
-          valueXField: "date",
-          tooltip: am5.Tooltip.new(root, {}),
-          maskBullets: false
-        }) 
-      );
-      
-      series.bullets.push(function() {
-        return am5.Bullet.new(root, {
-          sprite: am5.Circle.new(root, {
-            radius: 5,
-            fill: series.get("fill")
+      var yAxis2 = chart.yAxes.push(
+          am5xy.CategoryAxis.new(root, {
+              categoryField: "category",
+              extraTooltipPrecision: 1,
+              renderer: am5xy.AxisRendererY.new(root, { inversed: true }),
+              tooltip: am5.Tooltip.new(root, {
+                  themeTags: ["axis"],
+                  animationDuration: 200
+              })
           })
-        });
-      });
-      
-      series.strokes.template.set("strokeWidth", 2);
-      
-      series.get("tooltip").label.set("text", "[bold]{name}[/]\n{valueX.formatDate()}: {valueY}")
-      series.data.setAll(data);
-    }
+      );
+
+      // Create series правка 4 Заказы по дням
+      function createSeries(name, field, data) {
+
+          var series = chart.series.push(
+              am5xy.SmoothedXLineSeries.new(root, {
+                  name: name,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  valueYField: field,
+                  //fill: chart.get("colors").getIndex(13),
+                  strokeWidth: 5,
+                  valueXField: "date",
+                  tooltip: am5.Tooltip.new(root, {}),
+                  maskBullets: false
+              })
+          );
+
+          series.strokes.template.set("strokeWidth", 2);
+
+          if (name == 'Всего') {
+              //series.strokes.template.set("stroke", 'red');
+              series.strokes.template.set("strokeWidth", 8)
+          }
+
+          series.bullets.push(function () {
+              return am5.Bullet.new(root, {
+                  sprite: am5.Circle.new(root, {
+                      radius: 2,
+                      fill: series.get("fill")
+                  })
+              });
+          });
+
+          series.get("tooltip").label.set("text", "[bold]{name}[/]\n{valueX.formatDate()}: {valueY}")
+          series.data.setAll(data);
+      }
+
+      // Новый графи со столбиками 
+      function createSeries2(name, field, data) {
+          let cat = [];
+          data.map((item) => {
+              cat.push({ 'category': item['category'] });
+          })
+
+          yAxis2.data.setAll(cat);
+
+          // проверка  на пустой массив
+          if (data.length != 0) {
+              console.log('data=', data);
+              var series2 = chart.series.push(
+                  am5xy.ColumnSeries.new(root, {
+                      xAxis: xAxis,
+                      yAxis: yAxis2,
+                      openValueXField: "fromDate",
+                      valueXField: "toDate",
+                      categoryYField: "category",
+                      sequencedInterpolation: true,
+                      fill: am5.color(0x6794DA)
+                  })
+              );
+
+              series2.columns.template.setAll({
+                  opacity: 0.5,
+              });
+
+              series2.data.processor = am5.DataProcessor.new(root, {
+                  dateFields: ["fromDate", "toDate"],
+                  dateFormat: "yyyy-MM-dd HH:mm"
+              });
+
+              series2.data.setAll(data);
+          }
+      }
 
     createSeries("Всего", "value", data_all);
     createSeries("Самовывозов", "value", data_pic);
     createSeries("Доставок", "value", data_dev);
     createSeries("Зал", "value", data_hall);
+    if (this.state.is_show_adv) {
+        createSeries2("Акция", "value", MyData.adv_data);
+    }
 
     // Add cursor
     chart.set("cursor", am5xy.XYCursor.new(root, {
@@ -1057,12 +1356,13 @@ class SiteStatMarc_ extends React.Component {
         panY: false,
         wheelY: "zoomX",
         layout: root.verticalLayout,
-        maxTooltipDistance: 0
+        //maxTooltipDistance: 0
       }) 
     );
 
     var data_pizza = [];
     var data_rolls = [];
+    var data_adv = [];
 
     MyData.count_pizza.map( (item) => {
 
@@ -1082,7 +1382,7 @@ class SiteStatMarc_ extends React.Component {
         date: new Date(date[0], parseInt(date[1])-1, 1).getTime(),
         value: parseInt(item.count)
       })
-    } )
+    })
 
     // Create Y-axis
     var yAxis = chart.yAxes.push(
@@ -1107,10 +1407,10 @@ class SiteStatMarc_ extends React.Component {
     xAxis.get("dateFormats")["day"] = "MM/dd";
     xAxis.get("periodChangeDateFormats")["day"] = "MM/dd";
 
-    // Create series
+    // Create series правка 7 Позиций по месяцам
     function createSeries(name, field, data) {
       var series = chart.series.push( 
-        am5xy.LineSeries.new(root, { 
+          am5xy.SmoothedXLineSeries.new(root, {
           name: name,
           xAxis: xAxis, 
           yAxis: yAxis, 
@@ -1124,7 +1424,7 @@ class SiteStatMarc_ extends React.Component {
       series.bullets.push(function() {
         return am5.Bullet.new(root, {
           sprite: am5.Circle.new(root, {
-            radius: 5,
+            radius: 2,
             fill: series.get("fill")
           })
         });
@@ -1135,10 +1435,100 @@ class SiteStatMarc_ extends React.Component {
       series.get("tooltip").label.set("text", "[bold]{name}[/]\n{valueX.formatDate()}: {valueY}")
       series.data.setAll(data);
     }
+    function createSeries2(name, field, data) {
 
+        // вытаскиваем название акции
+        let adv1 = [], adv2 = [];
+        let lKey = 0, newArr = false;
+
+        // разделяем на два массива
+        for (const [key, value] of data.entries()) {
+            lKey = key == 0 ? 1 : key - 1;
+            if (key == 0) {
+                adv1.push(value);
+            } else if (data[lKey]['name'] != value['name']) {
+                adv2.push(value);
+                newArr = true;
+            } else if (newArr) {
+                adv2.push(value);
+            } else {
+                adv1.push(value);
+            }
+        }
+
+        // инцилизация первого массива на графике
+        if (adv1.length != 0) {
+            var series2 = chart.series.push(
+                am5xy.ColumnSeries.new(root, {
+                    name: adv1[0]['name'],
+                    xAxis: xAxis,
+                    yAxis: yAxis,
+                    valueYField: field,
+                    valueXField: "date",
+                    categoryXField: "date",
+                    color: '0x6794DC',
+                    clustered: false,
+                    tooltip: am5.Tooltip.new(root, {
+                        pointerOrientation: "horizontal",
+                        labelText: adv1[0]['name']
+                    })
+                })
+            );
+
+            series2.columns.template.setAll({
+                opacity: 0.5,
+                width: am5.percent(80),
+                templateField: "columnSettings",
+            });
+
+            chart.get("colors").set("colors", [
+                am5.color(0x6794DC),
+            ]);
+
+            // меняем цвет
+            series2.set("fill", am5.color(0x6794DC));
+            series2.data.setAll(adv1);
+        }
+
+        // инцилизация второго массива на графике
+        if (adv2.length != 0) {
+            var series3 = chart.series.push(
+                am5xy.ColumnSeries.new(root, {
+                    name: adv2[0]['name'],
+                    xAxis: xAxis,
+                    yAxis: yAxis,
+                    valueYField: field,
+                    valueXField: "date",
+                    categoryXField: "date",
+                    color: '0x6794DC',
+                    clustered: false,
+                    tooltip: am5.Tooltip.new(root, {
+                        pointerOrientation: "horizontal",
+                        labelText: adv2[0]['name']
+                    })
+                })
+            );
+
+            series3.columns.template.setAll({
+                opacity: 0.5,
+                width: am5.percent(80),
+                templateField: "columnSettings",
+            });
+
+            chart.get("colors").set("colors", [
+                am5.color(0x6794DA),
+            ]);
+
+            // меняем цвет
+            series3.set("fill", am5.color(0x6794DA));
+            series3.data.setAll(adv2);
+        }
+    }
     createSeries("Роллов", "value", data_rolls);
     createSeries("Пиццы", "value", data_pizza);
-
+    if (this.state.is_show_adv) {
+        createSeries2("Акция", "value", data_adv)
+    }
     // Add cursor
     chart.set("cursor", am5xy.XYCursor.new(root, {
       behavior: "zoomXY",
@@ -1172,13 +1562,12 @@ class SiteStatMarc_ extends React.Component {
         panY: false,
         wheelY: "zoomX",
         layout: root.verticalLayout,
-        maxTooltipDistance: 0
+        //maxTooltipDistance: 0
       }) 
     );
 
     var data_pizza = [];
     var data_rolls = [];
-
     MyData.count_pizza.map( (item) => {
 
       let date = item.date_new.split('-');
@@ -1197,7 +1586,7 @@ class SiteStatMarc_ extends React.Component {
         date: new Date(date[0], parseInt(date[1])-1, parseInt(date[2])).getTime(),
         value: parseInt(item.count)
       })
-    } )
+    })
 
     // Create Y-axis
     var yAxis = chart.yAxes.push(
@@ -1222,37 +1611,97 @@ class SiteStatMarc_ extends React.Component {
     xAxis.get("dateFormats")["day"] = "MM/dd";
     xAxis.get("periodChangeDateFormats")["day"] = "MM/dd";
 
-    // Create series
-    function createSeries(name, field, data) {
-      var series = chart.series.push( 
-        am5xy.LineSeries.new(root, { 
-          name: name,
-          xAxis: xAxis, 
-          yAxis: yAxis, 
-          valueYField: field, 
-          valueXField: "date",
-          tooltip: am5.Tooltip.new(root, {}),
-          maskBullets: false
-        }) 
-      );
-      
-      series.bullets.push(function() {
-        return am5.Bullet.new(root, {
-          sprite: am5.Circle.new(root, {
-            radius: 5,
-            fill: series.get("fill")
+      var yAxis2 = chart.yAxes.push(
+          am5xy.CategoryAxis.new(root, {
+              categoryField: "category",
+              extraTooltipPrecision: 1,
+              renderer: am5xy.AxisRendererY.new(root, { inversed: true }),
+              tooltip: am5.Tooltip.new(root, {
+                  themeTags: ["axis"],
+                  animationDuration: 200
+              })
           })
-        });
-      });
-      
-      series.strokes.template.set("strokeWidth", 2);
-      
-      series.get("tooltip").label.set("text", "[bold]{name}[/]\n{valueX.formatDate()}: {valueY}")
-      series.data.setAll(data);
-    }
+      );
+
+      // Create series правка 4 Заказы по дням
+      function createSeries(name, field, data) {
+
+          var series = chart.series.push(
+              am5xy.SmoothedXLineSeries.new(root, {
+                  name: name,
+                  xAxis: xAxis,
+                  yAxis: yAxis,
+                  valueYField: field,
+                  //fill: chart.get("colors").getIndex(13),
+                  strokeWidth: 5,
+                  valueXField: "date",
+                  tooltip: am5.Tooltip.new(root, {}),
+                  maskBullets: false
+              })
+          );
+
+          series.strokes.template.set("strokeWidth", 2);
+
+          if (name == 'Всего') {
+              //series.strokes.template.set("stroke", 'red');
+              series.strokes.template.set("strokeWidth", 8)
+          }
+
+          series.bullets.push(function () {
+              return am5.Bullet.new(root, {
+                  sprite: am5.Circle.new(root, {
+                      radius: 2,
+                      fill: series.get("fill")
+                  })
+              });
+          });
+
+          series.get("tooltip").label.set("text", "[bold]{name}[/]\n{valueX.formatDate()}: {valueY}")
+          series.data.setAll(data);
+      }
+
+      // Новый графи со столбиками 
+      function createSeries2(name, field, data) {
+          let cat = [];
+          data.map((item) => {
+              cat.push({ 'category': item['category'] });
+          })
+
+          yAxis2.data.setAll(cat);
+
+          // проверка  на пустой массив
+          if (data.length != 0) {
+              console.log('data=', data);
+              var series2 = chart.series.push(
+                  am5xy.ColumnSeries.new(root, {
+                      xAxis: xAxis,
+                      yAxis: yAxis2,
+                      openValueXField: "fromDate",
+                      valueXField: "toDate",
+                      categoryYField: "category",
+                      sequencedInterpolation: true,
+                      fill: am5.color(0x6794DA)
+                  })
+              );
+
+              series2.columns.template.setAll({
+                  opacity: 0.5,
+              });
+
+              series2.data.processor = am5.DataProcessor.new(root, {
+                  dateFields: ["fromDate", "toDate"],
+                  dateFormat: "yyyy-MM-dd HH:mm"
+              });
+
+              series2.data.setAll(data);
+          }
+      }
 
     createSeries("Роллов", "value", data_rolls);
     createSeries("Пиццы", "value", data_pizza);
+    if (this.state.is_show_adv) {
+        createSeries2("Акция", "value", MyData.adv_data)
+    }
 
     // Add cursor
     chart.set("cursor", am5xy.XYCursor.new(root, {
@@ -1278,6 +1727,25 @@ class SiteStatMarc_ extends React.Component {
     })
   }
 
+    showStat(type) {
+        let val;
+        switch (type) {
+            case 'roll':
+                val = this.state.show_stat_roll ? false : true;
+                this.setState({ show_stat_roll: val })
+            break;
+            case 'set':
+                val = this.state.show_stat_set ? false : true;
+                this.setState({ show_stat_set: val });
+                
+            break;
+            case 'pizza':
+                val = this.state.show_stat_pizza ? false : true;
+                this.setState({ show_stat_pizza: val });
+            break;
+        }
+    }
+
   render(){
     return (
       <>
@@ -1299,10 +1767,14 @@ class SiteStatMarc_ extends React.Component {
           <Grid item xs={6} sm={3}>
             <MyTextInput value={this.state.promoName} func={ (event) => { this.setState({ promoName: event.target.value }) } } label='Промокод' />
           </Grid>
-          <Grid item xs={6} sm={3}>
-            <MySelect data={this.state.typesShow} value={this.state.typeShow} func={ (event) => { this.setState({ typeShow: event.target.value }) } } label='Как показать' />
-          </Grid>
+                <Grid item xs={6} sm={3}> 
+              <MySelect data={this.state.typesShow} value={this.state.typeShow} func={ (event) => { this.setState({ typeShow: event.target.value }) } } label='Как показать' />
+            </Grid>
+                <Grid item xs={12} sm={1}> 
+                    <MyCheckBox label='Показать акции' value={this.state.is_show_adv} func={this.changeChekBox.bind(this, 'is_show_adv') }   />
+            </Grid>
           <Grid item xs={12} sm={3}>
+           
             <Button variant="contained" onClick={this.show.bind(this)}>Обновить данные</Button>
           </Grid>
         
@@ -1394,7 +1866,7 @@ class SiteStatMarc_ extends React.Component {
 
           { this.state.typeShow != 1 ? null :
             <Grid item xs={12}>
-              <h2 style={{ textAlign: 'center' }}>Позиций итог</h2>
+              <h2 style={{ textAlign: 'center' } }>Позиций итог</h2>
               <TableContainer component={Paper}>
                 <Table>
                   <TableHead>
@@ -1441,8 +1913,74 @@ class SiteStatMarc_ extends React.Component {
                   </TableBody>
                 </Table>
               </TableContainer>
-            </Grid>
-          }
+
+                 <Grid container spacing={3}>
+                   
+                     <Grid style={{ marginTop: 20}} item xs={12} sm={4}>
+                        <h2 style={{ textAlign: 'center' }}>Рейтинг роллов </h2>
+                        <h5 style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.showStat.bind(this, 'roll')} >Показать/Скрыть</h5>
+                        {this.state.show_stat_roll != true ? null :
+                            <TableContainer style={{ marginTop: 20 }} component={Paper} >
+                                <Table>
+                                    <TableBody>
+
+                                        {this.state.roll_stat.map((item, key) =>
+                                            <TableRow key={key}>
+                                                <TableCell>{item.name}</TableCell>
+                                                <TableCell style={{ textAlign: 'center' }}>{item.count}</TableCell>
+                                            </TableRow>
+                                        )}
+
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        }
+                    </Grid>
+
+                    <Grid style={{ marginTop: 20 }} item xs={12} sm={4}>
+                        <h2 style={{ textAlign: 'center' }}>Рейтинг сетов</h2>
+                        <h5 style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.showStat.bind(this, 'set')} >Показать/Скрыть</h5>
+                        {this.state.show_stat_set != true ? null :
+                            <TableContainer style={{ marginTop: 20 }} component={Paper} >
+                                <Table>
+                                    <TableBody>
+
+                                        {this.state.set_stat.map((item, key) =>
+                                            <TableRow key={key}>
+                                                <TableCell>{item.name}</TableCell>
+                                                <TableCell style={{ textAlign: 'center' }}>{item.count}</TableCell>
+                                            </TableRow>
+                                        )}
+
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        }
+                    </Grid>
+
+                    <Grid style={{ marginTop: 20 }} item  xs={12} sm={4}>
+                        <h2 style={{ textAlign: 'center' }}>Рейтинг Пиццы</h2>
+                        <h5 style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.showStat.bind(this, 'pizza')}>Показать/Скрыть</h5>
+                        {this.state.show_stat_pizza != true ? null :
+                             <TableContainer style={{ marginTop: 20 }} component={Paper} >
+                                <Table>
+                                    <TableBody>
+
+                                        {this.state.pizza_stat.map((item, key) =>
+                                            <TableRow key={key}>
+                                                <TableCell>{item.name}</TableCell>
+                                                <TableCell style={{ textAlign: 'center' }}>{item.count}</TableCell>
+                                            </TableRow>
+                                        )}
+
+                                    </TableBody>
+                                </Table>
+                             </TableContainer>
+                         }
+                    </Grid>
+               </Grid>
+             </Grid>
+            }
 
           { this.state.typeShow != 2 ? null :
             <Grid item xs={12}>

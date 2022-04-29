@@ -18,7 +18,12 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 
-import { MyTextInput, TextEditor } from '../../stores/elements';
+import ListItemIcon from '@mui/material/ListItemIcon';
+
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+
+import { MyTextInput, TextEditor, MySelect, MyAutocomplite, MyDaterange, MyCheckBox } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -70,6 +75,20 @@ const useStyles = makeStyles({
   }
 });
 
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2)
+        month = '0' + month;
+    if (day.length < 2)
+        day = '0' + day;
+
+    return [year, month, day].join('-');
+}
+    
 class AdvertisingCompany_ extends React.Component {
   constructor(props) {
     super(props);
@@ -79,23 +98,34 @@ class AdvertisingCompany_ extends React.Component {
       history: this.props.history,
       module: 'advertising_company',
       module_name: '',
+      description: '',
       is_load: false,
       
       cats: [],
+      
       modalDialog: false,
       modalDialogNew: false,
+      rangeDate: [formatDate(new Date()), formatDate(new Date())],
+
+      point_id: 0,
+      points: [],
+      choosePoint: [],
+      points_filter: [],
+
+      is_active: 1,
+      id: 0,
 
       nameCat: '',
       editText: '',
 
-      nameCatNew: '',
+      name: '',
       editTextNew: '',
 
       config: {
         readonly: false // all options from https://xdsoft.net/jodit/doc/
       },
 
-      showCat: null
+      showItem: null
     };
   }
   
@@ -103,8 +133,10 @@ class AdvertisingCompany_ extends React.Component {
     let data = await this.getData('get_all');
     
     this.setState({
-      module_name: data.module_info.name,
-      cats: data.cats
+        module_name     : data.module_info.name,
+        cats            : data.cats,
+        points          : data.points,
+        points_filter   : data.points
     })
     
     document.title = data.module_info.name;
@@ -155,69 +187,124 @@ class AdvertisingCompany_ extends React.Component {
     });
   }
    
-  openCat(item){
-    this.setState({
-      modalDialog: true,
-      showCat: item,
-      nameCat: item.name,
-      editText: item.text
-    })
-  }
+    openCat(item) {
+        this.setState({
+            modalDialog     : true,
+            showItem        : true,
+            name            : item.name,
+            rangeDate       : [formatDate(item.date_start), formatDate(item.date_end)],
+            is_active       : item.is_active,
+            id              : item.id,
+            description     : item.description,
+            choosePoint     : item.choosePoint,
+        })
+        console.log('modalDialog2=' + this.state.modalDialog);
+    }
 
   async save(){
-    let data = {
-      cat_id: this.state.showCat.id,
-      name: this.state.nameCat,
-      text: document.getElementById('EditorEdit').value
-    };
+     let data = {
+        id          : this.state.id,
+        points      : this.state.choosePoint,
+        name        : this.state.name,
+        rangeDate   : this.state.rangeDate,
+        is_active   : this.state.is_active,
+        id          : this.state.id,
+        description : this.state.description,
+     };
 
-    let res = await this.getData('save_edit', data);
+     let res = await this.getData('save_edit', data);
 
-    if( res.st === false ){
-      alert(res.text)
-    }else{
-      this.setState({ 
-        modalDialog: false, 
-        showCat: null, 
-        nameCat: '' 
-      })
+      if (res.st === false) {
+            console.log('res false');
+            alert(res.text)
+      } else {
+            console.log('res true');
+            this.setState({ 
+                 modalDialog: false, 
+                 // showItem: null, 
+                 // nameCat: '' 
+            })
 
-      document.getElementById('EditorEdit').value = '';
+          res = await this.getData('get_all');
 
-      res = await this.getData('get_all');
-    
-      this.setState({
-        cats: res.cats
-      })
-    }
+           // оновляем список 
+          this.setState({
+            cats: res.cats
+          })
+
+      }   
   }
 
   async saveNew(){
-    let data = {
-      name: this.state.nameCatNew,
-      text: document.getElementById('EditorNew').value
-    };
+      let data = {
+          points        : this.state.choosePoint,
+          name          : this.state.name,
+          rangeDate     : this.state.rangeDate,
+          is_active     : this.state.is_active,
+          description   : this.state.description
+      };
 
     let res = await this.getData('save_new', data);
 
-    if( res.st === false ){
-      alert(res.text)
-    }else{
-      this.setState({ 
-        modalDialogNew: false, 
-        editTextNew: '', 
-        nameCatNew: '' 
-      })
+      if (res.st === false) {
+          console.log('res false');
+          alert(res.text)
+      } else {
+          console.log('res true');
+          this.setState({ 
+            modalDialogNew: false, 
+           //editTextNew: '', 
+            //nameCatNew: '' 
+          })
 
-      document.getElementById('EditorNew').value = '';
-
-      res = await this.getData('get_all');
+          res = await this.getData('get_all');
     
-      this.setState({
-        cats: res.cats
-      })
+          this.setState({
+            cats: res.cats
+          })
+      }
     }
-  }
+
+    changeChekBox(type, event) {
+        this.setState({
+            [type]: event.target.checked
+        })
+    }
+
+    changeDateRange(data) {
+        let dateStart = data[0] ? formatDate(data[0]) : '';
+        let dateEnd = data[1] ? formatDate(data[1]) : '';
+
+        this.setState({
+            rangeDate: [dateStart, dateEnd]
+        })
+    }
+
+    // смена точки
+    changePoint(event) {
+        
+        console.log('set!=' + event.target.value);
+        this.setState({
+            point_id: event.target.value
+        })
+
+        setTimeout(() => {
+            this.getAdvList();
+        }, 50)
+    }
+
+    // получение спиок рек. компаний по точки
+    async getAdvList() {
+        let data = {
+            point_id: this.state.point_id,
+        };
+
+        let res = await this.getData('get_adv_point', data);
+
+        this.setState({
+            cats: res.cats,
+        })
+    }
 
   render(){
     return (
@@ -226,24 +313,36 @@ class AdvertisingCompany_ extends React.Component {
           <CircularProgress color="inherit" />
         </Backdrop>
         
-        { !this.state.showCat ? null :
+        { !this.state.showItem ? null :
           <Dialog
             open={this.state.modalDialog}
-            onClose={ () => { this.setState({ modalDialog: false, showCat: null, editText: '', nameCat: '' }) } }
+               onClose={() => { this.setState({ modalDialog: false, showItem: null, editText: '', name: '' }) } }
           >
-            <DialogTitle>Категория уборки "{this.state.showCat.name}"</DialogTitle>
+            <DialogTitle>Компания "{this.state.name}"</DialogTitle>
             <DialogContent style={{ paddingTop: 10 }}>
               
               <Grid container spacing={3}>
                 
                 <Grid item xs={12} sm={12}>
-                  <MyTextInput classes={this.state.classes} value={ this.state.nameCat } func={ (event) => { this.setState({ nameCat: event.target.value }) } } label='Название категории' />
+                    <MyTextInput classes={this.state.classes} value={this.state.name} func={(event) => { this.setState({ name: event.target.value }) }} label='Название акции' />
+                </Grid>
+
+                <Grid item xs={12} sm={6} className="MyDaterange">
+                    <MyDaterange startText="Дата от" endText="Дата до" value={this.state.rangeDate} func={this.changeDateRange.bind(this)} />
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                    <MyAutocomplite classes={this.state.classes} data={this.state.points} value={this.state.choosePoint} func={(event, data) => { this.setState({ choosePoint: data }) }} multiple={true} label='Точка' />
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
-                  <TextEditor id="EditorEdit" text={this.state.showCat.text} />
+                     <MyTextInput classes={this.state.classes} value={this.state.description} func={(event) => { this.setState({ description: event.target.value }) }} label='Описание' />
                 </Grid>
-                
+
+                <Grid item xs={12} sm={6}>
+                    <MyCheckBox label='Показать акцию' value={this.state.is_active == 1 ? true : false} func={this.changeChekBox.bind(this, 'is_active')} />
+                </Grid>
+                 
               </Grid>
 
             </DialogContent>
@@ -255,21 +354,32 @@ class AdvertisingCompany_ extends React.Component {
 
         <Dialog
           open={this.state.modalDialogNew}
-          onClose={ () => { this.setState({ modalDialogNew: false, editTextNew: '', nameCatNew: '' }) } }
+                onClose={() => { this.setState({ modalDialogNew: false, description: '', rangeDate: [formatDate(new Date()), formatDate(new Date())], choosePoint: [] }) } }
         >
-          <DialogTitle>Новая категория уборки</DialogTitle>
+          <DialogTitle>Новая акция</DialogTitle>
           <DialogContent style={{ paddingTop: 10 }}>
             
             <Grid container spacing={3}>
               
-              <Grid item xs={12} sm={12}>
-                <MyTextInput classes={this.state.classes} value={ this.state.nameCatNew } func={ (event) => { this.setState({ nameCatNew: event.target.value }) } } label='Название категории' />
-              </Grid>
+               <Grid item xs={12} sm={12}>
+                  <MyTextInput classes={this.state.classes} value={this.state.name} func={(event) => { this.setState({ name: event.target.value }) } } label='Название компании' />
+               </Grid>
 
-              <Grid item xs={12} sm={12}>
-                <TextEditor id="EditorNew" text={''} />
-              </Grid>
-              
+                <Grid item xs={12} sm={6} className="MyDaterange">
+                    <MyDaterange startText="Дата от" endText="Дата до" value={this.state.rangeDate} func={this.changeDateRange.bind(this)} />
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                    <MyAutocomplite classes={this.state.classes} data={this.state.points} value={this.state.choosePoint} func={(event, data) => { this.setState({ choosePoint: data }) }} multiple={true} label='Точка' />
+                </Grid>
+               
+                <Grid item xs={12} sm={12}>
+                     <MyTextInput classes={this.state.classes} value={this.state.description} func={(event) => { this.setState({ description: event.target.value }) }} label='Описание'  />
+                 </Grid>
+
+                <Grid item xs={12} sm={6}>
+                     <MyCheckBox label='Показать акцию' value={this.state.is_active == 1 ? true : false} func={this.changeChekBox.bind(this, 'is_active')} />
+                </Grid>
             </Grid>
 
           </DialogContent>
@@ -284,17 +394,27 @@ class AdvertisingCompany_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={12}>
-            <Button variant="contained" color="primary" onClick={ () => { this.setState({ modalDialogNew: true }) } }>Добавить категорию</Button>
+            <Button variant="contained" color="primary" onClick={ () => { this.setState({ modalDialogNew: true }) } }>Добавить акцию</Button>
           </Grid>
-          
+
+           <Grid item xs={12} sm={6}>
+               <MySelect data={this.state.points_filter} value={this.state.points_filter} func={this.changePoint.bind(this)} label='Точка' />
+            </Grid>
+
           <Grid item xs={12} sm={12}>
-            <List style={{ width: '100%' }}>
-              { this.state.cats.map( (item, key) =>
-                <ListItem button key={key} onClick={ this.openCat.bind(this, item) }>
-                  <ListItemText primary={ item.name } />
-                </ListItem>
-              ) }
-            </List>
+             <List style={{ width: '100%' }}>
+               {!this.state.cats  ? null : 
+                     this.state.cats.map((item, key) =>
+                           
+                        <ListItem button key={key} onClick={this.openCat.bind(this, item)} style={{ marginLeft: 10 }} >
+                            <ListItemIcon>
+                                {item.is_active == '1' ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                        </ListItemIcon>
+                      <ListItemText primary={ item.name } />
+                    </ListItem>
+                    )}
+                
+             </List>
           </Grid>
         
         </Grid>
