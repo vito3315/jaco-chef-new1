@@ -354,6 +354,8 @@ class SiteUserManager_ extends React.Component {
       this.setState({
         graphModal: true
       })
+
+      return ;
     }
 
     if( parseInt(this.state.editUser.user.app_id) == 0 && this.state.textDel.length == 0 ){
