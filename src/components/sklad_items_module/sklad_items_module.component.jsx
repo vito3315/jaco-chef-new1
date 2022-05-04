@@ -773,7 +773,7 @@ class SkladItemsModule_ extends React.Component {
                 >
                   <Typography>Без категории</Typography>
                 </AccordionSummary>
-                <AccordionDetails>
+                <AccordionDetails style={{ width: '100%', overflow: 'scroll' }}>
                   
                   <Table>
                   
