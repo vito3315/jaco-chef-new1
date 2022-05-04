@@ -114,7 +114,9 @@ class SkladItemsModule_ extends React.Component {
       checkArtDialog: false,
       checkArtList: [],
 
-      freeItems: []
+      freeItems: [],
+
+      searchItem: ''
     };
   }
   
@@ -466,6 +468,21 @@ class SkladItemsModule_ extends React.Component {
     
   }
 
+  async search(){
+    let data = {
+      item: this.state.searchItem
+    };
+
+    let res = await this.getData('get_all_search', data);
+
+    console.log( res )
+
+    this.setState({
+      cats: res.cats,
+      freeItems: res.items_free
+    })
+  }
+
   render(){
     return (
       <>
@@ -688,6 +705,10 @@ class SkladItemsModule_ extends React.Component {
           
           <Grid item xs={12} sm={3}>
             <Button onClick={this.openModalItemNew.bind(this)} variant="contained">Добавить товар</Button>
+          </Grid>
+
+          <Grid item xs={12} sm={3}>
+            <MyTextInput label="Поиск" value={ this.state.searchItem } func={ ( event ) => { this.setState({ searchItem: event.target.value }) } } onBlur={ this.search.bind(this) } />
           </Grid>
         
           <Grid item xs={12}>
