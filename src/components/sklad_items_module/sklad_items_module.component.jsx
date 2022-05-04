@@ -707,7 +707,7 @@ class SkladItemsModule_ extends React.Component {
                       >
                         <Typography>{cat.name}</Typography>
                       </AccordionSummary>
-                      <AccordionDetails>
+                      <AccordionDetails style={{ width: '100%', overflow: 'scroll' }}>
                         
                         <Table>
                   
@@ -726,7 +726,7 @@ class SkladItemsModule_ extends React.Component {
                               <TableCell style={{ width: '5%' }}>Ед. измер</TableCell>
                   
                               <TableCell style={{ width: '9%' }}>Место хранения</TableCell>
-                              <TableCell style={{ width: '9%' }}>Моя цена</TableCell>
+                              <TableCell style={{ width: '9%', minWidth: 150 }}>Моя цена</TableCell>
                             </TableRow>
                           </TableHead>
                   
@@ -792,7 +792,7 @@ class SkladItemsModule_ extends React.Component {
                         <TableCell style={{ width: '5%' }}>Ед. измер</TableCell>
             
                         <TableCell style={{ width: '9%' }}>Место хранения</TableCell>
-                        <TableCell style={{ width: '9%' }}>Моя цена</TableCell>
+                        <TableCell style={{ width: '9%', minWidth: 150 }}>Моя цена</TableCell>
                       </TableRow>
                     </TableHead>
             
