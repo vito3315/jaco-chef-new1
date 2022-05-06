@@ -18,6 +18,14 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
 import ListItemIcon from '@mui/material/ListItemIcon';
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -134,7 +142,8 @@ class AdvertisingCompany_ extends React.Component {
         module_name     : data.module_info.name,
         cats            : data.cats,
         points          : data.points,
-        points_filter   : data.points
+        points_filter   : data.points,
+        point_id        : data.points[0].id
     })
     
     document.title = data.module_info.name;
@@ -404,18 +413,35 @@ class AdvertisingCompany_ extends React.Component {
             </Grid>
 
           <Grid item xs={12} sm={12}>
-            <List style={{ width: '100%' }}>
-              {!this.state.cats  ? null : 
-                this.state.cats.map((item, key) =>
-                  <ListItem button key={key} onClick={this.openCat.bind(this, item)} style={{ marginLeft: 10 }} >
-                    <ListItemIcon>
-                      {item.is_active == '1' ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                    </ListItemIcon>
-                    <ListItemText primary={ item.name } />
-                  </ListItem>
-              )}
-                
-            </List>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell style={{ textAlign: 'center' }}>#</TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}>Название</TableCell>
+                        <TableCell style={{ textAlign: 'center' }}>Дата начало</TableCell>
+                        <TableCell style={{ textAlign: 'center' }}>Дата окончания</TableCell>
+                        <TableCell style={{ textAlign: 'center' }}>Точки</TableCell>
+                      </TableRow>
+                    </TableHead>
+
+                    <TableBody>
+                    {!this.state.cats ? null :
+                        this.state.cats.map((item, key) =>
+                            <TableRow onClick={this.openCat.bind(this, item)} >
+                                <TableCell style={{ textAlign: 'center' }}>{ key + 1 } </TableCell>
+                                <TableCell style={{ textAlign: 'center' }}> {item.is_active == '1' ? <VisibilityIcon /> : <VisibilityOffIcon />} </TableCell>
+                                <TableCell style={{ textAlign: 'center', cursor: 'pointer' }}>{ item.name } </TableCell>
+                                <TableCell style={{ textAlign: 'center' }}>{ item.date_start } </TableCell>
+                                <TableCell style={{ textAlign: 'center' }}>{ item.date_end } </TableCell>
+                                <TableCell style={{ textAlign: 'center' }}>{item.choosePoint.map((it, k) => <React.Fragment key={k}> {it.name} </React.Fragment> )}</TableCell>
+                            </TableRow>
+                     )}
+                    </TableBody>
+                 </Table>
+                </TableContainer>
+            
           </Grid>
         
         </Grid>

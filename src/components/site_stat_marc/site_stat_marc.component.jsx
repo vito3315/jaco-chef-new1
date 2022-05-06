@@ -579,7 +579,7 @@ class SiteStatMarc_ extends React.Component {
       })
     })
 
-    console.log('adv_data=', MyData.adv_data);
+    //console.log('adv_data=', MyData.adv_data);
     //MyData.adv_data.map((item) => {
     //    let date = item.date.split('-');
     //    data_adv.push({
@@ -641,93 +641,41 @@ class SiteStatMarc_ extends React.Component {
       series.data.setAll(data);
     }
 
+    // Новый графи со столбиками 
     function createSeries2(name, field, data) {
 
-        // вытаскиваем название акции
-        let adv1 = [], adv2 = [];
-        let lKey = 0, newArr = false;
+        let cat = [];
+        data.map((item) => {
+            cat.push({ 'category': item['category'] });
+        })
 
-        // разделяем на два массива
-        for (const [key, value] of data.entries()) {
-            lKey = key == 0 ? 1 : key - 1;
-            if (key == 0) {
-                adv1.push(value);
-            } else if (data[lKey]['name'] != value['name']) {
-                adv2.push(value);
-                newArr = true;
-            } else if (newArr) {
-                adv2.push(value);
-            } else {
-                adv1.push(value);
-            }
-        }
+        yAxis2.data.setAll(cat);
 
-        // инцилизация первого массива на графике
-        if (adv1.length != 0) {
+        // проверка  на пустой массив
+        if (data.length != 0) {
+            console.log('data=', data);
             var series2 = chart.series.push(
                 am5xy.ColumnSeries.new(root, {
-                    name: adv1[0]['name'],
                     xAxis: xAxis,
-                    yAxis: yAxis,
-                    valueYField: field,
-                    valueXField: "date",
-                    categoryXField: "date",
-                    color: '0x6794DC',
-                    clustered: false,
-                    tooltip: am5.Tooltip.new(root, {
-                        pointerOrientation: "horizontal",
-                        labelText: adv1[0]['name']
-                    })
+                    yAxis: yAxis2,
+                    openValueXField: "fromDate",
+                    valueXField: "toDate",
+                    categoryYField: "category",
+                    sequencedInterpolation: true,
+                    fill: am5.color(0x6794DA)
                 })
             );
 
             series2.columns.template.setAll({
                 opacity: 0.5,
-                width: am5.percent(80),
-                templateField: "columnSettings",
             });
 
-            chart.get("colors").set("colors", [
-                am5.color(0x6794DC),
-            ]);
-
-            // меняем цвет
-            series2.set("fill", am5.color(0x6794DC));
-            series2.data.setAll(adv1);
-        }
-
-        // инцилизация второго массива на графике
-        if (adv2.length != 0) {
-            var series3 = chart.series.push(
-                am5xy.ColumnSeries.new(root, {
-                    name: adv2[0]['name'],
-                    xAxis: xAxis,
-                    yAxis: yAxis,
-                    valueYField: field,
-                    valueXField: "date",
-                    categoryXField: "date",
-                    color: '0x6794DC',
-                    clustered: false,
-                    tooltip: am5.Tooltip.new(root, {
-                        pointerOrientation: "horizontal",
-                        labelText: adv2[0]['name']
-                    })
-                })
-            );
-
-            series3.columns.template.setAll({
-                opacity: 0.5,
-                width: am5.percent(80),
-                templateField: "columnSettings",
+            series2.data.processor = am5.DataProcessor.new(root, {
+                dateFields: ["fromDate", "toDate"],
+                dateFormat: "yyyy-MM-dd HH:mm"
             });
 
-            chart.get("colors").set("colors", [
-                am5.color(0x6794DA),
-            ]);
-
-            // меняем цвет
-            series3.set("fill", am5.color(0x6794DA));
-            series3.data.setAll(adv2);
+            series2.data.setAll(data);
         }
     }
 
@@ -735,7 +683,7 @@ class SiteStatMarc_ extends React.Component {
     createSeries("Самовывозов", "value", data_pic);
     createSeries("Доставок", "value", data_dev);
     createSeries("Зал", "value", data_hall);
-    if (this.state.is_show_adv) {
+    if (this.state.is_show_adv && MyData.adv_data) {
         createSeries2("Акция", "value", data_adv)
     }
     // Add cursor
@@ -851,6 +799,7 @@ class SiteStatMarc_ extends React.Component {
           })
       );
 
+
     // Create series правка 4 Заказы по дням
     function createSeries(name, field, data) {
      
@@ -891,38 +840,54 @@ class SiteStatMarc_ extends React.Component {
     // Новый графи со столбиками 
     function createSeries2(name, field, data) {
         let cat = [];
-        data.map((item) => {
-            cat.push( { 'category': item['category'] } );
+        // let colors = [0x6794DA, 0x62941A];
+
+        data.map((item, k) => {
+            data[k].name        = item.category;
+            data[k].category    = item.description;
+           // data[k].color       = colors[k];
+            cat.push({ 'category'   : item.description } ); // работает при замени кат на деск
         })
-       
+      
+        // привязка категории
         yAxis2.data.setAll(cat);
-         
+       
+        var legend = chart.children.push(am5.Legend.new(root, {
+            centerX: am5.p50,
+            x: am5.p50,
+            clickTarget: 'none'
+        }));
+
         // проверка  на пустой массив
-        if (data.length != 0) {
-            console.log('data=', data);
-            var series2 = chart.series.push(
+        var series2 = null;
+        data.map(function (item, key) {
+         
+            //console.log('item=', item);
+            series2 = chart.series.push(
                 am5xy.ColumnSeries.new(root, {
+                    name: item.name,
                     xAxis: xAxis,
                     yAxis: yAxis2,
                     openValueXField: "fromDate",
                     valueXField: "toDate",
                     categoryYField: "category",
                     sequencedInterpolation: true,
+                    //fill: am5.color(colors[key])
                     fill: am5.color(0x6794DA)
                 })
             );
 
             series2.columns.template.setAll({
                 opacity: 0.5,
-            });
+            }); 
 
             series2.data.processor = am5.DataProcessor.new(root, {
                 dateFields: ["fromDate", "toDate"],
                 dateFormat: "yyyy-MM-dd HH:mm"
             });
-
-            series2.data.setAll(data);
-        }
+            legend.data.push(series2);
+        })
+        series2.data.setAll(data);
     }
 
     createSeries("Всего", "value", data_all);
@@ -931,8 +896,7 @@ class SiteStatMarc_ extends React.Component {
     createSeries("Зал", "value", data_hall);
 
     // правка от 08.04 показываем столбики
-    if (this.state.is_show_adv) {
-        console.log('adv_data=', MyData.adv_data);;
+    if (this.state.is_show_adv && MyData.adv_data) {
         createSeries2("Акция", "value", MyData.adv_data);
     }
     // Add cursor
@@ -1124,7 +1088,7 @@ class SiteStatMarc_ extends React.Component {
     createSeries("Зал", "value", data_hall);
 
      // правка от 08.04 показываем столбики
-    if (this.state.is_show_adv) {
+    if (this.state.is_show_adv && MyData.adv_data) {
        // createSeries2("Акция", "value", MyData.adv_data)
     }
     // Add cursor
@@ -1283,23 +1247,39 @@ class SiteStatMarc_ extends React.Component {
       // Новый графи со столбиками 
       function createSeries2(name, field, data) {
           let cat = [];
-          data.map((item) => {
-              cat.push({ 'category': item['category'] });
+          // let colors = [0x6794DA, 0x62941A];
+
+          data.map((item, k) => {
+              data[k].name = item.category;
+              data[k].category = item.description;
+              // data[k].color       = colors[k];
+              cat.push({ 'category': item.description }); // работает при замени кат на деск
           })
 
+          // привязка категории
           yAxis2.data.setAll(cat);
 
+          var legend = chart.children.push(am5.Legend.new(root, {
+              centerX: am5.p50,
+              x: am5.p50,
+              clickTarget: 'none'
+          }));
+
           // проверка  на пустой массив
-          if (data.length != 0) {
-              console.log('data=', data);
-              var series2 = chart.series.push(
+          var series2 = null;
+          data.map(function (item, key) {
+
+              //console.log('item=', item);
+              series2 = chart.series.push(
                   am5xy.ColumnSeries.new(root, {
+                      name: item.name,
                       xAxis: xAxis,
                       yAxis: yAxis2,
                       openValueXField: "fromDate",
                       valueXField: "toDate",
                       categoryYField: "category",
                       sequencedInterpolation: true,
+                      //fill: am5.color(colors[key])
                       fill: am5.color(0x6794DA)
                   })
               );
@@ -1312,16 +1292,16 @@ class SiteStatMarc_ extends React.Component {
                   dateFields: ["fromDate", "toDate"],
                   dateFormat: "yyyy-MM-dd HH:mm"
               });
-
-              series2.data.setAll(data);
-          }
+              legend.data.push(series2);
+          })
+          series2.data.setAll(data);
       }
 
     createSeries("Всего", "value", data_all);
     createSeries("Самовывозов", "value", data_pic);
     createSeries("Доставок", "value", data_dev);
     createSeries("Зал", "value", data_hall);
-    if (this.state.is_show_adv) {
+    if (this.state.is_show_adv && MyData.adv_data) {
         createSeries2("Акция", "value", MyData.adv_data);
     }
 
@@ -1528,7 +1508,7 @@ class SiteStatMarc_ extends React.Component {
     }
     createSeries("Роллов", "value", data_rolls);
     createSeries("Пиццы", "value", data_pizza);
-    if (this.state.is_show_adv) {
+    if (this.state.is_show_adv && MyData.adv_data) {
         createSeries2("Акция", "value", data_adv)
     }
     // Add cursor
@@ -1665,23 +1645,39 @@ class SiteStatMarc_ extends React.Component {
       // Новый графи со столбиками 
       function createSeries2(name, field, data) {
           let cat = [];
-          data.map((item) => {
-              cat.push({ 'category': item['category'] });
+          // let colors = [0x6794DA, 0x62941A];
+
+          data.map((item, k) => {
+              data[k].name = item.category;
+              data[k].category = item.description;
+              // data[k].color       = colors[k];
+              cat.push({ 'category': item.description }); // работает при замени кат на деск
           })
 
+          // привязка категории
           yAxis2.data.setAll(cat);
 
+          var legend = chart.children.push(am5.Legend.new(root, {
+              centerX: am5.p50,
+              x: am5.p50,
+              clickTarget: 'none'
+          }));
+
           // проверка  на пустой массив
-          if (data.length != 0) {
-              console.log('data=', data);
-              var series2 = chart.series.push(
+          var series2 = null;
+          data.map(function (item, key) {
+
+              //console.log('item=', item);
+              series2 = chart.series.push(
                   am5xy.ColumnSeries.new(root, {
+                      name: item.name,
                       xAxis: xAxis,
                       yAxis: yAxis2,
                       openValueXField: "fromDate",
                       valueXField: "toDate",
                       categoryYField: "category",
                       sequencedInterpolation: true,
+                      //fill: am5.color(colors[key])
                       fill: am5.color(0x6794DA)
                   })
               );
@@ -1694,14 +1690,14 @@ class SiteStatMarc_ extends React.Component {
                   dateFields: ["fromDate", "toDate"],
                   dateFormat: "yyyy-MM-dd HH:mm"
               });
-
-              series2.data.setAll(data);
-          }
+              legend.data.push(series2);
+          })
+          series2.data.setAll(data);
       }
 
     createSeries("Роллов", "value", data_rolls);
     createSeries("Пиццы", "value", data_pizza);
-    if (this.state.is_show_adv) {
+    if (this.state.is_show_adv && MyData.adv_data) {
         createSeries2("Акция", "value", MyData.adv_data)
     }
 
