@@ -453,8 +453,6 @@ class SiteUserManager_ extends React.Component {
 
     console.log( this.state.app_list )
 
-    //return ;
-
     this.state.app_list.map( (item, key) => {
       if( parseInt(this.state.editUser.user.app_id) == parseInt(item.id) ){
 

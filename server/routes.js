@@ -25,9 +25,10 @@ const { AdvertisingCompany } = require( '../src/components/advertising_company' 
 const { RasBillAndCook } = require( '../src/components/ras_bill_and_cook' );
 const { SkladItemsModule } = require( '../src/components/sklad_items_module' );
 const { SiteUserManager } = require( '../src/components/site_user_manager' );
+const { PromoItemsStat } = require( '../src/components/promo_items_stat' );
 
 
-//AdvertisingCompany_
+//
 
 module.exports = [
     {
@@ -247,6 +248,13 @@ module.exports = [
         exact: true,
         component: SiteUserManager,
         title: 'Сотрудники',
+        code: 200
+    },
+    {
+        path: '/promo_items_stat',
+        exact: true,
+        component: PromoItemsStat,
+        title: 'Анализ промокодов',
         code: 200
     },
     
