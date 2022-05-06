@@ -114,7 +114,9 @@ class SkladItemsModule_ extends React.Component {
       checkArtDialog: false,
       checkArtList: [],
 
-      freeItems: []
+      freeItems: [],
+
+      searchItem: ''
     };
   }
   
@@ -466,6 +468,21 @@ class SkladItemsModule_ extends React.Component {
     
   }
 
+  async search(){
+    let data = {
+      item: this.state.searchItem
+    };
+
+    let res = await this.getData('get_all_search', data);
+
+    console.log( res )
+
+    this.setState({
+      cats: res.cats,
+      freeItems: res.items_free
+    })
+  }
+
   render(){
     return (
       <>
@@ -689,6 +706,10 @@ class SkladItemsModule_ extends React.Component {
           <Grid item xs={12} sm={3}>
             <Button onClick={this.openModalItemNew.bind(this)} variant="contained">Добавить товар</Button>
           </Grid>
+
+          <Grid item xs={12} sm={3}>
+            <MyTextInput label="Поиск" value={ this.state.searchItem } func={ ( event ) => { this.setState({ searchItem: event.target.value }) } } onBlur={ this.search.bind(this) } />
+          </Grid>
         
           <Grid item xs={12}>
           
@@ -707,7 +728,7 @@ class SkladItemsModule_ extends React.Component {
                       >
                         <Typography>{cat.name}</Typography>
                       </AccordionSummary>
-                      <AccordionDetails>
+                      <AccordionDetails style={{ width: '100%', overflow: 'scroll' }}>
                         
                         <Table>
                   
@@ -726,7 +747,7 @@ class SkladItemsModule_ extends React.Component {
                               <TableCell style={{ width: '5%' }}>Ед. измер</TableCell>
                   
                               <TableCell style={{ width: '9%' }}>Место хранения</TableCell>
-                              <TableCell style={{ width: '9%' }}>Моя цена</TableCell>
+                              <TableCell style={{ width: '9%', minWidth: 150 }}>Моя цена</TableCell>
                             </TableRow>
                           </TableHead>
                   
@@ -773,7 +794,7 @@ class SkladItemsModule_ extends React.Component {
                 >
                   <Typography>Без категории</Typography>
                 </AccordionSummary>
-                <AccordionDetails>
+                <AccordionDetails style={{ width: '100%', overflow: 'scroll' }}>
                   
                   <Table>
                   
@@ -792,7 +813,7 @@ class SkladItemsModule_ extends React.Component {
                         <TableCell style={{ width: '5%' }}>Ед. измер</TableCell>
             
                         <TableCell style={{ width: '9%' }}>Место хранения</TableCell>
-                        <TableCell style={{ width: '9%' }}>Моя цена</TableCell>
+                        <TableCell style={{ width: '9%', minWidth: 150 }}>Моя цена</TableCell>
                       </TableRow>
                     </TableHead>
             

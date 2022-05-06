@@ -333,6 +333,7 @@ class CategoryItems_ extends React.Component {
               <Grid item xs={12} sm={12}>
                 <MyAutocomplite 
                   label="Выбранные позиции" 
+                  multiple={true}
                   func={ (event, val) => { this.setState({ thisValItems: val }) } }
                   data={ this.state.thisDataItems } 
                   value={ this.state.thisValItems } />

@@ -344,8 +344,8 @@ class DriverStat_ extends React.Component {
     let data = {
       point_id: this.state.point,
       driver_id: driver.driver_id,
-      date_start: this.state.rangeDate[0],
-      date_end: this.state.rangeDate[1],
+      date_start: this.state.date_start,
+      date_end: this.state.date_end,
     };
     
     let res = await this.getData('getStatDop', data);
@@ -363,8 +363,8 @@ class DriverStat_ extends React.Component {
     let data = {
       point_id: this.state.point,
       driver_id: driver.driver_id,
-      date_start: this.state.rangeDate[0],
-      date_end: this.state.rangeDate[1],
+      date_start: this.state.date_start,
+      date_end: this.state.date_end,
     };
     
     let res = await this.getData('getStatDopMain', data);

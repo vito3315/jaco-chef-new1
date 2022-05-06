@@ -344,7 +344,8 @@ class SiteUserManager_ extends React.Component {
 
     this.state.app_list.map( (item, key) => {
       if( parseInt(this.state.editUser.user.app_id) == parseInt(item.id) ){
-        if( parseInt(item.id) == 1 && parseInt(this.state.graphType) == 0 ){
+
+        if( parseInt(item.is_graph) == 1 && parseInt(this.state.graphType) == 0 ){
           is_graph = true;
         }
       }
@@ -354,6 +355,8 @@ class SiteUserManager_ extends React.Component {
       this.setState({
         graphModal: true
       })
+
+      return ;
     }
 
     if( parseInt(this.state.editUser.user.app_id) == 0 && this.state.textDel.length == 0 ){
@@ -450,16 +453,14 @@ class SiteUserManager_ extends React.Component {
 
     console.log( this.state.app_list )
 
-    //return ;
-
     this.state.app_list.map( (item, key) => {
       if( parseInt(this.state.editUser.user.app_id) == parseInt(item.id) ){
 
-        if( parseInt(item.id) == 1 ){
+        if( parseInt(item.is_graph) == 1 ){
           is_graph_ = true;
         }
 
-        if( parseInt(item.id) == 1 && parseInt(this.state.graphType) == 0 ){
+        if( parseInt(item.is_graph) == 1 && parseInt(this.state.graphType) == 0 ){
           is_graph = true;
         }
       }
