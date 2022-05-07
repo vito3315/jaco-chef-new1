@@ -6,6 +6,11 @@ const ReactDOMServer = require( 'react-dom/server' );
 const { StaticRouter, matchPath } = require( 'react-router-dom' );
 const {Helmet} = require("react-helmet");
 
+var webpack = require('webpack');
+var webpackConfig = require('../webpack.config');
+var compiler = webpack(webpackConfig);
+
+
 // create express application
 const app = express();
 
@@ -22,6 +27,10 @@ app.get( /\.(js|css|map|ico|png|svg)$/, express.static( path.resolve( __dirname,
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private, max-age=10800')
     next()
 })*/
+
+app.use(require("webpack-dev-middleware")(compiler, {
+    noInfo: true, publicPath: webpackConfig.output.publicPath
+}));
 
 // for any other requests, send `index.html` as a response
 app.use( '*', async ( req, res ) => {

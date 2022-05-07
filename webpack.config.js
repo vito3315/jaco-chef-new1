@@ -5,8 +5,6 @@ const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require("compression-webpack-plugin");
 
-const TerserPlugin = require("terser-webpack-plugin");
-
 const webpack = require('webpack');
 
 /*-------------------------------------------------*/
@@ -26,9 +24,10 @@ module.exports = {
     output: {
         path: path.resolve( __dirname, 'dist' ),
         publicPath: '/',
-        //filename: '[name].[contenthash].js',
+        filename: '[name].[contenthash].js',
         clean: true,
         asyncChunks: true,
+        pathinfo: false,
     },
 
     
@@ -64,6 +63,7 @@ module.exports = {
 
     // webpack plugins
     plugins: [
+        new webpack.HotModuleReplacementPlugin(),
         new CompressionPlugin(),
         
         new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /ru/),
@@ -87,7 +87,7 @@ module.exports = {
             filename: 'index.html',
             title: 'Caching',
             template: path.resolve( __dirname, 'src/index.html' ),
-            minify: false,
+            minify: true,
         } ),
 
         // copy static files from `src` to `dist`
@@ -119,15 +119,6 @@ module.exports = {
                 },
             },
         },
-
-        minimize: true,
-        minimizer: [
-            new TerserPlugin({
-                minify: TerserPlugin.esbuildMinify,
-                parallel: true,
-                
-            })
-        ],
     },
     
     
