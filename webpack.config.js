@@ -5,6 +5,8 @@ const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require("compression-webpack-plugin");
 
+const TerserPlugin = require("terser-webpack-plugin");
+
 const webpack = require('webpack');
 
 /*-------------------------------------------------*/
@@ -24,7 +26,7 @@ module.exports = {
     output: {
         path: path.resolve( __dirname, 'dist' ),
         publicPath: '/',
-        filename: '[name].[contenthash].js',
+        //filename: '[name].[contenthash].js',
         clean: true,
         asyncChunks: true,
     },
@@ -116,7 +118,16 @@ module.exports = {
                     chunks: 'all',
                 },
             },
-       },
+        },
+
+        minimize: true,
+        minimizer: [
+            new TerserPlugin({
+                minify: TerserPlugin.esbuildMinify,
+                parallel: true,
+                
+            })
+        ],
     },
     
     
