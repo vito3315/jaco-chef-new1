@@ -357,9 +357,11 @@ class SiteStatMarc_ extends React.Component {
           })
         });
       });
-      
+        
       series.strokes.template.set("strokeWidth", 2);
-      
+      if (name == 'Всего') {
+         series.strokes.template.set("strokeWidth", 8)
+      }
       series.get("tooltip").label.set("text", "[bold]{name}[/]\n{valueX.formatDate()}: {valueY}")
       series.data.setAll(data);
     }
@@ -579,16 +581,6 @@ class SiteStatMarc_ extends React.Component {
       })
     })
 
-    //console.log('adv_data=', MyData.adv_data);
-    //MyData.adv_data.map((item) => {
-    //    let date = item.date.split('-');
-    //    data_adv.push({
-    //        date: new Date(date[0], parseInt(date[1]) - 1, parseInt(date[2])).getTime(),
-    //        value: parseInt(item.count),
-    //        name: item.name
-    //    })
-    //})
-
     // Create Y-axis
     var yAxis = chart.yAxes.push(
       am5xy.ValueAxis.new(root, {
@@ -636,47 +628,11 @@ class SiteStatMarc_ extends React.Component {
       });
       
       series.strokes.template.set("strokeWidth", 2);
-      
+      if (name == 'Всего') {
+        series.strokes.template.set("strokeWidth", 8)
+      }
       series.get("tooltip").label.set("text", "[bold]{name}[/]\n{valueX.formatDate()}: {valueY}")
       series.data.setAll(data);
-    }
-
-    // Новый графи со столбиками 
-    function createSeries2(name, field, data) {
-
-        let cat = [];
-        data.map((item) => {
-            cat.push({ 'category': item['category'] });
-        })
-
-        yAxis2.data.setAll(cat);
-
-        // проверка  на пустой массив
-        if (data.length != 0) {
-            console.log('data=', data);
-            var series2 = chart.series.push(
-                am5xy.ColumnSeries.new(root, {
-                    xAxis: xAxis,
-                    yAxis: yAxis2,
-                    openValueXField: "fromDate",
-                    valueXField: "toDate",
-                    categoryYField: "category",
-                    sequencedInterpolation: true,
-                    fill: am5.color(0x6794DA)
-                })
-            );
-
-            series2.columns.template.setAll({
-                opacity: 0.5,
-            });
-
-            series2.data.processor = am5.DataProcessor.new(root, {
-                dateFields: ["fromDate", "toDate"],
-                dateFormat: "yyyy-MM-dd HH:mm"
-            });
-
-            series2.data.setAll(data);
-        }
     }
 
     createSeries("Всего", "value", data_all);
@@ -715,10 +671,10 @@ class SiteStatMarc_ extends React.Component {
       am5themes_Animated.new(root)
     ]);
 
-      root.dateFormatter.setAll({
-          dateFormat: "yyyy-MM-dd", // not-ok
-          dateFields: ["valueX", "openValueX"] // no
-      });
+    root.dateFormatter.setAll({
+        dateFormat: "yyyy-MM-dd", 
+        dateFields: ["valueX", "openValueX"] 
+    });
 
     var chart = root.container.children.push( 
       am5xy.XYChart.new(root, {
@@ -862,7 +818,6 @@ class SiteStatMarc_ extends React.Component {
         var series2 = null;
         data.map(function (item, key) {
          
-            //console.log('item=', item);
             series2 = chart.series.push(
                 am5xy.ColumnSeries.new(root, {
                     name: item.name,
@@ -1026,10 +981,9 @@ class SiteStatMarc_ extends React.Component {
           );
 
           series.strokes.template.set("strokeWidth", 2);
-
-          //if (name == 'Всего') {
-          //    series.strokes.template.set("strokeWidth", 8)
-          //}
+          if (name == 'Всего') {
+              series.strokes.template.set("strokeWidth", 8)
+          }
 
           series.bullets.push(function () {
               return am5.Bullet.new(root, {

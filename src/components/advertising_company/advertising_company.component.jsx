@@ -429,7 +429,7 @@ class AdvertisingCompany_ extends React.Component {
                     <TableBody>
                     {!this.state.cats ? null :
                         this.state.cats.map((item, key) =>
-                            <TableRow onClick={this.openCat.bind(this, item)} >
+                            <TableRow key={key} onClick={this.openCat.bind(this, item)} >
                                 <TableCell style={{ textAlign: 'center' }}>{ key + 1 } </TableCell>
                                 <TableCell style={{ textAlign: 'center' }}> {item.is_active == '1' ? <VisibilityIcon /> : <VisibilityOffIcon />} </TableCell>
                                 <TableCell style={{ textAlign: 'center', cursor: 'pointer' }}>{ item.name } </TableCell>
