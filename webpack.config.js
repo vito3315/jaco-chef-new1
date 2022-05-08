@@ -27,6 +27,7 @@ module.exports = {
         filename: '[name].[contenthash].js',
         clean: true,
         asyncChunks: true,
+        pathinfo: false,
     },
 
     
@@ -62,6 +63,7 @@ module.exports = {
 
     // webpack plugins
     plugins: [
+        new webpack.HotModuleReplacementPlugin(),
         new CompressionPlugin(),
         
         new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /ru/),
@@ -85,7 +87,7 @@ module.exports = {
             filename: 'index.html',
             title: 'Caching',
             template: path.resolve( __dirname, 'src/index.html' ),
-            minify: false,
+            minify: true,
         } ),
 
         // copy static files from `src` to `dist`
@@ -116,7 +118,7 @@ module.exports = {
                     chunks: 'all',
                 },
             },
-       },
+        },
     },
     
     
