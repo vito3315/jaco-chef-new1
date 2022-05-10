@@ -26,7 +26,7 @@ const { RasBillAndCook } = require( '../src/components/ras_bill_and_cook' );
 const { SkladItemsModule } = require( '../src/components/sklad_items_module' );
 const { SiteUserManager } = require( '../src/components/site_user_manager' );
 const { PromoItemsStat } = require( '../src/components/promo_items_stat' );
-
+const { SiteItems } = require( '../src/components/site_items' );
 
 //
 
@@ -257,6 +257,12 @@ module.exports = [
         title: 'Анализ промокодов',
         code: 200
     },
-    
+    {
+        path: '/site_items',
+        exact: true,
+        component: SiteItems,
+        title: 'Товары Сайта',
+        code: 200
+    },
     
 ];
