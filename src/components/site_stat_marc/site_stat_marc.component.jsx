@@ -486,7 +486,9 @@ class SiteStatMarc_ extends React.Component {
       });
       
         series.strokes.template.set("strokeWidth", 2);
-
+        if (name == 'Всего') {
+            series.strokes.template.set("strokeWidth", 8)
+        }
         series.get("tooltip").label.set("text", "[bold]{name}[/]\n{valueX.formatDate()}: {valueY}")
         series.data.setAll(data);
       }
@@ -639,9 +641,7 @@ class SiteStatMarc_ extends React.Component {
     createSeries("Самовывозов", "value", data_pic);
     createSeries("Доставок", "value", data_dev);
     createSeries("Зал", "value", data_hall);
-    if (this.state.is_show_adv && MyData.adv_data) {
-        createSeries2("Акция", "value", data_adv)
-    }
+   
     // Add cursor
     chart.set("cursor", am5xy.XYCursor.new(root, {
       behavior: "zoomXY",
@@ -1870,7 +1870,7 @@ class SiteStatMarc_ extends React.Component {
 
                  <Grid container spacing={3}>
                    
-                     <Grid style={{ marginTop: 20}} item xs={12} sm={4}>
+                    <Grid style={{ marginTop: 20, marginBottom: 200}} item xs={12} sm={4}> 
                         <h2 style={{ textAlign: 'center' }}>Рейтинг роллов </h2>
                         <h5 style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.showStat.bind(this, 'roll')} >Показать/Скрыть</h5>
                         {this.state.show_stat_roll != true ? null :
@@ -1891,7 +1891,7 @@ class SiteStatMarc_ extends React.Component {
                         }
                     </Grid>
 
-                    <Grid style={{ marginTop: 20 }} item xs={12} sm={4}>
+                    <Grid style={{ marginTop: 20, marginBottom: 200 }} item xs={12} sm={4}>
                         <h2 style={{ textAlign: 'center' }}>Рейтинг сетов</h2>
                         <h5 style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.showStat.bind(this, 'set')} >Показать/Скрыть</h5>
                         {this.state.show_stat_set != true ? null :
@@ -1912,7 +1912,7 @@ class SiteStatMarc_ extends React.Component {
                         }
                     </Grid>
 
-                    <Grid style={{ marginTop: 20 }} item  xs={12} sm={4}>
+                     <Grid style={{ marginTop: 20, marginBottom: 200 }} item  xs={12} sm={4}> 
                         <h2 style={{ textAlign: 'center' }}>Рейтинг Пиццы</h2>
                         <h5 style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.showStat.bind(this, 'pizza')}>Показать/Скрыть</h5>
                         {this.state.show_stat_pizza != true ? null :
