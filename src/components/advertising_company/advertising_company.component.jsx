@@ -199,13 +199,14 @@ class AdvertisingCompany_ extends React.Component {
       modalDialog     : true,
       showItem        : true,
       name            : item.name,
-      rangeDate       : [formatDate(item.date_start), formatDate(item.date_end)],
+      date_start      : item.date_start,
+      date_end        : item.date_end,
       is_active       : item.is_active,
       id              : item.id,
       description     : item.description,
       choosePoint     : item.choosePoint,
     })
-    console.log('modalDialog2=' + this.state.modalDialog);
+    
   }
 
   async save(){

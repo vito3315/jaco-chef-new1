@@ -246,7 +246,7 @@ class SiteStatMarc_ extends React.Component {
 
      // графики по дням
       if (parseInt(this.state.typeShow) == 3) {
-          console.log('res.count_orders',res.count_orders);
+        
         this.renderGraphNewUsersD(res.new_users);
         this.renderGraphOrdersD(res.count_orders);
         this.renderGraphAvgSummD(res.avg_summ);
@@ -794,7 +794,8 @@ class SiteStatMarc_ extends React.Component {
     }
 
     // Новый графи со столбиками 
-    function createSeries2(name, field, data) {
+      function createSeries2(name, field, data) {
+        console.log('data=',data);
         let cat = [];
         // let colors = [0x6794DA, 0x62941A];
 
@@ -851,7 +852,10 @@ class SiteStatMarc_ extends React.Component {
     createSeries("Зал", "value", data_hall);
 
     // правка от 08.04 показываем столбики
-    if (this.state.is_show_adv && MyData.adv_data) {
+     
+      // to do
+      console.log('adv_order_day=', MyData.adv_data);
+   if (this.state.is_show_adv && MyData.adv_data.length > '1') {
         createSeries2("Акция", "value", MyData.adv_data);
     }
     // Add cursor
@@ -998,53 +1002,11 @@ class SiteStatMarc_ extends React.Component {
          
           series.data.setAll(data);
       }
-
-      // Новый графи со столбиками 
-      function createSeries2(name, field, data) {
-          let cat = [];
-          data.map((item) => {
-              cat.push({ 'category': item['category'] });
-          })
-
-          yAxis2.data.setAll(cat);
-
-          // проверка  на пустой массив
-          if (data.length != 0) {
-              console.log('data=', data);
-              var series2 = chart.series.push(
-                  am5xy.ColumnSeries.new(root, {
-                      xAxis: xAxis,
-                      yAxis: yAxis2,
-                      openValueXField: "fromDate",
-                      valueXField: "toDate",
-                      categoryYField: "category",
-                      sequencedInterpolation: true,
-                      fill: am5.color(0x6794DA)
-                  })
-              );
-
-              series2.columns.template.setAll({
-                  opacity: 0.5,
-              });
-
-              series2.data.processor = am5.DataProcessor.new(root, {
-                  dateFields: ["fromDate", "toDate"],
-                  dateFormat: "yyyy-MM-dd HH:mm"
-              });
-              console.log('series2 setAll- ', data);
-              series2.data.setAll(data);
-          }
-      }
-
     createSeries("Всего", "value", data_all);
     createSeries("Самовывозов", "value", data_pic);
     createSeries("Доставок", "value", data_dev);
     createSeries("Зал", "value", data_hall);
-
-     // правка от 08.04 показываем столбики
-    if (this.state.is_show_adv && MyData.adv_data) {
-       // createSeries2("Акция", "value", MyData.adv_data)
-    }
+    
     // Add cursor
     chart.set("cursor", am5xy.XYCursor.new(root, {
       behavior: "zoomXY",
@@ -1059,7 +1021,7 @@ class SiteStatMarc_ extends React.Component {
       themeTags: ["axis"]
     }));
   }
-   // график средний суммы за день
+   // график средний чек за день
   renderGraphAvgSummD(MyData){
     if( this.chartavgsummD ){
       this.chartavgsummD.dispose();
@@ -1198,14 +1160,20 @@ class SiteStatMarc_ extends React.Component {
           series.data.setAll(data);
       }
 
-      // Новый графи со столбиками 
+      // Новый графи со столбиками  средний чек за день
       function createSeries2(name, field, data) {
           let cat = [];
           // let colors = [0x6794DA, 0x62941A];
 
           data.map((item, k) => {
-              data[k].name = item.category;
-              data[k].category = item.description;
+              // to do
+              data[k].name      = item.category;
+              data[k].category  = item.description;
+              //data[k].name = k == 0 ? 'name_' +item.category : item.category;
+              item.description = item.description  == 'скидка 5% на все' && k == 3 ? item.description + ' ролллы!' : item.description;
+              
+             //item.description = k == 0 ? '!desc_'+ item.description : item.description  ;
+             // data[k].category = item.description ;
               // data[k].color       = colors[k];
               cat.push({ 'category': item.description }); // работает при замени кат на деск
           })
@@ -1221,6 +1189,7 @@ class SiteStatMarc_ extends React.Component {
 
           // проверка  на пустой массив
           var series2 = null;
+          console.log('data_new=', data);
           data.map(function (item, key) {
 
               //console.log('item=', item);
@@ -1255,7 +1224,10 @@ class SiteStatMarc_ extends React.Component {
     createSeries("Самовывозов", "value", data_pic);
     createSeries("Доставок", "value", data_dev);
     createSeries("Зал", "value", data_hall);
-    if (this.state.is_show_adv && MyData.adv_data) {
+
+      console.log('avg_sum_len=', MyData.adv_data);
+      
+    if (this.state.is_show_adv && MyData.adv_data.length > '1') {
         createSeries2("Акция", "value", MyData.adv_data);
     }
 
@@ -1462,9 +1434,9 @@ class SiteStatMarc_ extends React.Component {
     }
     createSeries("Роллов", "value", data_rolls);
     createSeries("Пиццы", "value", data_pizza);
-    if (this.state.is_show_adv && MyData.adv_data) {
-        createSeries2("Акция", "value", data_adv)
-    }
+    //if (this.state.is_show_adv && MyData.adv_data) {
+    //    createSeries2("Акция", "value", data_adv)
+    //}
     // Add cursor
     chart.set("cursor", am5xy.XYCursor.new(root, {
       behavior: "zoomXY",
@@ -1596,7 +1568,7 @@ class SiteStatMarc_ extends React.Component {
           series.data.setAll(data);
       }
 
-      // Новый графи со столбиками 
+      // Новый графи со столбиками, Позиций по дням
       function createSeries2(name, field, data) {
           let cat = [];
           // let colors = [0x6794DA, 0x62941A];
@@ -1649,11 +1621,12 @@ class SiteStatMarc_ extends React.Component {
           series2.data.setAll(data);
       }
 
-    createSeries("Роллов", "value", data_rolls);
-    createSeries("Пиццы", "value", data_pizza);
-    if (this.state.is_show_adv && MyData.adv_data) {
+     createSeries("Роллов", "value", data_rolls);
+     createSeries("Пиццы", "value", data_pizza);
+      
+     if (this.state.is_show_adv && MyData.adv_data.length > '1') {
         createSeries2("Акция", "value", MyData.adv_data)
-    }
+     }
 
     // Add cursor
     chart.set("cursor", am5xy.XYCursor.new(root, {

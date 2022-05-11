@@ -121,6 +121,8 @@ class PromoItemsStat_ extends React.Component {
       point_list: [],
       choosePoint: [],
 
+      stats: [],
+
       chooseItem: null,
       items_list: [],
       promoName: ''
@@ -133,6 +135,7 @@ class PromoItemsStat_ extends React.Component {
     this.setState({
       module_name: data.module_info.name,
       point_list: data.points,
+      stats: data.stats,
       items_list: data.items
     })
     
@@ -184,23 +187,27 @@ class PromoItemsStat_ extends React.Component {
     });
   }
    
-  async getOrders(){
+  async getStat() {
+      console.log('choosePoint=', this.state.choosePoint)
     let data = {
-      point_id: this.state.point_id,
-      date: this.state.date
+      choosePoint      : this.state.choosePoint,
+      date_start    : this.state.date_start,
+      date_end      : this.state.date_end,
+      promoName     : this.state.promoName,
+      chooseItem    : this.state.chooseItem,
     };
     
-    let res = await this.getData('get_orders', data);
+    let res = await this.getData('get_all', data);
 
     console.log( res )
 
     this.setState({
-      orders: res.orders
+        stats: res.stats
     })
 
-    setTimeout( () => {
-      this.filterNumber();
-    }, 300 )
+    //setTimeout( () => {
+    //  this.filterNumber();
+    //}, 300 )
   }
 
   choosePoint(event, data){
@@ -265,7 +272,7 @@ class PromoItemsStat_ extends React.Component {
           
           
           <Grid item xs={12} sm={3}>
-            <Button variant="contained" onClick={this.getOrders.bind(this)}>Обновить</Button>
+            <Button variant="contained" onClick={this.getStat.bind(this)}>Обновить</Button>
           </Grid>
           
           
@@ -275,30 +282,21 @@ class PromoItemsStat_ extends React.Component {
             <Table size={'small'}>
               <TableHead>
                 <TableRow>
-                  <TableCell>Заказ</TableCell>
-                  <TableCell>Оформил</TableCell>
-                  <TableCell>Номер клиента</TableCell>
-                  <TableCell>Адрес доставки</TableCell>
-                  <TableCell>Время открытия заказа</TableCell>
-                  
-                  <TableCell>Ко времени</TableCell>
-                  <TableCell>Закрыт на кухне</TableCell>
-                  <TableCell>Получен клиентом</TableCell>
-
-                  <TableCell>До просрочки</TableCell>
-                  <TableCell>Время обещ</TableCell>
-
-                  <TableCell>Тип</TableCell>
-                  <TableCell>Статус</TableCell>
-
-                  <TableCell>Сумма</TableCell>
-                  <TableCell>Оплата</TableCell>
-                  <TableCell>Водитель</TableCell>
+                  <TableCell>#</TableCell>
+                  <TableCell>Название</TableCell>
+                  <TableCell>Кол-во</TableCell>
                 </TableRow>
               </TableHead>
 
               <TableBody>
-                
+                {!this.state.stats ? null :
+                    this.state.stats.map((item, key) =>
+                        <TableRow key={key}  >
+                            <TableCell style={{ textAlign: 'center' }}>{key + 1} </TableCell>
+                            <TableCell style={{ textAlign: 'left' }}>{item.name} </TableCell>
+                            <TableCell style={{ textAlign: 'left' }}>{item.count} </TableCell>
+                        </TableRow>
+                    )}
                 
               
               </TableBody>
