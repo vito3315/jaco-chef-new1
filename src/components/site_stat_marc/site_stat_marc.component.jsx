@@ -852,9 +852,6 @@ class SiteStatMarc_ extends React.Component {
     createSeries("Зал", "value", data_hall);
 
     // правка от 08.04 показываем столбики
-     
-      // to do
-      console.log('adv_order_day=', MyData.adv_data);
    if (this.state.is_show_adv && MyData.adv_data.length > '1') {
         createSeries2("Акция", "value", MyData.adv_data);
     }
@@ -1166,15 +1163,8 @@ class SiteStatMarc_ extends React.Component {
           // let colors = [0x6794DA, 0x62941A];
 
           data.map((item, k) => {
-              // to do
               data[k].name      = item.category;
               data[k].category  = item.description;
-              //data[k].name = k == 0 ? 'name_' +item.category : item.category;
-              item.description = item.description  == 'скидка 5% на все' && k == 3 ? item.description + ' ролллы!' : item.description;
-              
-             //item.description = k == 0 ? '!desc_'+ item.description : item.description  ;
-             // data[k].category = item.description ;
-              // data[k].color       = colors[k];
               cat.push({ 'category': item.description }); // работает при замени кат на деск
           })
 
@@ -1225,8 +1215,7 @@ class SiteStatMarc_ extends React.Component {
     createSeries("Доставок", "value", data_dev);
     createSeries("Зал", "value", data_hall);
 
-      console.log('avg_sum_len=', MyData.adv_data);
-      
+    // показ акций
     if (this.state.is_show_adv && MyData.adv_data.length > '1') {
         createSeries2("Акция", "value", MyData.adv_data);
     }
