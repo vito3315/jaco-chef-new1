@@ -143,6 +143,7 @@ export class MySelect extends React.PureComponent {
         <Select
           value={this.props.value}
           label={this.props.label}
+          disabled={ this.props.disabled || this.props.disabled === true ? true : false }
           onChange={ this.props.func }
           multiple={ this.props.multiple && this.props.multiple === true ? true : false }
         >
@@ -305,13 +306,14 @@ export class MyCheckBox extends React.PureComponent {
   
   render(){
     return (
-      <FormGroup row>
+      <FormGroup row style={ this.props.style ? this.props.style : {} }>
         <FormControlLabel
           control={
             <Checkbox
               checked={this.props.value}
               onChange={this.props.func}
               color="primary"
+              
             />
           }
           label={this.props.label}
