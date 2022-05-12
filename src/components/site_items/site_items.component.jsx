@@ -27,6 +27,12 @@ import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText';
 
+import Box from '@mui/material/Box';
+import Tab from '@mui/material/Tab';
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
+
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -182,7 +188,9 @@ class SiteItems_ extends React.Component {
         { id: 4, name: 'Напиток' },
       ],
       cats: [],
-      cat_list: []
+      cat_list: [],
+
+      ItemTab: '1'
     };
   }
   
@@ -592,14 +600,20 @@ class SiteItems_ extends React.Component {
 
 
 
-  openItem(item){
+  async openItem(item){
 
-    console.log(item)
+    let data = {
+      id: item.id,
+    };
 
-    this.setState({
+    let res = await this.getData('get_one', data);
+
+    console.log(res)
+
+    /*this.setState({
       editItem: item,
       modalEdit: true
-    })
+    })*/
   }
 
   changeItem(data, event){
@@ -693,13 +707,15 @@ class SiteItems_ extends React.Component {
           open={this.state.modalEdit}
           fullWidth={true}
           maxWidth={'md'}
-          onClose={ () => { this.setState({ modalEdit: false, editItem: null }) } }
+          onClose={ () => { this.setState({ modalEdit: false, editItem: null, ItemTab: '1' }) } }
         >
           <DialogTitle>Редактирвоание товара</DialogTitle>
           <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             
             <Grid container spacing={3}>
               
+            
+
               {this.state.editItem && this.state.modalEdit ?
                 <>
                   <Grid item xs={12}>
@@ -707,172 +723,183 @@ class SiteItems_ extends React.Component {
                     <Grid container spacing={3}>
 
                       <Grid item xs={12}>
-                        <Grid container spacing={3}>
-                          <Grid item xs={12} sm={4}>
-                            <MyTextInput label="Название" value={ this.state.editItem.name } func={ this.changeItem.bind(this, 'name') } />
-                          </Grid>
-                          <Grid item xs={12} sm={4}>
-                            <MyTextInput label="Короткое название (20 сим.)" value={ this.state.editItem.short_name } func={ this.changeItem.bind(this, 'short_name') } />
-                          </Grid>
-                          <Grid item xs={12} sm={4}>
-                            <MyTextInput label="Ссылка" value={ this.state.editItem.link } func={ this.changeItem.bind(this, 'link') } />
-                          </Grid>
-                        </Grid>
+                        <TabContext value={this.state.ItemTab}>
+                          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                            <TabList onChange={ (event, value) => { this.setState({ ItemTab: value }) } } variant="fullWidth">
+                              <Tab label="Основные" value="1" />
+                              <Tab label="Рецепты" value="2" />
+                              <Tab label="Заготовки" value="3" />
+                              <Tab label="Позиции" value="4" />
+                            </TabList>
+                          </Box>
+                          <TabPanel value="1">
+
+                            <Grid container spacing={3}>
+
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12} sm={4}>
+                                    <MyTextInput label="Название" value={ this.state.editItem.name } func={ this.changeItem.bind(this, 'name') } />
+                                  </Grid>
+                                  <Grid item xs={12} sm={4}>
+                                    <MyTextInput label="Короткое название (20 сим.)" value={ this.state.editItem.short_name } func={ this.changeItem.bind(this, 'short_name') } />
+                                  </Grid>
+                                  <Grid item xs={12} sm={4}>
+                                    <MyTextInput label="Ссылка" value={ this.state.editItem.link } func={ this.changeItem.bind(this, 'link') } />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12} sm={4}>
+                                    <MySelect classes={this.state.classes} data={this.state.types} value={this.state.editItem.type} func={ this.changeItem.bind(this, 'type') } disabled={true} label='Тип' />
+                                  </Grid>
+                                  <Grid item xs={12} sm={4}>
+                                    <MySelect classes={this.state.classes} data={this.state.cat_list} value={this.state.editItem.category_id} func={ this.changeItem.bind(this, 'category_id') } label='Категория' />
+                                  </Grid>
+                                  <Grid item xs={12} sm={4}>
+                                    <MyTextInput label="Код из 1с" value={ this.state.editItem.art } func={ this.changeItem.bind(this, 'art') } />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12} sm={4}>
+                                    <MyTextInput label="Стол" value={ this.state.editItem.stol } func={ this.changeItem.bind(this, 'stol') } />
+                                  </Grid>
+                                  <Grid item xs={12} sm={4}>
+                                    <MyTextInput label="Вес" value={ this.state.editItem.weight } func={ this.changeItem.bind(this, 'weight') } />
+                                  </Grid>
+                                  { parseInt(this.state.editItem.category_id) != 14 ?
+                                    <Grid item xs={12} sm={4}>
+                                      <MyTextInput label="Кол-во кусочков" value={ this.state.editItem.count_part } func={ this.changeItem.bind(this, 'count_part') } />
+                                    </Grid>
+                                      :
+                                    <Grid item xs={12} sm={4}>
+                                      <MyTextInput label="Размер пиццы" value={ this.state.editItem.size_pizza } func={ this.changeItem.bind(this, 'size_pizza') } />
+                                    </Grid>
+                                  }
+                                </Grid>
+                              </Grid>
+
+                              
+
+                              { parseInt( this.state.editItem.type ) != 2 ?
+                                <Grid item xs={12}>
+                                  <Grid container spacing={3}>
+                                    <Grid item xs={12} sm={3}>
+                                      <MyTextInput label="Белки" value={ this.state.editItem.protein } func={ this.changeItem.bind(this, 'protein') } />
+                                    </Grid>
+                                    <Grid item xs={12} sm={3}>
+                                      <MyTextInput label="Жиры" value={ this.state.editItem.fat } func={ this.changeItem.bind(this, 'fat') } />
+                                    </Grid>
+                                    <Grid item xs={12} sm={3}>
+                                      <MyTextInput label="Углеводы" value={ this.state.editItem.carbohydrates } func={ this.changeItem.bind(this, 'carbohydrates') } />
+                                    </Grid>
+                                    <Grid item xs={12} sm={3}>
+                                      <MyTextInput label="Энергетическая ценность" value={ this.state.editItem.kkal } func={ this.changeItem.bind(this, 'kkal') } />
+                                    </Grid>
+                                  </Grid>
+                                </Grid>
+                                  :
+                                null
+                              }
+
+                              { parseInt( this.state.editItem.type ) != 2 ?
+                                <Grid item xs={12}>
+                                  <Grid container spacing={3}>
+                                    <Grid item xs={12} sm={4}>
+                                      <MyTextInput label="Время на 1 этап (ММ:СС)" value={ this.state.editItem.time_stage_1 } func={ this.changeItem.bind(this, 'time_stage_1') } />
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                      <MyTextInput label="Время на 2 этап (ММ:СС)" value={ this.state.editItem.time_stage_2 } func={ this.changeItem.bind(this, 'time_stage_2') } />
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                      <MyTextInput label="Время на 3 этап (ММ:СС)" value={ this.state.editItem.time_stage_3 } func={ this.changeItem.bind(this, 'time_stage_3') } />
+                                    </Grid>
+                                  </Grid>
+                                </Grid>
+                                  :
+                                null
+                              }
+
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12}>
+                                    <Typography>Картинка соотношением сторон (3:2) (пример: 600х400) только JPG</Typography>
+                                  </Grid>
+                                
+
+                                  <Grid item xs={12} sm={6}>
+                                    <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_new+'600х400.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <div className="dropzone" id="for_img_edit_old" style={{ width: '100%', minHeight: 150 }} />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12}>
+                                    <Typography>Картинка соотношением сторон (1:1) (пример: 600х600) только JPG</Typography>
+                                  </Grid>
+                                
+
+                                  <Grid item xs={12} sm={6}>
+                                    <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_new+'600х400.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <div className="dropzone" id="for_img_edit_new" style={{ width: '100%', minHeight: 150 }} />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12}>
+                                    <MyTextInput label="Состав" value={ this.state.editItem.tmp_desc } func={ this.changeItem.bind(this, 'tmp_desc') } />
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                    <MyTextInput label="Маркейтинговое описание" value={ this.state.editItem.marc_desc } func={ this.changeItem.bind(this, 'marc_desc') } />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12} sm={6}>
+                                    <MyCheckBox label="Новинка" value={ parseInt(this.state.editItem.is_new) == 1 ? true : false } func={ this.changeItem.bind(this, 'is_new') } style={{ justifyContent: 'center' }} />
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <MyCheckBox label="Хит" value={ parseInt(this.state.editItem.is_hit) == 1 ? true : false } func={ this.changeItem.bind(this, 'is_hit') } style={{ justifyContent: 'center' }} />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12} sm={4}>
+                                    <MyCheckBox label="Активность" value={ parseInt(this.state.editItem.is_show) == 1 ? true : false } func={ this.changeItem.bind(this, 'is_show') } style={{ justifyContent: 'center' }} />
+                                  </Grid>
+                                  <Grid item xs={12} sm={4}>
+                                    <MyCheckBox label="На сайте" value={ parseInt(this.state.editItem.show_site) == 1 ? true : false } func={ this.changeItem.bind(this, 'show_site') } style={{ justifyContent: 'center' }} />
+                                  </Grid>
+                                  <Grid item xs={12} sm={4}>
+                                    <MyCheckBox label="На складе" value={ parseInt(this.state.editItem.show_program) == 1 ? true : false } func={ this.changeItem.bind(this, 'show_program') } style={{ justifyContent: 'center' }} />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+
+                            </Grid>
+
+                          </TabPanel>
+                          <TabPanel value="2">Item Two</TabPanel>
+                          <TabPanel value="3">Item Three</TabPanel>
+                        </TabContext>
                       </Grid>
-
-                      <Grid item xs={12}>
-                        <Grid container spacing={3}>
-                          <Grid item xs={12} sm={4}>
-                            <MySelect classes={this.state.classes} data={this.state.types} value={this.state.editItem.type} func={ this.changeItem.bind(this, 'type') } disabled={true} label='Тип' />
-                          </Grid>
-                          <Grid item xs={12} sm={4}>
-                            <MySelect classes={this.state.classes} data={this.state.cat_list} value={this.state.editItem.category_id} func={ this.changeItem.bind(this, 'category_id') } label='Категория' />
-                          </Grid>
-                          <Grid item xs={12} sm={4}>
-                            <MyTextInput label="Код из 1с" value={ this.state.editItem.art } func={ this.changeItem.bind(this, 'art') } />
-                          </Grid>
-                        </Grid>
-                      </Grid>
-
-                      <Grid item xs={12}>
-                        <Grid container spacing={3}>
-                          <Grid item xs={12} sm={4}>
-                            <MyTextInput label="Стол" value={ this.state.editItem.stol } func={ this.changeItem.bind(this, 'stol') } />
-                          </Grid>
-                          <Grid item xs={12} sm={4}>
-                            <MyTextInput label="Вес" value={ this.state.editItem.weight } func={ this.changeItem.bind(this, 'weight') } />
-                          </Grid>
-                          { parseInt(this.state.editItem.category_id) != 14 ?
-                            <Grid item xs={12} sm={4}>
-                              <MyTextInput label="Кол-во кусочков" value={ this.state.editItem.count_part } func={ this.changeItem.bind(this, 'count_part') } />
-                            </Grid>
-                              :
-                            <Grid item xs={12} sm={4}>
-                              <MyTextInput label="Размер пиццы" value={ this.state.editItem.size_pizza } func={ this.changeItem.bind(this, 'size_pizza') } />
-                            </Grid>
-                          }
-                        </Grid>
-                      </Grid>
-
-                      
-
-                      { parseInt( this.state.editItem.type ) != 2 ?
-                        <Grid item xs={12}>
-                          <Grid container spacing={3}>
-                            <Grid item xs={12} sm={3}>
-                              <MyTextInput label="Белки" value={ this.state.editItem.protein } func={ this.changeItem.bind(this, 'protein') } />
-                            </Grid>
-                            <Grid item xs={12} sm={3}>
-                              <MyTextInput label="Жиры" value={ this.state.editItem.fat } func={ this.changeItem.bind(this, 'fat') } />
-                            </Grid>
-                            <Grid item xs={12} sm={3}>
-                              <MyTextInput label="Углеводы" value={ this.state.editItem.carbohydrates } func={ this.changeItem.bind(this, 'carbohydrates') } />
-                            </Grid>
-                            <Grid item xs={12} sm={3}>
-                              <MyTextInput label="Энергетическая ценность" value={ this.state.editItem.kkal } func={ this.changeItem.bind(this, 'kkal') } />
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                          :
-                        null
-                      }
-
-                      { parseInt( this.state.editItem.type ) != 2 ?
-                        <Grid item xs={12}>
-                          <Grid container spacing={3}>
-                            <Grid item xs={12} sm={4}>
-                              <MyTextInput label="Время на 1 этап (ММ:СС)" value={ this.state.editItem.time_stage_1 } func={ this.changeItem.bind(this, 'time_stage_1') } />
-                            </Grid>
-                            <Grid item xs={12} sm={4}>
-                              <MyTextInput label="Время на 2 этап (ММ:СС)" value={ this.state.editItem.time_stage_2 } func={ this.changeItem.bind(this, 'time_stage_2') } />
-                            </Grid>
-                            <Grid item xs={12} sm={4}>
-                              <MyTextInput label="Время на 3 этап (ММ:СС)" value={ this.state.editItem.time_stage_3 } func={ this.changeItem.bind(this, 'time_stage_3') } />
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                          :
-                        null
-                      }
-
-                      <Grid item xs={12}>
-                        <Grid container spacing={3}>
-                          <Grid item xs={12}>
-                            <Typography>Картинка соотношением сторон (3:2) (пример: 600х400) только JPG</Typography>
-                          </Grid>
-                        
-
-                          <Grid item xs={12} sm={6}>
-                            <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_new+'600х400.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
-                          </Grid>
-                          <Grid item xs={12} sm={6}>
-                            <div className="dropzone" id="for_img_edit_old" style={{ width: '100%', minHeight: 150 }} />
-                          </Grid>
-                        </Grid>
-                      </Grid>
-
-                      <Grid item xs={12}>
-                        <Grid container spacing={3}>
-                          <Grid item xs={12}>
-                            <Typography>Картинка соотношением сторон (1:1) (пример: 600х600) только JPG</Typography>
-                          </Grid>
-                        
-
-                          <Grid item xs={12} sm={6}>
-                            <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_new+'600х400.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
-                          </Grid>
-                          <Grid item xs={12} sm={6}>
-                            <div className="dropzone" id="for_img_edit_new" style={{ width: '100%', minHeight: 150 }} />
-                          </Grid>
-                        </Grid>
-                      </Grid>
-
-                      <Grid item xs={12}>
-                        <Grid container spacing={3}>
-                          <Grid item xs={12}>
-                            <MyTextInput label="Состав" value={ this.state.editItem.tmp_desc } func={ this.changeItem.bind(this, 'tmp_desc') } />
-                          </Grid>
-                          <Grid item xs={12}>
-                            <MyTextInput label="Маркейтинговое описание" value={ this.state.editItem.marc_desc } func={ this.changeItem.bind(this, 'marc_desc') } />
-                          </Grid>
-                        </Grid>
-                      </Grid>
-
-                      <Grid item xs={12}>
-                        <Grid container spacing={3}>
-                          <Grid item xs={12} sm={6}>
-                            <MyCheckBox label="Новинка" value={ parseInt(this.state.editItem.is_new) == 1 ? true : false } func={ this.changeItem.bind(this, 'is_new') } style={{ justifyContent: 'center' }} />
-                          </Grid>
-                          <Grid item xs={12} sm={6}>
-                            <MyCheckBox label="Хит" value={ parseInt(this.state.editItem.is_hit) == 1 ? true : false } func={ this.changeItem.bind(this, 'is_hit') } style={{ justifyContent: 'center' }} />
-                          </Grid>
-                        </Grid>
-                      </Grid>
-
-                      <Grid item xs={12}>
-                        <Grid container spacing={3}>
-                          <Grid item xs={12} sm={4}>
-                            <MyCheckBox label="Активность" value={ parseInt(this.state.editItem.is_show) == 1 ? true : false } func={ this.changeItem.bind(this, 'is_show') } style={{ justifyContent: 'center' }} />
-                          </Grid>
-                          <Grid item xs={12} sm={4}>
-                            <MyCheckBox label="На сайте" value={ parseInt(this.state.editItem.show_site) == 1 ? true : false } func={ this.changeItem.bind(this, 'show_site') } style={{ justifyContent: 'center' }} />
-                          </Grid>
-                          <Grid item xs={12} sm={4}>
-                            <MyCheckBox label="На складе" value={ parseInt(this.state.editItem.show_program) == 1 ? true : false } func={ this.changeItem.bind(this, 'show_program') } style={{ justifyContent: 'center' }} />
-                          </Grid>
-                        </Grid>
-                      </Grid>
-
-                      
-
-                      
-                      
-
-                      
-
-                      
-
-                      
 
                     </Grid>
 
