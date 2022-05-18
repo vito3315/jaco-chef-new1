@@ -109,7 +109,8 @@ class AdvertisingCompany_ extends React.Component {
       description: '',
       is_load: false,
       
-      cats: [],
+      adv_actual: [],
+      adv_old: [],
       
       modalDialog: false,
       modalDialogNew: false,
@@ -140,7 +141,8 @@ class AdvertisingCompany_ extends React.Component {
     
     this.setState({
         module_name     : data.module_info.name,
-        cats            : data.cats,
+        adv_actual      : data.adv_actual,
+        adv_old         : data.adv_old,
         points          : data.points,
         points_filter   : data.points,
         point_id        : data.points[0].id
@@ -209,6 +211,7 @@ class AdvertisingCompany_ extends React.Component {
     
   }
 
+  // сохранение после редактирования
   async save(){
      let data = {
         id          : this.state.id,
@@ -222,29 +225,30 @@ class AdvertisingCompany_ extends React.Component {
         description : this.state.description,
      };
 
-     let res = await this.getData('save_edit', data);
+      let res = await this.getData('save_edit', data);
 
       if (res.st === false) {
-            console.log('res false');
             alert(res.text)
       } else {
-            console.log('res true');
             this.setState({ 
                  modalDialog: false, 
                  // showItem: null, 
-                 // nameCat: '' 
+                 name: '',
+                 date_start: formatDate(new Date()),
+                 date_end: formatDate(new Date())
             })
 
-          res = await this.getData('get_all');
+          res = await this.getData('get_adv_point', { point_id: this.state.point_id } );
 
            // оновляем список 
           this.setState({
-            cats: res.cats
+              adv_actual : res.adv_actual,
+              adv_old    : res.adv_old
           })
 
       }   
   }
-
+     
   async saveNew(){
       let data = {
           points        : this.state.choosePoint,
@@ -258,20 +262,20 @@ class AdvertisingCompany_ extends React.Component {
     let res = await this.getData('save_new', data);
 
       if (res.st === false) {
-          console.log('res false');
           alert(res.text)
       } else {
-          console.log('res true');
           this.setState({ 
-            modalDialogNew: false, 
-           //editTextNew: '', 
-            //nameCatNew: '' 
+              modalDialogNew: false,
+              name: '',
+              date_start: formatDate(new Date()),
+              date_end: formatDate(new Date())
           })
 
-          res = await this.getData('get_all');
+          res = await this.getData('get_adv_point', {point_id: this.state.point_id} );
     
           this.setState({
-            cats: res.cats
+              adv_actual : res.adv_actual,
+              adv_old    : res.adv_old,
           })
       }
     }
@@ -308,7 +312,8 @@ class AdvertisingCompany_ extends React.Component {
       let res = await this.getData('get_adv_point', data);
 
       this.setState({
-          cats: res.cats,
+          adv_actual: res.adv_actual,
+          adv_old   : res.adv_old,
       })
   }
 
@@ -322,7 +327,7 @@ class AdvertisingCompany_ extends React.Component {
         { !this.state.showItem ? null :
           <Dialog
             open={this.state.modalDialog}
-               onClose={() => { this.setState({ modalDialog: false, showItem: null, editText: '', name: '' }) } }
+                    onClose={() => { this.setState({ modalDialog: false,  description: '', name: '', choosePoint: [], date_start: formatDate(new Date()), date_end: formatDate(new Date()) }) } }
           >
             <DialogTitle>Компания "{this.state.name}"</DialogTitle>
             <DialogContent style={{ paddingTop: 10 }}>
@@ -363,7 +368,7 @@ class AdvertisingCompany_ extends React.Component {
 
         <Dialog
           open={this.state.modalDialogNew}
-                onClose={() => { this.setState({ modalDialogNew: false, description: '', rangeDate: [formatDate(new Date()), formatDate(new Date())], choosePoint: [] }) } }
+                onClose={() => { this.setState({ modalDialogNew: false, description: '', name: '', choosePoint: [], date_start: formatDate(new Date()), date_end: formatDate(new Date()) }) } }
         >
           <DialogTitle>Новая акция</DialogTitle>
           <DialogContent style={{ paddingTop: 10 }}>
@@ -413,38 +418,74 @@ class AdvertisingCompany_ extends React.Component {
                <MySelect data={this.state.points_filter} value={this.state.point_id} func={this.changePoint.bind(this)} label='Точка' />
             </Grid>
 
-          <Grid item xs={12} sm={12}>
-                <TableContainer component={Paper}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell style={{ textAlign: 'center' }}>#</TableCell>
-                        <TableCell style={{ textAlign: 'center' }}></TableCell>
-                        <TableCell style={{ textAlign: 'center' }}>Название</TableCell>
-                        <TableCell style={{ textAlign: 'center' }}>Дата начало</TableCell>
-                        <TableCell style={{ textAlign: 'center' }}>Дата окончания</TableCell>
-                        <TableCell style={{ textAlign: 'center' }}>Точки</TableCell>
-                      </TableRow>
-                    </TableHead>
+                <Grid item xs={12} sm={12}>
+                    <Grid item xs={12} sm={12}>
+                        <h2 style={{ textAlign: 'center' }}>Актвные</h2>
+                    </Grid>
+                    
+                    <TableContainer component={Paper} style={{ marginTop: 10 }}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell style={{ textAlign: 'center' }}>#</TableCell>
+                            <TableCell style={{ textAlign: 'center' }}>Название</TableCell>
+                            <TableCell style={{ textAlign: 'center' }}>Дата начало</TableCell>
+                            <TableCell style={{ textAlign: 'center' }}>Дата окончания</TableCell>
+                            <TableCell style={{ textAlign: 'center' }}>Точки</TableCell>
+                          </TableRow>
+                        </TableHead>
 
-                    <TableBody>
-                    {!this.state.cats ? null :
-                        this.state.cats.map((item, key) =>
-                            <TableRow key={key} onClick={this.openCat.bind(this, item)} >
-                                <TableCell style={{ textAlign: 'center' }}>{ key + 1 } </TableCell>
-                                <TableCell style={{ textAlign: 'center' }}> {item.is_active == '1' ? <VisibilityIcon /> : <VisibilityOffIcon />} </TableCell>
-                                <TableCell style={{ textAlign: 'center', cursor: 'pointer' }}>{ item.name } </TableCell>
-                                <TableCell style={{ textAlign: 'center' }}>{ item.date_start } </TableCell>
-                                <TableCell style={{ textAlign: 'center' }}>{ item.date_end } </TableCell>
-                                <TableCell style={{ textAlign: 'center' }}>{item.choosePoint.map((it, k) => <React.Fragment key={k}> {it.name} </React.Fragment> )}</TableCell>
-                            </TableRow>
-                     )}
-                    </TableBody>
-                 </Table>
-                </TableContainer>
-            
-          </Grid>
-        
+                        <TableBody>
+                        {!this.state.adv_actual ? null :
+                           this.state.adv_actual.map((item, key) =>
+                                <TableRow key={key} onClick={this.openCat.bind(this, item)} >
+                                    <TableCell style={{ textAlign: 'center' }}>{ key + 1 } </TableCell>
+                                    <TableCell style={{ textAlign: 'center', cursor: 'pointer' }}>{ item.name } </TableCell>
+                                    <TableCell style={{ textAlign: 'center' }}>{ item.date_start } </TableCell>
+                                    <TableCell style={{ textAlign: 'center' }}>{ item.date_end } </TableCell>
+                                    <TableCell style={{ textAlign: 'center' }}>{item.choosePoint.map((it, k) => <React.Fragment key={k}> {it.name} </React.Fragment> )}</TableCell>
+                                </TableRow>
+                         )}
+                        </TableBody>
+                     </Table>
+                    </TableContainer>
+                </Grid>
+
+                <Grid item xs={12} sm={12}>
+                    <Grid contain>
+                        <Grid item xs={12} sm={12}>
+                            <h2 style={{ textAlign: 'center' }}>Не Актвные</h2>
+                        </Grid>
+                        <Grid item xs={12} sm={12}>
+                            <TableContainer component={Paper} style={{ marginTop: 10 }}>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell style={{ textAlign: 'center' }}></TableCell>
+                                            <TableCell style={{ textAlign: 'center' }}>Название</TableCell>
+                                            <TableCell style={{ textAlign: 'center' }}>Дата начало</TableCell>
+                                            <TableCell style={{ textAlign: 'center' }}>Дата окончания</TableCell>
+                                            <TableCell style={{ textAlign: 'center' }}>Точки</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+
+                                    <TableBody>
+                                        {!this.state.adv_old ? null :
+                                            this.state.adv_old.map((item, key) =>
+                                                <TableRow key={key} onClick={this.openCat.bind(this, item)} >
+                                                    <TableCell style={{ textAlign: 'center' }}>{key + 1} </TableCell>
+                                                    <TableCell style={{ textAlign: 'center', cursor: 'pointer' }}>{item.name} </TableCell>
+                                                    <TableCell style={{ textAlign: 'center' }}>{item.date_start} </TableCell>
+                                                    <TableCell style={{ textAlign: 'center' }}>{item.date_end} </TableCell>
+                                                    <TableCell style={{ textAlign: 'center' }}>{item.choosePoint.map((it, k) => <React.Fragment key={k}> {it.name} </React.Fragment>)}</TableCell>
+                                                </TableRow>
+                                            )}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Grid>
+                    </Grid>
+                </Grid>
         </Grid>
       </>
     )
