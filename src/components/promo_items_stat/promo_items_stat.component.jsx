@@ -277,12 +277,12 @@ class PromoItemsStat_ extends React.Component {
           
           
 
-          <Grid item xs={12}>
+           <Grid item xs={12} sm={6}>
             
             <Table size={'small'}>
               <TableHead>
                 <TableRow>
-                  <TableCell>#</TableCell>
+                  <TableCell></TableCell>
                   <TableCell>Название</TableCell>
                   <TableCell>Кол-во</TableCell>
                 </TableRow>
