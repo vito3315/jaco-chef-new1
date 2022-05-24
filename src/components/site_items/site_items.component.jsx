@@ -1,7 +1,5 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
 
-import { makeStyles } from '@mui/styles';
 import { createTheme } from '@mui/material/styles';
 
 import Grid from '@mui/material/Grid';
@@ -21,6 +19,10 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
+import DehazeIcon from '@mui/icons-material/Dehaze';
+
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -52,6 +54,9 @@ import { MySelect, MyCheckBox, MyAutocomplite, MyTextInput, MyDatePickerNew } fr
 
 import Dropzone from "dropzone";
 
+import Snackbar from '@mui/material/Snackbar';
+import IconButton from '@mui/material/IconButton';
+
 const queryString = require('query-string');
 
 const theme = createTheme({
@@ -62,57 +67,42 @@ const theme = createTheme({
   },
 });
 
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  },
-  backdrop: {
-    zIndex: 999
+class TableStages extends React.Component{
+  render (){
+    return (
+      <Table size='small' style={{ marginBottom: 50 }}>
+        <TableHead>
+          <TableRow>
+            <TableCell colSpan={5} style={{ textAlign: 'center' }}>{this.props.title}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Название</TableCell>
+            <TableCell>Количество</TableCell>
+            <TableCell></TableCell>
+            <TableCell>Сортировка</TableCell>
+            <TableCell></TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          { this.props.data.map( (item, key) =>
+            <TableRow key={key}>
+              <TableCell>{item.name}</TableCell>
+              <TableCell>
+                <MyTextInput label="" value={item.count} func={ this.props.changeData.bind(this, this.props.type, this.props.arr, 'count', key) } />
+              </TableCell>
+              <TableCell>{item.ei_name}</TableCell>
+              <TableCell style={{ maxWidth: 100 }}>
+                <MyTextInput label="" value={item.sort} func={ this.props.changeData.bind(this, this.props.type, this.props.arr, 'sort', key) } />
+              </TableCell>
+              <TableCell>
+                <CloseIcon onClick={this.props.delItem.bind(this, this.props.type, this.props.arr, key) } style={{ cursor: 'pointer' }} />
+              </TableCell>
+            </TableRow>
+          ) }
+        </TableBody>
+      </Table>
+    )
   }
-});
-
-function formatDate(date) {
-  var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-  if (month.length < 2) 
-      month = '0' + month;
-  if (day.length < 2) 
-      day = '0' + day;
-
-  return [year, month, day].join('-');
 }
 
 class SiteItems_ extends React.Component {
@@ -124,17 +114,15 @@ class SiteItems_ extends React.Component {
     parallelUploads: 10,
     acceptedFiles: "image/jpeg,image/png",
     addRemoveLinks: true,
-    url: "https://jacochef.ru/src/img/users/upload.php",
+    url: "https://jacochef.ru/src/img/site_img/upload_img_new.php",
   };
-  myDropzone = null;
-  isInit = false;
+  myDropzoneOld = null;
+  myDropzoneNew = null;
 
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'site_items',
       module_name: '',
       is_load: false,
@@ -180,7 +168,11 @@ class SiteItems_ extends React.Component {
 
 
       editItem: null,
+      item_rec: null,
+      item_pf: null,
+      item_items_all: [],
       modalEdit: false,
+      modalNew: false,
       types: [
         { id: 1, name: 'Позиция (ролл)' },
         { id: 2, name: 'Набор (сет)' },
@@ -190,12 +182,37 @@ class SiteItems_ extends React.Component {
       cats: [],
       cat_list: [],
 
-      ItemTab: '1'
+      ItemTab: '1',
+      anchorEl: null,
+      openMenu: false,
+      openMenuType: null,
+      openMenuitem: null,
+
+      rec_stage_1: [],
+      rec_stage_2: [],
+      rec_stage_3: [],
+
+      pf_stage_1: [],
+      pf_stage_2: [],
+      pf_stage_3: [],
+
+      item_items: [],
+
+      myDropzoneOld: null,
+      myDropzoneNew: null,
+
+      is_snack: false,
+      textSnack: '',
+
+      searchPf: '',
+      item_pf_render: [],
+
+      searchItems: '',
+      item_items_render: [],
     };
   }
   
   async componentDidMount(){
-    
     let data = await this.getData('get_all');
     
     this.setState({
@@ -207,6 +224,15 @@ class SiteItems_ extends React.Component {
     document.title = data.module_info.name;
   }
   
+  async getItems(){
+    let data = await this.getData('get_all');
+    
+    this.setState({
+      cats: data.cats,
+      cat_list: data.cat_list
+    })
+  }
+
   getData = (method, data = {}, is_load = true) => {
     
     if( is_load == true ){
@@ -229,7 +255,7 @@ class SiteItems_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -335,114 +361,7 @@ class SiteItems_ extends React.Component {
     })
   }
 
-  async saveeditItem(){
-
-    let is_graph = false;
-
-    this.state.app_list.map( (item, key) => {
-      if( parseInt(this.state.editItem.user.app_id) == parseInt(item.id) ){
-
-        if( parseInt(item.is_graph) == 1 && parseInt(this.state.graphType) == 0 ){
-          is_graph = true;
-        }
-      }
-    } )
-
-    if( is_graph === true ){
-      this.setState({
-        graphModal: true
-      })
-
-      return ;
-    }
-
-    if( parseInt(this.state.editItem.user.app_id) == 0 && this.state.textDel.length == 0 ){
-
-      this.setState({
-        delModal: true
-      })
-
-      return;
-    }
-
-    if( this.myDropzone['files'].length > 0 && this.isInit === false ){
-      this.isInit = true;
-
-      this.myDropzone.on("sending", (file, xhr, data) => {
-        let user_id = this.state.editItem.user.id;
-
-        let file_type = (file.name).split('.');
-        file_type = file_type[file_type.length - 1];
-        file_type = file_type.toLowerCase();
-        
-        console.log('user_id='+user_id)
-
-        data.append("filetype", 'user_'+user_id+'.'+file_type);
-        data.append("filename", 'user_'+user_id);
-        
-        this.getOrientation(file, function(orientation) {
-          data.append("orientation", orientation);
-        })
-        console.log('sending');
-      });
-
-      this.myDropzone.on("queuecomplete", (data) => {
-
-        var check_img = false;
-
-        console.log('queuecomplete!')
-
-        this.myDropzone['files'].map(function(item, key){
-          if( item['status'] == "error" ){
-            check_img = true;
-          }
-        })
-        
-        if( check_img ){
-          alert('Ошибка при загрузке фотографии')
-          return;
-        }
-        
-        console.log( 'queuecomplete' )
-        
-        this.setState({ 
-          modalUserEdit: false, 
-          editItem: null
-        })
   
-        this.isInit = false;
-        this.getUsers();
-      })
-    }
-
-    let data = {
-      user: this.state.editItem,
-      textDel: this.state.textDel,
-      graphType: this.state.graphType
-    };
-
-    let res = await this.getData('saveeditItem', data);
-
-    console.log( res )
-
-    if( res.st === false ){
-      alert(res.text);
-    }else{
-
-      if( this.myDropzone['files'].length == 0 ){
-        this.isInit = false;
-
-        this.setState({ 
-          modalUserEdit: false, 
-          editItem: null
-        })
-
-        this.getUsers();
-      }else{
-        this.myDropzone.processQueue();
-      }
-    }
-  }
 
   async saveNewUser(){
     let is_graph = false;
@@ -600,20 +519,131 @@ class SiteItems_ extends React.Component {
 
 
 
-  async openItem(item){
 
+  async openItem(item){
     let data = {
       id: item.id,
     };
 
     let res = await this.getData('get_one', data);
 
-    console.log(res)
+    var items_pf_stages_1 = [],
+			items_pf_stages_2 = [],
+			items_pf_stages_3 = [],
+			
+			items_rec_stages_1 = [],
+			items_rec_stages_2 = [],
+			items_rec_stages_3 = [],
 
-    /*this.setState({
-      editItem: item,
+      items_items = [];
+
+    if(res.item_rec.stage_1){
+      res.item_rec.stage_1.map(function(item){
+        items_rec_stages_1.push({item_id: item['rec_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name']});
+      })
+    }
+    if(res.item_rec.stage_2){
+      res.item_rec.stage_2.map(function(item){
+        items_rec_stages_2.push({item_id: item['rec_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name']});
+      })
+    }
+    if(res.item_rec.stage_3){
+      res.item_rec.stage_3.map(function(item){
+        items_rec_stages_3.push({item_id: item['rec_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name']});
+      })
+    }
+
+
+    if(res.item_pf.stage_1){
+			res.item_pf.stage_1.map(function(item){
+				items_pf_stages_1.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name']});
+			})
+		}
+		if(res.item_pf.stage_2){
+			res.item_pf.stage_2.map(function(item){
+				items_pf_stages_2.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name']});
+			})
+		}
+		if(res.item_pf.stage_3){
+			res.item_pf.stage_3.map(function(item){
+				items_pf_stages_3.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name']});
+			})
+		}
+
+    
+		
+		if(res.item_items.this_items){
+			res.item_items.this_items.map(function(item){
+				items_items.push({item_id: item['item_id'], name: item['name'], count: item['count'], is_add: parseInt(item['is_add']) });
+			})
+		}
+		
+
+		this.setState({
+      editItem: res.item,
+      item_rec: res.item_rec,
+      item_pf: res.item_pf,
+      item_pf_render: res.item_pf.all,
+      item_items_all: res.item_items.all_items,
+      item_items_render: res.item_items.all_items,
+
+      rec_stage_1: items_rec_stages_1,
+      rec_stage_2: items_rec_stages_2,
+      rec_stage_3: items_rec_stages_3,
+
+      pf_stage_1: items_pf_stages_1,
+      pf_stage_2: items_pf_stages_2,
+      pf_stage_3: items_pf_stages_3,
+
+      item_items: items_items,
+
       modalEdit: true
-    })*/
+    })
+
+    setTimeout( () => {
+      this.myDropzoneOld = new Dropzone("#for_img_edit_old", this.dropzoneOptions);
+      this.myDropzoneNew = new Dropzone("#for_img_edit_new", this.dropzoneOptions);
+    }, 300 )
+  }
+
+  async openNew(){
+    let res = await this.getData('get_all_for_new');
+
+    var items_pf_stages_1 = [],
+			items_pf_stages_2 = [],
+			items_pf_stages_3 = [],
+			
+			items_rec_stages_1 = [],
+			items_rec_stages_2 = [],
+			items_rec_stages_3 = [],
+
+      items_items = [];
+
+    this.setState({
+      editItem: res.item,
+      item_rec: res.item_rec,
+      item_pf: res.item_pf,
+      item_pf_render: res.item_pf.all,
+      item_items_all: res.item_items.all_items,
+      item_items_render: res.item_items.all_items,
+
+      rec_stage_1: items_rec_stages_1,
+      rec_stage_2: items_rec_stages_2,
+      rec_stage_3: items_rec_stages_3,
+
+      pf_stage_1: items_pf_stages_1,
+      pf_stage_2: items_pf_stages_2,
+      pf_stage_3: items_pf_stages_3,
+
+      item_items: items_items,
+
+      modalNew: true
+    })
+
+    setTimeout( () => {
+      this.myDropzoneOld = new Dropzone("#for_img_edit_old", this.dropzoneOptions);
+      this.myDropzoneNew = new Dropzone("#for_img_edit_new", this.dropzoneOptions);
+    }, 300 )
   }
 
   changeItem(data, event){
@@ -658,64 +688,693 @@ class SiteItems_ extends React.Component {
     })
   }
 
+  closeMenu(){
+    this.setState({
+      anchorEl: null,
+      openMenu: false,
+      openMenuType: null,
+      openMenuitem: null
+    })
+  }
+
+  openMenu(type, item, event){
+    this.setState({
+      anchorEl: event.currentTarget,
+      openMenu: true,
+      openMenuType: type,
+      openMenuitem: item
+    })
+  }
+
+  chooseStage(stage){
+    if( this.state.openMenuType == 'rec' ){
+      let check = false;
+
+      let rec = stage == 1 ? this.state.rec_stage_1 : stage == 2 ? this.state.rec_stage_2 : stage == 3 ? this.state.rec_stage_3 : [];
+
+      rec = rec ? rec : [];	
+      
+      rec.map((this_item) => {
+        if(parseInt(this.state.openMenuitem.id) == parseInt(this_item.item_id) ){
+          check = true;
+        }
+      })
+
+      if( !check ){
+
+        rec.push({item_id: this.state.openMenuitem.id, name: this.state.openMenuitem.name, count: 0, sort: 0, ei_name: this.state.openMenuitem.ei_name});
+
+        if( stage == 1 ){
+					this.setState({
+						rec_stage_1: rec
+					});
+				}
+				
+				if( stage == 2 ){
+					this.setState({
+						rec_stage_2: rec
+					});
+				}
+				
+				if( stage == 3 ){
+					this.setState({
+						rec_stage_3: rec
+					});
+				}
+      }
+    }
+
+    if( this.state.openMenuType == 'pf' ){
+      let check = false;
+
+      let rec = stage == 1 ? this.state.pf_stage_1 : stage == 2 ? this.state.pf_stage_2 : stage == 3 ? this.state.pf_stage_3 : [];
+
+      rec = rec ? rec : [];	
+      
+      rec.map((this_item) => {
+        if(parseInt(this.state.openMenuitem.id) == parseInt(this_item.item_id) ){
+          check = true;
+        }
+      })
+
+      if( !check ){
+
+        rec.push({item_id: this.state.openMenuitem.id, name: this.state.openMenuitem.name, count: 0, sort: 0, ei_name: this.state.openMenuitem.ei_name});
+
+        if( stage == 1 ){
+					this.setState({
+						pf_stage_1: rec
+					});
+				}
+				
+				if( stage == 2 ){
+					this.setState({
+						pf_stage_2: rec
+					});
+				}
+				
+				if( stage == 3 ){
+					this.setState({
+						pf_stage_3: rec
+					});
+				}
+      }
+    }
+
+    this.closeMenu();
+  }
+
+  forwardItem(item){
+    let check = false;
+
+    let rec = this.state.item_items;
+
+    rec = rec ? rec : [];	
+    
+    rec.map((this_item) => {
+      if(parseInt(item.id) == parseInt(this_item.item_id) ){
+        check = true;
+      }
+    })
+
+    if( !check ){
+
+      rec.push({item_id: item.id, name: item.name, count: 1, is_add: 0});
+
+      this.setState({
+        item_items: rec
+      });
+    }
+  }
+
+  changeData(type, arr, data, key, event){
+    if( type == 'rec' ){
+      let rec = arr == 'rec_stage_1' ? this.state.rec_stage_1 : arr == 'rec_stage_2' ? this.state.rec_stage_2 : arr == 'rec_stage_3' ? this.state.rec_stage_3 : [];
+
+      rec[ key ][ data ] = event.target.value;
+
+      if( arr == 'rec_stage_1' ){
+        this.setState({
+          rec_stage_1: rec
+        });
+      }
+      
+      if( arr == 'rec_stage_2' ){
+        this.setState({
+          rec_stage_2: rec
+        });
+      }
+      
+      if( arr == 'rec_stage_3' ){
+        this.setState({
+          rec_stage_3: rec
+        });
+      }
+    }
+
+    if( type == 'pf' ){
+      let rec = arr == 'pf_stage_1' ? this.state.pf_stage_1 : arr == 'pf_stage_2' ? this.state.pf_stage_2 : arr == 'pf_stage_3' ? this.state.pf_stage_3 : [];
+
+      rec[ key ][ data ] = event.target.value;
+
+      if( arr == 'pf_stage_1' ){
+        this.setState({
+          pf_stage_1: rec
+        });
+      }
+      
+      if( arr == 'pf_stage_2' ){
+        this.setState({
+          pf_stage_2: rec
+        });
+      }
+      
+      if( arr == 'pf_stage_3' ){
+        this.setState({
+          pf_stage_3: rec
+        });
+      }
+    }
+
+    if( type == 'item' ){
+      let rec = this.state.item_items;
+
+      if( data == 'is_add' ){
+        rec[ key ][ data ] = event.target.checked === true ? 1 : 0;
+      }else{
+        rec[ key ][ data ] = event.target.value;
+      }
+      
+      this.setState({
+        item_items: rec
+      });
+    }
+  }
+
+  delItem(type, arr, key){
+    if( type == 'rec' ){
+      let rec = arr == 'rec_stage_1' ? this.state.rec_stage_1 : arr == 'rec_stage_2' ? this.state.rec_stage_2 : arr == 'rec_stage_3' ? this.state.rec_stage_3 : [];
+
+      rec.splice(key, 1);
+
+      rec = rec ? rec : [];
+
+      if( arr == 'rec_stage_1' ){
+        this.setState({
+          rec_stage_1: rec
+        });
+      }
+      
+      if( arr == 'rec_stage_2' ){
+        this.setState({
+          rec_stage_2: rec
+        });
+      }
+      
+      if( arr == 'rec_stage_3' ){
+        this.setState({
+          rec_stage_3: rec
+        });
+      }
+    }
+
+    if( type == 'pf' ){
+      let rec = arr == 'pf_stage_1' ? this.state.pf_stage_1 : arr == 'pf_stage_2' ? this.state.pf_stage_2 : arr == 'pf_stage_3' ? this.state.pf_stage_3 : [];
+
+      rec.splice(key, 1);
+
+      rec = rec ? rec : [];
+
+      if( arr == 'pf_stage_1' ){
+        this.setState({
+          pf_stage_1: rec
+        });
+      }
+      
+      if( arr == 'pf_stage_2' ){
+        this.setState({
+          pf_stage_2: rec
+        });
+      }
+      
+      if( arr == 'pf_stage_3' ){
+        this.setState({
+          pf_stage_3: rec
+        });
+      }
+    }
+
+    if( type == 'item' ){
+      let rec = this.state.item_items;
+
+      rec.splice(key, 1);
+
+      rec = rec ? rec : [];
+
+      this.setState({
+        item_items: rec
+      });
+    }
+  }
+
+  saveImg(dropzone, name, id, type){
+    dropzone.on("sending", (file, xhr, data) => {
+      let file_type = (file.name).split('.');
+      file_type = file_type[file_type.length - 1];
+      file_type = file_type.toLowerCase();
+      
+      data.append("filetype", 'user_'+id+'.'+file_type);
+      data.append("filename", 'user_'+id);
+      data.append("typeFile", type);
+      data.append("name", name);
+    });
+
+    dropzone.on("queuecomplete", (data) => {
+
+      var check_img = false;
+
+      dropzone['files'].map(function(item, key){
+        if( item['status'] == "error" ){
+          check_img = true;
+        }
+      })
+      
+      if( check_img ){
+        alert('Ошибка при загрузке фотографии '+type)
+      }
+    })
+  }
+
+  async saveEditItem(){
+    if( this.myDropzoneOld['files'].length > 0 ){
+      
+      let name = this.state.editItem.name,
+        id = this.state.editItem.id,
+        type = 'old';
+
+      this.myDropzoneOld.on("sending", (file, xhr, data) => {
+        let file_type = (file.name).split('.');
+        file_type = file_type[file_type.length - 1];
+        file_type = file_type.toLowerCase();
+        
+        data.append("typeFile", type);
+        data.append("name", name);
+        data.append("id", id);
+      });
+  
+      this.myDropzoneOld.on("queuecomplete", (data) => {
+  
+        var check_img = false;
+  
+        var myDropzoneNew = this.myDropzoneNew;
+
+        this.myDropzoneOld['files'].map((item, key) => {
+          if( item['status'] == "error" ){
+            check_img = true;
+          }
+
+          if( item['status'] == "success" ){
+            if( myDropzoneNew['files'][0] && myDropzoneNew['files'][0]["status"] == 'success' ){
+              this.setState({ 
+                modalEdit: false, 
+                editItem: null, 
+                ItemTab: '1'
+              })
+
+              this.getItems();
+            }
+          }
+        })
+        
+        if( check_img ){
+          alert('Ошибка при загрузке фотографии '+type)
+        }
+      })
+    }
+
+    if( this.myDropzoneNew['files'].length > 0 ){
+      let name = this.state.editItem.name,
+        id = this.state.editItem.id,
+        type = 'new';
+
+      this.myDropzoneNew.on("sending", (file, xhr, data) => {
+        let file_type = (file.name).split('.');
+        file_type = file_type[file_type.length - 1];
+        file_type = file_type.toLowerCase();
+        
+        data.append("typeFile", type);
+        data.append("name", name);
+        data.append("id", id);
+      });
+  
+      this.myDropzoneNew.on("queuecomplete", (data) => {
+        var check_img = false;
+  
+        var myDropzoneOld = this.myDropzoneOld;
+
+        this.myDropzoneNew['files'].map((item, key) => {  
+          if( item['status'] == "error" ){
+            check_img = true;
+          }
+
+          if( item['status'] == "success" ){
+            if( myDropzoneOld['files'][0] && myDropzoneOld['files'][0]["status"] == 'success' ){
+              this.setState({ 
+                modalEdit: false, 
+                editItem: null, 
+                ItemTab: '1'
+              })
+
+              this.getItems();
+            }
+          }
+        })
+        
+        if( check_img ){
+          alert('Ошибка при загрузке фотографии '+type)
+        }
+      })
+    }
+
+    let data = {
+      item: this.state.editItem,
+      rec_stage_1: this.state.rec_stage_1,
+      rec_stage_2: this.state.rec_stage_2,
+      rec_stage_3: this.state.rec_stage_3,
+
+      pf_stage_1: this.state.pf_stage_1,
+      pf_stage_2: this.state.pf_stage_2,
+      pf_stage_3: this.state.pf_stage_3,
+
+      item_items: this.state.item_items,
+    };
+
+    let res = await this.getData('saveEditItem', data);
+
+    if( res.st === false ){
+      alert(res.text);
+    }else{
+      this.openSnack('Данные обновлены');
+
+      if( this.myDropzoneOld['files'].length > 0 ){
+        this.myDropzoneOld.processQueue();
+      }
+
+      if( this.myDropzoneNew['files'].length > 0 ){
+        this.myDropzoneNew.processQueue();
+      }
+    }
+  }
+
+  async saveNewItem(){
+    let data = {
+      item: this.state.editItem,
+      rec_stage_1: this.state.rec_stage_1,
+      rec_stage_2: this.state.rec_stage_2,
+      rec_stage_3: this.state.rec_stage_3,
+
+      pf_stage_1: this.state.pf_stage_1,
+      pf_stage_2: this.state.pf_stage_2,
+      pf_stage_3: this.state.pf_stage_3,
+
+      item_items: this.state.item_items,
+    };
+
+    let res = await this.getData('saveNewItem', data);
+
+    console.log( res )
+
+    if( res.st === false ){
+      alert(res.text);
+    }else{
+      this.openSnack('Данные обновлены');
+
+      if( this.myDropzoneOld['files'].length > 0 ){
+      
+        let name = this.state.editItem.name,
+          id = res.id,
+          type = 'old';
+  
+        this.myDropzoneOld.on("sending", (file, xhr, data) => {
+          let file_type = (file.name).split('.');
+          file_type = file_type[file_type.length - 1];
+          file_type = file_type.toLowerCase();
+          
+          data.append("typeFile", type);
+          data.append("name", name);
+          data.append("id", id);
+        });
+    
+        this.myDropzoneOld.on("queuecomplete", (data) => {
+    
+          var check_img = false;
+    
+          var myDropzoneNew = this.myDropzoneNew;
+  
+          this.myDropzoneOld['files'].map((item, key) => {
+            if( item['status'] == "error" ){
+              check_img = true;
+            }
+  
+            if( item['status'] == "success" ){
+              if( myDropzoneNew['files'][0] && myDropzoneNew['files'][0]["status"] == 'success' ){
+                this.setState({ 
+                  modalNew: false, 
+                  editItem: null, 
+                  ItemTab: '1'
+                })
+  
+                this.getItems();
+              }
+            }
+          })
+          
+          if( check_img ){
+            alert('Ошибка при загрузке фотографии '+type)
+          }
+        })
+      }
+  
+      if( this.myDropzoneNew['files'].length > 0 ){
+        let name = this.state.editItem.name,
+          id = res.id,
+          type = 'new';
+  
+        this.myDropzoneNew.on("sending", (file, xhr, data) => {
+          let file_type = (file.name).split('.');
+          file_type = file_type[file_type.length - 1];
+          file_type = file_type.toLowerCase();
+          
+          data.append("typeFile", type);
+          data.append("name", name);
+          data.append("id", id);
+        });
+    
+        this.myDropzoneNew.on("queuecomplete", (data) => {
+          var check_img = false;
+    
+          var myDropzoneOld = this.myDropzoneOld;
+  
+          this.myDropzoneNew['files'].map((item, key) => {  
+            if( item['status'] == "error" ){
+              check_img = true;
+            }
+  
+            if( item['status'] == "success" ){
+              if( myDropzoneOld['files'][0] && myDropzoneOld['files'][0]["status"] == 'success' ){
+                this.setState({ 
+                  modalNew: false, 
+                  editItem: null, 
+                  ItemTab: '1'
+                })
+  
+                this.getItems();
+              }
+            }
+          })
+          
+          if( check_img ){
+            alert('Ошибка при загрузке фотографии '+type)
+          }
+        })
+      }
+
+      if( this.myDropzoneOld['files'].length > 0 ){
+        this.myDropzoneOld.processQueue();
+      }
+
+      if( this.myDropzoneNew['files'].length > 0 ){
+        this.myDropzoneNew.processQueue();
+      }
+    }
+  }
+
+  changeTab(event, value){
+
+    this.setState({
+      myDropzoneOld: this.myDropzoneOld['files'],
+      myDropzoneNew: this.myDropzoneNew['files'],
+    })
+
+    this.setState({ 
+      ItemTab: value 
+    })
+
+    if( parseInt(value) == 1 ){
+      setTimeout( () => {
+        this.myDropzoneOld = new Dropzone("#for_img_edit_old", this.dropzoneOptions);
+        this.myDropzoneNew = new Dropzone("#for_img_edit_new", this.dropzoneOptions);
+
+        if( this.state.myDropzoneOld[0] ){
+          var mockFileOld = { 
+            name: this.state.myDropzoneOld[0].name,
+            size: this.state.myDropzoneOld[0].size, 
+            type: this.state.myDropzoneOld[0].type, 
+            status: this.state.myDropzoneOld[0].status,
+            url: this.state.myDropzoneOld[0].dataURL,
+            dataURL: this.state.myDropzoneOld[0].dataURL
+          };
+
+          this.myDropzoneOld.emit("addedfile", mockFileOld);
+          this.myDropzoneOld.emit("thumbnail", mockFileOld, this.state.myDropzoneOld[0].dataURL);
+          this.myDropzoneOld.files.push(this.state.myDropzoneOld[0]);
+        }
+
+        if( this.state.myDropzoneNew[0] ){
+          var mockFileNew = { 
+            name: this.state.myDropzoneNew[0].name,
+            size: this.state.myDropzoneNew[0].size, 
+            type: this.state.myDropzoneNew[0].type, 
+            status: this.state.myDropzoneNew[0].status,
+            url: this.state.myDropzoneNew[0].dataURL,
+            dataURL: this.state.myDropzoneNew[0].dataURL
+          };
+
+          this.myDropzoneNew.emit("addedfile", mockFileNew);
+          this.myDropzoneNew.emit("thumbnail", mockFileNew, this.state.myDropzoneNew[0].dataURL);
+          this.myDropzoneNew.files.push(this.state.myDropzoneNew[0]);
+        }
+      }, 300 )
+    }
+  }
+
+  closeSnack(){
+    this.setState({
+      is_snack: false,
+      textSnack: ''
+    })
+  }
+
+  openSnack(text){
+    this.setState({
+      is_snack: true,
+      textSnack: text
+    })
+  }
+
+  searchPf(event){
+    let all_data = this.state.item_pf.all;
+    let name = event.target.value;
+
+    this.setState({
+      searchPf: name
+    })
+
+    let data_to_render = [];
+
+    all_data.map( (item) => {
+      if( item.name.toLowerCase().indexOf(name.toLowerCase()) !== -1 ){
+        data_to_render.push(item)
+      }
+    })
+
+    this.setState({
+      item_pf_render: data_to_render
+    })
+  }
+
+  searchItems(event){
+    let all_data = this.state.item_items_all;
+    let name = event.target.value;
+
+    this.setState({
+      searchItems: name
+    })
+
+    let data_to_render = [];
+
+    all_data.map( (item) => {
+      if( item.name.toLowerCase().indexOf(name.toLowerCase()) !== -1 ){
+        data_to_render.push(item)
+      }
+    })
+
+    this.setState({
+      item_items_render: data_to_render
+    })
+  }
+
+  closeEdit(){
+    this.setState({ 
+      modalEdit: false, 
+      editItem: null, 
+      ItemTab: '1' 
+    })
+
+    this.getItems();
+  }
+
+  closeNew(){
+    this.setState({ 
+      modalNew: false, 
+      editItem: null, 
+      ItemTab: '1' 
+    })
+
+    this.getItems();
+  }
+
   render(){
+    const action = (
+      <React.Fragment>
+        <IconButton
+          size="small"
+          aria-label="close"
+          color="inherit"
+          onClick={this.closeSnack.bind(this)}
+        >
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </React.Fragment>
+    );
+  
+
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load} style={{ zIndex: 999 }}>
+        <Backdrop open={this.state.is_load} style={{ zIndex: 999 }}>
           <CircularProgress color="inherit" />
         </Backdrop>
+
+        <Snackbar
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          open={this.state.is_snack}
+          autoHideDuration={6000}
+          onClose={this.closeSnack.bind(this)}
+          message={this.state.textSnack}
+          action={action}
+        />
         
-        <Dialog open={this.state.delModal} onClose={() => { this.setState({ delModal: false, textDel: '' }) }}>
-          <DialogTitle>Причина увольнения</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Увольнение происходит не сразу, а в полночь
-            </DialogContentText>
-            <Grid container spacing={3} style={{ paddingBottom: 10, paddingTop: 20 }}>
-              <Grid item xs={12}>
-                <MyTextInput label="Причина увольнения" value={ this.state.textDel } func={ (event) => { this.setState({ textDel: event.target.value }) } } />
-              </Grid>
-            </Grid>
-          </DialogContent>
-          <DialogActions style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained" onClick={this.saveeditItem.bind(this)}>Уволить</Button>
-            <Button onClick={ () => { this.setState({ delModal: false, textDel: '' }) } }>Отмена</Button>
-          </DialogActions>
-        </Dialog>
-
-        <Dialog open={this.state.graphModal} onClose={() => { this.setState({ graphModal: false, graphType: 0 }) }}>
-          <DialogTitle>С какого периода применить изменения ?</DialogTitle>
-          <DialogContent>
-            <Grid container spacing={3} style={{ paddingBottom: 10, paddingTop: 20 }}>
-
-              <Grid item xs={12} sm={6}>
-                <Button variant="contained" onClick={ () => { this.setState({ graphType: 1 }); this.saveeditItem() } } style={{ width: '100%' }}>С текущего периода</Button>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Button variant="contained" onClick={ () => { this.setState({ graphType: 2 }); this.saveeditItem() } } style={{ width: '100%' }}>Со следующего периода</Button>
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Button variant="contained" onClick={ () => { this.setState({ graphType: -1 }); this.saveeditItem() } } style={{ width: '100%' }}>Без изменений</Button>
-              </Grid>
-
-            </Grid>
-          </DialogContent>
-        </Dialog>
-
-       <Dialog
+        <Dialog
           open={this.state.modalEdit}
           fullWidth={true}
           maxWidth={'md'}
-          onClose={ () => { this.setState({ modalEdit: false, editItem: null, ItemTab: '1' }) } }
+          onClose={ this.closeEdit.bind(this) }
         >
           <DialogTitle>Редактирвоание товара</DialogTitle>
           <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             
             <Grid container spacing={3}>
               
-            
-
               {this.state.editItem && this.state.modalEdit ?
                 <>
                   <Grid item xs={12}>
@@ -725,7 +1384,7 @@ class SiteItems_ extends React.Component {
                       <Grid item xs={12}>
                         <TabContext value={this.state.ItemTab}>
                           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                            <TabList onChange={ (event, value) => { this.setState({ ItemTab: value }) } } variant="fullWidth">
+                            <TabList onChange={ this.changeTab.bind(this) } variant="fullWidth">
                               <Tab label="Основные" value="1" />
                               <Tab label="Рецепты" value="2" />
                               <Tab label="Заготовки" value="3" />
@@ -738,14 +1397,11 @@ class SiteItems_ extends React.Component {
 
                               <Grid item xs={12}>
                                 <Grid container spacing={3}>
-                                  <Grid item xs={12} sm={4}>
+                                  <Grid item xs={12} sm={6}>
                                     <MyTextInput label="Название" value={ this.state.editItem.name } func={ this.changeItem.bind(this, 'name') } />
                                   </Grid>
-                                  <Grid item xs={12} sm={4}>
+                                  <Grid item xs={12} sm={6}>
                                     <MyTextInput label="Короткое название (20 сим.)" value={ this.state.editItem.short_name } func={ this.changeItem.bind(this, 'short_name') } />
-                                  </Grid>
-                                  <Grid item xs={12} sm={4}>
-                                    <MyTextInput label="Ссылка" value={ this.state.editItem.link } func={ this.changeItem.bind(this, 'link') } />
                                   </Grid>
                                 </Grid>
                               </Grid>
@@ -753,10 +1409,10 @@ class SiteItems_ extends React.Component {
                               <Grid item xs={12}>
                                 <Grid container spacing={3}>
                                   <Grid item xs={12} sm={4}>
-                                    <MySelect classes={this.state.classes} data={this.state.types} value={this.state.editItem.type} func={ this.changeItem.bind(this, 'type') } disabled={true} label='Тип' />
+                                    <MySelect data={this.state.types} value={this.state.editItem.type} func={ this.changeItem.bind(this, 'type') } disabled={true} label='Тип' />
                                   </Grid>
                                   <Grid item xs={12} sm={4}>
-                                    <MySelect classes={this.state.classes} data={this.state.cat_list} value={this.state.editItem.category_id} func={ this.changeItem.bind(this, 'category_id') } label='Категория' />
+                                    <MySelect data={this.state.cat_list} value={this.state.editItem.category_id} func={ this.changeItem.bind(this, 'category_id') } label='Категория' />
                                   </Grid>
                                   <Grid item xs={12} sm={4}>
                                     <MyTextInput label="Код из 1с" value={ this.state.editItem.art } func={ this.changeItem.bind(this, 'art') } />
@@ -833,7 +1489,11 @@ class SiteItems_ extends React.Component {
                                 
 
                                   <Grid item xs={12} sm={6}>
-                                    <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_new+'600х400.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
+                                    { this.state.editItem.img_new.length > 0 ?
+                                      <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_new+'600х400.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
+                                        :
+                                      <div style={{maxWidth: 300, maxHeight: 300}}/>
+                                    }
                                   </Grid>
                                   <Grid item xs={12} sm={6}>
                                     <div className="dropzone" id="for_img_edit_old" style={{ width: '100%', minHeight: 150 }} />
@@ -849,7 +1509,11 @@ class SiteItems_ extends React.Component {
                                 
 
                                   <Grid item xs={12} sm={6}>
-                                    <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_new+'600х400.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
+                                    { this.state.editItem.img_new.length > 0 ?
+                                      <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_new+'600х600.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
+                                        :
+                                      <div style={{maxWidth: 300, maxHeight: 300}}/>
+                                    }
                                   </Grid>
                                   <Grid item xs={12} sm={6}>
                                     <div className="dropzone" id="for_img_edit_new" style={{ width: '100%', minHeight: 150 }} />
@@ -896,12 +1560,174 @@ class SiteItems_ extends React.Component {
                             </Grid>
 
                           </TabPanel>
-                          <TabPanel value="2">Item Two</TabPanel>
-                          <TabPanel value="3">Item Three</TabPanel>
+                          <TabPanel value="2">
+
+                            <Grid container spacing={3}>
+
+                              { !this.state.item_rec ? null :
+                                <Grid item xs={12} sm={4}>
+                                  <Table size='small'>
+                                    <TableHead>
+                                      <TableRow>
+                                        <TableCell>Название</TableCell>
+                                        <TableCell></TableCell>
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                      { this.state.item_rec.all.map( (item, key) =>
+                                        <TableRow key={key}>
+                                          <TableCell>{item.name}</TableCell>
+                                          <TableCell>
+                                            <DehazeIcon onClick={this.openMenu.bind(this, 'rec', item)} />
+                                          </TableCell>
+                                        </TableRow>
+                                      ) }
+                                    </TableBody>
+                                  </Table>
+                                </Grid>
+                              }
+
+                              { !this.state.item_rec ? null :
+                                <Grid item xs={12} sm={8}>
+                                  <TableStages title={'1 этап'} type={'rec'} arr={'rec_stage_1'} data={this.state.rec_stage_1} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
+                                  <TableStages title={'2 этап'} type={'rec'} arr={'rec_stage_2'} data={this.state.rec_stage_2} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
+                                  <TableStages title={'3 этап'} type={'rec'} arr={'rec_stage_3'} data={this.state.rec_stage_3} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
+                                </Grid>
+                              }
+                              
+                            </Grid>
+
+                          </TabPanel>
+                          <TabPanel value="3">
+
+                            <Grid container spacing={3}>
+
+                              { !this.state.item_pf ? null :
+                                <Grid item xs={12} sm={4}>
+                                  <Table size='small'>
+                                    <TableHead>
+                                      <TableRow>
+                                        <TableCell>Название</TableCell>
+                                        <TableCell></TableCell>
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+
+                                      <TableRow>
+                                        <TableCell colSpan={2}>
+                                          <MyTextInput label="Поиск" value={ this.state.searchPf } func={ this.searchPf.bind(this) } />
+                                        </TableCell>
+                                      </TableRow>
+
+                                      { this.state.item_pf_render.map( (item, key) =>
+                                        <TableRow key={key}>
+                                          <TableCell>{item.name}</TableCell>
+                                          <TableCell>
+                                            <DehazeIcon onClick={this.openMenu.bind(this, 'pf', item)} />
+                                          </TableCell>
+                                        </TableRow>
+                                      ) }
+                                    </TableBody>
+                                  </Table>
+                                </Grid>
+                              }
+
+                              { !this.state.item_rec ? null :
+                                <Grid item xs={12} sm={8}>
+                                  <TableStages title={'1 этап'} type={'pf'} arr={'pf_stage_1'} data={this.state.pf_stage_1} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
+                                  <TableStages title={'2 этап'} type={'pf'} arr={'pf_stage_2'} data={this.state.pf_stage_2} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
+                                  <TableStages title={'3 этап'} type={'pf'} arr={'pf_stage_3'} data={this.state.pf_stage_3} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
+                                </Grid>
+                              }
+
+                            </Grid>
+
+                          </TabPanel>
+                          <TabPanel value="4">
+
+                            <Grid container spacing={3}>
+
+                              { !this.state.item_pf ? null :
+                                <Grid item xs={12} sm={4}>
+                                  <Table size='small'>
+                                    <TableHead>
+                                      <TableRow>
+                                        <TableCell>Название</TableCell>
+                                        <TableCell></TableCell>
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+
+                                      <TableRow>
+                                        <TableCell colSpan={2}>
+                                          <MyTextInput label="Поиск" value={ this.state.searchItems } func={ this.searchItems.bind(this) } />
+                                        </TableCell>
+                                      </TableRow>
+
+                                      { this.state.item_items_render.map( (item, key) =>
+                                        <TableRow key={key}>
+                                          <TableCell>{item.name}</TableCell>
+                                          <TableCell>
+                                            <AddIcon onClick={this.forwardItem.bind(this, item)} style={{ cursor: 'pointer' }} />
+                                          </TableCell>
+                                        </TableRow>
+                                      ) }
+                                    </TableBody>
+                                  </Table>
+                                </Grid>
+                              }
+
+                              { !this.state.item_rec ? null :
+                                <Grid item xs={12} sm={8}>
+                                  <Table size='small'>
+                                    <TableHead>
+                                      <TableRow>
+                                        <TableCell colSpan={5} style={{ textAlign: 'center' }}>{this.props.title}</TableCell>
+                                      </TableRow>
+                                      <TableRow>
+                                        <TableCell>Название</TableCell>
+                                        <TableCell>Количество</TableCell>
+                                        <TableCell>Авт. добавление</TableCell>
+                                        <TableCell></TableCell>
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                      { this.state.item_items.map( (item, key) =>
+                                        <TableRow key={key}>
+                                          <TableCell>{item.name}</TableCell>
+                                          <TableCell>
+                                            <MyTextInput label="" value={item.count} func={ this.changeData.bind(this, 'item', 'item_items', 'count', key) } />
+                                          </TableCell>
+                                          <TableCell>
+                                            <MyCheckBox label="" value={ parseInt(item.is_add) == 1 ? true : false } func={ this.changeData.bind(this, 'item', 'item_items', 'is_add', key) } />
+                                          </TableCell>
+                                          <TableCell>
+                                            <CloseIcon onClick={ this.delItem.bind(this, 'item', '', key) } style={{ cursor: 'pointer' }} />
+                                          </TableCell>
+                                        </TableRow>
+                                      ) }
+                                    </TableBody>
+                                  </Table>
+                                </Grid>
+                              }
+
+                            </Grid>
+
+                          </TabPanel>
                         </TabContext>
                       </Grid>
 
                     </Grid>
+
+                    <Menu
+                      anchorEl={this.state.anchorEl}
+                      open={this.state.openMenu}
+                      onClose={this.closeMenu.bind(this)}
+                    >
+                      <MenuItem onClick={this.chooseStage.bind(this, 1)}>1 этап</MenuItem>
+                      <MenuItem onClick={this.chooseStage.bind(this, 2)}>2 этап</MenuItem>
+                      <MenuItem onClick={this.chooseStage.bind(this, 3)}>3 этап</MenuItem>
+                    </Menu>
 
                   </Grid>
                   
@@ -913,97 +1739,378 @@ class SiteItems_ extends React.Component {
               
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.saveeditItem.bind(this)} color="primary">Сохранить</Button>
+            <Button onClick={this.saveEditItem.bind(this)} color="primary">Сохранить</Button>
           </DialogActions>
         </Dialog>
         
         <Dialog
-          open={this.state.modalUserNew}
+          open={this.state.modalNew}
           fullWidth={true}
           maxWidth={'md'}
-          onClose={ () => { this.setState({ modalUserNew: false, editItem: null }) } }
+          onClose={ this.closeNew.bind(this) }
         >
-          <DialogTitle>Новый сотрудник</DialogTitle>
+          <DialogTitle>Новый товар</DialogTitle>
           <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             
             <Grid container spacing={3}>
                 
-                {this.state.editItem && this.state.modalUserNew ?
+                {this.state.editItem && this.state.modalNew ?
                   <>
-                    <Grid item xs={12}>
+                  <Grid item xs={12}>
 
-                      <Grid container spacing={3}>
+                    <Grid container spacing={3}>
 
-                        <Grid item xs={12}>
-                          <Grid container spacing={3}>
-                            <Grid item xs={12} sm={4}>
-                              <MyTextInput label="Фамилия" value={ this.state.editItem.user.fam } func={ this.changeItem.bind(this, 'fam') } />
-                            </Grid>
-                            <Grid item xs={12} sm={4}>
-                              <MyTextInput label="Имя" value={ this.state.editItem.user.name } func={ this.changeItem.bind(this, 'name') } />
-                            </Grid>
-                            <Grid item xs={12} sm={4}>
-                              <MyTextInput label="Отчество" value={ this.state.editItem.user.otc } func={ this.changeItem.bind(this, 'otc') } />
-                            </Grid>
-                          </Grid>
-                        </Grid>
+                      <Grid item xs={12}>
+                        <TabContext value={this.state.ItemTab}>
+                          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                            <TabList onChange={ this.changeTab.bind(this) } variant="fullWidth">
+                              <Tab label="Основные" value="1" />
+                              <Tab label="Рецепты" value="2" />
+                              <Tab label="Заготовки" value="3" />
+                              <Tab label="Позиции" value="4" />
+                            </TabList>
+                          </Box>
+                          <TabPanel value="1">
 
-                        <Grid item xs={12}>
-                          <Grid container spacing={3}>
-                            <Grid item xs={12} sm={4}>
-                              <MyTextInput label="Номер телефона" value={ this.state.editItem.user.login } func={ this.changeItem.bind(this, 'login') } />
-                            </Grid>
-                            <Grid item xs={12} sm={4}>
-                              <MyDatePickerNew label="Дата рождения" value={ this.state.editItem.user.birthday } func={ this.changeItem.bind(this, 'birthday') } />
-                            </Grid>
-                          </Grid>
-                        </Grid>
+                            <Grid container spacing={3}>
 
-                        <Grid item xs={12}>
-                          <Grid container spacing={3}>
-                            <Grid item xs={12} sm={6}>
-                              <img src={'https://storage.yandexcloud.net/user-img/max-img/'+this.state.editItem.user['img_name']+'?'+this.state.editItem.user['img_update']} style={{maxWidth: 300, maxHeight: 300}} />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <div className="dropzone" id="for_img_new" style={{ width: '100%', minHeight: 150 }} />
-                            </Grid>
-                          </Grid>
-                          
-                        </Grid>
-                        
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12} sm={6}>
+                                    <MyTextInput label="Название" value={ this.state.editItem.name } func={ this.changeItem.bind(this, 'name') } />
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <MyTextInput label="Короткое название (20 сим.)" value={ this.state.editItem.short_name } func={ this.changeItem.bind(this, 'short_name') } />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
 
-                        <Grid item xs={12}>
-                          <Grid container spacing={3}>
-                            <Grid item xs={12} sm={4}>
-                              <MyTextInput label="Код авторизации (4 цифры)" value={ this.state.editItem.user.auth_code } func={ this.changeItem.bind(this, 'auth_code') } />
-                            </Grid>
-                            <Grid item xs={12} sm={4}>
-                              <MyTextInput label="ИНН" value={ this.state.editItem.user.inn } func={ this.changeItem.bind(this, 'inn') } />
-                            </Grid>
-                            <Grid item xs={12} sm={4}>
-                              <MyCheckBox label="Работает официально" value={ parseInt(this.state.editItem.user.acc_to_kas) == 1 ? true : false } func={ this.changeItem.bind(this, 'acc_to_kas') } />
-                            </Grid>
-                          </Grid>
-                        </Grid>
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12} sm={4}>
+                                    <MySelect data={this.state.types} value={this.state.editItem.type} func={ this.changeItem.bind(this, 'type') } disabled={true} label='Тип' />
+                                  </Grid>
+                                  <Grid item xs={12} sm={4}>
+                                    <MySelect data={this.state.cat_list} value={this.state.editItem.category_id} func={ this.changeItem.bind(this, 'category_id') } label='Категория' />
+                                  </Grid>
+                                  <Grid item xs={12} sm={4}>
+                                    <MyTextInput label="Код из 1с" value={ this.state.editItem.art } func={ this.changeItem.bind(this, 'art') } />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
 
-                        <Grid item xs={12}>
-                          <Grid container spacing={3}>
-                            <Grid item xs={12} sm={4}>
-                              <MySelect classes={this.state.classes} data={this.state.editItem.appointment} value={this.state.editItem.user.app_id} func={ this.changeItem.bind(this, 'app_id') } label='Должность' />
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12} sm={4}>
+                                    <MyTextInput label="Стол" value={ this.state.editItem.stol } func={ this.changeItem.bind(this, 'stol') } />
+                                  </Grid>
+                                  <Grid item xs={12} sm={4}>
+                                    <MyTextInput label="Вес" value={ this.state.editItem.weight } func={ this.changeItem.bind(this, 'weight') } />
+                                  </Grid>
+                                  { parseInt(this.state.editItem.category_id) != 14 ?
+                                    <Grid item xs={12} sm={4}>
+                                      <MyTextInput label="Кол-во кусочков" value={ this.state.editItem.count_part } func={ this.changeItem.bind(this, 'count_part') } />
+                                    </Grid>
+                                      :
+                                    <Grid item xs={12} sm={4}>
+                                      <MyTextInput label="Размер пиццы" value={ this.state.editItem.size_pizza } func={ this.changeItem.bind(this, 'size_pizza') } />
+                                    </Grid>
+                                  }
+                                </Grid>
+                              </Grid>
+
+                              
+
+                              { parseInt( this.state.editItem.type ) != 2 ?
+                                <Grid item xs={12}>
+                                  <Grid container spacing={3}>
+                                    <Grid item xs={12} sm={3}>
+                                      <MyTextInput label="Белки" value={ this.state.editItem.protein } func={ this.changeItem.bind(this, 'protein') } />
+                                    </Grid>
+                                    <Grid item xs={12} sm={3}>
+                                      <MyTextInput label="Жиры" value={ this.state.editItem.fat } func={ this.changeItem.bind(this, 'fat') } />
+                                    </Grid>
+                                    <Grid item xs={12} sm={3}>
+                                      <MyTextInput label="Углеводы" value={ this.state.editItem.carbohydrates } func={ this.changeItem.bind(this, 'carbohydrates') } />
+                                    </Grid>
+                                    <Grid item xs={12} sm={3}>
+                                      <MyTextInput label="Энергетическая ценность" value={ this.state.editItem.kkal } func={ this.changeItem.bind(this, 'kkal') } />
+                                    </Grid>
+                                  </Grid>
+                                </Grid>
+                                  :
+                                null
+                              }
+
+                              { parseInt( this.state.editItem.type ) != 2 ?
+                                <Grid item xs={12}>
+                                  <Grid container spacing={3}>
+                                    <Grid item xs={12} sm={4}>
+                                      <MyTextInput label="Время на 1 этап (ММ:СС)" value={ this.state.editItem.time_stage_1 } func={ this.changeItem.bind(this, 'time_stage_1') } />
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                      <MyTextInput label="Время на 2 этап (ММ:СС)" value={ this.state.editItem.time_stage_2 } func={ this.changeItem.bind(this, 'time_stage_2') } />
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                      <MyTextInput label="Время на 3 этап (ММ:СС)" value={ this.state.editItem.time_stage_3 } func={ this.changeItem.bind(this, 'time_stage_3') } />
+                                    </Grid>
+                                  </Grid>
+                                </Grid>
+                                  :
+                                null
+                              }
+
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12}>
+                                    <Typography>Картинка соотношением сторон (3:2) (пример: 600х400) только JPG</Typography>
+                                  </Grid>
+                                
+
+                                  <Grid item xs={12} sm={6}>
+                                    { this.state.editItem.img_new.length > 0 ?
+                                      <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_new+'600х400.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
+                                        :
+                                      <div style={{maxWidth: 300, maxHeight: 300}}/>
+                                    }
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <div className="dropzone" id="for_img_edit_old" style={{ width: '100%', minHeight: 150 }} />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12}>
+                                    <Typography>Картинка соотношением сторон (1:1) (пример: 600х600) только JPG</Typography>
+                                  </Grid>
+                                
+
+                                  <Grid item xs={12} sm={6}>
+                                    { this.state.editItem.img_new.length > 0 ?
+                                      <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_new+'600х600.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
+                                        :
+                                      <div style={{maxWidth: 300, maxHeight: 300}}/>
+                                    }
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <div className="dropzone" id="for_img_edit_new" style={{ width: '100%', minHeight: 150 }} />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12}>
+                                    <MyTextInput label="Состав" value={ this.state.editItem.tmp_desc } func={ this.changeItem.bind(this, 'tmp_desc') } />
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                    <MyTextInput label="Маркейтинговое описание" value={ this.state.editItem.marc_desc } func={ this.changeItem.bind(this, 'marc_desc') } />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12} sm={6}>
+                                    <MyCheckBox label="Новинка" value={ parseInt(this.state.editItem.is_new) == 1 ? true : false } func={ this.changeItem.bind(this, 'is_new') } style={{ justifyContent: 'center' }} />
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <MyCheckBox label="Хит" value={ parseInt(this.state.editItem.is_hit) == 1 ? true : false } func={ this.changeItem.bind(this, 'is_hit') } style={{ justifyContent: 'center' }} />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <Grid container spacing={3}>
+                                  <Grid item xs={12} sm={4}>
+                                    <MyCheckBox label="Активность" value={ parseInt(this.state.editItem.is_show) == 1 ? true : false } func={ this.changeItem.bind(this, 'is_show') } style={{ justifyContent: 'center' }} />
+                                  </Grid>
+                                  <Grid item xs={12} sm={4}>
+                                    <MyCheckBox label="На сайте" value={ parseInt(this.state.editItem.show_site) == 1 ? true : false } func={ this.changeItem.bind(this, 'show_site') } style={{ justifyContent: 'center' }} />
+                                  </Grid>
+                                  <Grid item xs={12} sm={4}>
+                                    <MyCheckBox label="На складе" value={ parseInt(this.state.editItem.show_program) == 1 ? true : false } func={ this.changeItem.bind(this, 'show_program') } style={{ justifyContent: 'center' }} />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+
                             </Grid>
-                            <Grid item xs={12} sm={4}>
-                              <MySelect classes={this.state.classes} data={this.state.editItem.cities} value={this.state.editItem.user.city_id} func={ this.changeItem.bind(this, 'city_id') } label='Город' />
+
+                          </TabPanel>
+                          <TabPanel value="2">
+
+                            <Grid container spacing={3}>
+
+                              { !this.state.item_rec ? null :
+                                <Grid item xs={12} sm={4}>
+                                  <Table size='small'>
+                                    <TableHead>
+                                      <TableRow>
+                                        <TableCell>Название</TableCell>
+                                        <TableCell></TableCell>
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                      { this.state.item_rec.all.map( (item, key) =>
+                                        <TableRow key={key}>
+                                          <TableCell>{item.name}</TableCell>
+                                          <TableCell>
+                                            <DehazeIcon onClick={this.openMenu.bind(this, 'rec', item)} />
+                                          </TableCell>
+                                        </TableRow>
+                                      ) }
+                                    </TableBody>
+                                  </Table>
+                                </Grid>
+                              }
+
+                              { !this.state.item_rec ? null :
+                                <Grid item xs={12} sm={8}>
+                                  <TableStages title={'1 этап'} type={'rec'} arr={'rec_stage_1'} data={this.state.rec_stage_1} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
+                                  <TableStages title={'2 этап'} type={'rec'} arr={'rec_stage_2'} data={this.state.rec_stage_2} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
+                                  <TableStages title={'3 этап'} type={'rec'} arr={'rec_stage_3'} data={this.state.rec_stage_3} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
+                                </Grid>
+                              }
+                              
                             </Grid>
-                            <Grid item xs={12} sm={4}>
-                              <MySelect classes={this.state.classes} data={this.state.point_list_render} value={this.state.editItem.user.point_id} func={ this.changeItem.bind(this, 'point_id') } label='Точка' />
+
+                          </TabPanel>
+                          <TabPanel value="3">
+
+                            <Grid container spacing={3}>
+
+                              { !this.state.item_pf ? null :
+                                <Grid item xs={12} sm={4}>
+                                  <Table size='small'>
+                                    <TableHead>
+                                      <TableRow>
+                                        <TableCell>Название</TableCell>
+                                        <TableCell></TableCell>
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+
+                                      <TableRow>
+                                        <TableCell colSpan={2}>
+                                          <MyTextInput label="Поиск" value={ this.state.searchPf } func={ this.searchPf.bind(this) } />
+                                        </TableCell>
+                                      </TableRow>
+
+                                      { this.state.item_pf_render.map( (item, key) =>
+                                        <TableRow key={key}>
+                                          <TableCell>{item.name}</TableCell>
+                                          <TableCell>
+                                            <DehazeIcon onClick={this.openMenu.bind(this, 'pf', item)} />
+                                          </TableCell>
+                                        </TableRow>
+                                      ) }
+                                    </TableBody>
+                                  </Table>
+                                </Grid>
+                              }
+
+                              { !this.state.item_rec ? null :
+                                <Grid item xs={12} sm={8}>
+                                  <TableStages title={'1 этап'} type={'pf'} arr={'pf_stage_1'} data={this.state.pf_stage_1} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
+                                  <TableStages title={'2 этап'} type={'pf'} arr={'pf_stage_2'} data={this.state.pf_stage_2} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
+                                  <TableStages title={'3 этап'} type={'pf'} arr={'pf_stage_3'} data={this.state.pf_stage_3} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
+                                </Grid>
+                              }
+
                             </Grid>
-                          </Grid>
-                        </Grid>
+
+                          </TabPanel>
+                          <TabPanel value="4">
+
+                            <Grid container spacing={3}>
+
+                              { !this.state.item_pf ? null :
+                                <Grid item xs={12} sm={4}>
+                                  <Table size='small'>
+                                    <TableHead>
+                                      <TableRow>
+                                        <TableCell>Название</TableCell>
+                                        <TableCell></TableCell>
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+
+                                      <TableRow>
+                                        <TableCell colSpan={2}>
+                                          <MyTextInput label="Поиск" value={ this.state.searchItems } func={ this.searchItems.bind(this) } />
+                                        </TableCell>
+                                      </TableRow>
+
+                                      { this.state.item_items_render.map( (item, key) =>
+                                        <TableRow key={key}>
+                                          <TableCell>{item.name}</TableCell>
+                                          <TableCell>
+                                            <AddIcon onClick={this.forwardItem.bind(this, item)} style={{ cursor: 'pointer' }} />
+                                          </TableCell>
+                                        </TableRow>
+                                      ) }
+                                    </TableBody>
+                                  </Table>
+                                </Grid>
+                              }
+
+                              { !this.state.item_rec ? null :
+                                <Grid item xs={12} sm={8}>
+                                  <Table size='small'>
+                                    <TableHead>
+                                      <TableRow>
+                                        <TableCell colSpan={5} style={{ textAlign: 'center' }}>{this.props.title}</TableCell>
+                                      </TableRow>
+                                      <TableRow>
+                                        <TableCell>Название</TableCell>
+                                        <TableCell>Количество</TableCell>
+                                        <TableCell>Авт. добавление</TableCell>
+                                        <TableCell></TableCell>
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                      { this.state.item_items.map( (item, key) =>
+                                        <TableRow key={key}>
+                                          <TableCell>{item.name}</TableCell>
+                                          <TableCell>
+                                            <MyTextInput label="" value={item.count} func={ this.changeData.bind(this, 'item', 'item_items', 'count', key) } />
+                                          </TableCell>
+                                          <TableCell>
+                                            <MyCheckBox label="" value={ parseInt(item.is_add) == 1 ? true : false } func={ this.changeData.bind(this, 'item', 'item_items', 'is_add', key) } />
+                                          </TableCell>
+                                          <TableCell>
+                                            <CloseIcon onClick={ this.delItem.bind(this, 'item', '', key) } style={{ cursor: 'pointer' }} />
+                                          </TableCell>
+                                        </TableRow>
+                                      ) }
+                                    </TableBody>
+                                  </Table>
+                                </Grid>
+                              }
+
+                            </Grid>
+
+                          </TabPanel>
+                        </TabContext>
                       </Grid>
 
                     </Grid>
-                    
-                  </>
+
+                    <Menu
+                      anchorEl={this.state.anchorEl}
+                      open={this.state.openMenu}
+                      onClose={this.closeMenu.bind(this)}
+                    >
+                      <MenuItem onClick={this.chooseStage.bind(this, 1)}>1 этап</MenuItem>
+                      <MenuItem onClick={this.chooseStage.bind(this, 2)}>2 этап</MenuItem>
+                      <MenuItem onClick={this.chooseStage.bind(this, 3)}>3 этап</MenuItem>
+                    </Menu>
+
+                  </Grid>
+                  
+                </>
                     :
                   null
                 }
@@ -1011,7 +2118,7 @@ class SiteItems_ extends React.Component {
               
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.saveNewUser.bind(this)} color="primary">Сохранить</Button>
+            <Button onClick={this.saveNewItem.bind(this)} color="primary">Сохранить</Button>
           </DialogActions>
         </Dialog>
         
@@ -1021,6 +2128,10 @@ class SiteItems_ extends React.Component {
             <h1>{this.state.module_name}</h1>
           </Grid>
           
+          <Grid item xs={12} sm={12}>
+            <Button onClick={this.openNew.bind(this)} color="primary" variant='contained'>Новый товар</Button>
+          </Grid>
+
           <Grid item xs={12}>
           
             { this.state.cats.length == 0 ? null :
@@ -1084,8 +2195,6 @@ class SiteItems_ extends React.Component {
             }
 
           </Grid>
-          
-          
         </Grid>
       </>
     )
@@ -1093,10 +2202,7 @@ class SiteItems_ extends React.Component {
 }
 
 export function SiteItems () {
-  const classes = useStyles();
-  let history = useHistory();
-  
   return (
-    <SiteItems_ classes={classes} history={history} />
+    <SiteItems_ />
   );
 }
