@@ -86,7 +86,7 @@ class TableStages extends React.Component{
   }
 }
 
-class SiteItems_ extends React.Component {
+export class SiteItems extends React.Component {
   dropzoneOptions = {
     autoProcessQueue: false,
     autoQueue: true,
@@ -1961,10 +1961,4 @@ class SiteItems_ extends React.Component {
       </>
     )
   }
-}
-
-export function SiteItems () {
-  return (
-    <SiteItems_ />
-  );
 }
