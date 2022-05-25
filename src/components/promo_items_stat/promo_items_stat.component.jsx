@@ -1,95 +1,20 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
-
-import PropTypes from 'prop-types';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import TableFooter from '@mui/material/TableFooter';
-import Paper from '@mui/material/Paper';
-
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
-import TextField from '@mui/material/TextField';
 
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyDatePickerNew, MyTextInput, MyAutocomplite } from '../../stores/elements';
-import Typography from '@mui/material/Typography';
+import { MyDatePickerNew, MyTextInput, MyAutocomplite } from '../../stores/elements';
 
 const queryString = require('query-string');
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    }
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
 
 function formatDate(date) {
   var d = new Date(date),
@@ -105,13 +30,11 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-class PromoItemsStat_ extends React.Component {
+export class PromoItemsStat extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'promo_items_stat',
       module_name: '',
       is_load: false,
@@ -162,7 +85,7 @@ class PromoItemsStat_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -188,9 +111,8 @@ class PromoItemsStat_ extends React.Component {
   }
    
   async getStat() {
-      console.log('choosePoint=', this.state.choosePoint)
     let data = {
-      choosePoint      : this.state.choosePoint,
+      choosePoint   : this.state.choosePoint,
       date_start    : this.state.date_start,
       date_end      : this.state.date_end,
       promoName     : this.state.promoName,
@@ -199,15 +121,12 @@ class PromoItemsStat_ extends React.Component {
     
     let res = await this.getData('get_all', data);
 
+    console.log( data )
     console.log( res )
 
     this.setState({
-        stats: res.stats
+      stats: res.stats
     })
-
-    //setTimeout( () => {
-    //  this.filterNumber();
-    //}, 300 )
   }
 
   choosePoint(event, data){
@@ -223,7 +142,6 @@ class PromoItemsStat_ extends React.Component {
   }
 
   chooseDataNew(data, val, val2){
-
     if( data == 'promoName' ){
       this.setState({
         [data]: val.target.value,
@@ -242,7 +160,7 @@ class PromoItemsStat_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop open={this.state.is_load} style={{ zIndex: 99 }}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -252,7 +170,7 @@ class PromoItemsStat_ extends React.Component {
           </Grid>
           
           <Grid item xs={12} sm={2}>
-            <MyAutocomplite classes={this.state.classes} data={this.state.point_list} value={this.state.choosePoint} func={ this.choosePoint.bind(this) } multiple={true} label='Точка' />
+            <MyAutocomplite data={this.state.point_list} value={this.state.choosePoint} func={ this.choosePoint.bind(this) } multiple={true} label='Точка' />
           </Grid>
 
           <Grid item xs={12} sm={2}>
@@ -266,7 +184,7 @@ class PromoItemsStat_ extends React.Component {
             <MyTextInput value={this.state.promoName} func={ this.chooseDataNew.bind(this, 'promoName') } label='Промокод' />
           </Grid>
           <Grid item xs={12} sm={3}>
-            <MyAutocomplite classes={this.state.classes} data={this.state.items_list} value={this.state.chooseItem} func={ this.chooseDataNew.bind(this, 'chooseItem') } multiple={false} label='Товар' />
+            <MyAutocomplite data={this.state.items_list} value={this.state.chooseItem} func={ this.chooseDataNew.bind(this, 'chooseItem') } multiple={false} label='Товар' />
           </Grid>
           
           
@@ -275,14 +193,11 @@ class PromoItemsStat_ extends React.Component {
             <Button variant="contained" onClick={this.getStat.bind(this)}>Обновить</Button>
           </Grid>
           
-          
-
-           <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={6}>
             
             <Table size={'small'}>
               <TableHead>
                 <TableRow>
-                  <TableCell></TableCell>
                   <TableCell>Название</TableCell>
                   <TableCell>Кол-во</TableCell>
                 </TableRow>
@@ -290,32 +205,19 @@ class PromoItemsStat_ extends React.Component {
 
               <TableBody>
                 {!this.state.stats ? null :
-                    this.state.stats.map((item, key) =>
-                        <TableRow key={key}  >
-                            <TableCell style={{ textAlign: 'center' }}>{key + 1} </TableCell>
-                            <TableCell style={{ textAlign: 'left' }}>{item.name} </TableCell>
-                            <TableCell style={{ textAlign: 'left' }}>{item.count} </TableCell>
-                        </TableRow>
-                    )}
-                
-              
+                  this.state.stats.map((item, key) =>
+                    <TableRow key={key}>
+                      <TableCell style={{ textAlign: 'left' }}>{item.name} </TableCell>
+                      <TableCell style={{ textAlign: 'left' }}>{item.count} </TableCell>
+                    </TableRow>
+                  )
+                }
               </TableBody>
             
             </Table>
-            
           </Grid>
-          
         </Grid>
       </>
     )
   }
-}
-
-export function PromoItemsStat () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <PromoItemsStat_ classes={classes} history={history} />
-  );
 }
