@@ -1,8 +1,4 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
@@ -31,61 +27,11 @@ import { MyTextInput, MyCheckBox, MySelect, MyTimePicker, MyAutocomplite } from 
 
 const queryString = require('query-string');
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    },
-    def: {
-      main: '#353b48',
-      secondary: '#fff'
-    },
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
-
-class AppWork_ extends React.Component {
+export class AppWork extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'app_work',
       module_name: '',
       is_load: false,
@@ -161,7 +107,7 @@ class AppWork_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -474,7 +420,7 @@ class AppWork_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop open={this.state.is_load} style={{ zIndex: 99 }}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -490,44 +436,44 @@ class AppWork_ extends React.Component {
               <Grid container spacing={3}>
                 
                 <Grid item xs={12} sm={4}>
-                  <MyTextInput classes={this.state.classes} value={ this.state.itemsEdit.item.name } func={ this.chengeItem.bind(this, 'name') } label='Название уборки' />
+                  <MyTextInput value={ this.state.itemsEdit.item.name } func={ this.chengeItem.bind(this, 'name') } label='Название уборки' />
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <MySelect classes={this.state.classes} data={this.state.itemsEdit.cats} value={this.state.itemsEdit.item.type_new} func={ this.chengeItem.bind(this, 'type_new') } label='Категория уборки' />
+                  <MySelect data={this.state.itemsEdit.cats} value={this.state.itemsEdit.item.type_new} func={ this.chengeItem.bind(this, 'type_new') } label='Категория уборки' />
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <MyTextInput classes={this.state.classes} value={ this.state.itemsEdit.item.time_min } func={ this.chengeItem.bind(this, 'time_min') } label='Время уборки (в минутах)' />
+                  <MyTextInput value={ this.state.itemsEdit.item.time_min } func={ this.chengeItem.bind(this, 'time_min') } label='Время уборки (в минутах)' />
                 </Grid>
 
 
                 <Grid item xs={12} sm={3}>
-                  <MyTextInput classes={this.state.classes} value={ this.state.itemsEdit.item.max_count } func={ this.chengeItem.bind(this, 'max_count') } label='Количество активаций' />
+                  <MyTextInput value={ this.state.itemsEdit.item.max_count } func={ this.chengeItem.bind(this, 'max_count') } label='Количество активаций' />
                 </Grid>
 
                 <Grid item xs={12} sm={9}>
-                  <MyTextInput multiline={true} maxRows={2} classes={this.state.classes} value={this.state.itemsEdit.item.description} func={ this.chengeItem.bind(this, 'description') } label='Описание (для внутренного использования)'/>
+                  <MyTextInput multiline={true} maxRows={2} value={this.state.itemsEdit.item.description} func={ this.chengeItem.bind(this, 'description') } label='Описание (для внутренного использования)'/>
                 </Grid>
                 
 
                 <Grid item xs={12} sm={4}>
-                  <MySelect classes={this.state.classes} data={this.state.itemsEdit.apps} value={this.state.itemsEdit.item.app_id} func={ this.chengeItem.bind(this, 'app_id') } label='Должность' />
+                  <MySelect data={this.state.itemsEdit.apps} value={this.state.itemsEdit.item.app_id} func={ this.chengeItem.bind(this, 'app_id') } label='Должность' />
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <MySelect classes={this.state.classes} data={this.state.dows} value={this.state.itemsEdit.item.dow} func={ this.chengeItem.bind(this, 'dow') } label='День недели' />
+                  <MySelect data={this.state.dows} value={this.state.itemsEdit.item.dow} func={ this.chengeItem.bind(this, 'dow') } label='День недели' />
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <MySelect classes={this.state.classes} data={this.state.types} value={this.state.itemsEdit.item.type_time} func={ this.chengeItem.bind(this, 'type_time') } label='Тип добавления' />
+                  <MySelect data={this.state.types} value={this.state.itemsEdit.item.type_time} func={ this.chengeItem.bind(this, 'type_time') } label='Тип добавления' />
                 </Grid>
                 
                 { parseInt(this.state.itemsEdit.item.dow) != 14 ? null :
                   <Grid item xs={12}>
                     <Grid container spacing={3}>
                       <Grid item xs={12} sm={6}>
-                        <MyAutocomplite classes={this.state.classes} data={this.state.items_min} value={this.state.chengeItem1} func={ this.chengeItem1.bind(this, 'work_id') } multiple={false} label='Если эта уборка завершена' />
+                        <MyAutocomplite data={this.state.items_min} value={this.state.chengeItem1} func={ this.chengeItem1.bind(this, 'work_id') } multiple={false} label='Если эта уборка завершена' />
                       </Grid>
                     </Grid>
                   </Grid>
@@ -541,13 +487,13 @@ class AppWork_ extends React.Component {
 
                     { this.state.itemsEdit.times_add.map( (item, key) =>
                       <ListItem key={key} style={{ borderBottom: '1px solid #e5e5e5' }}>
-                        <MyTimePicker classes={this.state.classes} label={''} value={item.time_action} func={ this.chengeTime.bind(this, key) } />
+                        <MyTimePicker label={''} value={item.time_action} func={ this.chengeTime.bind(this, key) } />
                         <CloseIcon style={{ cursor: 'pointer' }} onClick={ this.delTime.bind(this, key) } />
                       </ListItem>
                     ) }
 
                     <ListItem style={{ borderBottom: '1px solid #e5e5e5' }}>
-                      <MyTimePicker id="timePikerNew" classes={this.state.classes} label={''} value={'00:00'} onBlur={ this.addTime.bind(this) } />
+                      <MyTimePicker id="timePikerNew" label={''} value={'00:00'} onBlur={ this.addTime.bind(this) } />
                     </ListItem>
                   </List>
                 </Grid>
@@ -559,7 +505,7 @@ class AppWork_ extends React.Component {
                     </ListItem>
 
                     <ListItem style={{ borderBottom: '1px solid #e5e5e5' }}>
-                      <MyTimePicker classes={this.state.classes} label={''} value={this.state.itemsEdit.times_close} func={ this.chengeTimeClose.bind(this) } />
+                      <MyTimePicker label={''} value={this.state.itemsEdit.times_close} func={ this.chengeTimeClose.bind(this) } />
                     </ListItem>
                   </List>
                 </Grid>
@@ -585,42 +531,42 @@ class AppWork_ extends React.Component {
               <Grid container spacing={3}>
                 
                 <Grid item xs={12} sm={4}>
-                  <MyTextInput classes={this.state.classes} value={ this.state.itemsNew.item.name } func={ this.chengeItemNew.bind(this, 'name') } label='Название уборки' />
+                  <MyTextInput value={ this.state.itemsNew.item.name } func={ this.chengeItemNew.bind(this, 'name') } label='Название уборки' />
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <MySelect classes={this.state.classes} data={this.state.itemsNew.cats} value={this.state.itemsNew.item.type_new} func={ this.chengeItemNew.bind(this, 'type_new') } label='Категория уборки' />
+                  <MySelect data={this.state.itemsNew.cats} value={this.state.itemsNew.item.type_new} func={ this.chengeItemNew.bind(this, 'type_new') } label='Категория уборки' />
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <MyTextInput classes={this.state.classes} value={ this.state.itemsNew.item.time_min } func={ this.chengeItemNew.bind(this, 'time_min') } label='Время уборки (в минутах)' />
+                  <MyTextInput value={ this.state.itemsNew.item.time_min } func={ this.chengeItemNew.bind(this, 'time_min') } label='Время уборки (в минутах)' />
                 </Grid>
 
                 <Grid item xs={12} sm={3}>
-                  <MyTextInput classes={this.state.classes} value={ this.state.itemsNew.item.max_count } func={ this.chengeItemNew.bind(this, 'max_count') } label='Количество активаций' />
+                  <MyTextInput value={ this.state.itemsNew.item.max_count } func={ this.chengeItemNew.bind(this, 'max_count') } label='Количество активаций' />
                 </Grid>
 
                 <Grid item xs={12} sm={9}>
-                  <MyTextInput multiline={true} maxRows={2} classes={this.state.classes} value={this.state.itemsNew.item.description} func={ this.chengeItemNew.bind(this, 'description') } label='Описание (для внутренного использования)'/>
+                  <MyTextInput multiline={true} maxRows={2} value={this.state.itemsNew.item.description} func={ this.chengeItemNew.bind(this, 'description') } label='Описание (для внутренного использования)'/>
                 </Grid>
                 
                 <Grid item xs={12} sm={4}>
-                  <MySelect classes={this.state.classes} data={this.state.itemsNew.apps} value={this.state.itemsNew.item.app_id} func={ this.chengeItemNew.bind(this, 'app_id') } label='Должность' />
+                  <MySelect data={this.state.itemsNew.apps} value={this.state.itemsNew.item.app_id} func={ this.chengeItemNew.bind(this, 'app_id') } label='Должность' />
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <MySelect classes={this.state.classes} data={this.state.dows} value={this.state.itemsNew.item.dow} func={ this.chengeItemNew.bind(this, 'dow') } label='День недели' />
+                  <MySelect data={this.state.dows} value={this.state.itemsNew.item.dow} func={ this.chengeItemNew.bind(this, 'dow') } label='День недели' />
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <MySelect classes={this.state.classes} data={this.state.types} value={this.state.itemsNew.item.type_time} func={ this.chengeItemNew.bind(this, 'type_time') } label='Тип добавления' />
+                  <MySelect data={this.state.types} value={this.state.itemsNew.item.type_time} func={ this.chengeItemNew.bind(this, 'type_time') } label='Тип добавления' />
                 </Grid>
                 
                 { parseInt(this.state.itemsNew.item.dow) != 14 ? null :
                   <Grid item xs={12}>
                     <Grid container spacing={3}>
                       <Grid item xs={12} sm={6}>
-                        <MyAutocomplite classes={this.state.classes} data={this.state.items_min} value={this.state.chengeItemNew1} func={ this.chengeItemNew1.bind(this, 'work_id') } multiple={false} label='Если эта уборка завершена' />
+                        <MyAutocomplite data={this.state.items_min} value={this.state.chengeItemNew1} func={ this.chengeItemNew1.bind(this, 'work_id') } multiple={false} label='Если эта уборка завершена' />
                       </Grid>
                     </Grid>
                   </Grid>
@@ -634,13 +580,13 @@ class AppWork_ extends React.Component {
 
                     { this.state.itemsNew.times_add.map( (item, key) =>
                       <ListItem key={key} style={{ borderBottom: '1px solid #e5e5e5' }}>
-                        <MyTimePicker classes={this.state.classes} label={''} value={item.time_action} func={ this.chengeTimeNew.bind(this, key) } />
+                        <MyTimePicker label={''} value={item.time_action} func={ this.chengeTimeNew.bind(this, key) } />
                         <CloseIcon style={{ cursor: 'pointer' }} onClick={ this.delTimeNew.bind(this, key) } />
                       </ListItem>
                     ) }
 
                     <ListItem style={{ borderBottom: '1px solid #e5e5e5' }}>
-                      <MyTimePicker id="timePikerNew" classes={this.state.classes} label={''} value={'00:00'} onBlur={ this.addTimeNew.bind(this) } />
+                      <MyTimePicker id="timePikerNew" label={''} value={'00:00'} onBlur={ this.addTimeNew.bind(this) } />
                     </ListItem>
                   </List>
                 </Grid>
@@ -652,7 +598,7 @@ class AppWork_ extends React.Component {
                     </ListItem>
 
                     <ListItem style={{ borderBottom: '1px solid #e5e5e5' }}>
-                      <MyTimePicker classes={this.state.classes} label={''} value={this.state.itemsNew.times_close} func={ this.chengeTimeCloseNew.bind(this) } />
+                      <MyTimePicker label={''} value={this.state.itemsNew.times_close} func={ this.chengeTimeCloseNew.bind(this) } />
                     </ListItem>
                   </List>
                 </Grid>
@@ -705,13 +651,13 @@ class AppWork_ extends React.Component {
                     <TableCell>{item.times_close}</TableCell>
 
                     <TableCell>
-                      <MyCheckBox classes={this.state.classes} value={ parseInt(item.is_not_del) == 1 ? true : false } func={ this.changeCheck.bind(this, key, 'is_not_del') } label='' />
+                      <MyCheckBox value={ parseInt(item.is_not_del) == 1 ? true : false } func={ this.changeCheck.bind(this, key, 'is_not_del') } label='' />
                     </TableCell>
                     <TableCell>
-                      <MyCheckBox classes={this.state.classes} value={ parseInt(item.is_need) == 1 ? true : false } func={ this.changeCheck.bind(this, key, 'is_need') } label='' />
+                      <MyCheckBox value={ parseInt(item.is_need) == 1 ? true : false } func={ this.changeCheck.bind(this, key, 'is_need') } label='' />
                     </TableCell>
                     <TableCell>
-                      <MyCheckBox classes={this.state.classes} value={ parseInt(item.is_active) == 1 ? true : false } func={ this.changeCheck.bind(this, key, 'is_active') } label='' />
+                      <MyCheckBox value={ parseInt(item.is_active) == 1 ? true : false } func={ this.changeCheck.bind(this, key, 'is_active') } label='' />
                     </TableCell>
                   </TableRow>
                 ) }
@@ -725,13 +671,4 @@ class AppWork_ extends React.Component {
       </>
     )
   }
-}
-
-export function AppWork () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <AppWork_ classes={classes} history={history} />
-  );
 }

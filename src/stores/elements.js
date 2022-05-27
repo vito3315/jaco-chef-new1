@@ -192,7 +192,7 @@ export class MyTimePicker extends React.PureComponent {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
+      //classes: this.props.classes,
       thisVal: ''
     };
   }
@@ -221,7 +221,8 @@ export class MyTimePicker extends React.PureComponent {
         type="time"
         id={ this.props.id ? this.props.id : null }
         value={ this.props.func ? this.props.value : this.state.thisVal }
-        className={this.state.classes.timePicker}
+        //className={this.state.classes.timePicker}
+        style={{ width: '100%' }}
         onChange={this.props.func ? this.props.func : this.onChange.bind(this)}
         onBlur={this.props.onBlur ? this.onBlur.bind(this) : null}
         InputLabelProps={{

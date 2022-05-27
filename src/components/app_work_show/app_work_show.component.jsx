@@ -1,16 +1,10 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
-import Button from '@mui/material/Button';
 
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 
@@ -19,14 +13,6 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-
-import CloseIcon from '@mui/icons-material/Close';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 
 import PropTypes from 'prop-types';
@@ -36,57 +22,9 @@ import Box from '@mui/material/Box';
 
 import Typography from '@mui/material/Typography';
 
-import { MyTextInput, MyCheckBox, MySelect, MyTimePicker, MyAutocomplite } from '../../stores/elements';
+import { MySelect } from '../../stores/elements';
 
 const queryString = require('query-string');
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    },
-    def: {
-      main: '#353b48',
-      secondary: '#fff'
-    },
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -119,13 +57,11 @@ function a11yProps(index) {
   };
 }
 
-class AppWorkShow_ extends React.Component {
+export class AppWorkShow extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'app_work_show',
       module_name: '',
       is_load: false,
@@ -204,7 +140,7 @@ class AppWorkShow_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -300,7 +236,7 @@ class AppWorkShow_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -312,7 +248,7 @@ class AppWorkShow_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={3}>
-            <MySelect classes={this.state.classes} data={this.state.points} value={this.state.point_id} func={ (event) => { this.setState({ point_id: event.target.value }) } } label='Точка' />
+            <MySelect data={this.state.points} value={this.state.point_id} func={ (event) => { this.setState({ point_id: event.target.value }) } } label='Точка' />
           </Grid>
 
           { !this.state.itemsEdit ? null :
@@ -391,13 +327,4 @@ class AppWorkShow_ extends React.Component {
       </>
     )
   }
-}
-
-export function AppWorkShow () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <AppWorkShow_ classes={classes} history={history} />
-  );
 }

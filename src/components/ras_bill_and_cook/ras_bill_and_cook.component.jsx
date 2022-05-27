@@ -1,8 +1,4 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -26,50 +22,6 @@ import { MySelect, MyDatePickerNew } from '../../stores/elements';
 
 const queryString = require('query-string');
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    }
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
-
 function formatDate(date) {
   var d = new Date(date),
       month = '' + (d.getMonth() + 1),
@@ -84,15 +36,13 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-class RasBillAndCook_ extends React.Component {
+export class RasBillAndCook extends React.Component {
   click = false;
 
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'ras_bill_and_cook',
       module_name: '',
       is_load: false,
@@ -144,7 +94,7 @@ class RasBillAndCook_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -215,7 +165,7 @@ class RasBillAndCook_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -225,11 +175,11 @@ class RasBillAndCook_ extends React.Component {
           </Grid>
           
           <Grid item xs={12} sm={4}>
-            <MySelect classes={this.state.classes} data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
+            <MySelect data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
           </Grid>
 
           <Grid item xs={12} sm={4}>
-            <MySelect classes={this.state.classes} data={this.state.rev_list} value={this.state.rev} func={ this.changeRev.bind(this) } label='Ревизия' />
+            <MySelect data={this.state.rev_list} value={this.state.rev} func={ this.changeRev.bind(this) } label='Ревизия' />
           </Grid>
 
           <Grid item xs={12} sm={4}>
@@ -303,21 +253,8 @@ class RasBillAndCook_ extends React.Component {
             
 
           </Grid>
-
-          
-
-          
         </Grid>
       </>
     )
   }
-}
-
-export function RasBillAndCook () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <RasBillAndCook_ classes={classes} history={history} />
-  );
 }

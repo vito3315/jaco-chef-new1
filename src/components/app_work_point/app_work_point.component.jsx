@@ -1,8 +1,4 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
@@ -22,68 +18,15 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
-
-import VisibilityIcon from '@mui/icons-material/Visibility';
-
 import { MyTextInput, MySelect } from '../../stores/elements';
 
 const queryString = require('query-string');
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    },
-    def: {
-      main: '#353b48',
-      secondary: '#fff'
-    },
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
-
-class AppWorkPoint_ extends React.Component {
+export class AppWorkPoint extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'app_work_point',
       module_name: '',
       is_load: false,
@@ -138,7 +81,7 @@ class AppWorkPoint_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -299,7 +242,7 @@ class AppWorkPoint_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -309,10 +252,10 @@ class AppWorkPoint_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={3}>
-            <MySelect classes={this.state.classes} data={this.state.points} value={this.state.point_id} func={ (event) => { this.setState({ point_id: event.target.value }) } } label='Точка' />
+            <MySelect data={this.state.points} value={this.state.point_id} func={ (event) => { this.setState({ point_id: event.target.value }) } } label='Точка' />
           </Grid>
           <Grid item xs={12} sm={3}>
-            <MySelect classes={this.state.classes} data={this.state.apps} value={this.state.app_id} func={ this.changeApp.bind(this) } label='Должность' />
+            <MySelect data={this.state.apps} value={this.state.app_id} func={ this.changeApp.bind(this) } label='Должность' />
           </Grid>
 
           <Grid item xs={12} sm={3}>
@@ -348,7 +291,7 @@ class AppWorkPoint_ extends React.Component {
                     <TableCell>{item.name}</TableCell>
                     <TableCell>{item.time_min} мин.</TableCell>
                     <TableCell>
-                      <MyTextInput classes={this.state.classes} value={ item.dop_time } func={ this.changeDopTime.bind(this, key) } label='' />
+                      <MyTextInput value={ item.dop_time } func={ this.changeDopTime.bind(this, key) } label='' />
                     </TableCell>
                     <TableCell>
                       <CloseIcon onClick={this.del.bind(this, item.id, item.name)} style={{cursor: 'pointer'}} />
@@ -370,13 +313,4 @@ class AppWorkPoint_ extends React.Component {
       </>
     )
   }
-}
-
-export function AppWorkPoint(){
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <AppWorkPoint_ classes={classes} history={history} />
-  );
 }

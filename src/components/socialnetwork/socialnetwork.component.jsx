@@ -1,8 +1,5 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
 
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
@@ -14,61 +11,11 @@ import { MySelect, MyTextInput } from '../../stores/elements';
 import axios from 'axios';
 const queryString = require('query-string');
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    },
-    def: {
-      main: '#353b48',
-      secondary: '#fff'
-    },
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
-
-class SocialNetwork_ extends React.Component {
+export class SocialNetwork extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'socialnetwork',
       module_name: '',
       is_load: false,
@@ -117,7 +64,7 @@ class SocialNetwork_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -239,7 +186,7 @@ class SocialNetwork_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -289,13 +236,4 @@ class SocialNetwork_ extends React.Component {
       </>
     )
   }
-}
-
-export function SocialNetwork () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <SocialNetwork_ classes={classes} history={history} />
-  );
 }

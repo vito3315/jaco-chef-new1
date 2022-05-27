@@ -1,8 +1,4 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -15,11 +11,9 @@ import Tab from '@mui/material/Tab';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableFooter from '@mui/material/TableFooter';
-import Paper from '@mui/material/Paper';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -29,14 +23,12 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
 import TextField from '@mui/material/TextField';
 
 import Backdrop from '@mui/material/Backdrop';
@@ -46,50 +38,6 @@ import { MySelect, MyDatePickerNew, MyTextInput } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
 
 const queryString = require('query-string');
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    }
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
 
 function formatDate(date) {
   var d = new Date(date),
@@ -136,13 +84,11 @@ function a11yProps(index) {
   };
 }
 
-class Concenter_ extends React.Component {
+export class Concenter extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'concenter',
       module_name: '',
       is_load: false,
@@ -217,7 +163,7 @@ class Concenter_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -502,7 +448,7 @@ class Concenter_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -700,7 +646,7 @@ class Concenter_ extends React.Component {
           </Grid>
           
           <Grid item xs={12} sm={3}>
-            <MySelect classes={this.state.classes} data={this.state.cities} value={this.state.city_id} func={ this.changeCity.bind(this) } label='Город' />
+            <MySelect data={this.state.cities} value={this.state.city_id} func={ this.changeCity.bind(this) } label='Город' />
           </Grid>
 
           <Grid item xs={12} sm={3}>
@@ -792,13 +738,4 @@ class Concenter_ extends React.Component {
       </>
     )
   }
-}
-
-export function Concenter () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <Concenter_ classes={classes} history={history} />
-  );
 }

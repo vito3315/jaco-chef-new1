@@ -1,8 +1,4 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -10,27 +6,19 @@ import Button from '@mui/material/Button';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-
-import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
 
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText';
 
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 import Accordion from '@mui/material/Accordion';
@@ -46,57 +34,11 @@ import { MySelect, MyCheckBox, MyAutocomplite, MyTextInput } from '../../stores/
 
 const queryString = require('query-string');
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    }
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
-
-class SkladItemsModule_ extends React.Component {
+export class SkladItemsModule extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'sklad_items_module',
       module_name: '',
       is_load: false,
@@ -157,7 +99,7 @@ class SkladItemsModule_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -486,7 +428,7 @@ class SkladItemsModule_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -522,7 +464,7 @@ class SkladItemsModule_ extends React.Component {
                         <MyTextInput label="Название товара" value={ this.state.itemEdit.item.name } func={ this.changeItem.bind(this, 'name') } />
                       </Grid>
                       <Grid item xs={12} sm={6}>
-                        <MySelect classes={this.state.classes} data={this.state.itemEdit.pf_list} value={this.state.itemEdit.item.pf_id} func={ this.changeItem.bind(this, 'pf_id') } label='Заготовка' />
+                        <MySelect data={this.state.itemEdit.pf_list} value={this.state.itemEdit.item.pf_id} func={ this.changeItem.bind(this, 'pf_id') } label='Заготовка' />
                       </Grid>
                       <Grid item xs={12} sm={6}>
                         <MyTextInput label="Название товара для поставщика" value={ this.state.itemEdit.item.name_for_vendor } func={ this.changeItem.bind(this, 'name_for_vendor') } />
@@ -534,7 +476,7 @@ class SkladItemsModule_ extends React.Component {
                         <MyTextInput label="Максимальное количество заказов в месяц (0 - без ограничений)" value={ this.state.itemEdit.item.max_count_in_m } func={ this.changeItem.bind(this, 'max_count_in_m') } />
                       </Grid>
                       <Grid item xs={12} sm={6}>
-                        <MySelect classes={this.state.classes} data={this.state.itemEdit.cats} value={this.state.itemEdit.item.cat_id} func={ this.changeItem.bind(this, 'cat_id') } label='Категория' />
+                        <MySelect data={this.state.itemEdit.cats} value={this.state.itemEdit.item.cat_id} func={ this.changeItem.bind(this, 'cat_id') } label='Категория' />
                       </Grid>
                     </Grid>
                   </Grid>
@@ -544,10 +486,10 @@ class SkladItemsModule_ extends React.Component {
                     <MyTextInput label="Количество в упаковке" value={ this.state.itemEdit.item.pq } func={ this.changeItem.bind(this, 'pq') } />
                   </Grid>
                   <Grid item xs={12} sm={4}>
-                    <MySelect classes={this.state.classes} data={this.state.itemEdit.ed_izmer} value={this.state.itemEdit.item.ed_izmer_id} func={ this.changeItem.bind(this, 'ed_izmer_id') } label='Ед измер' />
+                    <MySelect data={this.state.itemEdit.ed_izmer} value={this.state.itemEdit.item.ed_izmer_id} func={ this.changeItem.bind(this, 'ed_izmer_id') } label='Ед измер' />
                   </Grid>
                   <Grid item xs={12} sm={4}>
-                    <MySelect classes={this.state.classes} data={this.state.itemEdit.apps} value={this.state.itemEdit.item.app_id} func={ this.changeItem.bind(this, 'app_id') } label='Должность на кухне' />
+                    <MySelect data={this.state.itemEdit.apps} value={this.state.itemEdit.item.app_id} func={ this.changeItem.bind(this, 'app_id') } label='Должность на кухне' />
                   </Grid>
 
                   <Grid item xs={12} sm={4}>
@@ -621,7 +563,7 @@ class SkladItemsModule_ extends React.Component {
                         <MyTextInput label="Название товара" value={ this.state.itemEdit.item.name } func={ this.changeItem.bind(this, 'name') } />
                       </Grid>
                       <Grid item xs={12} sm={6}>
-                        <MySelect classes={this.state.classes} data={this.state.itemEdit.pf_list} value={this.state.itemEdit.item.pf_id} func={ this.changeItem.bind(this, 'pf_id') } label='Заготовка' />
+                        <MySelect data={this.state.itemEdit.pf_list} value={this.state.itemEdit.item.pf_id} func={ this.changeItem.bind(this, 'pf_id') } label='Заготовка' />
                       </Grid>
                       <Grid item xs={12} sm={6}>
                         <MyTextInput label="Название товара для поставщика" value={ this.state.itemEdit.item.name_for_vendor } func={ this.changeItem.bind(this, 'name_for_vendor') } />
@@ -633,7 +575,7 @@ class SkladItemsModule_ extends React.Component {
                         <MyTextInput label="Максимальное количество заказов в месяц (0 - без ограничений)" value={ this.state.itemEdit.item.max_count_in_m } func={ this.changeItem.bind(this, 'max_count_in_m') } />
                       </Grid>
                       <Grid item xs={12} sm={6}>
-                        <MySelect classes={this.state.classes} data={this.state.itemEdit.cats} value={this.state.itemEdit.item.cat_id} func={ this.changeItem.bind(this, 'cat_id') } label='Категория' />
+                        <MySelect data={this.state.itemEdit.cats} value={this.state.itemEdit.item.cat_id} func={ this.changeItem.bind(this, 'cat_id') } label='Категория' />
                       </Grid>
                     </Grid>
                   </Grid>
@@ -643,10 +585,10 @@ class SkladItemsModule_ extends React.Component {
                     <MyTextInput label="Количество в упаковке" value={ this.state.itemEdit.item.pq } func={ this.changeItem.bind(this, 'pq') } />
                   </Grid>
                   <Grid item xs={12} sm={4}>
-                    <MySelect classes={this.state.classes} data={this.state.itemEdit.ed_izmer} value={this.state.itemEdit.item.ed_izmer_id} func={ this.changeItem.bind(this, 'ed_izmer_id') } label='Ед измер' />
+                    <MySelect data={this.state.itemEdit.ed_izmer} value={this.state.itemEdit.item.ed_izmer_id} func={ this.changeItem.bind(this, 'ed_izmer_id') } label='Ед измер' />
                   </Grid>
                   <Grid item xs={12} sm={4}>
-                    <MySelect classes={this.state.classes} data={this.state.itemEdit.apps} value={this.state.itemEdit.item.app_id} func={ this.changeItem.bind(this, 'app_id') } label='Должность на кухне' />
+                    <MySelect data={this.state.itemEdit.apps} value={this.state.itemEdit.item.app_id} func={ this.changeItem.bind(this, 'app_id') } label='Должность на кухне' />
                   </Grid>
 
                   <Grid item xs={12} sm={4}>
@@ -850,19 +792,8 @@ class SkladItemsModule_ extends React.Component {
             }
 
           </Grid>
-          
-          
         </Grid>
       </>
     )
   }
-}
-
-export function SkladItemsModule () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <SkladItemsModule_ classes={classes} history={history} />
-  );
 }

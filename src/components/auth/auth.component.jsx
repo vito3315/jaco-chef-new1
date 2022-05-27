@@ -1,13 +1,9 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
 
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -20,53 +16,11 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 const queryString = require('query-string');
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    }
-  },
-});
-
-const useStyles = makeStyles({
-  paper: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  avatar: {
-    borderRadius: 0,
-    width: '100%',
-    height: 150,
-    margin: 0,
-    backgroundColor: '#fff'
-  },
-  avatar2: {
-    borderRadius: 0,
-    width: '100%',
-    height: 130,
-    margin: 0,
-    backgroundColor: '#fff'
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  textLink: {
-    color: '#c03'
-  }
-});
-
-class Auth_ extends React.Component {
+export class Auth extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'auth',
       module_name: '',
       is_load: false,
@@ -102,12 +56,12 @@ class Auth_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
       if( json.st === false && json.type == 'auth' ){
-        this.state.history.push("/auth");
+        window.location.pathname = '/auth';
         return;
       }
       
@@ -169,7 +123,7 @@ class Auth_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -190,11 +144,11 @@ class Auth_ extends React.Component {
         
         <Grid container spacing={3} direction="row" justifyContent="center" alignItems="center">
           <Grid item xs={12} sm={6} md={6} lg={4} xl={3}>
-            <div className={this.state.classes.paper}>
-              <Avatar className={this.state.classes.avatar}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
+              <Avatar style={{ borderRadius: 0, width: '100%', height: 150, margin: 0, backgroundColor: '#fff' }}>
                 <img alt="Жако доставка роллов и пиццы" src="../assets/img_other/Favikon.png" style={{ height: '100%' }} />
               </Avatar>
-              <form className={this.state.classes.form} noValidate>
+              <form style={{ width: '100%' }} noValidate>
                 <TextField
                   variant="outlined"
                   margin="normal"
@@ -223,14 +177,14 @@ class Auth_ extends React.Component {
                   fullWidth
                   variant="contained"
                   color="primary"
-                  className={this.state.classes.submit}
+                  style={{ marginTop: 10, marginBottom: 10 }}
                   onClick={ this.auth.bind(this) }
                 >
                   Войти
                 </Button>
                 <Grid container>
                   <Grid item xs>
-                    <a href="/registration" className={this.state.classes.textLink}>Восстановить пароль</a>
+                    <a href="/registration" style={{ color: '#c03' }}>Восстановить пароль</a>
                   </Grid>
                 </Grid>
               </form>
@@ -240,13 +194,4 @@ class Auth_ extends React.Component {
       </>
     )
   }
-}
-
-export function Auth () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <Auth_ classes={classes} history={history} />
-  );
 }

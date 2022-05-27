@@ -1,8 +1,4 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -24,61 +20,15 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyTextInput } from '../../stores/elements';
+import { MySelect, MyCheckBox, MyTextInput, MyAutocomplite } from '../../stores/elements';
 
 const queryString = require('query-string');
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    }
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
-
-class VendorItemPrice_ extends React.Component {
+export class VendorItemPrice extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'vendor_item_price',
       module_name: '',
       is_load: false,
@@ -86,12 +36,12 @@ class VendorItemPrice_ extends React.Component {
       modalDialog: false,
       
       vendors: [],
-      vendor: 0,
+      vendor: null,
       
       items: [],
       
       cities: [],
-      city: -1,
+      city: '',
       allCity: false,
       isPrioriti: false
     };
@@ -129,7 +79,7 @@ class VendorItemPrice_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -166,29 +116,30 @@ class VendorItemPrice_ extends React.Component {
     this.setState({
       vendors: res,
       city: event.target.value,
-      vendor: 0,
+      vendor: null,
       items: []
     })
   }
   
-  async changeVendor(event){
+  async changeVendor(event, value){
+
+    console.log( event.target.value, value )
+
     let data = {
       city: this.state.city,
-      vendor_id: event.target.value,
+      vendor_id: value.id,
     }
     
     let res = await this.getData('get_vendor_items', data);
     
     this.setState({
       items: res,
-      vendor: event.target.value,
+      vendor: value,
     })
   }
   
   update(item_id, data, event){
     let this_items = this.state.items;
-    
-    
     
     this_items.map( (item, key) => {
       if( parseInt(item.item_id) == parseInt(item_id) ){
@@ -224,7 +175,7 @@ class VendorItemPrice_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 999 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -237,10 +188,7 @@ class VendorItemPrice_ extends React.Component {
           <DialogTitle id="alert-dialog-title"></DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              
-              
-              
-              
+            
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -255,16 +203,16 @@ class VendorItemPrice_ extends React.Component {
           </Grid>
           
           <Grid item xs={12} sm={3}>
-            <MySelect classes={this.state.classes} data={this.state.cities} value={this.state.city} func={ this.changeCity.bind(this) } label='Город' />
+            <MySelect data={this.state.cities} value={this.state.city} func={ this.changeCity.bind(this) } label='Город' />
           </Grid>
           <Grid item xs={12} sm={3}>
-            <MySelect classes={this.state.classes} data={this.state.vendors} value={this.state.vendor} func={ this.changeVendor.bind(this) } label='Поставщик' />
+            <MyAutocomplite data={this.state.vendors} value={this.state.vendor} func={ this.changeVendor.bind(this) } multiple={false} label='Поставщик' />
           </Grid>
           <Grid item xs={12} sm={3}>
-            <MyCheckBox classes={this.state.classes} value={this.state.allCity} func={ (event) => { this.setState({ allCity: event.target.checked }) } } label='На все города поставщика' />
+            <MyCheckBox value={this.state.allCity} func={ (event) => { this.setState({ allCity: event.target.checked }) } } label='На все города поставщика' />
           </Grid>
           <Grid item xs={12} sm={12}>
-            <MyCheckBox classes={this.state.classes} value={this.state.isPrioriti} func={ (event) => { this.setState({ isPrioriti: event.target.checked }) } } label='Приоритетный постащик' />
+            <MyCheckBox value={this.state.isPrioriti} func={ (event) => { this.setState({ isPrioriti: event.target.checked }) } } label='Приоритетный постащик' />
           </Grid>
           
           <Grid item xs={12}>
@@ -298,7 +246,7 @@ class VendorItemPrice_ extends React.Component {
                         <MyTextInput label="" value={item.full_price} func={ this.update.bind(this, item.item_id, 'full_price') } />
                       </TableCell>
                       <TableCell>
-                        <MySelect classes={this.state.classes} data={item.pqs} value={item.rec_pq} func={ this.update.bind(this, item.item_id, 'rec_pq') } label='' />
+                        <MySelect data={item.pqs} value={ parseInt(item.rec_pq) == 0 ? '' : item.rec_pq } func={ this.update.bind(this, item.item_id, 'rec_pq') } label='' />
                       </TableCell>
                       <TableCell>{item.price} / {item.ei_name}</TableCell>
                     </TableRow>
@@ -314,13 +262,4 @@ class VendorItemPrice_ extends React.Component {
       </>
     )
   }
-}
-
-export function VendorItemPrice () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <VendorItemPrice_ classes={classes} history={history} />
-  );
 }

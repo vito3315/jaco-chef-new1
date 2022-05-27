@@ -1,5 +1,4 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -25,13 +24,11 @@ const dynamicCellStyle = params => {
   return null;
 };
 
-class Tender_ extends React.Component {
+export class Tender extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'tender',
       module_name: '',
       is_load: false,
@@ -134,7 +131,7 @@ class Tender_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -303,12 +300,4 @@ class Tender_ extends React.Component {
       </>
     )
   }
-}
-
-export function Tender () {
-  let history = useHistory();
-  
-  return (
-    <Tender_ history={history} />
-  );
 }

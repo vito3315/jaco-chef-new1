@@ -1,13 +1,9 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
 
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -24,60 +20,11 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 const queryString = require('query-string');
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    }
-  },
-});
-
-const useStyles = makeStyles({
-  paper: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  avatar: {
-    borderRadius: 0,
-    width: '100%',
-    height: 150,
-    margin: 0,
-    backgroundColor: '#fff'
-  },
-  avatar2: {
-    borderRadius: 0,
-    width: '100%',
-    height: 130,
-    margin: 0,
-    backgroundColor: '#fff'
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  backButton: {
-    marginRight: theme.spacing(1),
-  },
-  instructions: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-  },
-  textLink: {
-    color: '#c03'
-  }
-});
-
-class Reg_ extends React.Component {
+export class Reg extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'auth',
       module_name: '',
       is_load: false,
@@ -93,10 +40,6 @@ class Reg_ extends React.Component {
       code: '',
       pwd: ''
     };
-  }
-  
-  async componentDidMount(){
-      
   }
   
   getData = (method, data = {}) => {
@@ -120,12 +63,12 @@ class Reg_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
       if( json.st === false && json.type == 'auth' ){
-        this.state.history.push("/auth");
+        window.location.pathname = '/auth';
         return;
       }
       
@@ -237,7 +180,7 @@ class Reg_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -258,8 +201,8 @@ class Reg_ extends React.Component {
         
         <Grid container spacing={3} direction="row" justifyContent="center" alignItems="center">
           <Grid item xs={12} sm={6} md={6} lg={4} xl={3}>
-            <div className={this.state.classes.paper}>
-              <Avatar className={this.state.classes.avatar}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
+              <Avatar style={{ borderRadius: 0, width: '100%', height: 150, margin: 0, backgroundColor: '#fff', marginBottom: 20 }}>
                 <img alt="Жако доставка роллов и пиццы" src="../assets/img_other/Favikon.png" style={{ height: '100%' }} />
               </Avatar>
               
@@ -270,7 +213,7 @@ class Reg_ extends React.Component {
                   </Step>
                 ))}
               </Stepper>
-              <div className={this.state.classes.form} style={{ width: '100%' }}>
+              <div style={{ width: '100%' }}>
                 
                 { this.state.activeStep == 0 ?
                   <TextField
@@ -330,14 +273,14 @@ class Reg_ extends React.Component {
                   fullWidth
                   variant="contained"
                   color="primary"
-                  className={this.state.classes.submit}
+                  style={{ marginTop: 10, marginBottom: 10 }}
                   onClick={ this.nextStep.bind(this) }
                 >
                   Дальше
                 </Button>
                 <Grid container>
                   <Grid item xs>
-                    <a href="/auth" className={this.state.classes.textLink}>Вернуться к авторизации</a>
+                    <a href="/auth" style={{ color: '#c03' }}>Вернуться к авторизации</a>
                   </Grid>
                 </Grid>
                 
@@ -351,13 +294,4 @@ class Reg_ extends React.Component {
       </>
     )
   }
-}
-
-export function Reg () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <Reg_ classes={classes} history={history} />
-  );
 }

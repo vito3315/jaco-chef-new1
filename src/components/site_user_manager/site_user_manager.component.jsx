@@ -1,8 +1,4 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -15,85 +11,20 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-
-import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
-
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ListItemText from '@mui/material/ListItemText';
-
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyAutocomplite, MyTextInput, MyDatePickerNew } from '../../stores/elements';
+import { MySelect, MyCheckBox, MyTextInput, MyDatePickerNew } from '../../stores/elements';
 
 import Dropzone from "dropzone";
 
 const queryString = require('query-string');
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    }
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  },
-  backdrop: {
-    zIndex: 999
-  }
-});
 
 function formatDate(date) {
   var d = new Date(date),
@@ -109,7 +40,7 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-class SiteUserManager_ extends React.Component {
+export class SiteUserManager extends React.Component {
   dropzoneOptions = {
     autoProcessQueue: false,
     autoQueue: true,
@@ -127,8 +58,6 @@ class SiteUserManager_ extends React.Component {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'site_user_manager',
       module_name: '',
       is_load: false,
@@ -210,7 +139,7 @@ class SiteUserManager_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -267,8 +196,6 @@ class SiteUserManager_ extends React.Component {
 
     let res = await this.getData('getUser', data);
 
-    console.log( res )
-
     this.setState({
       editUser: res,
       modalUserEdit: true
@@ -283,8 +210,6 @@ class SiteUserManager_ extends React.Component {
 
   async openNewUser(){
     let res = await this.getData('getAllForNew');
-
-    console.log( res )
 
     this.setState({
       editUser: res,
@@ -378,22 +303,17 @@ class SiteUserManager_ extends React.Component {
         file_type = file_type[file_type.length - 1];
         file_type = file_type.toLowerCase();
         
-        console.log('user_id='+user_id)
-
         data.append("filetype", 'user_'+user_id+'.'+file_type);
         data.append("filename", 'user_'+user_id);
         
         this.getOrientation(file, function(orientation) {
           data.append("orientation", orientation);
         })
-        console.log('sending');
       });
 
       this.myDropzone.on("queuecomplete", (data) => {
 
         var check_img = false;
-
-        console.log('queuecomplete!')
 
         this.myDropzone['files'].map(function(item, key){
           if( item['status'] == "error" ){
@@ -405,8 +325,6 @@ class SiteUserManager_ extends React.Component {
           alert('Ошибка при загрузке фотографии')
           return;
         }
-        
-        console.log( 'queuecomplete' )
         
         this.setState({ 
           modalUserEdit: false, 
@@ -425,8 +343,6 @@ class SiteUserManager_ extends React.Component {
     };
 
     let res = await this.getData('saveEditUser', data);
-
-    console.log( res )
 
     if( res.st === false ){
       alert(res.text);
@@ -450,8 +366,6 @@ class SiteUserManager_ extends React.Component {
   async saveNewUser(){
     let is_graph = false;
     let is_graph_ = false;
-
-    console.log( this.state.app_list )
 
     this.state.app_list.map( (item, key) => {
       if( parseInt(this.state.editUser.user.app_id) == parseInt(item.id) ){
@@ -481,22 +395,17 @@ class SiteUserManager_ extends React.Component {
         file_type = file_type[file_type.length - 1];
         file_type = file_type.toLowerCase();
         
-        console.log('user_id='+user_id)
-
         data.append("filetype", 'user_'+user_id+'.'+file_type);
         data.append("filename", 'user_'+user_id);
         
         this.getOrientation(file, function(orientation) {
           data.append("orientation", orientation);
         })
-        console.log('sending');
       });
 
       this.myDropzone.on("queuecomplete", (data) => {
 
         var check_img = false;
-
-        console.log('queuecomplete!')
 
         this.myDropzone['files'].map(function(item, key){
           if( item['status'] == "error" ){
@@ -508,8 +417,6 @@ class SiteUserManager_ extends React.Component {
           alert('Ошибка при загрузке фотографии')
           return;
         }
-        
-        console.log( 'queuecomplete' )
         
         this.setState({ 
           modalUserNew: false, 
@@ -527,8 +434,6 @@ class SiteUserManager_ extends React.Component {
     };
 
     let res = await this.getData('saveNewUser', data);
-
-    console.log( res )
 
     if( res.st === false ){
       alert(res.text);
@@ -604,7 +509,7 @@ class SiteUserManager_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load} style={{ zIndex: 999 }}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -718,13 +623,13 @@ class SiteUserManager_ extends React.Component {
                       <Grid item xs={12}>
                         <Grid container spacing={3}>
                           <Grid item xs={12} sm={4}>
-                            <MySelect classes={this.state.classes} data={this.state.editUser.appointment} value={this.state.editUser.user.app_id} func={ this.changeItem.bind(this, 'app_id') } label='Должность' />
+                            <MySelect data={this.state.editUser.appointment} value={this.state.editUser.user.app_id} func={ this.changeItem.bind(this, 'app_id') } label='Должность' />
                           </Grid>
                           <Grid item xs={12} sm={4}>
-                            <MySelect classes={this.state.classes} data={this.state.editUser.cities} value={this.state.editUser.user.city_id} func={ this.changeItem.bind(this, 'city_id') } label='Город' />
+                            <MySelect data={this.state.editUser.cities} value={this.state.editUser.user.city_id} func={ this.changeItem.bind(this, 'city_id') } label='Город' />
                           </Grid>
                           <Grid item xs={12} sm={4}>
-                            <MySelect classes={this.state.classes} data={this.state.point_list_render} value={this.state.editUser.user.point_id} func={ this.changeItem.bind(this, 'point_id') } label='Точка' />
+                            <MySelect data={this.state.point_list_render} value={this.state.editUser.user.point_id} func={ this.changeItem.bind(this, 'point_id') } label='Точка' />
                           </Grid>
                         </Grid>
                       </Grid>
@@ -852,13 +757,13 @@ class SiteUserManager_ extends React.Component {
                         <Grid item xs={12}>
                           <Grid container spacing={3}>
                             <Grid item xs={12} sm={4}>
-                              <MySelect classes={this.state.classes} data={this.state.editUser.appointment} value={this.state.editUser.user.app_id} func={ this.changeItem.bind(this, 'app_id') } label='Должность' />
+                              <MySelect data={this.state.editUser.appointment} value={this.state.editUser.user.app_id} func={ this.changeItem.bind(this, 'app_id') } label='Должность' />
                             </Grid>
                             <Grid item xs={12} sm={4}>
-                              <MySelect classes={this.state.classes} data={this.state.editUser.cities} value={this.state.editUser.user.city_id} func={ this.changeItem.bind(this, 'city_id') } label='Город' />
+                              <MySelect data={this.state.editUser.cities} value={this.state.editUser.user.city_id} func={ this.changeItem.bind(this, 'city_id') } label='Город' />
                             </Grid>
                             <Grid item xs={12} sm={4}>
-                              <MySelect classes={this.state.classes} data={this.state.point_list_render} value={this.state.editUser.user.point_id} func={ this.changeItem.bind(this, 'point_id') } label='Точка' />
+                              <MySelect data={this.state.point_list_render} value={this.state.editUser.user.point_id} func={ this.changeItem.bind(this, 'point_id') } label='Точка' />
                             </Grid>
                           </Grid>
                         </Grid>
@@ -885,10 +790,10 @@ class SiteUserManager_ extends React.Component {
           </Grid>
           
           <Grid item xs={12} sm={6}>
-            <MySelect classes={this.state.classes} data={this.state.point_list} value={this.state.point_id} func={ this.changeSort.bind(this, 'point_id') } label='Точка' />
+            <MySelect data={this.state.point_list} value={this.state.point_id} func={ this.changeSort.bind(this, 'point_id') } label='Точка' />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <MySelect classes={this.state.classes} data={this.state.app_list} value={this.state.app_id} func={ this.changeSort.bind(this, 'app_id') } label='Должность' />
+            <MySelect data={this.state.app_list} value={this.state.app_id} func={ this.changeSort.bind(this, 'app_id') } label='Должность' />
           </Grid>
 
           <Grid item xs={12} sm={3}>
@@ -933,13 +838,4 @@ class SiteUserManager_ extends React.Component {
       </>
     )
   }
-}
-
-export function SiteUserManager () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <SiteUserManager_ classes={classes} history={history} />
-  );
 }

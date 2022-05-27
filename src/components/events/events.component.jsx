@@ -1,12 +1,7 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -41,57 +36,11 @@ import Typography from '@mui/material/Typography';
 
 const queryString = require('query-string');
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    }
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
-
-class Events_ extends React.Component {
+export class Events extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'events',
       module_name: '',
       is_load: false,
@@ -164,7 +113,7 @@ class Events_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -390,7 +339,7 @@ class Events_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -413,26 +362,26 @@ class Events_ extends React.Component {
                 }
                 
                 <Grid item xs={12} sm={12}>
-                  <MySelect classes={this.state.classes} data={this.state.events} value={this.state.chooseEvent} func={ this.changeEvent.bind(this) } label='Событие' />
+                  <MySelect data={this.state.events} value={this.state.chooseEvent} func={ this.changeEvent.bind(this) } label='Событие' />
                 </Grid>
                 
                 <Grid item xs={12} sm={12}>
-                  <MySelect classes={this.state.classes} data={this.state.points} value={ this.state.eventPoint1 } func={ this.changePoint1.bind(this) } label='Точка' />
+                  <MySelect data={this.state.points} value={ this.state.eventPoint1 } func={ this.changePoint1.bind(this) } label='Точка' />
                 </Grid>
                 
                 { parseInt(this.state.chooseEvent) !== 2 ? null :
                   <>
                     <Grid item xs={6} sm={6}>
-                      <MyTimePicker classes={this.state.classes} value={ this.state.timeStart2 } func={ this.changeTimeStart2.bind(this) } label='Время начала работы' />
+                      <MyTimePicker value={ this.state.timeStart2 } func={ this.changeTimeStart2.bind(this) } label='Время начала работы' />
                     </Grid>
                     <Grid item xs={6} sm={6}>
-                      <MyTimePicker classes={this.state.classes} value={ this.state.timeEnd2 } func={ this.changeTimeEnd2.bind(this) } label='Время окончания работы' />
+                      <MyTimePicker value={ this.state.timeEnd2 } func={ this.changeTimeEnd2.bind(this) } label='Время окончания работы' />
                     </Grid>
                   </>
                 }
                 
                 <Grid item xs={12} sm={12}>
-                  <MyCheckBox classes={this.state.classes} value={ this.state.everyYear1 } func={ this.changeEveryYear1.bind(this) } label='Каждый год' />
+                  <MyCheckBox value={ this.state.everyYear1 } func={ this.changeEveryYear1.bind(this) } label='Каждый год' />
                 </Grid>
                 
               </Grid>
@@ -481,21 +430,18 @@ class Events_ extends React.Component {
           </Grid>
           
           <Grid item xs={12} sm={3}>
-            <MySelect classes={this.state.classes} data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
+            <MySelect  data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
           </Grid>
           <Grid item xs={12} sm={3}>
-            <MySelect classes={this.state.classes} data={this.state.mounths} value={this.state.mounth} func={ this.changeMounth.bind(this) } label='Месяц' />
+            <MySelect  data={this.state.mounths} value={this.state.mounth} func={ this.changeMounth.bind(this) } label='Месяц' />
           </Grid>
           <Grid item xs={12} sm={3}>
-            <MySelect classes={this.state.classes} data={this.state.years} value={this.state.year} func={ this.changeYear.bind(this) } label='Год' />
+            <MySelect  data={this.state.years} value={this.state.year} func={ this.changeYear.bind(this) } label='Год' />
           </Grid>
           <Grid item xs={12} sm={3}>
             <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
           </Grid>
         
-          
-          
-          
           <Grid container direction="row" justifyContent="center" style={{ paddingTop: 20 }}>
             
             { this.state.calendar.map( (item, key) =>
@@ -506,13 +452,13 @@ class Events_ extends React.Component {
                   <Table aria-label="a dense table" style={{ overflow: 'hidden' }}>
                     <TableHead>
                       <TableRow>
-                        <TableCell className={this.state.classes.tableCelHead}>Пн</TableCell>
-                        <TableCell className={this.state.classes.tableCelHead}>Вт</TableCell>
-                        <TableCell className={this.state.classes.tableCelHead}>Ср</TableCell>
-                        <TableCell className={this.state.classes.tableCelHead}>Чт</TableCell>
-                        <TableCell className={this.state.classes.tableCelHead}>Пт</TableCell>
-                        <TableCell className={this.state.classes.tableCelHead}>Сб</TableCell>
-                        <TableCell className={this.state.classes.tableCelHead}>Вс</TableCell>
+                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Пн</TableCell>
+                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Вт</TableCell>
+                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Ср</TableCell>
+                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Чт</TableCell>
+                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Пт</TableCell>
+                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Сб</TableCell>
+                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Вс</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -526,7 +472,7 @@ class Events_ extends React.Component {
                               
                               style={{ color: day.dir ? 'yellow' : day.holy ? '#c03' : '#000' }}
                               
-                              className={ day.event ? this.state.classes.customCel : this.state.classes.tableCel }
+                              className={ day.event ? 'customCel' : 'tableCel' }
                             > { day.day } </TableCell>
                           ) }
                         </TableRow>
@@ -543,13 +489,4 @@ class Events_ extends React.Component {
       </>
     )
   }
-}
-
-export function Events () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <Events_ classes={classes} history={history} />
-  );
 }

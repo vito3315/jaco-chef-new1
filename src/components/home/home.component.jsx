@@ -1,6 +1,4 @@
 import React from 'react';
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 
 import Grid from '@mui/material/Grid';
 
@@ -9,34 +7,11 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 const queryString = require('query-string');
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    }
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  backdrop: {
-    zIndex: theme.zIndex.drawer + 1,
-    color: '#fff',
-  },
-});
-
-class Home_ extends React.Component {
+export class Home extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
       module: 'home',
       module_name: '',
       is_load: false,
@@ -48,10 +23,6 @@ class Home_ extends React.Component {
       onstol: [],
       ordersQueue: []
     };
-  }
-  
-  async componentDidMount(){
-    
   }
   
   getData = (method, data = {}) => {
@@ -89,7 +60,7 @@ class Home_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -104,12 +75,4 @@ class Home_ extends React.Component {
       </>
     )
   }
-}
-
-export function Home () {
-  const classes = useStyles();
-  
-  return (
-    <Home_ classes={classes} />
-  );
 }

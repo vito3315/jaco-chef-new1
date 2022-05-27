@@ -1,8 +1,4 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -29,54 +25,10 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyAutocomplite, MyDaterange, MyDatePickerNew } from '../../stores/elements';
+import { MySelect, MyAutocomplite, MyDatePickerNew } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
 
 const queryString = require('query-string');
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    }
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
 
 function formatDate(date) {
   var d = new Date(date),
@@ -92,13 +44,11 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-class RasByBill_ extends React.Component {
+export class RasByBill extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'ras_by_bill',
       module_name: '',
       is_load: false,
@@ -156,7 +106,7 @@ class RasByBill_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -260,7 +210,7 @@ class RasByBill_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -288,7 +238,7 @@ class RasByBill_ extends React.Component {
           </Grid>
           
           <Grid item xs={12} sm={3}>
-            <MySelect classes={this.state.classes} data={this.state.points} multiple={true} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
+            <MySelect data={this.state.points} multiple={true} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
           </Grid>
           
           <Grid item xs={12} sm={3}>
@@ -299,12 +249,12 @@ class RasByBill_ extends React.Component {
           </Grid>
           
           <Grid item xs={12} sm={3}>
-            <MySelect classes={this.state.classes} data={this.state.items_cat} multiple={false} value={this.state.item_cat} func={ (event) => {this.setState({ item_cat: event.target.value })} } label='Категория товара' />
+            <MySelect data={this.state.items_cat} multiple={false} value={this.state.item_cat} func={ (event) => {this.setState({ item_cat: event.target.value })} } label='Категория товара' />
           </Grid>
           
 
           <Grid item xs={12} sm={12}>
-            <MyAutocomplite classes={this.state.classes} data={this.state.items} multiple={true} value={this.state.myItems} func={ this.changeItems.bind(this) } label='Заготовки' />
+            <MyAutocomplite data={this.state.items} multiple={true} value={this.state.myItems} func={ this.changeItems.bind(this) } label='Заготовки' />
           </Grid>
           <Grid item xs={12} sm={3}>
             <Button variant="contained" onClick={this.getItems.bind(this)}>Показать заготовки</Button>
@@ -497,13 +447,4 @@ class RasByBill_ extends React.Component {
       </>
     )
   }
-}
-
-export function RasByBill () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <RasByBill_ classes={classes} history={history} />
-  );
 }

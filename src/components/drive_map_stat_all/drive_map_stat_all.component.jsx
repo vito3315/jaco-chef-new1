@@ -1,33 +1,22 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox } from '../../stores/elements';
+import { MySelect } from '../../stores/elements';
 
 const queryString = require('query-string');
 
-class DriveMapStatAll_ extends React.Component {
+export class DriveMapStatAll extends React.Component {
   map = null;
 
   constructor(props) {
     super(props);
         
     this.state = {
-      //classes: this.props.classes,
-      history: this.props.history,
       module: 'drive_map_stat_all',
       module_name: '',
       is_load: false,
@@ -75,7 +64,7 @@ class DriveMapStatAll_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -126,184 +115,169 @@ class DriveMapStatAll_ extends React.Component {
   }
   
   getOrders(orders, home, drivers){
+    let objectManager = new ymaps.ObjectManager();
     
-      
-      //setTimeout( () => {
-        let objectManager = new ymaps.ObjectManager();
+    if( !this.map ){
+      ymaps.ready(() => {
+        this.map = new ymaps.Map('map', {
+          center: [home.latitude, home.longitude],
+          zoom: 11
+        }, {
+          searchControlProvider: 'yandex#search'
+        })
         
-        if( !this.map ){
-          ymaps.ready(() => {
-            this.map = new ymaps.Map('map', {
-              center: [home.latitude, home.longitude],
-              zoom: 11
-            }, {
-              searchControlProvider: 'yandex#search'
-            })
-            
-            //дом
-            let myGeoObject = new ymaps.GeoObject({
-              geometry: {
-                type: "Point",
-                coordinates: [home.latitude, home.longitude]
-              },
-            }, {
-              preset: 'islands#blackDotIcon', 
-              iconColor: 'black'
-            })
-            
-            this.map.geoObjects.add(myGeoObject);
-            
-            
-            
-            let json = {
-              "type": "FeatureCollection",
-              "features": []
-            };
-                    
-            orders.map( function(item){
-            
-              json.features.push({
-                type: "Feature",
-                id: item.id,
-                options: {
-                  preset: parseInt(item.status_order) == 6 ? 'islands#blueCircleDotIconWithCaption' : 'islands#circleDotIcon', 
-                  iconColor: item.point_color ? item.point_color : item.color
-                },
-                properties: {
-                  iconCaption: item.point_text,
-                },
-                geometry: {
-                  type: "Point",
-                  coordinates: [item.xy.latitude, item.xy.longitude]
-                },
-              })
-              
-            } )
-            
-            objectManager.add(json);
-
-            drivers.map( function(driver){
-              driver.positions.map( function(pos, key){
-  
-                pos['xy'] = JSON.parse(pos['xy'], true);
-  
-                json.features.push({
-                  type: "Feature",
-                  id: pos.id,
-                  options: {
-                    preset: 'islands#stretchyIcon', 
-                    iconColor: driver.color,
-                  },
-                  properties: {
-                    iconContent: key
-                  },
-                  geometry: {
-                    type: "Point",
-                    coordinates: [pos['xy'][0], pos['xy'][1]],
-                  },
-                })
-  
-  
-              } )
-            } )
-  
-            objectManager.add(json);
-
-            this.map.geoObjects.add(objectManager);
-          });
-        }else{
-          
-          let json = {
-            "type": "FeatureCollection",
-            "features": []
-          };
-                  
-          //дом
+        //дом
+        let myGeoObject = new ymaps.GeoObject({
+          geometry: {
+            type: "Point",
+            coordinates: [home.latitude, home.longitude]
+          },
+        }, {
+          preset: 'islands#blackDotIcon', 
+          iconColor: 'black'
+        })
+        
+        this.map.geoObjects.add(myGeoObject);
+        
+        
+        
+        let json = {
+          "type": "FeatureCollection",
+          "features": []
+        };
+                
+        orders.map( function(item){
+        
           json.features.push({
             type: "Feature",
-            id: 0,
+            id: item.id,
             options: {
-              preset: 'islands#blackDotIcon', 
-              iconColor: 'black'
+              preset: parseInt(item.status_order) == 6 ? 'islands#blueCircleDotIconWithCaption' : 'islands#circleDotIcon', 
+              iconColor: item.point_color ? item.point_color : item.color
+            },
+            properties: {
+              iconCaption: item.point_text,
             },
             geometry: {
               type: "Point",
-              coordinates: [home.latitude, home.longitude]
+              coordinates: [item.xy.latitude, item.xy.longitude]
             },
           })
           
-          
-          orders.map( function(item){
-            
+        } )
+        
+        objectManager.add(json);
+
+        drivers.map( function(driver){
+          driver.positions.map( function(pos, key){
+
+            pos['xy'] = JSON.parse(pos['xy'], true);
+
             json.features.push({
               type: "Feature",
-              id: item.id,
+              id: pos.id,
               options: {
-                preset: parseInt(item.status_order) == 6 ? 'islands#blueCircleDotIconWithCaption' : 'islands#circleDotIcon', 
-                iconColor: item.point_color ? item.point_color : item.color
+                preset: 'islands#stretchyIcon', 
+                iconColor: driver.color,
               },
               properties: {
-                iconCaption: item.point_text,
-                //iconCaption: parseInt(item.status_order) == 6 ? item.close_time_ : parseInt(item.is_pred) == 1 ? item.need_time : parseInt(item.is_my) == 1 ? item.time_start_mini : '',
+                iconContent: key
               },
               geometry: {
                 type: "Point",
-                coordinates: [item.xy.latitude, item.xy.longitude]
+                coordinates: [pos['xy'][0], pos['xy'][1]],
               },
             })
-            
+
+
           } )
-          
-          objectManager.add(json);
+        } )
 
-          drivers.map( function(driver){
-            driver.positions.map( function(pos, key){
+        objectManager.add(json);
 
-              pos['xy'] = JSON.parse(pos['xy'], true);
-
-              json.features.push({
-                type: "Feature",
-                id: pos.id,
-                options: {
-                  preset: 'islands#stretchyIcon', 
-                  iconColor: driver.color,
-                },
-                properties: {
-                  iconContent: key
-                },
-                geometry: {
-                  type: "Point",
-                  coordinates: [pos['xy'][0], pos['xy'][1]],
-                },
-              })
-
-
-            } )
-          } )
-
-          objectManager.add(json);
-
-          this.map.geoObjects.removeAll()
-          this.map.geoObjects.add(objectManager);
-        }
+        this.map.geoObjects.add(objectManager);
+      });
+    }else{
+      
+      let json = {
+        "type": "FeatureCollection",
+        "features": []
+      };
+              
+      //дом
+      json.features.push({
+        type: "Feature",
+        id: 0,
+        options: {
+          preset: 'islands#blackDotIcon', 
+          iconColor: 'black'
+        },
+        geometry: {
+          type: "Point",
+          coordinates: [home.latitude, home.longitude]
+        },
+      })
+      
+      
+      orders.map( function(item){
         
-        /*objectManager.objects.events.add(['click'], (e) => {
-          let order_id = e.get('objectId');
-          let order = this.state.orders.find( (item) => parseInt(item.id) == parseInt(order_id) );
-          
-          if( order ){
-            this.showOrder(order);
-          }
-        });*/
+        json.features.push({
+          type: "Feature",
+          id: item.id,
+          options: {
+            preset: parseInt(item.status_order) == 6 ? 'islands#blueCircleDotIconWithCaption' : 'islands#circleDotIcon', 
+            iconColor: item.point_color ? item.point_color : item.color
+          },
+          properties: {
+            iconCaption: item.point_text,
+            //iconCaption: parseInt(item.status_order) == 6 ? item.close_time_ : parseInt(item.is_pred) == 1 ? item.need_time : parseInt(item.is_my) == 1 ? item.time_start_mini : '',
+          },
+          geometry: {
+            type: "Point",
+            coordinates: [item.xy.latitude, item.xy.longitude]
+          },
+        })
         
-      //}, 300 )
-    
+      } )
+      
+      objectManager.add(json);
+
+      drivers.map( function(driver){
+        driver.positions.map( function(pos, key){
+
+          pos['xy'] = JSON.parse(pos['xy'], true);
+
+          json.features.push({
+            type: "Feature",
+            id: pos.id,
+            options: {
+              preset: 'islands#stretchyIcon', 
+              iconColor: driver.color,
+            },
+            properties: {
+              iconContent: key
+            },
+            geometry: {
+              type: "Point",
+              coordinates: [pos['xy'][0], pos['xy'][1]],
+            },
+          })
+
+
+        } )
+      } )
+
+      objectManager.add(json);
+
+      this.map.geoObjects.removeAll()
+      this.map.geoObjects.add(objectManager);
+    }
   }
 
   render(){
     return (
       <>
-        <Backdrop open={this.state.is_load}>
+        <Backdrop open={this.state.is_load} style={{ zIndex: 99 }}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -336,12 +310,4 @@ class DriveMapStatAll_ extends React.Component {
       </>
     )
   }
-}
-
-export function DriveMapStatAll () {
-  let history = useHistory();
-  
-  return (
-    <DriveMapStatAll_ history={history} />
-  );
 }

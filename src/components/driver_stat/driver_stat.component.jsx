@@ -1,12 +1,7 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -25,53 +20,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyTextInput, MyDaterange, MyDatePickerNew } from '../../stores/elements';
+import { MySelect, MyTextInput, MyDatePickerNew } from '../../stores/elements';
 
 const queryString = require('query-string');
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    }
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
 
 function formatDate(date) {
   var d = new Date(date),
@@ -87,15 +38,13 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-class DriverStat_ extends React.Component {
+export class DriverStat extends React.Component {
   click = false;
 
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'driver_stat',
       module_name: '',
       is_load: false,
@@ -166,7 +115,7 @@ class DriverStat_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -205,15 +154,6 @@ class DriverStat_ extends React.Component {
     })
   }
   
-  changeDateRange(data){
-    let dateStart = data[0] ? formatDate(data[0]) : '';
-    let dateEnd = data[1] ? formatDate(data[1]) : '';
-    
-    this.setState({
-      rangeDate: [dateStart, dateEnd]
-    })
-  }
-
   changeDate(data, event){
     this.setState({
       [data]: formatDate(event)
@@ -381,7 +321,7 @@ class DriverStat_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -414,16 +354,14 @@ class DriverStat_ extends React.Component {
             <Grid container spacing={3}>
               
               <Grid item xs={12} sm={12}>
-                <MyTextInput classes={this.state.classes} type='number' value={ this.state.getSumm } func={ (event) => { this.setState({ getSumm: event.target.value }) } } label='Сумма' />
+                <MyTextInput type='number' value={ this.state.getSumm } func={ (event) => { this.setState({ getSumm: event.target.value }) } } label='Сумма' />
               </Grid>
 
               <Grid item xs={12} sm={12}>
-                <MyTextInput classes={this.state.classes} maxRows={2} value={ this.state.getSummComment } func={ (event) => { this.setState({ getSummComment: event.target.value }) } } label='Комментарий' />
+                <MyTextInput maxRows={2} value={ this.state.getSummComment } func={ (event) => { this.setState({ getSummComment: event.target.value }) } } label='Комментарий' />
               </Grid>
 
             </Grid>
-
-            
 
           </DialogContent>
           <DialogActions>
@@ -528,7 +466,7 @@ class DriverStat_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <MySelect classes={this.state.classes} data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
+            <MySelect data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
           </Grid>
           <Grid item xs={12} sm={6}>
             <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
@@ -584,7 +522,7 @@ class DriverStat_ extends React.Component {
 
                       
                       <TableCell>
-                        <Button variant="contained" onClick={this.getStatDopMain.bind(this, item)} style={{ fontWeight: 'bolder' }}>{item.my_orders}</Button>
+                        <Button variant="contained" onClick={this.getStatDopMain.bind(this, item)} style={{ fontWeight: 'bolder' }}>{item.my_orders ? item.my_orders : 0}</Button>
                       </TableCell>
 
                       
@@ -657,7 +595,7 @@ class DriverStat_ extends React.Component {
                             )
                           }else{
                             return (
-                              <React.Fragment key={key}>
+                              <React.Fragment key={order_k}>
                                 <TableCell style={{textAlign: 'center'}}>{data.full_cash}</TableCell>
                                 <TableCell style={{textAlign: 'center'}}>{data.full_bank}</TableCell>
                                 <TableCell style={{textAlign: 'center'}}>{data.sdacha}</TableCell>
@@ -701,13 +639,4 @@ class DriverStat_ extends React.Component {
       </>
     )
   }
-}
-
-export function DriverStat () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <DriverStat_ classes={classes} history={history} />
-  );
 }

@@ -1,5 +1,4 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -19,13 +18,11 @@ import { MySelect, MyCheckBox } from '../../stores/elements';
 
 const queryString = require('query-string');
 
-class Live_Orders extends React.Component {
+export class LiveOrders extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'live_orders',
       module_name: '',
       is_load: false,
@@ -76,7 +73,7 @@ class Live_Orders extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/auth';
         return;
       }
       
@@ -136,7 +133,7 @@ class Live_Orders extends React.Component {
   render(){
     return (
       <>
-        <Backdrop open={this.state.is_load}>
+        <Backdrop open={this.state.is_load} style={{ zIndex: 99 }}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -144,24 +141,18 @@ class Live_Orders extends React.Component {
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
-          { this.state.points.length > 0 ?
-            <>
-              <Grid item xs={6} sm={6}>
-                <MySelect data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
-              </Grid>
-              <Grid item xs={6} sm={6}>
-                <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
-              </Grid>
-              <Grid item xs={12} sm={12}>
-                <MyCheckBox value={this.state.showReady} func={ this.changeCheckOrders.bind(this) } label='Показывать готовые' />
-              </Grid>
-            </>
-              :
-            null
-          }
           
-          
-          
+            
+          <Grid item xs={6} sm={6}>
+            <MySelect data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
+          </Grid>
+          <Grid item xs={6} sm={6}>
+            <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
+          </Grid>
+          <Grid item xs={12} sm={12}>
+            <MyCheckBox value={this.state.showReady} func={ this.changeCheckOrders.bind(this) } label='Показывать готовые' />
+          </Grid>
+            
           <Grid item xs={12} sm={12}>
             
             <TableContainer component={Paper}>
@@ -266,12 +257,4 @@ class Live_Orders extends React.Component {
       </>
     )
   }
-}
-
-export function LiveOrders () {
-  let history = useHistory();
-  
-  return (
-    <Live_Orders history={history} />
-  );
 }

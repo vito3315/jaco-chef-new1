@@ -1,8 +1,6 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
 import { NavLink as Link, Switch, Route, Redirect } from 'react-router-dom';
 
-import { makeStyles } from '@mui/styles';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
@@ -93,19 +91,13 @@ function a11yProps(index) {
   };
 }
 
-const useStyles = makeStyles((theme) => ({
-  
-}));
-
 // главная страница
-class Revizion_ extends React.Component {
+export class Revizion extends React.Component {
   
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'revizion',
       module_name: '',
       is_load: false,
@@ -128,7 +120,7 @@ class Revizion_ extends React.Component {
       chooseTab: 0,
       
     };
-    }
+  }
 
   // переменные для фильтра
   async componentDidMount(){
@@ -169,7 +161,7 @@ class Revizion_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -203,7 +195,7 @@ class Revizion_ extends React.Component {
     setTimeout( () => {
       this.getRevList();
     }, 50 )
-    }
+  }
 
   // смена ревизии
   changeRev(event){
@@ -220,7 +212,7 @@ class Revizion_ extends React.Component {
   }
 
    // поиск
-   async search(event){
+  async search(event){
 	    
 		let data = {
 			point_id: this.state.point,
@@ -305,14 +297,14 @@ class Revizion_ extends React.Component {
         rec_b: res.rec,
         pf_b: res.pf,
     })
-    }
+  }
 
 
    // рендер главная
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -331,8 +323,8 @@ class Revizion_ extends React.Component {
           <Grid item xs={12} sm={6}>
             <MySelect data={this.state.revList} value={this.state.chooseRev} func={ this.changeRev.bind(this) } label='Ревизия' />
           </Grid>
-		  <Grid item xs={12} sm={6}>
-			<MyTextInput  classes={this.state.classes} func={ this.search.bind(this) } label='Поиск' value={this.state.search} />
+		      <Grid item xs={12} sm={6}>
+			      <MyTextInput func={ this.search.bind(this) } label='Поиск' value={this.state.search} />
           </Grid>
           <Grid item xs={12} sm={6}>
             <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
@@ -410,20 +402,20 @@ class RevizionNewItem extends React.Component{
     };
    }
 
-    // to do del
-    componentWillMount() {
-        //console.log('Will type=' + this.state.type);
-    }
-    componentDidMount() {
-        //console.log('type=' + this.state.type);
-    }
+  // to do del
+  componentWillMount() {
+      //console.log('Will type=' + this.state.type);
+  }
+  componentDidMount() {
+      //console.log('type=' + this.state.type);
+  }
 
-    shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) {
     return (
         this.state.change !== nextState.change ||
         this.state.change !== nextProps.change
     );
-    }
+  }
   
   render(){
     return (
@@ -479,13 +471,11 @@ class RevizionNewItem extends React.Component{
 }
 
 // Новая ревизия
-class RevizionNew_ extends React.Component {
+export class RevizionNew extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'revizion',
       module_name: '',
       is_load: false,
@@ -560,7 +550,7 @@ class RevizionNew_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -728,7 +718,7 @@ class RevizionNew_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -836,22 +826,4 @@ class RevizionNew_ extends React.Component {
       </>
     )
   }
-}
-
-export function Revizion () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <Revizion_ classes={classes} history={history} />
-  );
-}
-
-export function RevizionNew () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <RevizionNew_ classes={classes} history={history} />
-  );
 }

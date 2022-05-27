@@ -1,8 +1,4 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
@@ -22,61 +18,11 @@ import { MyTextInput, TextEditor } from '../../stores/elements';
 
 const queryString = require('query-string');
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    },
-    def: {
-      main: '#353b48',
-      secondary: '#fff'
-    },
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
-
-class CatWork_ extends React.Component {
+export class CatWork extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'cat_work',
       module_name: '',
       is_load: false,
@@ -130,7 +76,7 @@ class CatWork_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -222,7 +168,7 @@ class CatWork_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -237,7 +183,7 @@ class CatWork_ extends React.Component {
               <Grid container spacing={3}>
                 
                 <Grid item xs={12} sm={12}>
-                  <MyTextInput classes={this.state.classes} value={ this.state.nameCat } func={ (event) => { this.setState({ nameCat: event.target.value }) } } label='Название категории' />
+                  <MyTextInput value={ this.state.nameCat } func={ (event) => { this.setState({ nameCat: event.target.value }) } } label='Название категории' />
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
@@ -263,7 +209,7 @@ class CatWork_ extends React.Component {
             <Grid container spacing={3}>
               
               <Grid item xs={12} sm={12}>
-                <MyTextInput classes={this.state.classes} value={ this.state.nameCatNew } func={ (event) => { this.setState({ nameCatNew: event.target.value }) } } label='Название категории' />
+                <MyTextInput value={ this.state.nameCatNew } func={ (event) => { this.setState({ nameCatNew: event.target.value }) } } label='Название категории' />
               </Grid>
 
               <Grid item xs={12} sm={12}>
@@ -301,13 +247,4 @@ class CatWork_ extends React.Component {
       </>
     )
   }
-}
-
-export function CatWork () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <CatWork_ classes={classes} history={history} />
-  );
 }
