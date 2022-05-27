@@ -13,7 +13,7 @@ const app = express();
 const { App } = require( '../src/components/app' );
 
 // import routes
-const routes = require( './routes' );
+//const routes = require( './routes' );
 
 // serve static assets
 app.get( /\.(js|css|map|ico|png|svg)$/, express.static( path.resolve( __dirname, '../dist' ) ) );
@@ -27,9 +27,9 @@ app.get( /\.(js|css|map|ico|png|svg)$/, express.static( path.resolve( __dirname,
 app.use( '*', async ( req, res ) => {
 
     // get matched route
-    const matchRoute = routes.find( route => matchPath( req.originalUrl, route ) );
+    //const matchRoute = routes.find( route => matchPath( req.originalUrl, route ) );
 
-    if( matchRoute ){
+    //if( matchRoute ){
         // fetch data of the matched component
         /*let componentData = null;
         if( typeof matchRoute.component.fetchData === 'function' ) {
@@ -51,7 +51,7 @@ app.use( '*', async ( req, res ) => {
         const helmet = Helmet.renderStatic();
         
         
-        indexHTML = indexHTML.replace('<!-- title -->', `${matchRoute.title}`);
+        //indexHTML = indexHTML.replace('<!-- title -->', `${matchRoute.title}`);
         //indexHTML = indexHTML.replace('<!-- description -->', `<meta name="description" content="${componentData.description}" />`);
         //indexHTML = indexHTML.replace('<h1 class="MuiTypography-root MuiTypography-h5"></h1>', `<h1 class="MuiTypography-root MuiTypography-h5">${componentData.page_h}</h1>`);
         
@@ -77,13 +77,13 @@ app.use( '*', async ( req, res ) => {
 
         // set header and status
         res.contentType( 'text/html' );
-        res.status( matchRoute.code );
+        res.status( 200 );
 
         return res.send( indexHTML );
-    }else{
-        res.status( 302 );
-        return res.redirect("/")
-    }
+    //}else{
+    //    res.status( 302 );
+    //    return res.redirect("/")
+    //}
 } );
 
 // run express server on port 9000
