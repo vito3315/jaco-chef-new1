@@ -26,10 +26,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-import ListItemIcon from '@mui/material/ListItemIcon';
+import CloseIcon from '@mui/icons-material/Close';
 
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 import { MyTextInput, MyDatePickerNew, MySelect, MyAutocomplite, MyCheckBox } from '../../stores/elements';
 
@@ -315,7 +313,32 @@ class AdvertisingCompany_ extends React.Component {
           adv_actual: res.adv_actual,
           adv_old   : res.adv_old,
       })
-  }
+    }
+
+    // удаление РК
+    async delAdv(id) {
+        let data = {
+            point_id: this.state.point_id,
+        };
+
+        if (confirm('Вы действительно хотите удалить рекламную компанию?')) {
+           
+
+            let del = await this.getData('delete_adv', {id : id} );
+            if (!del['st']) {
+                alert('При удалении произошла ошибка');
+            }
+
+            let res = await this.getData('get_adv_point', data);
+
+            this.setState({
+                adv_actual: res.adv_actual,
+                adv_old: res.adv_old,
+            })
+
+        } 
+        
+    }
 
   render(){
     return (
@@ -432,19 +455,21 @@ class AdvertisingCompany_ extends React.Component {
                             <TableCell style={{ textAlign: 'center' }}>Дата начало</TableCell>
                             <TableCell style={{ textAlign: 'center' }}>Дата окончания</TableCell>
                             <TableCell style={{ textAlign: 'center' }}>Точки</TableCell>
+                            <TableCell style={{ textAlign: 'center' }}></TableCell>
                           </TableRow>
                         </TableHead>
 
                         <TableBody>
                         {!this.state.adv_actual ? null :
                            this.state.adv_actual.map((item, key) =>
-                                <TableRow key={key} onClick={this.openCat.bind(this, item)} >
+                                <TableRow key={key}  >
                                     <TableCell style={{ textAlign: 'center' }}>{ key + 1 } </TableCell>
-                                    <TableCell style={{ textAlign: 'center', cursor: 'pointer' }}>{ item.name } </TableCell>
+                                    <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.openCat.bind(this, item)} >{ item.name } </TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>{ item.date_start } </TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>{ item.date_end } </TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>{item.choosePoint.map((it, k) => <React.Fragment key={k}> {it.name} </React.Fragment> )}</TableCell>
-                                </TableRow>
+                                    <TableCell style={{ textAlign: 'center' }}> <CloseIcon onClick={this.delAdv.bind(this, item.id)} /> </TableCell>
+                               </TableRow>
                          )}
                         </TableBody>
                      </Table>
@@ -452,7 +477,7 @@ class AdvertisingCompany_ extends React.Component {
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
-                    <Grid contain>
+                    <Grid container>
                         <Grid item xs={12} sm={12}>
                             <h2 style={{ textAlign: 'center' }}>Не Актвные</h2>
                         </Grid>
@@ -466,18 +491,20 @@ class AdvertisingCompany_ extends React.Component {
                                             <TableCell style={{ textAlign: 'center' }}>Дата начало</TableCell>
                                             <TableCell style={{ textAlign: 'center' }}>Дата окончания</TableCell>
                                             <TableCell style={{ textAlign: 'center' }}>Точки</TableCell>
+                                            <TableCell style={{ textAlign: 'center' }}></TableCell>
                                         </TableRow>
                                     </TableHead>
 
                                     <TableBody>
                                         {!this.state.adv_old ? null :
                                             this.state.adv_old.map((item, key) =>
-                                                <TableRow key={key} onClick={this.openCat.bind(this, item)} >
+                                                <TableRow key={key}  >
                                                     <TableCell style={{ textAlign: 'center' }}>{key + 1} </TableCell>
-                                                    <TableCell style={{ textAlign: 'center', cursor: 'pointer' }}>{item.name} </TableCell>
+                                                    <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.openCat.bind(this, item)} >{item.name} </TableCell>
                                                     <TableCell style={{ textAlign: 'center' }}>{item.date_start} </TableCell>
                                                     <TableCell style={{ textAlign: 'center' }}>{item.date_end} </TableCell>
                                                     <TableCell style={{ textAlign: 'center' }}>{item.choosePoint.map((it, k) => <React.Fragment key={k}> {it.name} </React.Fragment>)}</TableCell>
+                                                    <TableCell style={{ textAlign: 'center' }}> <CloseIcon onClick={this.delAdv.bind(this, item.id )} /> </TableCell>
                                                 </TableRow>
                                             )}
                                     </TableBody>
