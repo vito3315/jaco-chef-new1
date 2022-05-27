@@ -1,17 +1,10 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
 
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
 
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -26,62 +19,11 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-import ListItemIcon from '@mui/material/ListItemIcon';
-
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import CloseIcon from '@mui/icons-material/Close';
 
 import { MyTextInput, MyDatePickerNew, MySelect, MyAutocomplite, MyCheckBox } from '../../stores/elements';
 
 const queryString = require('query-string');
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    },
-    def: {
-      main: '#353b48',
-      secondary: '#fff'
-    },
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
 
 function formatDate(date) {
     var d = new Date(date),
@@ -97,13 +39,11 @@ function formatDate(date) {
     return [year, month, day].join('-');
 }
     
-class AdvertisingCompany_ extends React.Component {
+export class AdvertisingCompany extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'advertising_company',
       module_name: '',
       description: '',
@@ -171,7 +111,7 @@ class AdvertisingCompany_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -315,19 +255,44 @@ class AdvertisingCompany_ extends React.Component {
           adv_actual: res.adv_actual,
           adv_old   : res.adv_old,
       })
-  }
+    }
+
+    // удаление РК
+    async delAdv(id) {
+        let data = {
+            point_id: this.state.point_id,
+        };
+
+        if (confirm('Вы действительно хотите удалить рекламную компанию?')) {
+           
+
+            let del = await this.getData('delete_adv', {id : id} );
+            if (!del['st']) {
+                alert('При удалении произошла ошибка');
+            }
+
+            let res = await this.getData('get_adv_point', data);
+
+            this.setState({
+                adv_actual: res.adv_actual,
+                adv_old: res.adv_old,
+            })
+
+        } 
+        
+    }
 
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
         { !this.state.showItem ? null :
           <Dialog
             open={this.state.modalDialog}
-                    onClose={() => { this.setState({ modalDialog: false,  description: '', name: '', choosePoint: [], date_start: formatDate(new Date()), date_end: formatDate(new Date()) }) } }
+            onClose={() => { this.setState({ modalDialog: false,  description: '', name: '', choosePoint: [], date_start: formatDate(new Date()), date_end: formatDate(new Date()) }) } }
           >
             <DialogTitle>Компания "{this.state.name}"</DialogTitle>
             <DialogContent style={{ paddingTop: 10 }}>
@@ -335,7 +300,7 @@ class AdvertisingCompany_ extends React.Component {
               <Grid container spacing={3}>
                 
                 <Grid item xs={12} sm={12}>
-                    <MyTextInput classes={this.state.classes} value={this.state.name} func={(event) => { this.setState({ name: event.target.value }) }} label='Название акции' />
+                    <MyTextInput value={this.state.name} func={(event) => { this.setState({ name: event.target.value }) }} label='Название акции' />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
@@ -346,11 +311,11 @@ class AdvertisingCompany_ extends React.Component {
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
-                    <MyAutocomplite classes={this.state.classes} data={this.state.points} value={this.state.choosePoint} func={(event, data) => { this.setState({ choosePoint: data }) }} multiple={true} label='Точка' />
+                    <MyAutocomplite data={this.state.points} value={this.state.choosePoint} func={(event, data) => { this.setState({ choosePoint: data }) }} multiple={true} label='Точка' />
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
-                     <MyTextInput classes={this.state.classes} value={this.state.description} func={(event) => { this.setState({ description: event.target.value }) }} label='Описание' />
+                     <MyTextInput value={this.state.description} func={(event) => { this.setState({ description: event.target.value }) }} label='Описание' />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
@@ -376,7 +341,7 @@ class AdvertisingCompany_ extends React.Component {
             <Grid container spacing={3}>
               
                <Grid item xs={12} sm={12}>
-                  <MyTextInput classes={this.state.classes} value={this.state.name} func={(event) => { this.setState({ name: event.target.value }) } } label='Название компании' />
+                  <MyTextInput value={this.state.name} func={(event) => { this.setState({ name: event.target.value }) } } label='Название компании' />
                </Grid>
 
                 <Grid item xs={12} sm={6}>
@@ -387,11 +352,11 @@ class AdvertisingCompany_ extends React.Component {
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
-                    <MyAutocomplite classes={this.state.classes} data={this.state.points} value={this.state.choosePoint} func={(event, data) => { this.setState({ choosePoint: data }) }} multiple={true} label='Точка' />
+                    <MyAutocomplite data={this.state.points} value={this.state.choosePoint} func={(event, data) => { this.setState({ choosePoint: data }) }} multiple={true} label='Точка' />
                 </Grid>
                
                 <Grid item xs={12} sm={12}>
-                     <MyTextInput classes={this.state.classes} value={this.state.description} func={(event) => { this.setState({ description: event.target.value }) }} label='Описание'  />
+                     <MyTextInput value={this.state.description} func={(event) => { this.setState({ description: event.target.value }) }} label='Описание'  />
                  </Grid>
 
                 <Grid item xs={12} sm={6}>
@@ -432,19 +397,21 @@ class AdvertisingCompany_ extends React.Component {
                             <TableCell style={{ textAlign: 'center' }}>Дата начало</TableCell>
                             <TableCell style={{ textAlign: 'center' }}>Дата окончания</TableCell>
                             <TableCell style={{ textAlign: 'center' }}>Точки</TableCell>
+                            <TableCell style={{ textAlign: 'center' }}></TableCell>
                           </TableRow>
                         </TableHead>
 
                         <TableBody>
                         {!this.state.adv_actual ? null :
                            this.state.adv_actual.map((item, key) =>
-                                <TableRow key={key} onClick={this.openCat.bind(this, item)} >
+                                <TableRow key={key}  >
                                     <TableCell style={{ textAlign: 'center' }}>{ key + 1 } </TableCell>
-                                    <TableCell style={{ textAlign: 'center', cursor: 'pointer' }}>{ item.name } </TableCell>
+                                    <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.openCat.bind(this, item)} >{ item.name } </TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>{ item.date_start } </TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>{ item.date_end } </TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>{item.choosePoint.map((it, k) => <React.Fragment key={k}> {it.name} </React.Fragment> )}</TableCell>
-                                </TableRow>
+                                    <TableCell style={{ textAlign: 'center' }}> <CloseIcon onClick={this.delAdv.bind(this, item.id)} /> </TableCell>
+                               </TableRow>
                          )}
                         </TableBody>
                      </Table>
@@ -452,7 +419,7 @@ class AdvertisingCompany_ extends React.Component {
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
-                    <Grid contain>
+                    <Grid container>
                         <Grid item xs={12} sm={12}>
                             <h2 style={{ textAlign: 'center' }}>Не Актвные</h2>
                         </Grid>
@@ -466,18 +433,20 @@ class AdvertisingCompany_ extends React.Component {
                                             <TableCell style={{ textAlign: 'center' }}>Дата начало</TableCell>
                                             <TableCell style={{ textAlign: 'center' }}>Дата окончания</TableCell>
                                             <TableCell style={{ textAlign: 'center' }}>Точки</TableCell>
+                                            <TableCell style={{ textAlign: 'center' }}></TableCell>
                                         </TableRow>
                                     </TableHead>
 
                                     <TableBody>
                                         {!this.state.adv_old ? null :
                                             this.state.adv_old.map((item, key) =>
-                                                <TableRow key={key} onClick={this.openCat.bind(this, item)} >
+                                                <TableRow key={key}  >
                                                     <TableCell style={{ textAlign: 'center' }}>{key + 1} </TableCell>
-                                                    <TableCell style={{ textAlign: 'center', cursor: 'pointer' }}>{item.name} </TableCell>
+                                                    <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.openCat.bind(this, item)} >{item.name} </TableCell>
                                                     <TableCell style={{ textAlign: 'center' }}>{item.date_start} </TableCell>
                                                     <TableCell style={{ textAlign: 'center' }}>{item.date_end} </TableCell>
                                                     <TableCell style={{ textAlign: 'center' }}>{item.choosePoint.map((it, k) => <React.Fragment key={k}> {it.name} </React.Fragment>)}</TableCell>
+                                                    <TableCell style={{ textAlign: 'center' }}> <CloseIcon onClick={this.delAdv.bind(this, item.id )} /> </TableCell>
                                                 </TableRow>
                                             )}
                                     </TableBody>
@@ -490,13 +459,4 @@ class AdvertisingCompany_ extends React.Component {
       </>
     )
   }
-}
-
-export function AdvertisingCompany () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <AdvertisingCompany_ classes={classes} history={history} />
-  );
 }

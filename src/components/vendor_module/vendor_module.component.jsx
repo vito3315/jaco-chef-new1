@@ -1,8 +1,4 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -36,57 +32,11 @@ import Typography from '@mui/material/Typography';
 
 const queryString = require('query-string');
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    }
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
-
-class VendorModule_ extends React.Component {
+export class VendorModule extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'vendor_module',
       module_name: '',
       is_load: false,
@@ -152,7 +102,7 @@ class VendorModule_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -387,7 +337,7 @@ class VendorModule_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -410,7 +360,7 @@ class VendorModule_ extends React.Component {
                   <TableBody>
                     <TableRow style={{ height: 75 }}>
                       <TableCell>
-                        <MySelect classes={this.state.classes} data={this.state.allItems} value={this.state.customAdd} func={ (event) => { this.setState({ customAdd: event.target.value }) } } />
+                        <MySelect data={this.state.allItems} value={this.state.customAdd} func={ (event) => { this.setState({ customAdd: event.target.value }) } } />
                       </TableCell>
                       <TableCell><AddIcon onClick={this.addItemCustom.bind(this)} style={{ cursor: 'pointer' }} /></TableCell>
                     </TableRow>
@@ -436,7 +386,7 @@ class VendorModule_ extends React.Component {
                           <MyTextInput label="" value={ item.sort } func={ this.changeSort.bind(this, item.item_id) } />
                         </TableCell>
                         <TableCell>
-                          <MySelect classes={this.state.classes} data={this.state.nds} value={item.nds} func={ this.changeNDS.bind(this, item.item_id) } />
+                          <MySelect data={this.state.nds} value={item.nds} func={ this.changeNDS.bind(this, item.item_id) } />
                         </TableCell>
                         <TableCell><CloseIcon onClick={ this.delItem.bind(this, item.item_id) } style={{ cursor: 'pointer' }} /></TableCell>
                       </TableRow>
@@ -603,7 +553,7 @@ class VendorModule_ extends React.Component {
           </Grid>
           
           <Grid item xs={12} sm={3}>
-            <MySelect classes={this.state.classes} data={this.state.cities} value={this.state.city} func={ this.changeCity.bind(this) } label='Город' />
+            <MySelect data={this.state.cities} value={this.state.city} func={ this.changeCity.bind(this) } label='Город' />
           </Grid>
           
           <Grid item xs={12} sm={3}>
@@ -639,13 +589,4 @@ class VendorModule_ extends React.Component {
       </>
     )
   }
-}
-
-export function VendorModule () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <VendorModule_ classes={classes} history={history} />
-  );
 }

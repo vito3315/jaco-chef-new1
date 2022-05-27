@@ -26,16 +26,55 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-import { NavLink as Link, Switch, Route } from 'react-router-dom';
+import {
+  Routes,
+  Route,
+  Link,
+  useLocation
+} from "react-router-dom";
 
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 
-import routes from '../../../server/routes';
+//import routes from '../../../server/routes';
 
 const queryString = require('query-string');
+
+import { Home } from '../home';
+import { Auth } from '../auth';
+import { Reg } from '../registration';
+
+import { LiveOrders } from '../live_orders';
+import { Events } from '../events';
+import { RasByBill } from '../ras_by_bill';
+import { CategoryItems } from '../category_items';
+import { VendorModule } from '../vendor_module';
+
+import { VendorItemPrice } from '../vendor_item_price';
+import { Tender } from '../tender';
+import { Revizion, RevizionNew } from '../revizion';
+import { WorkSchedule } from '../work_schedule';
+import { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat, SiteSale2_StatList } from '../site_sale_2';
+
+import { DriveMapStatAll } from '../drive_map_stat_all';
+import { DriverStat } from '../driver_stat';
+import { Concenter } from '../concenter';
+import { SocialNetwork } from '../socialnetwork';
+import { CatWork } from '../cat_work';
+
+import { AppWorkPoint } from '../app_work_point';
+import { AppWork } from '../app_work';
+import { AppWorkShow } from '../app_work_show';
+import { SiteStatMarc } from '../site_stat_marc';
+import { AdvertisingCompany } from '../advertising_company';
+
+import { RasBillAndCook } from '../ras_bill_and_cook';
+import { SkladItemsModule } from '../sklad_items_module';
+import { SiteUserManager } from '../site_user_manager';
+import { PromoItemsStat } from '../promo_items_stat';
+import { SiteItems } from '../site_items';
 
 const theme = createTheme({
     palette: {
@@ -48,7 +87,6 @@ const theme = createTheme({
       },
     },
 });
-
 
 class Header extends React.Component {
   constructor(props) {
@@ -234,13 +272,14 @@ export function NotFound() {
 }
 
 export function App () {
+    let history = useLocation();
     let check_header = true;
     
     if( 
-      window.location.pathname == '/auth/' || 
-      window.location.pathname == '/auth' || 
-      window.location.pathname == '/registration/' ||
-      window.location.pathname == '/registration'
+      history.pathname == '/auth/' || 
+      history.pathname == '/auth' || 
+      history.pathname == '/registration/' ||
+      history.pathname == '/registration'
     ){
       check_header = false;
     }
@@ -256,16 +295,48 @@ export function App () {
           }
           <main style={{flexGrow: 1, overflow: 'auto'}}>
             <Container maxWidth={false} style={{ marginTop: 80 }}>
-        
-              <Switch>
-                { routes.map( (item, key) =>
-                  <Route
-                    key={key}
-                    path={item.path}
-                    exact={ item.exact }
-                    component={ item.component }
-                  />
-                ) }
+          
+              <Routes>
+                
+                <Route path={'/'} exact={ true } element={ <Home /> } />
+                <Route path={'/auth'} exact={ true } element={ <Auth /> } />
+                <Route path={'/registration'} exact={ true } element={ <Reg /> } />
+
+                <Route path={'/live_orders'} exact={ true } element={ <LiveOrders /> } />
+                <Route path={'/events'} exact={ true } element={ <Events /> } />
+                <Route path={'/ras_by_bill'} exact={ true } element={ <RasByBill /> } />
+                <Route path={'/category_items'} exact={ true } element={ <CategoryItems /> } />
+                <Route path={'/vendor_module'} exact={ true } element={ <VendorModule /> } />
+
+                <Route path={'/vendor_item_price'} exact={ true } element={ <VendorItemPrice /> } />
+                <Route path={'/tender'} exact={ true } element={ <Tender /> } />
+                <Route path={'/revizion'} exact={ true } element={ <Revizion /> } />
+                <Route path={'/revizion/new'} exact={ true } element={ <RevizionNew /> } />
+                <Route path={'/work_schedule'} exact={ true } element={ <WorkSchedule /> } />
+                <Route path={'/site_sale_2'} exact={ true } element={ <SiteSale2 /> } />
+                <Route path={'/site_sale_2/new'} exact={ true } element={ <SiteSale2_New /> } />
+                <Route path={'/site_sale_2/edit/:promoId'} exact={ true } element={ <SiteSale2_Edit /> } />
+                <Route path={'/site_sale_2/stat'} exact={ true } element={ <SiteSale2_Stat /> } />
+                <Route path={'/site_sale_2/stat_list'} exact={ true } element={ <SiteSale2_StatList /> } />
+
+                <Route path={'/drive_map_stat_all'} exact={ true } element={ <DriveMapStatAll /> } />
+                <Route path={'/driver_stat'} exact={ true } element={ <DriverStat /> } />
+                <Route path={'/concenter'} exact={ true } element={ <Concenter /> } />
+                <Route path={'/socialnetwork'} exact={ true } element={ <SocialNetwork /> } />
+                <Route path={'/cat_work'} exact={ true } element={ <CatWork /> } />
+
+                <Route path={'/app_work_point'} exact={ true } element={ <AppWorkPoint /> } />
+                <Route path={'/app_work'} exact={ true } element={ <AppWork /> } />
+                <Route path={'/app_work_show'} exact={ true } element={ <AppWorkShow /> } />
+                <Route path={'/site_stat_marc'} exact={ true } element={ <SiteStatMarc /> } />
+                <Route path={'/advertising_company'} exact={ true } element={ <AdvertisingCompany /> } />
+
+                <Route path={'/ras_bill_and_cook'} exact={ true } element={ <RasBillAndCook /> } />
+                <Route path={'/sklad_items_module'} exact={ true } element={ <SkladItemsModule /> } />
+                <Route path={'/site_user_manager'} exact={ true } element={ <SiteUserManager /> } />
+                <Route path={'/promo_items_stat'} exact={ true } element={ <PromoItemsStat /> } />
+                <Route path={'/site_items'} exact={ true } element={ <SiteItems /> } />
+                
                 
                 <Route
                   component={ () =>
@@ -278,8 +349,9 @@ export function App () {
                     </Status>
                   }
                 />
-              </Switch>
-        
+
+              </Routes>
+
             </Container>
           </main>
         </div>

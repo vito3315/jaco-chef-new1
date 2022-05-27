@@ -1,8 +1,5 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
 
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
@@ -17,65 +14,9 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-//import * as am5 from "@amcharts/amcharts5";
-//import * as am5xy from "@amcharts/amcharts5/xy";
-//import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
-
-//import * as am4core from "@amcharts/amcharts4/core";
-//import * as am4charts from "@amcharts/amcharts4/charts";
-
 import { MyTextInput, MySelect, MyAutocomplite, MyDaterange, MyCheckBox, MyDatePickerNew } from '../../stores/elements';
 
 const queryString = require('query-string');
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    },
-    def: {
-      main: '#353b48',
-      secondary: '#fff'
-    },
-  },
-});
-
-const useStyles = makeStyles({
-  formControl: {
-    //margin: theme.spacing(1),
-    width: '100%',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  tableCel: {
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  tableCelHead: {
-    textAlign: 'center',
-    padding: 15
-  },
-  customCel: {
-    backgroundColor: "#bababa",
-    textAlign: 'center',
-    borderRight: '1px solid #e5e5e5',
-    padding: 15,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: "#e5e5e5",
-    },
-  },
-  timePicker: {
-    width: '100%'
-  }
-});
-
 
 function formatDate(date) {
   var d = new Date(date),
@@ -91,7 +32,7 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-class SiteStatMarc_ extends React.Component {
+export class SiteStatMarc extends React.Component {
   chartnewusers = null;
   chartorders = null;
   chartavgsumm = null;
@@ -106,8 +47,6 @@ class SiteStatMarc_ extends React.Component {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'site_stat_marc',
       module_name: '',
       is_load: false,
@@ -176,7 +115,7 @@ class SiteStatMarc_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -1660,7 +1599,7 @@ class SiteStatMarc_ extends React.Component {
   render(){
     return (
       <>
-        <Backdrop className={this.state.classes.backdrop} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -1678,7 +1617,7 @@ class SiteStatMarc_ extends React.Component {
 
 
           <Grid item xs={12} sm={3}>
-            <MyAutocomplite classes={this.state.classes} data={this.state.points} value={this.state.choosePoint} func={ (event, data) => { this.setState({ choosePoint: data }) } } multiple={true} label='Точка' />
+            <MyAutocomplite data={this.state.points} value={this.state.choosePoint} func={ (event, data) => { this.setState({ choosePoint: data }) } } multiple={true} label='Точка' />
           </Grid>
           <Grid item xs={6} sm={3}>
             <MyTextInput value={this.state.promoName} func={ (event) => { this.setState({ promoName: event.target.value }) } } label='Промокод' />
@@ -1960,13 +1899,4 @@ class SiteStatMarc_ extends React.Component {
       </>
     )
   }
-}
-
-export function SiteStatMarc () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <SiteStatMarc_ classes={classes} history={history} />
-  );
 }

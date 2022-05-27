@@ -5,8 +5,6 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
-
-
 import TextField from '@mui/material/TextField';
 
 import FormGroup from '@mui/material/FormGroup';
@@ -16,16 +14,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
 
-//import Grid from '@mui/material/Grid';
 import ruLocale from "date-fns/locale/ru";
-
-/*import DateFnsUtils from '@date-io/date-fns';
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-} from '@material-ui/pickers';*/
-
-//"@date-io/date-fns": "^1.3.13",
 
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -33,14 +22,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
 
-
-//import DateRangePicker from '@mui/lab/DateRangePicker';
-//import AdapterDateFns from '@mui/lab/AdapterDateFns';
-//import LocalizationProvider from '@mui/lab/LocalizationProvider';
-//import DatePicker from '@mui/lab/DatePicker';
 import Typography from '@mui/material/Typography';
-
-//import DatePicker from '@mui/lab/DatePicker';
 
 function formatDate(date) {
   var d = new Date(date),
@@ -61,7 +43,6 @@ export class MyDaterange extends React.PureComponent {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
     };
   }
   
@@ -95,7 +76,6 @@ export class MyAutocomplite extends React.PureComponent {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
     };
   }
   
@@ -132,7 +112,6 @@ export class MySelect extends React.PureComponent {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
     };
   }
   
@@ -162,7 +141,6 @@ export class MyTextInput extends React.PureComponent {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
       type: 'text'
     };
   }
@@ -192,7 +170,6 @@ export class MyTimePicker extends React.PureComponent {
     super(props);
         
     this.state = {
-      //classes: this.props.classes,
       thisVal: ''
     };
   }
@@ -221,7 +198,6 @@ export class MyTimePicker extends React.PureComponent {
         type="time"
         id={ this.props.id ? this.props.id : null }
         value={ this.props.func ? this.props.value : this.state.thisVal }
-        //className={this.state.classes.timePicker}
         style={{ width: '100%' }}
         onChange={this.props.func ? this.props.func : this.onChange.bind(this)}
         onBlur={this.props.onBlur ? this.onBlur.bind(this) : null}
@@ -242,7 +218,6 @@ export class MyDatePicker extends React.PureComponent {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
     };
   }
   
@@ -275,7 +250,6 @@ export class MyDatePickerNew extends React.PureComponent {
     super(props);
         
     this.state = {
-      classes: this.props.classes
     };
   }
   
@@ -301,7 +275,6 @@ export class MyCheckBox extends React.PureComponent {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
     };
   }
   
@@ -329,7 +302,6 @@ export class TextEditor extends React.PureComponent {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
     };
   }
   

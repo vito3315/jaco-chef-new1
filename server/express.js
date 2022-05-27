@@ -42,7 +42,7 @@ app.use( '*', async ( req, res ) => {
         } );
 
         // get HTML string from the `App` component
-        let appHTML = ReactDOMServer.renderToString(
+        let appHTML = ReactDOMServer.renderToPipeableStream(
             <StaticRouter location={ req.originalUrl }>
                 <App />
             </StaticRouter>

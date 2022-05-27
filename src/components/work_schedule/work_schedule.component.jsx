@@ -1,8 +1,4 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
-
-import { makeStyles } from '@mui/styles';
-import { createTheme } from '@mui/material/styles';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -62,20 +58,6 @@ import CheckIcon from '@mui/icons-material/Check';
 import { MySelect, MyCheckBox, MyTimePicker } from '../../stores/elements';
 
 const queryString = require('query-string'); 
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#c03',
-    }
-  },
-});
-
-const useStyles = makeStyles({
-  timePicker: {
-    width: '100%'
-  }
-});
 
 function SimpleDialog(props) {
   const { onClose, selectedValue, open } = props;
@@ -237,13 +219,11 @@ class HeaderItem extends React.Component {
   }
 }
 
-class WorkSchedule_ extends React.Component {
+export class WorkSchedule extends React.Component {
   constructor(props) {
     super(props);
         
     this.state = {
-      classes: this.props.classes,
-      history: this.props.history,
       module: 'work_schedule',
       module_name: '',
       is_load: false,
@@ -374,7 +354,7 @@ class WorkSchedule_ extends React.Component {
     }).then(res => res.json()).then(json => {
       
       if( json.st === false && json.type == 'redir' ){
-        this.state.history.push("/");
+        window.location.pathname = '/';
         return;
       }
       
@@ -884,8 +864,8 @@ class WorkSchedule_ extends React.Component {
                 </AccordionSummary>
                 <AccordionDetails style={{ display: 'flex', flexDirection: 'row' }}>
                   
-                  <MyTimePicker value={this.state.newTimeStart} func={ (event) => { this.setState({ newTimeStart: event.target.value }) } } classes={this.state.classes} label='Время начала работы' />
-                  <MyTimePicker value={this.state.newTimeEnd} func={ (event) => { this.setState({ newTimeEnd: event.target.value }) } } classes={this.state.classes} label='Время окончания работы' />
+                  <MyTimePicker value={this.state.newTimeStart} func={ (event) => { this.setState({ newTimeStart: event.target.value }) } } label='Время начала работы' />
+                  <MyTimePicker value={this.state.newTimeEnd} func={ (event) => { this.setState({ newTimeEnd: event.target.value }) } } label='Время окончания работы' />
                   
                   <AddIcon style={{ minWidth: 50, minHeight: 38, cursor: 'pointer' }} onClick={ this.addTime.bind(this) } />
                   
@@ -901,8 +881,8 @@ class WorkSchedule_ extends React.Component {
                     <Typography>{item.time_start + ' - ' + item.time_end}</Typography>
                   </AccordionSummary>
                   <AccordionDetails style={{ display: 'flex', flexDirection: 'row' }}>
-                    <MyTimePicker value={item.time_start} func={ this.changeHourse.bind(this, 'time_start', key) } classes={this.state.classes} label='Время начала работы' />
-                    <MyTimePicker value={item.time_end} func={ this.changeHourse.bind(this, 'time_end', key) } classes={this.state.classes} label='Время окончания работы' />
+                    <MyTimePicker value={item.time_start} func={ this.changeHourse.bind(this, 'time_start', key) } label='Время начала работы' />
+                    <MyTimePicker value={item.time_end} func={ this.changeHourse.bind(this, 'time_end', key) } label='Время окончания работы' />
                   </AccordionDetails>
                 </Accordion>  
               ) }
@@ -1190,13 +1170,4 @@ class WorkSchedule_ extends React.Component {
       </>
     )
   }
-}
-
-export function WorkSchedule () {
-  const classes = useStyles();
-  let history = useHistory();
-  
-  return (
-    <WorkSchedule_ classes={classes} history={history} />
-  );
 }
