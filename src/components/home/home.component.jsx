@@ -7,7 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 const queryString = require('query-string');
 
-export class Home extends React.Component {
+class Home_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -75,4 +75,10 @@ export class Home extends React.Component {
       </>
     )
   }
+}
+
+export function Home() {
+  return (
+    <Home_ />
+  );
 }

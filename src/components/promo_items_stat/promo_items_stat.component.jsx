@@ -30,7 +30,7 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-export class PromoItemsStat extends React.Component {
+class PromoItemsStat_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -220,4 +220,10 @@ export class PromoItemsStat extends React.Component {
       </>
     )
   }
+}
+
+export function PromoItemsStat() {
+  return (
+    <PromoItemsStat_ />
+  );
 }

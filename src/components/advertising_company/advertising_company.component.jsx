@@ -39,7 +39,7 @@ function formatDate(date) {
     return [year, month, day].join('-');
 }
     
-export class AdvertisingCompany extends React.Component {
+class AdvertisingCompany_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -459,4 +459,10 @@ export class AdvertisingCompany extends React.Component {
       </>
     )
   }
+}
+
+export function AdvertisingCompany() {
+  return (
+    <AdvertisingCompany_ />
+  );
 }

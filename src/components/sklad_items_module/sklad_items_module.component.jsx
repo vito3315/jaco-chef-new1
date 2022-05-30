@@ -34,7 +34,7 @@ import { MySelect, MyCheckBox, MyAutocomplite, MyTextInput } from '../../stores/
 
 const queryString = require('query-string');
 
-export class SkladItemsModule extends React.Component {
+class SkladItemsModule_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -796,4 +796,10 @@ export class SkladItemsModule extends React.Component {
       </>
     )
   }
+}
+
+export function SkladItemsModule() {
+  return (
+    <SkladItemsModule_ />
+  );
 }

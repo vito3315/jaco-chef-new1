@@ -11,7 +11,7 @@ import { MySelect, MyTextInput } from '../../stores/elements';
 import axios from 'axios';
 const queryString = require('query-string');
 
-export class SocialNetwork extends React.Component {
+class SocialNetwork_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -236,4 +236,10 @@ export class SocialNetwork extends React.Component {
       </>
     )
   }
+}
+
+export function SocialNetwork() {
+  return (
+    <SocialNetwork_ />
+  );
 }

@@ -84,7 +84,7 @@ function a11yProps(index) {
   };
 }
 
-export class Concenter extends React.Component {
+class Concenter_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -738,4 +738,10 @@ export class Concenter extends React.Component {
       </>
     )
   }
+}
+
+export function Concenter() {
+  return (
+    <Concenter_ />
+  );
 }

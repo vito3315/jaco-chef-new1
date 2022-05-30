@@ -22,7 +22,7 @@ import { MyTextInput, MySelect } from '../../stores/elements';
 
 const queryString = require('query-string');
 
-export class AppWorkPoint extends React.Component {
+class AppWorkPoint_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -313,4 +313,10 @@ export class AppWorkPoint extends React.Component {
       </>
     )
   }
+}
+
+export function AppWorkPoint() {
+  return (
+    <AppWorkPoint_ />
+  );
 }

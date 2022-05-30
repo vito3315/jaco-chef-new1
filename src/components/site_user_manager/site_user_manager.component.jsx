@@ -40,7 +40,7 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-export class SiteUserManager extends React.Component {
+class SiteUserManager_ extends React.Component {
   dropzoneOptions = {
     autoProcessQueue: false,
     autoQueue: true,
@@ -838,4 +838,10 @@ export class SiteUserManager extends React.Component {
       </>
     )
   }
+}
+
+export function SiteUserManager() {
+  return (
+    <SiteUserManager_ />
+  );
 }

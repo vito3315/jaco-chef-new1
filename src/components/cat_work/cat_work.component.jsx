@@ -18,7 +18,7 @@ import { MyTextInput, TextEditor } from '../../stores/elements';
 
 const queryString = require('query-string');
 
-export class CatWork extends React.Component {
+class CatWork_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -247,4 +247,10 @@ export class CatWork extends React.Component {
       </>
     )
   }
+}
+
+export function CatWork() {
+  return (
+    <CatWork_ />
+  );
 }

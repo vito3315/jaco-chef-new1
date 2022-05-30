@@ -20,7 +20,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 const queryString = require('query-string');
 
-export class Reg extends React.Component {
+class Reg_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -294,4 +294,10 @@ export class Reg extends React.Component {
       </>
     )
   }
+}
+
+export function Reg() {
+  return (
+    <Reg_ />
+  );
 }

@@ -44,7 +44,7 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-export class RasByBill extends React.Component {
+class RasByBill_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -447,4 +447,10 @@ export class RasByBill extends React.Component {
       </>
     )
   }
+}
+
+export function RasByBill() {
+  return (
+    <RasByBill_ />
+  );
 }

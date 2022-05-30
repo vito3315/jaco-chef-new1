@@ -32,7 +32,7 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-export class SiteStatMarc extends React.Component {
+class SiteStatMarc_ extends React.Component {
   chartnewusers = null;
   chartorders = null;
   chartavgsumm = null;
@@ -1899,4 +1899,10 @@ export class SiteStatMarc extends React.Component {
       </>
     )
   }
+}
+
+export function SiteStatMarc() {
+  return (
+    <SiteStatMarc_ />
+  );
 }

@@ -36,7 +36,7 @@ import Typography from '@mui/material/Typography';
 
 const queryString = require('query-string');
 
-export class Events extends React.Component {
+class Events_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -489,4 +489,10 @@ export class Events extends React.Component {
       </>
     )
   }
+}
+
+export function Events() {
+  return (
+    <Events_ />
+  );
 }

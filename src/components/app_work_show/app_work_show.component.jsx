@@ -57,7 +57,7 @@ function a11yProps(index) {
   };
 }
 
-export class AppWorkShow extends React.Component {
+class AppWorkShow_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -327,4 +327,10 @@ export class AppWorkShow extends React.Component {
       </>
     )
   }
+}
+
+export function AppWorkShow() {
+  return (
+    <AppWorkShow_ />
+  );
 }
