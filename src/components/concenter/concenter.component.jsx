@@ -466,6 +466,16 @@ class Concenter_ extends React.Component {
                 <Grid item xs={12}>
                   <span>{this.state.showOrder.order.type_order}: {this.state.showOrder.order.type_order_addr_new}</span>
                 </Grid>
+                { parseInt(this.state.showOrder.order.type_order_) == 1 ?
+                  parseInt(this.state.showOrder.order.fake_dom) == 0 ?
+                    <Grid item xs={12}>
+                      <b>Домофон не работает</b>
+                    </Grid>
+                      :
+                    null
+                    :
+                  null
+                }
                 <Grid item xs={12}>
                   <span>{this.state.showOrder.order.time_order_name}: {this.state.showOrder.order.time_order}</span>
                 </Grid>
