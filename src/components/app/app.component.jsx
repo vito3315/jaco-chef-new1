@@ -38,8 +38,6 @@ import Autocomplete from '@mui/material/Autocomplete';
 
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 
-//import routes from '../../../server/routes';
-
 const queryString = require('query-string');
 
 import { Home } from '../home';
@@ -75,6 +73,8 @@ import { SkladItemsModule } from '../sklad_items_module';
 import { SiteUserManager } from '../site_user_manager';
 import { PromoItemsStat } from '../promo_items_stat';
 import { SiteItems } from '../site_items';
+
+import { HotMap } from '../hot_map';
 
 const theme = createTheme({
     palette: {
@@ -336,6 +336,8 @@ export function App () {
                 <Route path={'/site_user_manager'} exact={ true } element={ <SiteUserManager /> } />
                 <Route path={'/promo_items_stat'} exact={ true } element={ <PromoItemsStat /> } />
                 <Route path={'/site_items'} exact={ true } element={ <SiteItems /> } />
+
+                <Route path={'/hot_map'} exact={ true } element={ <HotMap /> } />
                 
                 
                 <Route
