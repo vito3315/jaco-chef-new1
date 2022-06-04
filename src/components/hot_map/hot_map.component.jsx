@@ -8,7 +8,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import Typography from '@mui/material/Typography';
 
-import { MySelect, MyDatePickerNew, MyTimePicker } from '../../stores/elements';
+import { MySelect, MyDatePickerNew, MyTimePicker, MyCheckBox } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -125,6 +125,7 @@ class HotMap_ extends React.Component {
       date_end: this.state.date_end,
       time_start: this.state.time_start,
       time_end: this.state.time_end,
+      is_new: this.state.is_new,
     };
     
     let res = await this.getData('get_orders', data);
@@ -359,7 +360,8 @@ class HotMap_ extends React.Component {
       date_end: this.state.date_end,
       time_start: this.state.time_start,
       time_end: this.state.time_end,
-
+      is_new: this.state.is_new,
+      
       zone: new_this_zone[ new_this_zone.length - 1 ]
     };
 
@@ -380,8 +382,17 @@ class HotMap_ extends React.Component {
   }
 
   changeData(type, event){
+
+    let data = '';
+
+    if( type == 'is_new' ){
+      data = event.target.checked == true ? 1 : 0;
+    }else{
+      data = event.target.value;
+    }
+
     this.setState({
-      [ type ]: event.target.value
+      [ type ]: data
     })
   }
 
@@ -400,7 +411,10 @@ class HotMap_ extends React.Component {
           <Grid item xs={12} sm={6}>
             <MySelect data={this.state.cities} value={this.state.city_id} func={ this.changeCity.bind(this) } label='Город' />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={3}>
+            <MyCheckBox value={ this.state.is_new == 1 ? true : false } func={ this.changeData.bind(this, 'is_new') } label='Только новые клиенты' />
+          </Grid>
+          <Grid item xs={12} sm={3}>
             <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
           </Grid>
 
@@ -429,7 +443,7 @@ class HotMap_ extends React.Component {
                 <Typography>Заказов в зоне: {this.state.statTrueCount}</Typography>
               </Grid>
               <Grid item xs={6}>
-                <Typography>Всего заказов: {this.state.statAllCount}</Typography>
+                <Typography>Всего заказов в городе: {this.state.statAllCount}</Typography>
               </Grid>
             </Grid>
           </Grid>
