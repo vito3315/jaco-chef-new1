@@ -3,8 +3,8 @@
     "",
     "\\src",
     "\\src\\components",
-    "\\src\\components\\promo_items_stat"
+    "\\src\\components\\promo_items_stat",
+    "\\src\\components\\site_stat_marc"
   ],
-  "SelectedNode": "\\src\\components\\advertising_company",
   "PreviewInSolutionExplorer": false
 }

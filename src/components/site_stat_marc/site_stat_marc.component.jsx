@@ -43,6 +43,8 @@ export class SiteStatMarc extends React.Component {
   chartavgsummD = null;
   chartcountposD = null;
 
+ 
+
   constructor(props) {
     super(props);
         
@@ -78,9 +80,13 @@ export class SiteStatMarc extends React.Component {
         {id: 2, name: 'График по месяцам'},
         {id: 3, name: 'График по дням'},
       ],
-      typeShow: 1
+        typeShow: 1,
+
+        // правка от 06.06.22
+        colors: [0x679499, 0x2941A, 0x62941A, 0xFF0000, 0x46bdc6, 0xFFB6C1,
+            0x679499, 0x2941A, 0x62941A, 0xFF0000, 0x46bdc6, 0xFFB6C1]
     };
-    }
+  }
 
    
 
@@ -192,8 +198,6 @@ export class SiteStatMarc extends React.Component {
         this.renderCountPosD(res.count_pos);
     }
   }
-
-  
 
   renderGraphNewUsers(MyData){
     if( this.chartnewusers ){
@@ -389,9 +393,7 @@ export class SiteStatMarc extends React.Component {
         baseInterval: { timeUnit: "day", count: 1 },
         startLocation: 0.5,
         endLocation: 0.5,
-        renderer: am5xy.AxisRendererX.new(root, {
-          minGridDistance: 30
-        })
+        renderer: am5xy.AxisRendererX.new(root, {})
       })
     );
 
@@ -687,10 +689,10 @@ export class SiteStatMarc extends React.Component {
               categoryField: "category",
               extraTooltipPrecision: 1,
               renderer: am5xy.AxisRendererY.new(root, { inversed: true }),
-              tooltip: am5.Tooltip.new(root, {
-                  themeTags: ["axis"],
-                  animationDuration: 200
-              })
+              //tooltip: am5.Tooltip.new(root, {
+              //    themeTags: ["axis"],
+              //    animationDuration: 200
+              //})
           })
       );
 
@@ -699,23 +701,21 @@ export class SiteStatMarc extends React.Component {
     function createSeries(name, field, data) {
      
       var series = chart.series.push( 
-      am5xy.SmoothedXLineSeries.new(root, {
+        am5xy.SmoothedXLineSeries.new(root, {
           name: name,
           xAxis: xAxis, 
           yAxis: yAxis, 
           valueYField: field,
-          //fill: chart.get("colors").getIndex(13),
           strokeWidth: 5,
           valueXField: "date",
           tooltip: am5.Tooltip.new(root, {}),
           maskBullets: false
         }) 
-        );
+      );
 
       series.strokes.template.set("strokeWidth", 2);
 
       if (name == 'Всего') {
-          //series.strokes.template.set("stroke", 'red');
           series.strokes.template.set("strokeWidth", 8)
       }
        
@@ -732,68 +732,78 @@ export class SiteStatMarc extends React.Component {
       series.data.setAll(data);
     }
 
-    // Новый графи со столбиками 
+      // Новый график рекламнеы компании, заказы по дням
+      let colors = this.state.colors;
       function createSeries2(name, field, data) {
-        console.log('data=',data);
-        let cat = [];
-        // let colors = [0x6794DA, 0x62941A];
 
-        data.map((item, k) => {
-            data[k].name        = item.category;
-            data[k].category    = item.description;
-           // data[k].color       = colors[k];
-            cat.push({ 'category'   : item.description } ); // работает при замени кат на деск
-        })
-      
-        // привязка категории
-        yAxis2.data.setAll(cat);
-       
-        var legend = chart.children.push(am5.Legend.new(root, {
-            centerX: am5.p50,
-            x: am5.p50,
-            clickTarget: 'none'
-        }));
+          let cat = [];
+          data.map((item, k) => {
+              data[k].name = item.category;
+              data[k].promo = (item.promo != "" || item.promo.length > 0) ? '\nПромокод: ' + item.promo : '';
+              data[k].columnSettings.fill = am5.color(colors[k]);
+              cat.push({ 'category': item.category })
+          })
 
-        // проверка  на пустой массив
-        var series2 = null;
-        data.map(function (item, key) {
-         
-            series2 = chart.series.push(
-                am5xy.ColumnSeries.new(root, {
-                    name: item.name,
-                    xAxis: xAxis,
-                    yAxis: yAxis2,
-                    openValueXField: "fromDate",
-                    valueXField: "toDate",
-                    categoryYField: "category",
-                    sequencedInterpolation: true,
-                    //fill: am5.color(colors[key])
-                    fill: am5.color(0x6794DA)
-                })
-            );
+          // привязка категории
+          yAxis2.data.setAll(cat);
 
-            series2.columns.template.setAll({
-                opacity: 0.5,
-            }); 
+          // инфилизация настроик графика
+          var series2 = null;
+          let ser_settings = {
+              xAxis: xAxis,
+              yAxis: yAxis2,
+              openValueXField: "fromDate",
+              valueXField: "toDate",
+              categoryYField: "category",
+              sequencedInterpolation: true,
+          }
 
-            series2.data.processor = am5.DataProcessor.new(root, {
-                dateFields: ["fromDate", "toDate"],
-                dateFormat: "yyyy-MM-dd HH:mm"
-            });
-            legend.data.push(series2);
-        })
-        series2.data.setAll(data);
-    }
+          // перебор массия для заполнения подсказки и цвета Рек. Компании
+          data.map(function (item, key) {
+              ser_settings['fill'] = am5.color(colors[key]);
 
-    createSeries("Всего", "value", data_all);
-    createSeries("Самовывозов", "value", data_pic);
-    createSeries("Доставок", "value", data_dev);
-    createSeries("Зал", "value", data_hall);
+              series2 = chart.series.push(
+                  am5xy.ColumnSeries.new(root, ser_settings));
 
-    // правка от 08.04 показываем столбики
-   if (this.state.is_show_adv && MyData.adv_data.length > '1') {
+              series2.columns.template.setAll({
+                  templateField: "columnSettings",
+                  strokeOpacity: 0,
+                  tooltipText: "[bold]{category}[/]\n{description}\n" +
+                      "{openValueX.formatDate('yyyy-MM-dd')} - {valueX.formatDate('yyyy-MM-dd')}" +
+                      "{promo}"
+              });
+
+              series2.bullets.push(function () {
+                  return am5.Bullet.new(root, {
+                      sprite: am5.Circle.new(root, {
+                          radius: 2,
+                          fill: series2.get("fill")
+                      })
+                  });
+              });
+          })
+
+          series2.columns.template.setAll({
+              opacity: 0.5,
+          });
+
+          series2.data.processor = am5.DataProcessor.new(root, {
+              dateFields: ["fromDate", "toDate"],
+              dateFormat: "yyyy-MM-dd HH:mm"
+          });
+
+          series2.data.setAll(data);
+      }
+
+      createSeries("Всего", "value", data_all);
+      createSeries("Самовывозов", "value", data_pic);
+      createSeries("Доставок", "value", data_dev);
+      createSeries("Зал", "value", data_hall);
+
+     // правка от 08.04 показываем столбики
+     if (this.state.is_show_adv && MyData.adv_data.length > '1') {
         createSeries2("Акция", "value", MyData.adv_data);
-    }
+     }
     // Add cursor
     chart.set("cursor", am5xy.XYCursor.new(root, {
       behavior: "zoomXY",
@@ -891,17 +901,7 @@ export class SiteStatMarc extends React.Component {
     xAxis.get("dateFormats")["day"] = "MM/dd";
     xAxis.get("periodChangeDateFormats")["day"] = "MM/dd";
 
-      var yAxis2 = chart.yAxes.push(
-          am5xy.CategoryAxis.new(root, {
-              categoryField: "category",
-              extraTooltipPrecision: 1,
-              renderer: am5xy.AxisRendererY.new(root, { inversed: true }),
-              tooltip: am5.Tooltip.new(root, {
-                  themeTags: ["axis"],
-                  animationDuration: 200
-              })
-          })
-      );
+     
 
       // Create series правка 4 Заказы по дням
       function createSeries(name, field, data) {
@@ -971,6 +971,11 @@ export class SiteStatMarc extends React.Component {
       am5themes_Animated.new(root)
     ]);
 
+    root.dateFormatter.setAll({
+       dateFormat: "yyyy-MM-dd",
+       dateFields: ["valueX", "openValueX"]
+    });
+
     var chart = root.container.children.push( 
       am5xy.XYChart.new(root, {
         panY: false,
@@ -1039,25 +1044,25 @@ export class SiteStatMarc extends React.Component {
         baseInterval: { timeUnit: "day", count: 1 },
         startLocation: 0.5,
         endLocation: 0.5,
-        renderer: am5xy.AxisRendererX.new(root, {
-          minGridDistance: 30
-        })
+        renderer: am5xy.AxisRendererX.new(root, {})
       })
     );
 
     xAxis.get("dateFormats")["day"] = "MM/dd";
     xAxis.get("periodChangeDateFormats")["day"] = "MM/dd";
-      var yAxis2 = chart.yAxes.push(
-          am5xy.CategoryAxis.new(root, {
-              categoryField: "category",
-              extraTooltipPrecision: 1,
-              renderer: am5xy.AxisRendererY.new(root, { inversed: true }),
-              tooltip: am5.Tooltip.new(root, {
-                  themeTags: ["axis"],
-                  animationDuration: 200
-              })
-          })
-      );
+
+    var yAxis2 = chart.yAxes.push(
+        am5xy.CategoryAxis.new(root, {
+            categoryField: "category",
+            extraTooltipPrecision: 1,
+            renderer: am5xy.AxisRendererY.new(root, { inversed: true }),
+            //tooltip: am5.Tooltip.new(root, {
+            //    themeTags: ["axis"],
+            //    opacity: 0.4,
+            //    animationDuration: 200
+            //})
+        })
+    );
 
       // Create series правка 4 Заказы по дням
       function createSeries(name, field, data) {
@@ -1068,7 +1073,6 @@ export class SiteStatMarc extends React.Component {
                   xAxis: xAxis,
                   yAxis: yAxis,
                   valueYField: field,
-                  //fill: chart.get("colors").getIndex(13),
                   strokeWidth: 5,
                   valueXField: "date",
                   tooltip: am5.Tooltip.new(root, {}),
@@ -1079,7 +1083,6 @@ export class SiteStatMarc extends React.Component {
           series.strokes.template.set("strokeWidth", 2);
 
           if (name == 'Всего') {
-              //series.strokes.template.set("stroke", 'red');
               series.strokes.template.set("strokeWidth", 8)
           }
 
@@ -1096,56 +1099,66 @@ export class SiteStatMarc extends React.Component {
           series.data.setAll(data);
       }
 
-      // Новый графи со столбиками  средний чек за день
+      // Новый график Рекламные компании, Средний чек за день
+      let colors = this.state.colors;
       function createSeries2(name, field, data) {
-          let cat = [];
-          // let colors = [0x6794DA, 0x62941A];
 
+          let cat = [];
           data.map((item, k) => {
-              data[k].name      = item.category;
-              data[k].category  = item.description;
-              cat.push({ 'category': item.description }); // работает при замени кат на деск
+              data[k].name  = item.category;
+              data[k].promo = (item.promo != "" || item.promo.length > 0) ? '\nПромокод: ' + item.promo : '';
+              data[k].columnSettings.fill = am5.color(colors[k]);
+              cat.push({ 'category': item.category })
           })
 
           // привязка категории
           yAxis2.data.setAll(cat);
 
-          var legend = chart.children.push(am5.Legend.new(root, {
-              centerX: am5.p50,
-              x: am5.p50,
-              clickTarget: 'none'
-          }));
-
-          // проверка  на пустой массив
+          // инфилизация настроик графика
           var series2 = null;
-          console.log('data_new=', data);
-          data.map(function (item, key) {
+          let ser_settings = {
+              xAxis: xAxis,
+              yAxis: yAxis2,
+              openValueXField: "fromDate",
+              valueXField: "toDate",
+              categoryYField: "category",
+              sequencedInterpolation: true,
+          }
 
-              //console.log('item=', item);
+          // перебор массия для заполнения подсказки и цвета Рек. Компании
+          data.map(function (item, key) {
+              ser_settings['fill'] = am5.color(colors[key]);
+
               series2 = chart.series.push(
-                  am5xy.ColumnSeries.new(root, {
-                      name: item.name,
-                      xAxis: xAxis,
-                      yAxis: yAxis2,
-                      openValueXField: "fromDate",
-                      valueXField: "toDate",
-                      categoryYField: "category",
-                      sequencedInterpolation: true,
-                      //fill: am5.color(colors[key])
-                      fill: am5.color(0x6794DA)
-                  })
-              );
+                  am5xy.ColumnSeries.new(root, ser_settings));
 
               series2.columns.template.setAll({
-                  opacity: 0.5,
+                  templateField: "columnSettings",
+                  strokeOpacity: 0,
+                  tooltipText: "[bold]{category}[/]\n{description}\n" +
+                      "{openValueX.formatDate('yyyy-MM-dd')} - {valueX.formatDate('yyyy-MM-dd')}" +
+                      "{promo}"
               });
 
-              series2.data.processor = am5.DataProcessor.new(root, {
-                  dateFields: ["fromDate", "toDate"],
-                  dateFormat: "yyyy-MM-dd HH:mm"
+              series2.bullets.push(function () {
+                  return am5.Bullet.new(root, {
+                      sprite: am5.Circle.new(root, {
+                          radius: 2,
+                          fill: series2.get("fill")
+                      })
+                  });
               });
-              legend.data.push(series2);
           })
+
+          series2.columns.template.setAll({
+              opacity: 0.5,
+          });
+
+          series2.data.processor = am5.DataProcessor.new(root, {
+              dateFields: ["fromDate", "toDate"],
+              dateFormat: "yyyy-MM-dd HH:mm"
+          });
+
           series2.data.setAll(data);
       }
 
@@ -1380,6 +1393,7 @@ export class SiteStatMarc extends React.Component {
     }));
   }
 
+  // Позиций по дням
   renderCountPosD(MyData){
     if( this.chartcountposD ){
       this.chartcountposD.dispose();
@@ -1390,8 +1404,13 @@ export class SiteStatMarc extends React.Component {
     this.chartcountposD = root;
 
     root.setThemes([
-      am5themes_Animated.new(root)
+       am5themes_Animated.new(root)
     ]);
+
+    root.dateFormatter.setAll({
+       dateFormat: "yyyy-MM-dd",
+       dateFields: ["valueX", "openValueX"]
+    });
 
     var chart = root.container.children.push( 
       am5xy.XYChart.new(root, {
@@ -1438,9 +1457,7 @@ export class SiteStatMarc extends React.Component {
         baseInterval: { timeUnit: "day", count: 1 },
         startLocation: 0.5,
         endLocation: 0.5,
-        renderer: am5xy.AxisRendererX.new(root, {
-          minGridDistance: 30
-        })
+        renderer: am5xy.AxisRendererX.new(root, {})
       })
     );
 
@@ -1452,10 +1469,10 @@ export class SiteStatMarc extends React.Component {
               categoryField: "category",
               extraTooltipPrecision: 1,
               renderer: am5xy.AxisRendererY.new(root, { inversed: true }),
-              tooltip: am5.Tooltip.new(root, {
-                  themeTags: ["axis"],
-                  animationDuration: 200
-              })
+              //tooltip: am5.Tooltip.new(root, {
+              //    themeTags: ["axis"],
+              //    animationDuration: 200
+              //})
           })
       );
 
@@ -1496,56 +1513,66 @@ export class SiteStatMarc extends React.Component {
           series.data.setAll(data);
       }
 
-      // Новый графи со столбиками, Позиций по дням
+      // Новый график Рекламные компании, Позиций по дням
+      let colors = this.state.colors;
       function createSeries2(name, field, data) {
-          let cat = [];
-          // let colors = [0x6794DA, 0x62941A];
 
+          let cat = [];
           data.map((item, k) => {
               data[k].name = item.category;
-              data[k].category = item.description;
-              // data[k].color       = colors[k];
-              cat.push({ 'category': item.description }); // работает при замени кат на деск
+              data[k].promo = (item.promo != "" || item.promo.length > 0) ? '\nПромокод: ' + item.promo : '';
+              data[k].columnSettings.fill = am5.color(colors[k]);
+              cat.push({ 'category': item.category })
           })
 
           // привязка категории
           yAxis2.data.setAll(cat);
 
-          var legend = chart.children.push(am5.Legend.new(root, {
-              centerX: am5.p50,
-              x: am5.p50,
-              clickTarget: 'none'
-          }));
-
-          // проверка  на пустой массив
+          // инфилизация настроик графика
           var series2 = null;
-          data.map(function (item, key) {
+          let ser_settings = {
+              xAxis: xAxis,
+              yAxis: yAxis2,
+              openValueXField: "fromDate",
+              valueXField: "toDate",
+              categoryYField: "category",
+              sequencedInterpolation: true,
+          }
 
-              //console.log('item=', item);
+          // перебор массия для заполнения подсказки и цвета Рек. Компании
+          data.map(function (item, key) {
+              ser_settings['fill'] = am5.color(colors[key]);
+
               series2 = chart.series.push(
-                  am5xy.ColumnSeries.new(root, {
-                      name: item.name,
-                      xAxis: xAxis,
-                      yAxis: yAxis2,
-                      openValueXField: "fromDate",
-                      valueXField: "toDate",
-                      categoryYField: "category",
-                      sequencedInterpolation: true,
-                      //fill: am5.color(colors[key])
-                      fill: am5.color(0x6794DA)
-                  })
-              );
+                  am5xy.ColumnSeries.new(root, ser_settings));
 
               series2.columns.template.setAll({
-                  opacity: 0.5,
+                  templateField: "columnSettings",
+                  strokeOpacity: 0,
+                  tooltipText: "[bold]{category}[/]\n{description}\n" +
+                      "{openValueX.formatDate('yyyy-MM-dd')} - {valueX.formatDate('yyyy-MM-dd')}" +
+                      "{promo}"
               });
 
-              series2.data.processor = am5.DataProcessor.new(root, {
-                  dateFields: ["fromDate", "toDate"],
-                  dateFormat: "yyyy-MM-dd HH:mm"
+              series2.bullets.push(function () {
+                  return am5.Bullet.new(root, {
+                      sprite: am5.Circle.new(root, {
+                          radius: 2,
+                          fill: series2.get("fill")
+                      })
+                  });
               });
-              legend.data.push(series2);
           })
+
+          series2.columns.template.setAll({
+              opacity: 0.5,
+          });
+
+          series2.data.processor = am5.DataProcessor.new(root, {
+              dateFields: ["fromDate", "toDate"],
+              dateFormat: "yyyy-MM-dd HH:mm"
+          });
+
           series2.data.setAll(data);
       }
 

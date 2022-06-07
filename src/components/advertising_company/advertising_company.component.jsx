@@ -47,6 +47,7 @@ export class AdvertisingCompany extends React.Component {
       module: 'advertising_company',
       module_name: '',
       description: '',
+      promo: '',
       is_load: false,
       
       adv_actual: [],
@@ -147,6 +148,7 @@ export class AdvertisingCompany extends React.Component {
       id              : item.id,
       description     : item.description,
       choosePoint     : item.choosePoint,
+      promo           : item.promo,
     })
     
   }
@@ -163,6 +165,7 @@ export class AdvertisingCompany extends React.Component {
         is_active   : this.state.is_active,
         id          : this.state.id,
         description : this.state.description,
+        promo       : this.state.promo,
      };
 
       let res = await this.getData('save_edit', data);
@@ -196,7 +199,8 @@ export class AdvertisingCompany extends React.Component {
           date_start    : this.state.date_start,
           date_end      : this.state.date_end,
           is_active     : this.state.is_active,
-          description   : this.state.description
+          description   : this.state.description,
+          promo         : this.state.promo,
       };
 
     let res = await this.getData('save_new', data);
@@ -292,7 +296,7 @@ export class AdvertisingCompany extends React.Component {
         { !this.state.showItem ? null :
           <Dialog
             open={this.state.modalDialog}
-            onClose={() => { this.setState({ modalDialog: false,  description: '', name: '', choosePoint: [], date_start: formatDate(new Date()), date_end: formatDate(new Date()) }) } }
+                    onClose={() => { this.setState({ modalDialog: false, description: '', name: '', promo: '', choosePoint: [], date_start: formatDate(new Date()), date_end: formatDate(new Date()) }) } }
           >
             <DialogTitle>Компания "{this.state.name}"</DialogTitle>
             <DialogContent style={{ paddingTop: 10 }}>
@@ -318,6 +322,10 @@ export class AdvertisingCompany extends React.Component {
                      <MyTextInput value={this.state.description} func={(event) => { this.setState({ description: event.target.value }) }} label='Описание' />
                 </Grid>
 
+                <Grid item xs={12} sm={12}>
+                     <MyTextInput value={this.state.promo} func={(event) => { this.setState({ promo: event.target.value }) }} label='Промокод' />
+                </Grid>
+
                 <Grid item xs={12} sm={6}>
                     <MyCheckBox label='Показать акцию' value={this.state.is_active == 1 ? true : false} func={this.changeChekBox.bind(this, 'is_active')} />
                 </Grid>
@@ -333,7 +341,7 @@ export class AdvertisingCompany extends React.Component {
 
         <Dialog
           open={this.state.modalDialogNew}
-                onClose={() => { this.setState({ modalDialogNew: false, description: '', name: '', choosePoint: [], date_start: formatDate(new Date()), date_end: formatDate(new Date()) }) } }
+                onClose={() => { this.setState({ modalDialogNew: false, description: '', name: '', promo: '', choosePoint: [], date_start: formatDate(new Date()), date_end: formatDate(new Date()) }) } }
         >
           <DialogTitle>Новая акция</DialogTitle>
           <DialogContent style={{ paddingTop: 10 }}>
@@ -357,7 +365,11 @@ export class AdvertisingCompany extends React.Component {
                
                 <Grid item xs={12} sm={12}>
                      <MyTextInput value={this.state.description} func={(event) => { this.setState({ description: event.target.value }) }} label='Описание'  />
-                 </Grid>
+                </Grid>
+
+                <Grid item xs={12} sm={12}>
+                    <MyTextInput value={this.state.promo} func={(event) => { this.setState({ promo: event.target.value }) }} label='Промокод' />
+                </Grid>
 
                 <Grid item xs={12} sm={6}>
                      <MyCheckBox label='Показать акцию' value={this.state.is_active == 1 ? true : false} func={this.changeChekBox.bind(this, 'is_active')} />
@@ -397,6 +409,7 @@ export class AdvertisingCompany extends React.Component {
                             <TableCell style={{ textAlign: 'center' }}>Дата начало</TableCell>
                             <TableCell style={{ textAlign: 'center' }}>Дата окончания</TableCell>
                             <TableCell style={{ textAlign: 'center' }}>Точки</TableCell>
+                            <TableCell style={{ textAlign: 'center' }}>Промокод</TableCell>
                             <TableCell style={{ textAlign: 'center' }}></TableCell>
                           </TableRow>
                         </TableHead>
@@ -410,6 +423,7 @@ export class AdvertisingCompany extends React.Component {
                                     <TableCell style={{ textAlign: 'center' }}>{ item.date_start } </TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>{ item.date_end } </TableCell>
                                     <TableCell style={{ textAlign: 'center' }}>{item.choosePoint.map((it, k) => <React.Fragment key={k}> {it.name} </React.Fragment> )}</TableCell>
+                                    <TableCell style={{ textAlign: 'center' }}>{item.promo} </TableCell>
                                     <TableCell style={{ textAlign: 'center' }}> <CloseIcon onClick={this.delAdv.bind(this, item.id)} /> </TableCell>
                                </TableRow>
                          )}
@@ -433,6 +447,7 @@ export class AdvertisingCompany extends React.Component {
                                             <TableCell style={{ textAlign: 'center' }}>Дата начало</TableCell>
                                             <TableCell style={{ textAlign: 'center' }}>Дата окончания</TableCell>
                                             <TableCell style={{ textAlign: 'center' }}>Точки</TableCell>
+                                            <TableCell style={{ textAlign: 'center' }}>Промокод</TableCell>
                                             <TableCell style={{ textAlign: 'center' }}></TableCell>
                                         </TableRow>
                                     </TableHead>
@@ -446,7 +461,8 @@ export class AdvertisingCompany extends React.Component {
                                                     <TableCell style={{ textAlign: 'center' }}>{item.date_start} </TableCell>
                                                     <TableCell style={{ textAlign: 'center' }}>{item.date_end} </TableCell>
                                                     <TableCell style={{ textAlign: 'center' }}>{item.choosePoint.map((it, k) => <React.Fragment key={k}> {it.name} </React.Fragment>)}</TableCell>
-                                                    <TableCell style={{ textAlign: 'center' }}> <CloseIcon onClick={this.delAdv.bind(this, item.id )} /> </TableCell>
+                                                    <TableCell style={{ textAlign: 'center' }}>{item.promo} </TableCell>
+                                                    <TableCell style={{ textAlign: 'center' }}> <CloseIcon onClick={this.delAdv.bind(this, item.id)} /> </TableCell>
                                                 </TableRow>
                                             )}
                                     </TableBody>
