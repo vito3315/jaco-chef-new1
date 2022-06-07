@@ -47,7 +47,9 @@ class HotMap_ extends React.Component {
       time_end: '23:59',
 
       statAllCount: '',
-      statTrueCount: ''
+      statTrueCount: '',
+
+      is_new: 0
     };
   }
   
