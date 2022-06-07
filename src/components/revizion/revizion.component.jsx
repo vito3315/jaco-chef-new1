@@ -92,7 +92,7 @@ function a11yProps(index) {
 }
 
 // главная страница
-export class Revizion extends React.Component {
+class Revizion_ extends React.Component {
   
   constructor(props) {
     super(props);
@@ -471,7 +471,7 @@ class RevizionNewItem extends React.Component{
 }
 
 // Новая ревизия
-export class RevizionNew extends React.Component {
+class RevizionNew_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -826,4 +826,16 @@ export class RevizionNew extends React.Component {
       </>
     )
   }
+}
+
+export function Revizion() {
+  return (
+    <Revizion_ />
+  );
+}
+
+export function RevizionNew() {
+  return (
+    <RevizionNew_ />
+  );
 }

@@ -219,7 +219,7 @@ class HeaderItem extends React.Component {
   }
 }
 
-export class WorkSchedule extends React.Component {
+class WorkSchedule_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -1170,4 +1170,10 @@ export class WorkSchedule extends React.Component {
       </>
     )
   }
+}
+
+export function WorkSchedule() {
+  return (
+    <WorkSchedule_ />
+  );
 }

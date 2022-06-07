@@ -38,7 +38,7 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-export class DriverStat extends React.Component {
+class DriverStat_ extends React.Component {
   click = false;
 
   constructor(props) {
@@ -639,4 +639,10 @@ export class DriverStat extends React.Component {
       </>
     )
   }
+}
+
+export function DriverStat() {
+  return (
+    <DriverStat_ />
+  );
 }

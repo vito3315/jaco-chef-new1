@@ -24,7 +24,7 @@ import { MySelect, MyCheckBox, MyTextInput, MyAutocomplite } from '../../stores/
 
 const queryString = require('query-string');
 
-export class VendorItemPrice extends React.Component {
+class VendorItemPrice_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -262,4 +262,10 @@ export class VendorItemPrice extends React.Component {
       </>
     )
   }
+}
+
+export function VendorItemPrice() {
+  return (
+    <VendorItemPrice_ />
+  );
 }

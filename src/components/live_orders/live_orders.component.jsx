@@ -18,7 +18,7 @@ import { MySelect, MyCheckBox } from '../../stores/elements';
 
 const queryString = require('query-string');
 
-export class LiveOrders extends React.Component {
+class LiveOrders_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -257,4 +257,10 @@ export class LiveOrders extends React.Component {
       </>
     )
   }
+}
+
+export function LiveOrders() {
+  return (
+    <LiveOrders_ />
+  );
 }

@@ -32,7 +32,7 @@ import Typography from '@mui/material/Typography';
 
 const queryString = require('query-string');
 
-export class VendorModule extends React.Component {
+class VendorModule_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -589,4 +589,10 @@ export class VendorModule extends React.Component {
       </>
     )
   }
+}
+
+export function VendorModule() {
+  return (
+    <VendorModule_ />
+  );
 }

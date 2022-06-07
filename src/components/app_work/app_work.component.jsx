@@ -27,7 +27,7 @@ import { MyTextInput, MyCheckBox, MySelect, MyTimePicker, MyAutocomplite } from 
 
 const queryString = require('query-string');
 
-export class AppWork extends React.Component {
+class AppWork_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -671,4 +671,10 @@ export class AppWork extends React.Component {
       </>
     )
   }
+}
+
+export function AppWork() {
+  return (
+    <AppWork_ />
+  );
 }

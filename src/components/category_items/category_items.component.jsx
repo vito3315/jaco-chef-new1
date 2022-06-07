@@ -24,7 +24,7 @@ import Typography from '@mui/material/Typography';
 
 const queryString = require('query-string');
 
-export class CategoryItems extends React.Component {
+class CategoryItems_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -391,4 +391,10 @@ export class CategoryItems extends React.Component {
       </>
     )
   }
+}
+
+export function CategoryItems() {
+  return (
+    <CategoryItems_ />
+  );
 }

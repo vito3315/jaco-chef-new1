@@ -24,7 +24,7 @@ const dynamicCellStyle = params => {
   return null;
 };
 
-export class Tender extends React.Component {
+class Tender_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -300,4 +300,10 @@ export class Tender extends React.Component {
       </>
     )
   }
+}
+
+export function Tender() {
+  return (
+    <Tender_ />
+  );
 }

@@ -10,7 +10,7 @@ import { MySelect } from '../../stores/elements';
 
 const queryString = require('query-string');
 
-export class DriveMapStatAll extends React.Component {
+class DriveMapStatAll_ extends React.Component {
   map = null;
 
   constructor(props) {
@@ -310,4 +310,10 @@ export class DriveMapStatAll extends React.Component {
       </>
     )
   }
+}
+
+export function DriveMapStatAll() {
+  return (
+    <DriveMapStatAll_ />
+  );
 }

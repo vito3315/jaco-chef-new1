@@ -16,7 +16,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 const queryString = require('query-string');
 
-export class Auth extends React.Component {
+class Auth_ extends React.Component {
   constructor(props) {
     super(props);
         
@@ -194,4 +194,10 @@ export class Auth extends React.Component {
       </>
     )
   }
+}
+
+export function Auth() {
+  return (
+    <Auth_ />
+  );
 }
