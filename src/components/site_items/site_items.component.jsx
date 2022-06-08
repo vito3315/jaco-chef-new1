@@ -1279,8 +1279,8 @@ class SiteItems_ extends React.Component {
                                 
 
                                   <Grid item xs={12} sm={6}>
-                                    { this.state.editItem.img_new.length > 0 ?
-                                      <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_new+'600х600.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
+                                    { this.state.editItem.img_app.length > 0 ?
+                                      <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_app+'600х600.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
                                         :
                                       <div style={{maxWidth: 300, maxHeight: 300}}/>
                                     }
@@ -1664,8 +1664,8 @@ class SiteItems_ extends React.Component {
                                   
 
                                     <Grid item xs={12} sm={6}>
-                                      { this.state.editItem.img_new.length > 0 ?
-                                        <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_new+'600х600.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
+                                      { this.state.editItem.img_app.length > 0 ?
+                                        <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_app+'600х600.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
                                           :
                                         <div style={{maxWidth: 300, maxHeight: 300}}/>
                                       }
