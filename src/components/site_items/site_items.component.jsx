@@ -1187,9 +1187,17 @@ class SiteItems_ extends React.Component {
                                   <Grid item xs={12} sm={4}>
                                     <MyTextInput label="Стол" value={ this.state.editItem.stol } func={ this.changeItem.bind(this, 'stol') } />
                                   </Grid>
-                                  <Grid item xs={12} sm={4}>
-                                    <MyTextInput label="Вес" value={ this.state.editItem.weight } func={ this.changeItem.bind(this, 'weight') } />
-                                  </Grid>
+                                  
+                                  { parseInt(this.state.editItem.category_id) == 6 ?
+                                    <Grid item xs={12} sm={4}>
+                                      <MyTextInput label="Объем" value={ this.state.editItem.weight } func={ this.changeItem.bind(this, 'weight') } />
+                                    </Grid>
+                                      :
+                                    <Grid item xs={12} sm={4}>
+                                      <MyTextInput label="Вес" value={ this.state.editItem.weight } func={ this.changeItem.bind(this, 'weight') } />
+                                    </Grid>
+                                  }
+
                                   { parseInt(this.state.editItem.category_id) != 14 ?
                                     <Grid item xs={12} sm={4}>
                                       <MyTextInput label="Кол-во кусочков" value={ this.state.editItem.count_part } func={ this.changeItem.bind(this, 'count_part') } />
@@ -1566,9 +1574,15 @@ class SiteItems_ extends React.Component {
                                     <Grid item xs={12} sm={4}>
                                       <MyTextInput label="Стол" value={ this.state.editItem.stol } func={ this.changeItem.bind(this, 'stol') } />
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                      <MyTextInput label="Вес" value={ this.state.editItem.weight } func={ this.changeItem.bind(this, 'weight') } />
-                                    </Grid>
+                                    { parseInt(this.state.editItem.category_id) == 6 ?
+                                      <Grid item xs={12} sm={4}>
+                                        <MyTextInput label="Объем" value={ this.state.editItem.weight } func={ this.changeItem.bind(this, 'weight') } />
+                                      </Grid>
+                                        :
+                                      <Grid item xs={12} sm={4}>
+                                        <MyTextInput label="Вес" value={ this.state.editItem.weight } func={ this.changeItem.bind(this, 'weight') } />
+                                      </Grid>
+                                    }
                                     { parseInt(this.state.editItem.category_id) != 14 ?
                                       <Grid item xs={12} sm={4}>
                                         <MyTextInput label="Кол-во кусочков" value={ this.state.editItem.count_part } func={ this.changeItem.bind(this, 'count_part') } />
