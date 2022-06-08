@@ -1925,7 +1925,7 @@ class SiteItems_ extends React.Component {
                     
                       <TableHead>
                         <TableRow>
-                          <TableCell style={{ width: '2%' }}>#</TableCell>
+                          <TableCell style={{ width: '2%' }}>id</TableCell>
 
                           <TableCell style={{ width: '38%' }}>Название</TableCell>
                           <TableCell style={{ width: '15%' }}>Сортировка</TableCell>
@@ -1940,7 +1940,7 @@ class SiteItems_ extends React.Component {
                         
                         { cat.items.map( (it, k) =>
                           <TableRow key={k}>
-                            <TableCell>{k+1}</TableCell>
+                            <TableCell>{item.id}</TableCell>
                             <TableCell onClick={this.openItem.bind(this, it)}>{it.name}</TableCell>
                             <TableCell>
                               <MyTextInput label="" value={it.sort} func={ this.changeSort.bind(this, key, k) } onBlur={this.saveSort.bind(this, it.id)} />

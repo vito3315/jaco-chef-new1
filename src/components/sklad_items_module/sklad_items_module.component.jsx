@@ -676,7 +676,7 @@ class SkladItemsModule_ extends React.Component {
                   
                           <TableHead>
                             <TableRow>
-                              <TableCell style={{ width: '2%' }}>#</TableCell>
+                              <TableCell style={{ width: '2%' }}>id</TableCell>
                   
                               <TableCell style={{ width: '2%' }}></TableCell>
                               <TableCell style={{ width: '3%' }}>Ревизия</TableCell>
@@ -697,7 +697,7 @@ class SkladItemsModule_ extends React.Component {
                             
                             { cat.items.map( (it, k) =>
                               <TableRow key={k}>
-                                <TableCell>{k+1}</TableCell>
+                                <TableCell>{it.id}</TableCell>
                                 <TableCell> 
                                   { parseInt(it.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> } 
                                 </TableCell>
@@ -742,7 +742,7 @@ class SkladItemsModule_ extends React.Component {
                   
                     <TableHead>
                       <TableRow>
-                        <TableCell style={{ width: '2%' }}>#</TableCell>
+                        <TableCell style={{ width: '2%' }}>id</TableCell>
             
                         <TableCell style={{ width: '2%' }}></TableCell>
                         <TableCell style={{ width: '3%' }}>Ревизия</TableCell>
@@ -763,7 +763,7 @@ class SkladItemsModule_ extends React.Component {
                       
                       { this.state.freeItems.map( (it, k) =>
                         <TableRow key={k}>
-                          <TableCell>{k+1}</TableCell>
+                          <TableCell>{it.id}</TableCell>
                           <TableCell> 
                             { parseInt(it.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> } 
                           </TableCell>
