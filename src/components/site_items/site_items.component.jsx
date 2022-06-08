@@ -1940,7 +1940,7 @@ class SiteItems_ extends React.Component {
                         
                         { cat.items.map( (it, k) =>
                           <TableRow key={k}>
-                            <TableCell>{item.id}</TableCell>
+                            <TableCell>{it.id}</TableCell>
                             <TableCell onClick={this.openItem.bind(this, it)}>{it.name}</TableCell>
                             <TableCell>
                               <MyTextInput label="" value={it.sort} func={ this.changeSort.bind(this, key, k) } onBlur={this.saveSort.bind(this, it.id)} />
