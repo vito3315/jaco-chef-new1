@@ -158,6 +158,14 @@ class Header extends React.Component {
     })
   }
   
+  logOut(){
+    localStorage.removeItem('token')
+      
+    setTimeout( () => {
+      window.location.pathname = '/'
+    }, 300)
+  }
+
   render(){
     return (
       <>
@@ -237,6 +245,15 @@ class Header extends React.Component {
                 </AccordionDetails>
               </Accordion>
             ) }
+
+            
+
+            <Accordion>
+              <AccordionSummary onClick={this.logOut.bind(this)}>
+                <Typography>Выйти из аккаунта</Typography>
+              </AccordionSummary>
+            </Accordion>
+
           </SwipeableDrawer>
         </React.Fragment>
         
