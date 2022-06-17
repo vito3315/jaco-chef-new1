@@ -75,6 +75,9 @@ import { PromoItemsStat } from '../promo_items_stat';
 import { SiteItems } from '../site_items';
 
 import { HotMap } from '../hot_map';
+import { SiteSaleMin, SiteSaleMin_New, SiteSaleMin_Edit, SiteSaleMin_StatList } from '../site_sale_min';
+
+
 
 const theme = createTheme({
     palette: {
@@ -355,7 +358,10 @@ export function App () {
                 <Route path={'/site_items'} exact={ true } element={ <SiteItems /> } />
 
                 <Route path={'/hot_map'} exact={ true } element={ <HotMap /> } />
-                
+                <Route path={'/site_sale_min'} exact={ true } element={ <SiteSaleMin /> } />
+                <Route path={'/site_sale_min/new'} exact={ true } element={ <SiteSaleMin_New /> } />
+                <Route path={'/site_sale_min/edit/:promoId'} exact={ true } element={ <SiteSaleMin_Edit /> } />
+                <Route path={'/site_sale_min/stat_list'} exact={ true } element={ <SiteSaleMin_StatList /> } />
                 
                 <Route
                   component={ () =>

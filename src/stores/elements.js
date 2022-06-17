@@ -284,6 +284,7 @@ export class MyCheckBox extends React.PureComponent {
         <FormControlLabel
           control={
             <Checkbox
+              disabled={ this.props.disabled || this.props.disabled === true ? true : false }
               checked={this.props.value}
               onChange={this.props.func}
               color="primary"

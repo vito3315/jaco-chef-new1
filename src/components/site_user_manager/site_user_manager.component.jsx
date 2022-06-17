@@ -327,6 +327,7 @@ class SiteUserManager_ extends React.Component {
         }
         
         this.setState({ 
+          delModal: false,
           modalUserEdit: false, 
           editUser: null
         })
@@ -352,6 +353,7 @@ class SiteUserManager_ extends React.Component {
         this.isInit = false;
 
         this.setState({ 
+          delModal: false,
           modalUserEdit: false, 
           editUser: null
         })
