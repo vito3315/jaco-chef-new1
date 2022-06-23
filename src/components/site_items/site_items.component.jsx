@@ -1097,6 +1097,21 @@ class SiteItems_ extends React.Component {
     let res = await this.getData('saveSort', data);
   }
 
+  async trueUpdateVK(){
+    let res = await this.getData('updateVK', {});
+  }
+
+  updateVK(){
+    const result = confirm('Точно обновить товары в VK ?');
+    if(result){
+      //true
+
+      this.trueUpdateVK();
+    } else {
+      //false
+    }
+  }
+
   render(){
     const action = (
       <React.Fragment>
@@ -1936,8 +1951,12 @@ class SiteItems_ extends React.Component {
             <h1>{this.state.module_name}</h1>
           </Grid>
           
-          <Grid item xs={12} sm={12}>
+          <Grid item xs={12} sm={6}>
             <Button onClick={this.openNew.bind(this)} color="primary" variant='contained'>Новый товар</Button>
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <Button onClick={this.updateVK.bind(this)} color="primary" variant='contained'>Обновить товары VK</Button>
           </Grid>
 
           <Grid item xs={12}>
