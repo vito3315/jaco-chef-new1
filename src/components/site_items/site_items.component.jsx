@@ -1274,13 +1274,26 @@ class SiteItems_ extends React.Component {
                               <Grid item xs={12}>
                                 <Grid container spacing={3}>
                                   <Grid item xs={12}>
-                                    <Typography>Картинка соотношением сторон (1:1) (пример: 600х600) только JPG</Typography>
+                                    <Typography>Картинка соотношением сторон (1:1) (пример: 2000х2000) только JPG</Typography>
                                   </Grid>
                                 
 
                                   <Grid item xs={12} sm={6}>
                                     { this.state.editItem.img_app.length > 0 ?
-                                      <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_app+'600х600.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
+                                      <picture>
+                                        <source srcSet={`
+                                            https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_276x276.jpg 138w, 
+                                            https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_292x292.jpg 146w,
+                                            https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_366x366.jpg 183w,
+                                            https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_466x466.jpg 233w,
+                                            https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_585x585.jpg 292w
+                                            https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_732x732.jpg 366w,
+                                            https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_1168x1168.jpg 584w,
+                                            https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_1420x1420.jpg 760w,
+                                            https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_2000x2000.jpg 1875w`} 
+                                            sizes="(max-width=1439px) 233px, (max-width=1279px) 218px, 292px" />
+                                        <img style={{ maxHeight: 300 }} src={`https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_276х276.jpg`} />
+                                      </picture>
                                         :
                                       <div style={{maxWidth: 300, maxHeight: 300}}/>
                                     }
@@ -1297,7 +1310,10 @@ class SiteItems_ extends React.Component {
                                     <MyTextInput label="Состав" value={ this.state.editItem.tmp_desc } func={ this.changeItem.bind(this, 'tmp_desc') } />
                                   </Grid>
                                   <Grid item xs={12}>
-                                    <MyTextInput label="Маркейтинговое описание" value={ this.state.editItem.marc_desc } func={ this.changeItem.bind(this, 'marc_desc') } />
+                                    <MyTextInput label="Короткое описание (в списке)" value={ this.state.editItem.marc_desc } func={ this.changeItem.bind(this, 'marc_desc') } />
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                    <MyTextInput label="Полное описание (в карточке)" value={ this.state.editItem.marc_desc_full } func={ this.changeItem.bind(this, 'marc_desc_full') } />
                                   </Grid>
                                 </Grid>
                               </Grid>
@@ -1659,13 +1675,26 @@ class SiteItems_ extends React.Component {
                                 <Grid item xs={12}>
                                   <Grid container spacing={3}>
                                     <Grid item xs={12}>
-                                      <Typography>Картинка соотношением сторон (1:1) (пример: 600х600) только JPG</Typography>
+                                      <Typography>Картинка соотношением сторон (1:1) (пример: 2000х2000) только JPG</Typography>
                                     </Grid>
                                   
 
                                     <Grid item xs={12} sm={6}>
                                       { this.state.editItem.img_app.length > 0 ?
-                                        <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_app+'600х600.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
+                                        <picture>
+                                          <source srcSet={`
+                                              https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_276x276.jpg 138w, 
+                                              https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_292x292.jpg 146w,
+                                              https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_366x366.jpg 183w,
+                                              https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_466x466.jpg 233w,
+                                              https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_585x585.jpg 292w
+                                              https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_732x732.jpg 366w,
+                                              https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_1168x1168.jpg 584w,
+                                              https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_1420x1420.jpg 760w,
+                                              https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_2000x2000.jpg 1875w`} 
+                                              sizes="(max-width=1439px) 233px, (max-width=1279px) 218px, 292px" />
+                                          <img style={{ maxHeight: 300 }} src={`https://storage.yandexcloud.net/site-img/${this.state.editItem.img_app}_276x276.jpg`} />
+                                        </picture>
                                           :
                                         <div style={{maxWidth: 300, maxHeight: 300}}/>
                                       }
@@ -1682,7 +1711,10 @@ class SiteItems_ extends React.Component {
                                       <MyTextInput label="Состав" value={ this.state.editItem.tmp_desc } func={ this.changeItem.bind(this, 'tmp_desc') } />
                                     </Grid>
                                     <Grid item xs={12}>
-                                      <MyTextInput label="Маркейтинговое описание" value={ this.state.editItem.marc_desc } func={ this.changeItem.bind(this, 'marc_desc') } />
+                                      <MyTextInput label="Короткое описание (в карточке)" value={ this.state.editItem.marc_desc } func={ this.changeItem.bind(this, 'marc_desc') } />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <MyTextInput label="Полное описание (в карточке)" value={ this.state.editItem.marc_desc_full } func={ this.changeItem.bind(this, 'marc_desc_full') } />
                                     </Grid>
                                   </Grid>
                                 </Grid>
