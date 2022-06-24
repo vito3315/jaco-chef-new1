@@ -128,7 +128,7 @@ class SiteSaleMin_new_ extends React.Component {
     super(props);
         
     this.state = {
-      module: 'site_sale_2',
+      module: 'site_sale_min',
       module_name: '',
       is_load: false,
       modalText: '',
@@ -1227,7 +1227,7 @@ class SiteSaleMin_edit_ extends React.Component {
     super(props);
         
     this.state = {
-      module: 'site_sale_2',
+      module: 'site_sale_min',
       module_name: '',
       is_load: false,
       modalText: '',
@@ -1894,7 +1894,7 @@ class SiteSaleMin_ extends React.Component {
     super(props);
         
     this.state = {
-      module: 'site_sale_2',
+      module: 'site_sale_min',
       module_name: '',
       is_load: false,
       modalText: '',
@@ -2112,7 +2112,7 @@ class SiteSaleMin_StatList_ extends React.Component {
     super(props);
         
     this.state = {
-      module: 'site_sale_2',
+      module: 'site_sale_min',
       module_name: '',
       is_load: false,
       
