@@ -1876,7 +1876,19 @@ class SiteSaleMin_edit_ extends React.Component {
             </Grid>
               
           </Grid>
-          
+
+          <Grid container direction="row" justifyContent="center" style={{ paddingTop: 20 }} spacing={3}>
+            
+              <Grid item xs={12} sm={4}>
+                <MySelect data={this.state.cities} value={this.state.city} func={ this.changeData.bind(this, 'city') } label='Город' />
+              </Grid>
+            
+              <Grid item xs={12} sm={4}>
+                <MySelect data={this.state.points} value={this.state.point} func={ this.changeData.bind(this, 'point') } label='Точка' />
+              </Grid>
+            
+          </Grid>
+
           <Grid container direction="row" justifyContent="end" style={{ paddingTop: 50 }} spacing={3}>
             <Button variant="contained" onClick={this.save.bind(this)}>Сохранить</Button>
           </Grid>
