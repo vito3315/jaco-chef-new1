@@ -3,7 +3,7 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 const React = require( 'react' );
 const ReactDOMServer = require( 'react-dom/server' );
-const { StaticRouter, matchPath } = require( 'react-router-dom' );
+const { StaticRouter } = require( 'react-router-dom' );
 const {Helmet} = require("react-helmet");
 
 // create express application
@@ -40,7 +40,7 @@ app.use( '*', async ( req, res ) => {
         let indexHTML = fs.readFileSync( path.resolve( __dirname, '../dist/index.html' ), {
             encoding: 'utf8',
         } );
-
+        
         // get HTML string from the `App` component
         let appHTML = ReactDOMServer.renderToPipeableStream(
             <StaticRouter location={ req.originalUrl }>

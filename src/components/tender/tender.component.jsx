@@ -13,10 +13,11 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { MyAutocomplite } from '../../stores/elements';
 
-import {AgGridColumn, AgGridReact} from 'ag-grid-react';
+//import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 
 const queryString = require('query-string');
 
+/*
 const dynamicCellStyle = params => {
   if( params.colDef.headerName == 'Цена' ){
     return { borderRight: '1px solid #bababa' };
@@ -300,10 +301,10 @@ class Tender_ extends React.Component {
       </>
     )
   }
-}
+}*/
 
 export function Tender() {
   return (
-    <Tender_ />
+    <></>
   );
 }

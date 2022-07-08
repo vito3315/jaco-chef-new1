@@ -5,7 +5,15 @@ const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require("compression-webpack-plugin");
 
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
+const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin');
+const currentYear = new Date().getFullYear();
+const supportedLocales = ['ru-ru', 'ru']
+
 const webpack = require('webpack');
+
+//"ag-grid-community": "^28.0.0",
+//"ag-grid-react": "^28.0.0",
 
 /*-------------------------------------------------*/
 
@@ -66,8 +74,22 @@ module.exports = {
         new webpack.HotModuleReplacementPlugin(),
         new CompressionPlugin(),
         
-        new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /ru/),
+        new webpack.ContextReplacementPlugin(
+            /^date-fns[/\\]locale$/,
+            new RegExp(`\\.[/\\\\](${supportedLocales.join('|')})[/\\\\]index\\.js$`)
+        ),
+
+        new MomentLocalesPlugin({
+            localesToKeep: ['ru-ru'],
+        }),
         
+        new MomentTimezoneDataPlugin({
+            //matchZones: /^America/
+            matchZones: /^Europe/,
+            startYear: currentYear - 5,
+            endYear: currentYear + 5,
+        }),
+
         new BundleAnalyzerPlugin({
             analyzerMode: 'disabled',
             generateStatsFile: true,
@@ -111,11 +133,24 @@ module.exports = {
         moduleIds: 'deterministic',
         runtimeChunk: 'single',
         splitChunks: {
+            chunks: 'async',
             cacheGroups: {
+                default: {
+                    minChunks: 2,
+                    reuseExistingChunk: true,
+                },
+
                 vendor: {
                     test: /[\\/]node_modules[\\/]/,
                     name: 'vendors',
                     chunks: 'all',
+                },
+
+                vendor_react: {
+                    test: /.*\/node_modules\/react\/index\.js/,
+                    name: 'vendor-react',
+                    chunks: 'initial',
+                    enforce: true,
                 },
             },
         },
