@@ -20,7 +20,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyTextInput, MyDatePickerNew } from '../../stores/elements';
+import { MySelect, MyCheckBox, MyAutocomplite, MyTextInput, MyDatePickerNew } from '../../stores/elements';
 
 import Dropzone from "dropzone";
 
@@ -85,7 +85,9 @@ class SiteUserManager_ extends React.Component {
       point_id: 0,
 
       app_list: [],
-      app_id: -1,
+      chose_app: [],
+      //app_id: -1,
+      app_id: "",
 
       users: [],
       editUser: null,
@@ -103,7 +105,8 @@ class SiteUserManager_ extends React.Component {
   async componentDidMount(){
     
     let data = await this.getData('get_all');
-    
+
+    console.log('apps=',data.apps);
     this.setState({
       module_name: data.module_info.name,
       point_list: data.points,
@@ -196,10 +199,24 @@ class SiteUserManager_ extends React.Component {
 
     let res = await this.getData('getUser', data);
 
+    // хак для автокомплита
+      console.log('res.user', res.user);
+
+    res.user.app_id = res.appointment.find((app) =>
+          parseInt(app.id) == parseInt(res.user.app_id));
+   // res.user.app_id = null;
     this.setState({
       editUser: res,
       modalUserEdit: true
     })
+
+    //todo тест
+     
+    setTimeout(() => {
+        console.log('data_app=', this.state.editUser.appointment);
+        console.log('user=', this.state.editUser.user);
+        console.log('value_app=', this.state.editUser.user.app_id);
+    }, 300)
 
     setTimeout( () => {
       this.sortPoint();
@@ -211,19 +228,24 @@ class SiteUserManager_ extends React.Component {
   async openNewUser(){
     let res = await this.getData('getAllForNew');
 
+    // хак для автокомплита
+    res.user.app_id = null;
     this.setState({
       editUser: res,
       modalUserNew: true
     })
 
+     
     setTimeout( () => {
       this.sortPoint();
 
       this.myDropzone = new Dropzone("#for_img_new", this.dropzoneOptions);
-    }, 300 )
+    }, 300)
+      
   }
 
-  changeItem(data, event){
+    changeItem(data, event) {
+
     let vendor = this.state.editUser;
     
     if( data == 'birthday' ){
@@ -235,7 +257,7 @@ class SiteUserManager_ extends React.Component {
         vendor.user[data] = event.target.value;
       }
     }
-    
+
     this.setState({ 
       editUser: vendor
     })
@@ -248,7 +270,7 @@ class SiteUserManager_ extends React.Component {
   }
 
   sortPoint(){
-    let city_id = this.state.editUser.user.city_id;
+    let city_id = this.state.editUser ? this.state.editUser.user.city_id : 0;
     let points = this.state.editUser.point_list;
     let points_render = [];
 
@@ -266,9 +288,17 @@ class SiteUserManager_ extends React.Component {
   async saveEditUser(){
 
     let is_graph = false;
+    var editUser_user = this.state.editUser;
 
-    this.state.app_list.map( (item, key) => {
-      if( parseInt(this.state.editUser.user.app_id) == parseInt(item.id) ){
+     
+    //editUser_user.user.app_id = editUser_user.app_id.id;
+     editUser_user.user.app_id = editUser_user.user.app_id.id;
+
+
+      this.state.app_list.map((item, key) => {
+      //todo переделать
+     // if( parseInt(this.state.editUser.user.app_id) == parseInt(item.id) ){
+      if (parseInt(editUser_user.user.app_id) == parseInt(item.id) ){
 
         if( parseInt(item.is_graph) == 1 && parseInt(this.state.graphType) == 0 ){
           is_graph = true;
@@ -284,7 +314,9 @@ class SiteUserManager_ extends React.Component {
       return ;
     }
 
-    if( parseInt(this.state.editUser.user.app_id) == 0 && this.state.textDel.length == 0 ){
+    //todo 
+   // if( parseInt(this.state.editUser.user.app_id) == 0 && this.state.textDel.length == 0 ){
+    if (parseInt(editUser_user.user.app_id) == 0 && this.state.textDel.length == 0 ){
 
       this.setState({
         delModal: true
@@ -338,7 +370,8 @@ class SiteUserManager_ extends React.Component {
     }
 
     let data = {
-      user: this.state.editUser,
+     // user: this.state.editUser,
+      user: editUser_user,
       textDel: this.state.textDel,
       graphType: this.state.graphType
     };
@@ -369,8 +402,12 @@ class SiteUserManager_ extends React.Component {
     let is_graph = false;
     let is_graph_ = false;
 
+      let editUser_user = this.state.editUser;
+      editUser_user.user.app_id = editUser_user.user.app_id.id;
+
     this.state.app_list.map( (item, key) => {
-      if( parseInt(this.state.editUser.user.app_id) == parseInt(item.id) ){
+      // if( parseInt(this.state.editUser.user.app_id) == parseInt(item.id) ){
+      if (parseInt(editUser_user.user.app_id) == parseInt(item.id) ){
 
         if( parseInt(item.is_graph) == 1 ){
           is_graph_ = true;
@@ -431,7 +468,8 @@ class SiteUserManager_ extends React.Component {
     }
 
     let data = {
-      user: this.state.editUser,
+     // user: this.state.editUser,
+      user: editUser_user,
       graphType: is_graph === true ? 1 : 0
     };
 
@@ -625,7 +663,9 @@ class SiteUserManager_ extends React.Component {
                       <Grid item xs={12}>
                         <Grid container spacing={3}>
                           <Grid item xs={12} sm={4}>
-                            <MySelect data={this.state.editUser.appointment} value={this.state.editUser.user.app_id} func={ this.changeItem.bind(this, 'app_id') } label='Должность' />
+                            <MyAutocomplite data={this.state.editUser.appointment} value={this.state.editUser.user.app_id} func={(event, data) => {
+                                let user = this.state.editUser; user.user.app_id = data; this.setState({ editUser: user })
+                            }} multiple={false} label='Должность' />
                           </Grid>
                           <Grid item xs={12} sm={4}>
                             <MySelect data={this.state.editUser.cities} value={this.state.editUser.user.city_id} func={ this.changeItem.bind(this, 'city_id') } label='Город' />
@@ -759,7 +799,10 @@ class SiteUserManager_ extends React.Component {
                         <Grid item xs={12}>
                           <Grid container spacing={3}>
                             <Grid item xs={12} sm={4}>
-                              <MySelect data={this.state.editUser.appointment} value={this.state.editUser.user.app_id} func={ this.changeItem.bind(this, 'app_id') } label='Должность' />
+
+                                <MyAutocomplite data={this.state.editUser.appointment} value={this.state.editUser.user.app_id} func={(event, data) => { 
+                                    let user = this.state.editUser; user.user.app_id = data; this.setState({ editUser: user })
+                                }} multiple={false} label='Должность' />
                             </Grid>
                             <Grid item xs={12} sm={4}>
                               <MySelect data={this.state.editUser.cities} value={this.state.editUser.user.city_id} func={ this.changeItem.bind(this, 'city_id') } label='Город' />

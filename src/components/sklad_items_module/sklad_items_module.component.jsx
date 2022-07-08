@@ -177,6 +177,15 @@ class SkladItemsModule_ extends React.Component {
       itemEdit: res,
       itemName: res.item.name
     })
+	
+	//todo тест
+	setTimeout( () => {
+        console.log('storages=' , this.state.itemEdit.storages);
+        console.log('this_storages=' , this.state.itemEdit.this_storages);
+      }, 300 )
+	
+	
+	
   }
 
   async saveEditItem(main_item_id = 0){

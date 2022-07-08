@@ -74,7 +74,7 @@ class SiteStatMarc_ extends React.Component {
       roll_stat:    [],
       set_stat:     [],
       pizza_stat:   [],
-
+   //
       typesShow: [
         {id: 1, name: 'Итоговый результат'},
         {id: 2, name: 'График по месяцам'},
@@ -98,7 +98,7 @@ class SiteStatMarc_ extends React.Component {
       points: data.points
     })
     
-    document.title = data.module_info.name;
+      document.title = data.module_info.name;
   }
   
   getData = (method, data = {}) => {
@@ -1663,7 +1663,7 @@ class SiteStatMarc_ extends React.Component {
 
           { this.state.typeShow != 1 ? null :
             <Grid item xs={12}>
-              <h2 style={{ textAlign: 'center' }}>Новые клиенты итог</h2>
+              <h2 style={{ textAlign: 'center' }}>Новые клиенты итог 3</h2>
               <TableContainer component={Paper}>
                 <Table>
                   <TableHead>
