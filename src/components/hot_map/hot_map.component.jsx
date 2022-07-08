@@ -26,7 +26,7 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-class HotMap_ extends React.Component {
+export class HotMap extends React.Component {
   map = null;
   heatmap = null;
 
@@ -459,10 +459,4 @@ class HotMap_ extends React.Component {
       </>
     )
   }
-}
-
-export function HotMap() {
-  return (
-    <HotMap_ />
-  );
 }

@@ -107,6 +107,74 @@ export class MyAutocomplite extends React.PureComponent {
   }
 }
 
+export class MyAutocomplite2 extends React.PureComponent {
+  constructor(props) {
+    super(props);
+        
+    this.state = {
+    };
+  }
+  
+  render(){
+    if( this.props.id && this.props.id == 'promoName' ){
+      return (
+        <Stack spacing={3}>
+          <Autocomplete
+            freeSolo={ this.props.freeSolo ? this.props.freeSolo : false }
+            size="small"
+            disableCloseOnSelect={true}
+            onBlur={this.props.onBlur ? this.props.onBlur : null}
+            id={ this.props.id ?? null }
+            options={this.props.data}
+            
+
+            getOptionLabel={(option) => option.name}
+            value={this.props.value}
+            onChange={this.props.func}
+            //filterSelectedOptions
+            multiple={ this.props.multiple && this.props.multiple === true ? true : false }
+            //isOptionEqualToValue={(option, value) => option.id === value.id}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={this.props.label}
+                placeholder={this.props.placeholder}
+              />
+            )}
+          />
+        </Stack>
+      )
+    }
+
+    return (
+      <Stack spacing={3}>
+        <Autocomplete
+          freeSolo={ this.props.freeSolo ? this.props.freeSolo : false }
+          size="small"
+          //disableCloseOnSelect={true}
+          onBlur={this.props.onBlur ? this.props.onBlur : null}
+          id={ this.props.id ?? null }
+          
+          options={this.props.data.map((option) => option.name)}
+
+          value={this.props.value}
+          onChange={this.props.func}
+          //filterSelectedOptions
+          multiple={ this.props.multiple && this.props.multiple === true ? true : false }
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={this.props.label}
+              placeholder={this.props.placeholder}
+            />
+          )}
+        />
+      </Stack>
+    )
+  }
+}
+
 export class MySelect extends React.PureComponent {
   constructor(props) {
     super(props);
