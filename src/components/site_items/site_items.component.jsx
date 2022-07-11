@@ -39,7 +39,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyTextInput } from '../../stores/elements';
+import { MySelect, MyCheckBox, MyTextInput, MyDatePickerNew } from '../../stores/elements';
 
 import Dropzone from "dropzone";
 
@@ -86,6 +86,20 @@ class TableStages extends React.Component{
   }
 }
 
+function formatDate(date) {
+  var d = new Date(date),
+      month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear();
+
+  if (month.length < 2) 
+      month = '0' + month;
+  if (day.length < 2) 
+      day = '0' + day;
+
+  return [year, month, day].join('-');
+}
+
 class SiteItems_ extends React.Component {
   dropzoneOptions = {
     autoProcessQueue: false,
@@ -124,6 +138,7 @@ class SiteItems_ extends React.Component {
       freeItems: [],
 
 
+      date_update: formatDate(new Date()),
 
 
       point_list: [],
@@ -164,6 +179,8 @@ class SiteItems_ extends React.Component {
       cat_list: [],
 
       ItemTab: '1',
+      ItemTab1: '0',
+
       anchorEl: null,
       openMenu: false,
       openMenuType: null,
@@ -190,6 +207,8 @@ class SiteItems_ extends React.Component {
 
       searchItems: '',
       item_items_render: [],
+
+      openHist: []
     };
   }
   
@@ -263,9 +282,11 @@ class SiteItems_ extends React.Component {
     });
   }  
 
-  async openItem(item){
+  async openItem(item, type = 'origin'){
     let data = {
       id: item.id,
+      type: type,
+      hist_id: parseInt(this.state.ItemTab1)
     };
 
     let res = await this.getData('get_one', data);
@@ -340,7 +361,11 @@ class SiteItems_ extends React.Component {
 
       item_items: items_items,
 
-      modalEdit: true
+      openHist: res.hist,
+
+      modalEdit: true,
+
+      date_update: formatDate(res.item.date_start) ?? formatDate(new Date()),
     })
 
     setTimeout( () => {
@@ -829,6 +854,291 @@ class SiteItems_ extends React.Component {
     }
   }
 
+  async saveEditItemHist(){
+    if( this.myDropzoneOld['files'].length > 0 ){
+      
+      let name = this.state.editItem.name,
+        id = this.state.editItem.id,
+        date_update = this.state.date_update,
+        hist_id = this.state.editItem.hist_id,
+        type = 'old';
+
+      this.myDropzoneOld.on("sending", (file, xhr, data) => {
+        let file_type = (file.name).split('.');
+        file_type = file_type[file_type.length - 1];
+        file_type = file_type.toLowerCase();
+        
+        data.append("typeFile", type);
+        data.append("name", name);
+        data.append("id", id);
+        data.append("hist_id", hist_id);
+        data.append("date_update", date_update);
+      });
+  
+      this.myDropzoneOld.on("queuecomplete", (data) => {
+  
+        var check_img = false;
+  
+        var myDropzoneNew = this.myDropzoneNew;
+
+        this.myDropzoneOld['files'].map((item, key) => {
+          if( item['status'] == "error" ){
+            check_img = true;
+          }
+
+          if( item['status'] == "success" ){
+            if( (myDropzoneNew['files'][0] && myDropzoneNew['files'][0]["status"] == 'success') || myDropzoneNew['files'].length == 0 ){
+              this.setState({ 
+                modalEdit: false, 
+                editItem: null, 
+                ItemTab1: '0'
+              })
+
+              this.getItems();
+            }
+          }
+        })
+        
+        if( check_img ){
+          alert('Ошибка при загрузке фотографии '+type)
+        }
+      })
+    }
+
+    if( this.myDropzoneNew['files'].length > 0 ){
+      let name = this.state.editItem.name,
+        id = this.state.editItem.id,
+        date_update = this.state.date_update,
+        hist_id = this.state.editItem.hist_id,
+        type = 'new';
+
+      this.myDropzoneNew.on("sending", (file, xhr, data) => {
+        let file_type = (file.name).split('.');
+        file_type = file_type[file_type.length - 1];
+        file_type = file_type.toLowerCase();
+        
+        data.append("typeFile", type);
+        data.append("name", name);
+        data.append("id", id);
+        data.append("hist_id", hist_id);
+        data.append("date_update", date_update);
+      });
+  
+      this.myDropzoneNew.on("queuecomplete", (data) => {
+        var check_img = false;
+  
+        var myDropzoneOld = this.myDropzoneOld;
+
+        this.myDropzoneNew['files'].map((item, key) => {  
+          if( item['status'] == "error" ){
+            check_img = true;
+          }
+
+          if( item['status'] == "success" ){
+            if( (myDropzoneOld['files'][0] && myDropzoneOld['files'][0]["status"] == 'success') || myDropzoneOld['files'].length == 0 ){
+              this.setState({ 
+                modalEdit: false, 
+                editItem: null, 
+                ItemTab1: '0',
+                ItemTab: '1'
+              })
+
+              this.getItems();
+            }
+          }
+        })
+        
+        if( check_img ){
+          alert('Ошибка при загрузке фотографии '+type)
+        }
+      })
+    }
+
+    let data = {
+      dateUpdate: this.state.date_update,
+      item: this.state.editItem,
+      rec_stage_1: this.state.rec_stage_1,
+      rec_stage_2: this.state.rec_stage_2,
+      rec_stage_3: this.state.rec_stage_3,
+
+      pf_stage_1: this.state.pf_stage_1,
+      pf_stage_2: this.state.pf_stage_2,
+      pf_stage_3: this.state.pf_stage_3,
+
+      item_items: this.state.item_items,
+    };
+
+    let res = await this.getData('saveEditItemHist', data);
+
+    if( res.st === false ){
+      alert(res.text);
+    }else{
+      this.openSnack('Данные обновлены');
+
+      if( this.myDropzoneOld['files'].length > 0 ){
+        this.myDropzoneOld.processQueue();
+      }
+
+      if( this.myDropzoneNew['files'].length > 0 ){
+        this.myDropzoneNew.processQueue();
+      }
+
+      if( this.myDropzoneOld['files'].length == 0 && this.myDropzoneNew['files'].length == 0 ){
+        this.setState({ 
+          modalEdit: false, 
+          editItem: null, 
+          ItemTab1: '0',
+          ItemTab: '1'
+        })
+
+        this.getItems();
+      }
+    }
+  }
+
+  async saveNewItemHist(){
+    let data = {
+      dateUpdate: this.state.date_update,
+      item: this.state.editItem,
+      rec_stage_1: this.state.rec_stage_1,
+      rec_stage_2: this.state.rec_stage_2,
+      rec_stage_3: this.state.rec_stage_3,
+
+      pf_stage_1: this.state.pf_stage_1,
+      pf_stage_2: this.state.pf_stage_2,
+      pf_stage_3: this.state.pf_stage_3,
+
+      item_items: this.state.item_items,
+    };
+
+    let res = await this.getData('saveNewItemHist', data);
+
+    if( res.st === false ){
+      alert(res.text);
+    }else{
+      this.openSnack('Данные обновлены');
+
+      if( this.myDropzoneOld['files'].length > 0 ){
+      
+        let name = this.state.editItem.name,
+          id = this.state.editItem.id,
+          date_update = this.state.date_update,
+          hist_id = res.hist_id,
+          type = 'old';
+  
+        this.myDropzoneOld.on("sending", (file, xhr, data) => {
+          let file_type = (file.name).split('.');
+          file_type = file_type[file_type.length - 1];
+          file_type = file_type.toLowerCase();
+          
+          data.append("typeFile", type);
+          data.append("name", name);
+          data.append("id", id);
+          data.append("hist_id", hist_id);
+          data.append("date_update", date_update);
+        });
+    
+        this.myDropzoneOld.on("queuecomplete", (data) => {
+    
+          var check_img = false;
+    
+          var myDropzoneNew = this.myDropzoneNew;
+  
+          this.myDropzoneOld['files'].map((item, key) => {
+            if( item['status'] == "error" ){
+              check_img = true;
+            }
+  
+            if( item['status'] == "success" ){
+              if( (myDropzoneNew['files'][0] && myDropzoneNew['files'][0]["status"] == 'success') || myDropzoneNew['files'].length == 0 ){
+                this.setState({ 
+                  modalEdit: false, 
+                  editItem: null, 
+                  ItemTab1: '0',
+                  ItemTab: '1'
+                })
+  
+                this.getItems();
+              }
+            }
+          })
+          
+          if( check_img ){
+            alert('Ошибка при загрузке фотографии '+type)
+          }
+        })
+      }
+  
+      if( this.myDropzoneNew['files'].length > 0 ){
+        let name = this.state.editItem.name,
+          id = this.state.editItem.id,
+          date_update = this.state.date_update,
+          hist_id = res.hist_id,
+          type = 'new';
+  
+        this.myDropzoneNew.on("sending", (file, xhr, data) => {
+          let file_type = (file.name).split('.');
+          file_type = file_type[file_type.length - 1];
+          file_type = file_type.toLowerCase();
+          
+          data.append("typeFile", type);
+          data.append("name", name);
+          data.append("id", id);
+          data.append("hist_id", hist_id);
+          data.append("date_update", date_update);
+        });
+    
+        this.myDropzoneNew.on("queuecomplete", (data) => {
+          var check_img = false;
+    
+          var myDropzoneOld = this.myDropzoneOld;
+  
+          this.myDropzoneNew['files'].map((item, key) => {  
+            if( item['status'] == "error" ){
+              check_img = true;
+            }
+  
+            if( item['status'] == "success" ){
+              if( (myDropzoneOld['files'][0] && myDropzoneOld['files'][0]["status"] == 'success') || myDropzoneOld['files'].length == 0 ){
+                this.setState({ 
+                  modalEdit: false, 
+                  editItem: null, 
+                  ItemTab: '1',
+                  ItemTab1: '0'
+                })
+  
+                this.getItems();
+              }
+            }
+          })
+          
+          if( check_img ){
+            alert('Ошибка при загрузке фотографии '+type)
+          }
+        })
+      }
+
+      if( this.myDropzoneOld['files'].length > 0 ){
+        this.myDropzoneOld.processQueue();
+      }
+
+      if( this.myDropzoneNew['files'].length > 0 ){
+        this.myDropzoneNew.processQueue();
+      }
+
+      if( this.myDropzoneOld['files'].length == 0 && this.myDropzoneNew['files'].length == 0 ){
+        this.setState({ 
+          modalEdit: false, 
+          editItem: null, 
+          ItemTab1: '0',
+          ItemTab: '1'
+        })
+
+        this.getItems();
+      }
+    }
+  }
+
   async saveNewItem(){
     let data = {
       item: this.state.editItem,
@@ -952,6 +1262,37 @@ class SiteItems_ extends React.Component {
     }
   }
 
+  async delUpdateItemTrue(){
+    let data = {
+      item: this.state.editItem,
+    };
+
+    let res = await this.getData('delUpdateItem', data);
+
+    this.setState({
+      ItemTab1: '0'
+    })
+
+    setTimeout( () => {
+      //if( parseInt(this.state.ItemTab1) == -1 || parseInt(this.state.ItemTab1) == 0 ){
+        this.openItem(this.state.editItem, 'origin');
+      //}else{
+      //  this.openItem(this.state.editItem, 'hist');
+      //}
+    }, 300 )
+  }
+
+  delUpdateItem(){
+
+    const result = confirm('Точно удалить ?');
+    if (result) {
+      this.delUpdateItemTrue();
+    //document.querySelector('#result').textContent = 'Вы ответили, что Вам нравится JavaScript';
+    } else {
+    //document.querySelector('#result').textContent = 'Вы ответили, что Вам не нравится JavaScript';
+    }
+  }
+
   changeTab(event, value){
 
     this.setState({
@@ -999,6 +1340,20 @@ class SiteItems_ extends React.Component {
         }
       }, 300 )
     }
+  }
+
+  changeTab1(event, value){
+    this.setState({ 
+      ItemTab1: value 
+    })
+
+    setTimeout( () => {
+      if( parseInt(value) == -1 || parseInt(value) == 0 ){
+        this.openItem(this.state.editItem, 'origin');
+      }else{
+        this.openItem(this.state.editItem, 'hist');
+      }
+    }, 300 )
   }
 
   closeSnack(){
@@ -1061,7 +1416,9 @@ class SiteItems_ extends React.Component {
     this.setState({ 
       modalEdit: false, 
       editItem: null, 
-      ItemTab: '1' 
+      ItemTab: '1',
+      ItemTab1: '0',
+      date_update: formatDate(new Date()),
     })
 
     this.getItems();
@@ -1088,6 +1445,24 @@ class SiteItems_ extends React.Component {
     })
   }
 
+  async changeDateUpdate(key_cat, key_item, update_id, event){
+    let value = event;
+    let cats = this.state.cats;
+    
+    cats[ key_cat ]['items'][ key_item ]['date_update'] = formatDate(value);
+
+    this.setState({
+      cats: cats
+    })
+
+    let data = {
+      update_id: update_id,
+      dateUpdate: formatDate(value)
+    };
+
+    let res = await this.getData('saveUpdateDate', data);
+  }
+
   async saveSort(item_id, event){
     let data = {
       id: item_id,
@@ -1095,6 +1470,18 @@ class SiteItems_ extends React.Component {
     };
 
     let res = await this.getData('saveSort', data);
+  }
+
+  async saveUpdateDate(item_id, update_id, event){
+    let data = {
+      id: item_id,
+      update_id: update_id,
+      dateUpdate: formatDate(event)
+    };
+
+    console.log( data )
+
+    let res = await this.getData('saveUpdateDate', data);
   }
 
   async trueUpdateVK(){
@@ -1110,6 +1497,12 @@ class SiteItems_ extends React.Component {
     } else {
       //false
     }
+  }
+
+  changeDateRange(data, event){
+    this.setState({
+      [data]: formatDate(event)
+    })
   }
 
   render(){
@@ -1129,7 +1522,7 @@ class SiteItems_ extends React.Component {
 
     return (
       <>
-        <Backdrop open={this.state.is_load} style={{ zIndex: 999 }}>
+        <Backdrop open={this.state.is_load} style={{ zIndex: 99999 }}>
           <CircularProgress color="inherit" />
         </Backdrop>
 
@@ -1156,6 +1549,18 @@ class SiteItems_ extends React.Component {
                 <>
                   <Grid item xs={12}>
 
+                    <TabContext value={this.state.ItemTab1}>
+                      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                        <TabList onChange={ this.changeTab1.bind(this) } variant="fullWidth">
+                          <Tab label="Текущая" value="0" />
+                          { this.state.openHist.map( (item, key) => 
+                            <Tab key={key} label={item.date_start} value={item.id} />
+                          ) }
+                          <Tab label="Добавить" value="-1" />
+                        </TabList>
+                      </Box>
+                    </TabContext>
+
                     <Grid container spacing={3}>
 
                       <Grid item xs={12}>
@@ -1171,6 +1576,26 @@ class SiteItems_ extends React.Component {
                           <TabPanel value="1">
 
                             <Grid container spacing={3}>
+
+                              { parseInt( this.state.ItemTab1 ) == -1 || parseInt( this.state.ItemTab1 ) > 0 ?
+                                <Grid item xs={12}>
+                                  <Grid container spacing={3} justifyContent="center">
+                                    <Grid item xs={4}>
+                                      <MyDatePickerNew label="Дата обновления" value={ this.state.date_update } func={ this.changeDateRange.bind(this, 'date_update') } />
+                                    </Grid>
+
+                                    { parseInt( this.state.ItemTab1 ) > 0 ?
+                                      <Grid item xs={4}>
+                                        <Button onClick={this.delUpdateItem.bind(this)} style={{ backgroundColor: '#c03', color: '#fff', height: '100%' }}><CloseIcon /></Button>
+                                      </Grid>
+                                        :
+                                      null
+                                    }
+                                  </Grid>
+                                </Grid>
+                                  :
+                                null
+                              }
 
                               <Grid item xs={12}>
                                 <Grid container spacing={3}>
@@ -1540,7 +1965,14 @@ class SiteItems_ extends React.Component {
               
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.saveEditItem.bind(this)} color="primary">Сохранить</Button>
+            { parseInt( this.state.ItemTab1 ) == -1 ?
+              <Button onClick={this.saveNewItemHist.bind(this)} color="primary">Сохранить</Button>
+                :
+                parseInt( this.state.ItemTab1 ) == 0 ?
+                  <Button onClick={this.saveEditItem.bind(this)} color="primary">Сохранить</Button>
+                    :
+                  <Button onClick={this.saveEditItemHist.bind(this)} color="primary">Сохранить</Button>
+            }
           </DialogActions>
         </Dialog>
         
@@ -1978,7 +2410,8 @@ class SiteItems_ extends React.Component {
                         <TableRow>
                           <TableCell style={{ width: '2%' }}>id</TableCell>
 
-                          <TableCell style={{ width: '38%' }}>Название</TableCell>
+                          <TableCell style={{ width: '23%' }}>Название</TableCell>
+                          <TableCell style={{ width: '15%' }}>Ближайшее обновление</TableCell>
                           <TableCell style={{ width: '15%' }}>Сортировка</TableCell>
 
                           <TableCell style={{ width: '15%' }}>Активность</TableCell>
@@ -1992,7 +2425,14 @@ class SiteItems_ extends React.Component {
                         { cat.items.map( (it, k) =>
                           <TableRow key={k}>
                             <TableCell>{it.id}</TableCell>
-                            <TableCell onClick={this.openItem.bind(this, it)}>{it.name}</TableCell>
+                            <TableCell onClick={this.openItem.bind(this, it, 'origin')}>{it.name}</TableCell>
+                            { it.date_update ?
+                              <TableCell>
+                                <MyDatePickerNew label="" value={ it.date_update } func={ this.changeDateUpdate.bind(this, key, k, it.date_update_id) } />
+                              </TableCell>
+                                :
+                              <TableCell></TableCell>
+                            }
                             <TableCell>
                               <MyTextInput label="" value={it.sort} func={ this.changeSort.bind(this, key, k) } onBlur={this.saveSort.bind(this, it.id)} />
                             </TableCell>

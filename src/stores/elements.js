@@ -323,7 +323,7 @@ export class MyDatePickerNew extends React.PureComponent {
   
   render(){
     return (
-      <LocalizationProvider dateAdapter={AdapterDateFns} locale={ruLocale}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ruLocale}>
         <DatePicker
           multiple={true}
           mask="____-__-__"
@@ -331,6 +331,7 @@ export class MyDatePickerNew extends React.PureComponent {
           label={this.props.label}
           value={formatDate(this.props.value)}
           onChange={this.props.func}
+          onBlur={this.props.onBlur ? this.props.onBlur : null}
           renderInput={(params) => <TextField variant="outlined" size={'small'} color='primary' style={{ width: '100%' }} {...params} />}
         />
       </LocalizationProvider>
