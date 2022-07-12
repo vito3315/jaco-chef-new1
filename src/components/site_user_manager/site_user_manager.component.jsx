@@ -123,17 +123,15 @@ class SiteUserManager_ extends React.Component {
 
             freeItems: [],
 
-
-
-
             point_list: [],
             point_list_render: [],
             point_id: 0,
 
             app_list: [],
             chose_app: null,
-            //app_id: -1,
-            app_id: "",
+            //app_id: "-1",
+            app_id   : 0,
+            app_filter: null,
 
             users: [],
             editUser: null,
@@ -153,7 +151,6 @@ class SiteUserManager_ extends React.Component {
 
         let data = await this.getData('get_all');
 
-        console.log('apps=', data.apps);
         this.setState({
             module_name: data.module_info.name,
             point_list: data.points,
@@ -217,10 +214,20 @@ class SiteUserManager_ extends React.Component {
             });
     }
 
-    changeSort(type, event) {
-        this.setState({
-            [type]: event.target.value
-        })
+    changeSort(type, event, data) {
+
+        // автокомлит для должностей
+        if (type == 'app_id') {
+            this.setState({
+                app_id      : data != null ? data.id : 0,
+                app_filter  : data
+            })
+
+        } else {
+            this.setState({
+                [type]: event.target.value
+            })
+        }
 
         setTimeout(() => {
             this.getUsers();
@@ -228,6 +235,10 @@ class SiteUserManager_ extends React.Component {
     }
 
     async getUsers() {
+
+        // todo
+        let app_id = this.state.app_id != null ? this.state.app_id.id : null;
+
         let data = {
             point_id: this.state.point_id,
             app_id: this.state.app_id,
@@ -247,29 +258,16 @@ class SiteUserManager_ extends React.Component {
         };
 
         let res = await this.getData('getUser', data);
-        let chose_app;
-        // хак для автокомплита
-        console.log('res.user', res.user);
 
+        // хак для автокомплита
         res.user.app_id = res.appointment.find((app) =>
             parseInt(app.id) == parseInt(res.user.app_id));
-        //chose_app = res.appointment.find((app) =>
-           // parseInt(app.id) == parseInt(res.user.app_id));
-        
-        // res.user.app_id = null;
+
         this.setState({
             editUser: res,
             chose_app: res.user.app_id,
             modalUserEdit: true
         })
-
-        //todo тест
-
-        setTimeout(() => {
-            console.log('data_app=', this.state.editUser.appointment);
-            console.log('user=', this.state.editUser.user);
-            console.log('value_app=', this.state.editUser.user.app_id);
-        }, 300)
 
         setTimeout(() => {
             this.sortPoint();
@@ -287,7 +285,6 @@ class SiteUserManager_ extends React.Component {
             editUser: res,
             modalUserNew: true
         })
-
 
         setTimeout(() => {
             this.sortPoint();
@@ -320,15 +317,12 @@ class SiteUserManager_ extends React.Component {
                 this.sortPoint();
             }, 300)
         }
-
-        
     }
 
     // функция поиска по телефону или Фамилии
     search(data, event) {
 
         let v = event.target.value;
-       
 
         this.setState({
             textSearch: v
@@ -360,16 +354,10 @@ class SiteUserManager_ extends React.Component {
         let is_graph = false;
         var editUser_user = this.state.editUser;
 
-
-        //editUser_user.user.app_id = editUser_user.app_id.id;
-       // editUser_user.user.app_id = editUser_user.user.app_id.id;
         editUser_user.user.app_id = this.state.chose_app !== null ? this.state.chose_app.id : 0;
 
         this.state.app_list.map((item, key) => {
-            //todo переделать
-            // if( parseInt(this.state.editUser.user.app_id) == parseInt(item.id) ){
             if (parseInt(editUser_user.user.app_id) == parseInt(item.id)) {
-
                 if (parseInt(item.is_graph) == 1 && parseInt(this.state.graphType) == 0) {
                     is_graph = true;
                 }
@@ -385,7 +373,6 @@ class SiteUserManager_ extends React.Component {
         }
 
         //todo 
-        // if( parseInt(this.state.editUser.user.app_id) == 0 && this.state.textDel.length == 0 ){
         if (parseInt(editUser_user.user.app_id) == 0 && this.state.textDel.length == 0) {
 
             this.setState({
@@ -430,6 +417,7 @@ class SiteUserManager_ extends React.Component {
 
                 this.setState({
                     delModal: false,
+                    graphModal: false,
                     modalUserEdit: false,
                     editUser: null
                 })
@@ -440,7 +428,6 @@ class SiteUserManager_ extends React.Component {
         }
 
         let data = {
-            // user: this.state.editUser,
             user: editUser_user,
             textDel: this.state.textDel,
             graphType: this.state.graphType
@@ -457,6 +444,7 @@ class SiteUserManager_ extends React.Component {
 
                 this.setState({
                     delModal: false,
+                    graphModal: false,
                     modalUserEdit: false,
                     editUser: null
                 })
@@ -473,18 +461,10 @@ class SiteUserManager_ extends React.Component {
         let is_graph_ = false;
 
         // хак для нормальной работы атокомплита должность
-       // let app_origin      = this.state.editUser.user.app_id;
         let editUser_user = this.state.editUser;
-        //let editUser_user = this.state.editUser;
-        // todo
-        //this.state.editUser.user.app_id
         editUser_user.user.app_id = this.state.chose_app !== null ? this.state.chose_app.id : 0;
 
-        // todo
-        console.log('chose_app=' + this.state.chose_app);
-
         this.state.app_list.map((item, key) => {
-            // if( parseInt(this.state.editUser.user.app_id) == parseInt(item.id) ){
             if (parseInt(editUser_user.user.app_id) == parseInt(item.id)) {
 
                 if (parseInt(item.is_graph) == 1) {
@@ -548,7 +528,6 @@ class SiteUserManager_ extends React.Component {
         }
 
         let data = {
-            // user: this.state.editUser,
             user: editUser_user,
             graphType: is_graph === true ? 1 : 0
         };
@@ -576,27 +555,19 @@ class SiteUserManager_ extends React.Component {
                 let user = this.state.editUser;
                 user.user.id = res.user_id;
 
-                // хак что бы не сбивалась должность
-                console.log('app_origin='+ app_origin);
-                user.user.app_id = app_origin;
+                user.user.app_id = this.state.editUser.user.app_id;
 
                 // картинка прелоадер
                 this.setState({
-                    editUser: user
+                    editUser: user,
+                    is_load: true
                 })
 
                 setTimeout(() => {
                     this.myDropzone.processQueue();
-                    this.setState({
-                        is_load: true
-                    })
-                    // todo
-                    console.log('new_app_origi' + this.state.editUser.user.app_id);
                 }, 400)
             }
         }
-
-
     }
 
     getOrientation(file, callback) {
@@ -635,16 +606,11 @@ class SiteUserManager_ extends React.Component {
 
         reader.readAsArrayBuffer(file.slice(0, 64 * 1024));
     };
-    //todo
-    getUser() {
-        return this.state.editUser;
-    }
 
     render() {
-        console.log('test');
         return (
             <>
-                <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
+                <Backdrop style={{ zIndex: 99999 }} open={this.state.is_load}>
                     <CircularProgress color="inherit" />
                 </Backdrop>
 
@@ -932,7 +898,7 @@ class SiteUserManager_ extends React.Component {
                         <MySelect data={this.state.point_list} value={this.state.point_id} func={this.changeSort.bind(this, 'point_id')} label='Точка' />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                        <MySelect data={this.state.app_list} value={this.state.app_id} func={this.changeSort.bind(this, 'app_id')} label='Должность' />
+                        <MyAutocomplite data={this.state.app_list} value={this.state.app_filter} func={this.changeSort.bind(this, 'app_id') } multiple={false} label='Должность' />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <MyTextInput label="Поиск по телефону/имени" value={this.state.textSearch} func={this.search.bind(this, 'search')} />

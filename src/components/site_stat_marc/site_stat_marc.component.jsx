@@ -1663,7 +1663,7 @@ class SiteStatMarc_ extends React.Component {
 
           { this.state.typeShow != 1 ? null :
             <Grid item xs={12}>
-              <h2 style={{ textAlign: 'center' }}>Новые клиенты итог 3</h2>
+              <h2 style={{ textAlign: 'center' }}>Новые клиенты итог</h2>
               <TableContainer component={Paper}>
                 <Table>
                   <TableHead>
