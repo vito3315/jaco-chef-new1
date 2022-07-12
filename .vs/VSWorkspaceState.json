@@ -5,7 +5,9 @@
     "\\src\\components",
     "\\src\\components\\advertising_company",
     "\\src\\components\\promo_items_stat",
-    "\\src\\components\\site_stat_marc"
+    "\\src\\components\\site_stat_marc",
+    "\\src\\stores"
   ],
+  "SelectedNode": "\\src\\stores\\elements.js",
   "PreviewInSolutionExplorer": false
 }
