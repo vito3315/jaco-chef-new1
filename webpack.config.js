@@ -135,10 +135,7 @@ module.exports = {
         splitChunks: {
             chunks: 'async',
             cacheGroups: {
-                default: {
-                    minChunks: 2,
-                    reuseExistingChunk: true,
-                },
+                
 
                 vendor: {
                     test: /[\\/]node_modules[\\/]/,

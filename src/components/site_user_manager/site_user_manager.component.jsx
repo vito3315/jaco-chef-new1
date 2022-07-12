@@ -40,6 +40,52 @@ function formatDate(date) {
     return [year, month, day].join('-');
 }
 
+class SiteUserManagerTable extends React.Component{
+    shouldComponentUpdate(nextProps){
+        var array1 = nextProps.users;
+        var array2 = this.props.users;
+
+        var is_same = (array1.length == array2.length) && array1.every(function(element, index) {
+            return element === array2[index]; 
+        });
+
+        return !is_same;
+    }
+
+    render (){
+        return (
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>#</TableCell>
+                            <TableCell>Фото</TableCell>
+                            <TableCell>Телефон</TableCell>
+                            <TableCell>Имя</TableCell>
+                            <TableCell>Должность</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {this.props.users.map((item, key) =>
+                            <TableRow key={key} onClick={this.props.openEditUser.bind(this, item.id)}>
+                                <TableCell>{key + 1}</TableCell>
+                                <TableCell>
+                                    {item['img_name'] === null ? null :
+                                        <img src={'https://storage.yandexcloud.net/user-img/min-img/' + item['img_name'] + '?' + item['img_update']} style={{ maxWidth: 100, maxHeight: 100 }} />
+                                    }
+                                </TableCell>
+                                <TableCell>{item.login}</TableCell>
+                                <TableCell>{item.name}</TableCell>
+                                <TableCell>{item.app_name}</TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        )
+    }
+}
+
 class SiteUserManager_ extends React.Component {
     dropzoneOptions = {
         autoProcessQueue: false,
@@ -897,36 +943,11 @@ class SiteUserManager_ extends React.Component {
                     </Grid>
 
                     <Grid item xs={12}>
-
-                        <TableContainer component={Paper}>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>#</TableCell>
-                                        <TableCell>Фото</TableCell>
-                                        <TableCell>Телефон</TableCell>
-                                        <TableCell>Имя</TableCell>
-                                        <TableCell>Должность</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {this.state.users.map((item, key) =>
-                                        <TableRow key={key} onClick={this.openEditUser.bind(this, item.id)}>
-                                            <TableCell>{key + 1}</TableCell>
-                                            <TableCell>
-                                                {item['img_name'] === null ? null :
-                                                    <img src={'https://storage.yandexcloud.net/user-img/min-img/' + item['img_name'] + '?' + item['img_update']} style={{ maxWidth: 100, maxHeight: 100 }} />
-                                                }
-                                            </TableCell>
-                                            <TableCell>{item.login}</TableCell>
-                                            <TableCell>{item.name}</TableCell>
-                                            <TableCell>{item.app_name}</TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-
+                        { this.state.users.length > 0 ?
+                            <SiteUserManagerTable users={this.state.users} openEditUser={ this.openEditUser.bind(this) } />
+                                :
+                            null
+                        }
                     </Grid>
 
 
