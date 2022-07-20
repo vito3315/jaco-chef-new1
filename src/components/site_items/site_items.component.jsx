@@ -102,17 +102,19 @@ function formatDate(date) {
 
 class SiteItemsTable extends React.Component {
   shouldComponentUpdate(nextProps){
-    var array1 = nextProps.cats;
-    var array2 = this.props.cats;
+    var array1 = nextProps.timeUpdate;
+    var array2 = this.props.timeUpdate;
 
-    var is_same = (array1.length == array2.length) && array1.every(function(element, index) {
-        return element === array2[index]; 
-    });
+    //var is_same = (array1.length == array2.length) && array1.every(function(element, index) {
+    //    return element === array2[index]; 
+    //});
 
-    return !is_same;
+    return array1 != array2;
   }
 
   render(){
+    console.log( 'render SiteItemsTable' )
+
     return (
       <Grid item xs={12}>
           {this.props.cats.map( (cat, key) =>
@@ -294,7 +296,8 @@ class SiteItems_ extends React.Component {
       searchItems: '',
       item_items_render: [],
 
-      openHist: []
+      openHist: [],
+      timeUpdate: new Date()
     };
   }
   
@@ -304,7 +307,8 @@ class SiteItems_ extends React.Component {
     this.setState({
       module_name: data.module_info.name,
       cats: data.cats,
-      cat_list: data.cat_list
+      cat_list: data.cat_list,
+      timeUpdate: new Date()
     })
     
     document.title = data.module_info.name;
@@ -315,7 +319,8 @@ class SiteItems_ extends React.Component {
     
     this.setState({
       cats: data.cats,
-      cat_list: data.cat_list
+      cat_list: data.cat_list,
+      timeUpdate: new Date()
     })
   }
 
@@ -1527,7 +1532,8 @@ class SiteItems_ extends React.Component {
     data[ key_cat ]['items'][ key_item ]['sort'] = value;
 
     this.setState({
-      cats: data
+      cats: data,
+      timeUpdate: new Date()
     })
   }
 
@@ -1538,7 +1544,8 @@ class SiteItems_ extends React.Component {
     cats[ key_cat ]['items'][ key_item ]['date_update'] = formatDate(value);
 
     this.setState({
-      cats: cats
+      cats: cats,
+      timeUpdate: new Date()
     })
 
     let data = {
@@ -2478,7 +2485,7 @@ class SiteItems_ extends React.Component {
           </Grid>
 
           { this.state.cats.length == 0 ? null :
-            <SiteItemsTable cats={this.state.cats} changeSort={this.changeSort.bind(this)} saveSort={this.saveSort.bind(this)} changeDateUpdate={this.changeDateUpdate.bind(this)} openItem={this.openItem.bind(this)} />
+            <SiteItemsTable timeUpdate={this.state.timeUpdate} cats={this.state.cats} changeSort={this.changeSort.bind(this)} saveSort={this.saveSort.bind(this)} changeDateUpdate={this.changeDateUpdate.bind(this)} openItem={this.openItem.bind(this)} />
           }
 
         </Grid>
