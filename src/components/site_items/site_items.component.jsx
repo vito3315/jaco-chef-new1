@@ -100,6 +100,92 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
+class SiteItemsTable extends React.Component {
+  shouldComponentUpdate(nextProps){
+    var array1 = nextProps.cats;
+    var array2 = this.props.cats;
+
+    var is_same = (array1.length == array2.length) && array1.every(function(element, index) {
+        return element === array2[index]; 
+    });
+
+    return !is_same;
+  }
+
+  render(){
+    return (
+      <Grid item xs={12}>
+          {this.props.cats.map( (cat, key) =>
+            <Accordion key={key}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+              >
+                <Typography>{cat.name}</Typography>
+              </AccordionSummary>
+              <AccordionDetails style={{ width: '100%', overflow: 'scroll' }}>
+                
+                <Table>
+                
+                  <TableHead>
+                    <TableRow>
+                      <TableCell style={{ width: '2%' }}>id</TableCell>
+
+                      <TableCell style={{ width: '23%' }}>Название</TableCell>
+                      <TableCell style={{ width: '15%' }}>Ближайшее обновление</TableCell>
+                      <TableCell style={{ width: '15%' }}>Сортировка</TableCell>
+
+                      <TableCell style={{ width: '15%' }}>Активность</TableCell>
+                      <TableCell style={{ width: '15%' }}>Сайт</TableCell>
+                      <TableCell style={{ width: '15%' }}>Склад</TableCell>
+                    </TableRow>
+                  </TableHead>
+
+                  <TableBody>
+                    
+                    { cat.items.map( (it, k) =>
+                      <TableRow key={k}>
+                        <TableCell>{it.id}</TableCell>
+                        <TableCell onClick={this.props.openItem.bind(this, it, 'origin')}>{it.name}</TableCell>
+                        { it.date_update ?
+                          <TableCell>
+                            <MyDatePickerNew label="" value={ it.date_update } func={ this.props.changeDateUpdate.bind(this, key, k, it.date_update_id) } />
+                          </TableCell>
+                            :
+                          <TableCell></TableCell>
+                        }
+                        <TableCell>
+                          <MyTextInput label="" value={it.sort} func={ this.props.changeSort.bind(this, key, k) } onBlur={this.props.saveSort.bind(this, it.id)} />
+                        </TableCell>
+
+                        <TableCell> 
+                          { parseInt(it.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> } 
+                        </TableCell>
+                        <TableCell> 
+                          { parseInt(it.show_site) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> } 
+                        </TableCell>
+                        <TableCell> 
+                          { parseInt(it.show_program) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> } 
+                        </TableCell>
+
+                        
+                      </TableRow>           
+                    ) }
+                  
+                  </TableBody>
+                
+                </Table>
+
+              </AccordionDetails>
+            </Accordion>
+          )
+          
+        }
+
+      </Grid>
+    )
+  }
+}
+
 class SiteItems_ extends React.Component {
   dropzoneOptions = {
     autoProcessQueue: false,
@@ -2391,77 +2477,10 @@ class SiteItems_ extends React.Component {
             <Button onClick={this.updateVK.bind(this)} color="primary" variant='contained'>Обновить товары VK</Button>
           </Grid>
 
-          <Grid item xs={12}>
-          
-            { this.state.cats.length == 0 ? null :
+          { this.state.cats.length == 0 ? null :
+            <SiteItemsTable cats={this.state.cats} changeSort={this.changeSort.bind(this)} saveSort={this.saveSort.bind(this)} changeDateUpdate={this.changeDateUpdate.bind(this)} openItem={this.openItem.bind(this)} />
+          }
 
-              this.state.cats.map( (cat, key) =>
-                <Accordion key={key}>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                  >
-                    <Typography>{cat.name}</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails style={{ width: '100%', overflow: 'scroll' }}>
-                    
-                    <Table>
-                    
-                      <TableHead>
-                        <TableRow>
-                          <TableCell style={{ width: '2%' }}>id</TableCell>
-
-                          <TableCell style={{ width: '23%' }}>Название</TableCell>
-                          <TableCell style={{ width: '15%' }}>Ближайшее обновление</TableCell>
-                          <TableCell style={{ width: '15%' }}>Сортировка</TableCell>
-
-                          <TableCell style={{ width: '15%' }}>Активность</TableCell>
-                          <TableCell style={{ width: '15%' }}>Сайт</TableCell>
-                          <TableCell style={{ width: '15%' }}>Склад</TableCell>
-                        </TableRow>
-                      </TableHead>
-
-                      <TableBody>
-                        
-                        { cat.items.map( (it, k) =>
-                          <TableRow key={k}>
-                            <TableCell>{it.id}</TableCell>
-                            <TableCell onClick={this.openItem.bind(this, it, 'origin')}>{it.name}</TableCell>
-                            { it.date_update ?
-                              <TableCell>
-                                <MyDatePickerNew label="" value={ it.date_update } func={ this.changeDateUpdate.bind(this, key, k, it.date_update_id) } />
-                              </TableCell>
-                                :
-                              <TableCell></TableCell>
-                            }
-                            <TableCell>
-                              <MyTextInput label="" value={it.sort} func={ this.changeSort.bind(this, key, k) } onBlur={this.saveSort.bind(this, it.id)} />
-                            </TableCell>
-
-                            <TableCell> 
-                              { parseInt(it.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> } 
-                            </TableCell>
-                            <TableCell> 
-                              { parseInt(it.show_site) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> } 
-                            </TableCell>
-                            <TableCell> 
-                              { parseInt(it.show_program) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> } 
-                            </TableCell>
-
-                            
-                          </TableRow>           
-                        ) }
-                      
-                      </TableBody>
-                    
-                    </Table>
-
-                  </AccordionDetails>
-                </Accordion>
-              )
-              
-            }
-
-          </Grid>
         </Grid>
       </>
     )
