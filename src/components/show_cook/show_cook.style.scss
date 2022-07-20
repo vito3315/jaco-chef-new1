@@ -1,0 +1,15 @@
+#items .MuiBox-root{
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+#rec .MuiBox-root{
+    justify-content: center;
+    display: flex;
+}
+
+#rec, #items, #pf{
+    & > div{
+        padding: 0;
+    }
+}

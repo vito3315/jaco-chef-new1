@@ -109,6 +109,7 @@ const SiteItems = React.lazy(() => import("../site_items"));
 //import { SiteItems } from '../site_items';
 
 const HotMap = React.lazy(() => import("../hot_map"));
+const ShowCook = React.lazy(() => import("../show_cook"));
 
 //import { HotMap } from '../hot_map';
 import { SiteSaleMin, SiteSaleMin_New, SiteSaleMin_Edit, SiteSaleMin_StatList } from '../site_sale_min';
@@ -400,6 +401,8 @@ export function App () {
                   <Route path={'/site_sale_min/edit/:promoId'} exact={ true } element={ <SiteSaleMin_Edit /> } />
                   <Route path={'/site_sale_min/stat_list'} exact={ true } element={ <SiteSaleMin_StatList /> } />
                   
+                  <Route path={'/show_cook'} exact={ true } element={ <ShowCook /> } />
+
                   <Route
                     component={ () =>
                       <Status code={404}>
