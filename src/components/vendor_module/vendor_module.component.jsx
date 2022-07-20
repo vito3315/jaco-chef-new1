@@ -436,6 +436,13 @@ class VendorModule_ extends React.Component {
                     <MyTextInput label="ОГРН" value={ this.state.openVendor.ogrn } func={ this.testChange.bind(this, 'ogrn') } />
                   </Grid>
                   
+                  <Grid item xs={12} sm={6}>
+                    <MyTextInput label="БИК" value={ this.state.openVendor.bik } func={ this.testChange.bind(this, 'bik') } />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <MyTextInput label="РС" value={ this.state.openVendor.rc } func={ this.testChange.bind(this, 'rc') } />
+                  </Grid>
+
                   <Grid item xs={12} sm={8}>
                     <MyTextInput label="Адрес компании" value={ this.state.openVendor.addr } func={ this.testChange.bind(this, 'addr') } />
                   </Grid>
@@ -505,6 +512,13 @@ class VendorModule_ extends React.Component {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <MyTextInput label="ОГРН" value={ this.state.openVendor.ogrn } func={ this.testChange.bind(this, 'ogrn') } />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <MyTextInput label="БИК" value={ this.state.openVendor.bik } func={ this.testChange.bind(this, 'bik') } />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <MyTextInput label="РС" value={ this.state.openVendor.rc } func={ this.testChange.bind(this, 'rc') } />
                   </Grid>
                   
                   <Grid item xs={12} sm={8}>
