@@ -510,7 +510,7 @@ class СafeUprEdit_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={12}>
-              <MySelect data={this.state.tables} value={this.state.count_tables} func={(event) => { this.setState({ name: event.target.value }) } }  label='Количество столов сборки' />
+              <MySelect data={this.state.tables} value={this.state.count_tables} func={(event) => { this.setState({ count_tables: event.target.value }) } }  label='Количество столов сборки' />
           </Grid> 
 
           <Grid item xs={12} sm={4}>
