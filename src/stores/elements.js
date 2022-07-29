@@ -194,7 +194,10 @@ export class MySelect extends React.PureComponent {
           onChange={ this.props.func }
           multiple={ this.props.multiple && this.props.multiple === true ? true : false }
         >
-          <MenuItem value=""><em>None</em></MenuItem>
+          {this.props.is_none === false ? null : 
+            <MenuItem value=""><em>None</em></MenuItem>
+          }
+          
           { this.props.data.map( (item, key) =>
             <MenuItem key={key} value={item.id}>{item.name}</MenuItem>
           ) }

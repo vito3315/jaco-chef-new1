@@ -163,6 +163,9 @@ module.exports = {
 
     // generate source map
     //devtool: ( process.env.NODE_ENV === 'development' ? 'eval' : 'source-map' ),
+
+    // to do перд билдо вирнетьу source-map
     devtool: 'source-map'
+   //devtool : 'eval'
 
 };

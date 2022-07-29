@@ -17,6 +17,13 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
 import Paper from '@mui/material/Paper';
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -62,6 +69,7 @@ class СafeUprEdit_ extends React.Component {
 
       zone_list           : [],
       dop_time_list       : [],
+      actual_time_list    : [],
       zones               : [],
       zone_id             : 0,
       nal_zone_id         : 0,
@@ -130,7 +138,8 @@ class СafeUprEdit_ extends React.Component {
         cook_common_stol    : res.point_info.cook_common_stol,
         summ_driver         : res.point_info.summ_driver,
         add_time_list       : res.add_time_list,
-        dop_time_list       : res.dop_time_list
+        dop_time_list       : res.dop_time_list,
+        actual_time_list    : res.actual_time_list
     })
 
     document.title = res.module_info.name;
@@ -219,11 +228,16 @@ class СafeUprEdit_ extends React.Component {
     console.log('addTimeDelivery');
   }
 
+  // открываем модалку
   stopZone(){  
-    this.setState({ 
-      modalStopZone: true, 
-    })
-    console.log('stopZone');
+   
+    // дергаем актуальные данные
+    this.getPoint();
+    setTimeout(() => {
+      this.setState({
+        modalStopZone: true
+      })  
+    }, 300)
   }
 
   // обычный чекбокс
@@ -231,9 +245,7 @@ class СafeUprEdit_ extends React.Component {
 
       //  убираем галку закрытия кафе если в модалке ничего не нажали
       if(type == 'is_active' && event.target.checked  == false){
-        this.setState({ 
-          modalStopReason: true, 
-        })
+        this.opneCloseCafeModal();
       }
      
       this.setState({
@@ -242,8 +254,14 @@ class СafeUprEdit_ extends React.Component {
 
       if(type == 'is_сlosed_technic'){
         this.setState({
-          showComment: event.target.checked ? true : false
+          showComment           : event.target.checked ? true : false,
+          is_сlosed_overload    : false
         })
+      } else if (type == 'is_сlosed_overload') {
+        this.setState({
+          showComment           : event.target.checked ? true : false,
+          is_сlosed_technic     : false
+        }) 
       }
      
   }
@@ -257,12 +275,6 @@ class СafeUprEdit_ extends React.Component {
       zone_list: zone 
     })
    
-  }
-
-  changeDateRange(data, val) {
-    this.setState({
-      [data]: formatDate(val)
-    })
   }
 
   // смена точки
@@ -295,13 +307,10 @@ class СafeUprEdit_ extends React.Component {
         summ_driver         : res.point_info.summ_driver,
         zone_list           : res.point_zone,
         add_time_list       : res.add_time_list,
-        dop_time_list       : res.dop_time_list
+        dop_time_list       : res.dop_time_list,
+        actual_time_list    : res.actual_time_list
      })
 
-      setTimeout( () => {
-        console.log('zone', this.state.zone_list);
-        console.log('add_time_list', this.state.add_time_list);
-      }, 300 )
   }
 
   // смена зоны
@@ -310,6 +319,19 @@ class СafeUprEdit_ extends React.Component {
     this.setState({
       zone_id:  event.target.value 
     })
+  }
+
+  // открываем модалку закрытия кафе
+  opneCloseCafeModal() {
+      console.log('opneCloseCafeModal');
+
+      // дергаем актуальные данные
+      this.getPoint();
+      setTimeout(() => {
+        this.setState({
+          modalStopReason: true
+        })  
+      }, 300)
   }
 
   // сохранение зоны
@@ -327,9 +349,9 @@ class СafeUprEdit_ extends React.Component {
           alert(res.text)
         } else {
             console.log('ok');
-              this.setState({ 
-                modalStopZone: false, 
-              })
+            this.setState({ 
+              modalStopZone: false, 
+            })
         }
 
       }
@@ -413,7 +435,6 @@ class СafeUprEdit_ extends React.Component {
         time_end      : '17:30',
         add_time_id   : 0,
        });
-      
   } 
 
   render(){
@@ -424,7 +445,7 @@ class СafeUprEdit_ extends React.Component {
         </Backdrop>
     
         <Dialog
-          open={this.state.modalStopReason}
+          open={this.state.modalStopReason }
                 onClose={this.closeModalCafe.bind(this)  }
         >
           <DialogTitle>Причина закрытия кафе</DialogTitle>
@@ -479,11 +500,11 @@ class СafeUprEdit_ extends React.Component {
           <DialogContent style={{ paddingTop: 10 }}>
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
-                  <MySelect data={this.state.zone_list} value={this.state.nal_zone_id} func={(event) => { this.setState({ nal_zone_id: event.target.value }) }} label='Зона' />
+                  <MySelect is_none={false} data={this.state.zone_list} value={this.state.nal_zone_id} func={(event) => { this.setState({ nal_zone_id: event.target.value }) }} label='Зона' />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                  <MySelect data={this.state.add_time_list} value={this.state.add_time_id} func={(event) => { this.setState({ add_time_id: event.target.value }) }} label='Доп время, мин' />
+                  <MySelect is_none={false} data={this.state.add_time_list} value={this.state.add_time_id} func={(event) => { this.setState({ add_time_id: event.target.value }) }} label='Доп время, мин' />
                 </Grid>
                 <Grid item xs={6} sm={6}>
                     <MyTimePicker label="Время начала" value={this.state.time_start} func={(event) => { this.setState({ time_start: event.target.value }) }}  />
@@ -543,28 +564,74 @@ class СafeUprEdit_ extends React.Component {
 
           <Grid item xs={12} sm={6}>
             <Button color="primary" variant="contained" onClick={this.save.bind(this)}>Сохранить</Button>
-          </Grid>   
-          <div style={{width:'100%', overflow: 'scroll' }} >          
-            <Table >
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Зона</TableCell>
-                      <TableCell>Промежуток</TableCell>
-                      <TableCell>Время доставки</TableCell>
-                    </TableRow>
-                  </TableHead>
+          </Grid> 
 
-                  <TableBody>
-                  { this.state.dop_time_list.map( (item, key) =>
-                      <TableRow key={key}>
-                        <TableCell>{item.name}</TableCell>
-                        <TableCell>{item.time_start} - {item.time_end}</TableCell>
-                        <TableCell>{item.time_dev} мин.</TableCell>
-                      </TableRow>
-                    ) }
-                </TableBody>
-            </Table>
-          </div>              
+          <Grid item xs={12} >
+
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+              >
+              <Typography>Актуальное время</Typography>
+              </AccordionSummary>
+                <AccordionDetails>
+                    <div style={{width:'100%', overflow: 'scroll' }} >          
+                    <Table >
+                          <TableHead>
+                            <TableRow>
+                              <TableCell style={{width:'33%' }}>Зона</TableCell>
+                              <TableCell style={{width:'33%' }}>Промежуток</TableCell>
+                              <TableCell style={{width:'33%' }}>Время доставки</TableCell>
+                            </TableRow>
+                          </TableHead>
+
+                          <TableBody>
+                          { this.state.actual_time_list.map( (item, key) =>
+                              <TableRow key={key}>
+                                <TableCell>{item.name}</TableCell>
+                                <TableCell>{item.time_start} - {item.time_end}</TableCell>
+                                <TableCell>{item.time_dev} мин.</TableCell>
+                              </TableRow>
+                            ) }
+                        </TableBody>
+                    </Table>
+                  </div>   
+                </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+              >
+              <Typography>Дополнительное время</Typography>
+              </AccordionSummary>
+                <AccordionDetails>
+                    <div style={{width:'100%', overflow: 'scroll' }} >          
+                    <Table >
+                          <TableHead>
+                            <TableRow>
+                              <TableCell style={{width:'33%' }}>Зона</TableCell>
+                              <TableCell style={{width:'33%' }}>Промежуток</TableCell>
+                              <TableCell style={{width:'33%' }}>Время доставки</TableCell>
+                            </TableRow>
+                          </TableHead>
+
+                          <TableBody>
+                          { this.state.dop_time_list.map( (item, key) =>
+                              <TableRow key={key}>
+                                <TableCell>{item.name}</TableCell>
+                                <TableCell>{item.time_start} - {item.time_end}</TableCell>
+                                <TableCell>{item.time_dev} мин.</TableCell>
+                              </TableRow>
+                            ) }
+                        </TableBody>
+                    </Table>
+                  </div>   
+                </AccordionDetails>
+            </Accordion>
+
+          </Grid>      
+                  
         </Grid>
       </>
     )
