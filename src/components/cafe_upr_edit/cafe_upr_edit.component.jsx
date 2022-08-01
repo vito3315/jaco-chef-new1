@@ -46,6 +46,7 @@ function getTime(type) {
     h  = d.getHours();
   }
   h   = (h < 10) ? '0' + h : h;
+  m   = (m < 10) ? '0' + m : m;
 
   return  h + ':' + m ;
 }   
@@ -96,7 +97,7 @@ class СafeUprEdit_ extends React.Component {
       comment             : '',
 
       point_id            : 0,
-      
+      is_load             : false
     };
   }
   
@@ -120,6 +121,7 @@ class СafeUprEdit_ extends React.Component {
         dop_time_list       : res.dop_time_list,
         actual_time_list    : res.actual_time_list,
         nal_zone_id         : res.nal_zone_id,
+        point_id            : res.points[0].id ,
     })
 
     document.title = res.module_info.name;
@@ -392,6 +394,7 @@ class СafeUprEdit_ extends React.Component {
         add_time_id : this.state.add_time_id,
         time_start  : this.state.time_start,
         time_end    : this.state.time_end,
+        point_id    : this.state.point_id,
       };
      
       console.log('saveAddTime ', data);
@@ -411,12 +414,13 @@ class СafeUprEdit_ extends React.Component {
 
   // закрывал модалки добавления времени
   closeAddTime(){
-    this.setState({ 
+    
+    this.setState({  
       modalAddTime: false,
       time_start    : getTime(1),
       time_end      : getTime(2),
       add_time_id   : 0,
-      nal_zone_id   : this.state.nal_zone_id,
+      nal_zone_id   : this.state.zone_list[0].id,
     });
   } 
 
