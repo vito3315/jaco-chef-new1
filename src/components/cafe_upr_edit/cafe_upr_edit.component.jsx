@@ -24,41 +24,37 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-import Paper from '@mui/material/Paper';
+//import Paper from '@mui/material/Paper';
 
-import CloseIcon from '@mui/icons-material/Close';
+//import CloseIcon from '@mui/icons-material/Close';
 
 import { MyTextInput, MyDatePickerNew, MyTimePicker, MySelect, MyAutocomplite, MyCheckBox } from '../../stores/elements';
-import { alertTitleClasses } from '@mui/material';
+//import { alertTitleClasses } from '@mui/material';
 
 const queryString = require('query-string');
 
-function formatDate(date) {
-    var d = new Date(date),
-        month = '' + (d.getMonth() + 1),
-        day = '' + d.getDate(),
-        year = d.getFullYear();
 
-    if (month.length < 2)
-        month = '0' + month;
-    if (day.length < 2)
-        day = '0' + day;
 
-    return [year, month, day].join('-');
-}
-    
+function getTime(type) {
+
+  let d   = new Date();
+  let h   = d.getHours();
+  let m   = d.getMinutes();
+ 
+  if(type == 2){
+    d.setHours(d.getHours() + 2);
+    h  = d.getHours();
+  }
+  h   = (h < 10) ? '0' + h : h;
+
+  return  h + ':' + m ;
+}   
+
+
 class СafeUprEdit_ extends React.Component {
   constructor(props) {
     super(props);
-       
-    let d   = new Date();
-    let h   =  d.getHours();
-    let m   = d.getMinutes();
-    d.setHours(d.getHours() + 2);
-    let h2  = d.getHours();
-    h       = (h < 10) ? '0' + h : h;
-    h2      = (h2 < 10) ? '0' + h2 : h;
-    
+      
     this.state = {
       module: 'cafe_upr_edit',
       module_name: '',
@@ -82,8 +78,8 @@ class СafeUprEdit_ extends React.Component {
       zone_id             : 0,
       nal_zone_id         : 0,
       
-      time_start          : h   + ':' + m ,
-      time_end            : h2  + ':' + m,
+      time_start          : getTime(1),
+      time_end            : getTime(2),
 
       add_time_list       : [],
       add_time_id         : 0,
@@ -100,34 +96,7 @@ class СafeUprEdit_ extends React.Component {
       comment             : '',
 
       point_id            : 0,
-      // points: [],
-      // old to del
-      //modalDialog: false,
-      //modalDialogNew: false, //todo
-
-      //description: '',
-      //promo: '',
-      //is_load: false,
       
-      //adv_actual: [],
-     // adv_old: [],
-
-     
-      //rangeDate: [formatDate(new Date()), formatDate(new Date())],
-      //date_start: formatDate(new Date()),
-      //date_end: formatDate(new Date()),
-
-     
-     // choosePoint: [],
-      //points_filter: [], // todo
-     
-      //nameCat: '',
-      //editText: '',
-
-      //name: '',
-      //editTextNew: '',
-
-      //showItem: null
     };
   }
   
@@ -202,7 +171,6 @@ class СafeUprEdit_ extends React.Component {
     });
   }
    
-
   // сохранение после редактирования
   async save(){
      let data = {
@@ -232,17 +200,15 @@ class СafeUprEdit_ extends React.Component {
   }
   //saveNew
   
-  // открываем модалнку для доавления времени
-    addTimeDelivery(){  
+  // открываем модалнку для добавления времени
+  addTimeDelivery(){  
 
     this.setState({ 
       modalAddTime: true
     })
-
-    console.log('addTimeDelivery');
   }
 
-  // открываем модалку
+  // открываем модалку стоп зоны
   stopZone(){  
    
     // дергаем актуальные данные
@@ -280,7 +246,7 @@ class СafeUprEdit_ extends React.Component {
      
   }
 
-  // чекбокс дл зон
+  // чекбокс для зон
   changeChekBoxZone(type, key, event) {
  
     let zone =  this.state.zone_list ;
@@ -443,14 +409,15 @@ class СafeUprEdit_ extends React.Component {
   }
   
 
-  // очищаем форму добавления времени
+  // закрывал модалки добавления времени
   closeAddTime(){
-      this.setState({ 
-        modalAddTime: false,
-       // time_start    : '17:00',
-       // time_end      : '17:30',
-        add_time_id   : 0,
-       });
+    this.setState({ 
+      modalAddTime: false,
+      time_start    : getTime(1),
+      time_end      : getTime(2),
+      add_time_id   : 0,
+      nal_zone_id   : this.state.nal_zone_id,
+    });
   } 
 
   render(){
@@ -543,7 +510,7 @@ class СafeUprEdit_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-              <MySelect data={this.state.points_list} value={this.state.point_id} func={this.changePoint.bind(this)} label='Точка' />
+              <MySelect is_none={false} data={this.state.points_list} value={this.state.point_id} func={this.changePoint.bind(this)} label='Точка' />
           </Grid>
 
           <Grid item xs={12} sm={12}>
