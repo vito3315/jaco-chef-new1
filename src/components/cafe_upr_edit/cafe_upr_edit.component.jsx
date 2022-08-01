@@ -50,7 +50,15 @@ function formatDate(date) {
 class СafeUprEdit_ extends React.Component {
   constructor(props) {
     super(props);
-        
+       
+    let d   = new Date();
+    let h   =  d.getHours();
+    let m   = d.getMinutes();
+    d.setHours(d.getHours() + 2);
+    let h2  = d.getHours();
+    h       = (h < 10) ? '0' + h : h;
+    h2      = (h2 < 10) ? '0' + h2 : h;
+    
     this.state = {
       module: 'cafe_upr_edit',
       module_name: '',
@@ -74,8 +82,8 @@ class СafeUprEdit_ extends React.Component {
       zone_id             : 0,
       nal_zone_id         : 0,
       
-      time_start          : '17:00',
-      time_end            : '17:30',
+      time_start          : h   + ':' + m ,
+      time_end            : h2  + ':' + m,
 
       add_time_list       : [],
       add_time_id         : 0,
@@ -87,37 +95,39 @@ class СafeUprEdit_ extends React.Component {
       cook_common_stol    : 0,
       summ_driver         : '',
 
+      is_сlosed_overload  : 0,
+      is_сlosed_technic   : 0,
+      comment             : '',
+
+      point_id            : 0,
+      // points: [],
       // old to del
-      modalDialog: false,
-      modalDialogNew: false, //todo
+      //modalDialog: false,
+      //modalDialogNew: false, //todo
 
-      description: '',
-      promo: '',
-      is_load: false,
+      //description: '',
+      //promo: '',
+      //is_load: false,
       
-      adv_actual: [],
-      adv_old: [],
+      //adv_actual: [],
+     // adv_old: [],
 
-      is_сlosed_overload : 0,
-      is_сlosed_technic : 0,
-      comment : '',
-
-      rangeDate: [formatDate(new Date()), formatDate(new Date())],
-      date_start: formatDate(new Date()),
-      date_end: formatDate(new Date()),
-
-      point_id: 0,
-      points: [],
-      choosePoint: [],
-      points_filter: [], // todo
      
-      nameCat: '',
-      editText: '',
+      //rangeDate: [formatDate(new Date()), formatDate(new Date())],
+      //date_start: formatDate(new Date()),
+      //date_end: formatDate(new Date()),
 
-      name: '',
-      editTextNew: '',
+     
+     // choosePoint: [],
+      //points_filter: [], // todo
+     
+      //nameCat: '',
+      //editText: '',
 
-      showItem: null
+      //name: '',
+      //editTextNew: '',
+
+      //showItem: null
     };
   }
   
@@ -139,10 +149,12 @@ class СafeUprEdit_ extends React.Component {
         summ_driver         : res.point_info.summ_driver,
         add_time_list       : res.add_time_list,
         dop_time_list       : res.dop_time_list,
-        actual_time_list    : res.actual_time_list
+        actual_time_list    : res.actual_time_list,
+        nal_zone_id         : res.nal_zone_id,
     })
 
     document.title = res.module_info.name;
+
   }
   
   getData = (method, data = {}) => {
@@ -220,11 +232,13 @@ class СafeUprEdit_ extends React.Component {
   }
   //saveNew
   
+  // открываем модалнку для доавления времени
+    addTimeDelivery(){  
 
-  addTimeDelivery(){  
     this.setState({ 
-      modalAddTime: true, 
+      modalAddTime: true
     })
+
     console.log('addTimeDelivery');
   }
 
@@ -259,7 +273,7 @@ class СafeUprEdit_ extends React.Component {
         })
       } else if (type == 'is_сlosed_overload') {
         this.setState({
-          showComment           : event.target.checked ? true : false,
+          showComment           : false,
           is_сlosed_technic     : false
         }) 
       }
@@ -308,7 +322,8 @@ class СafeUprEdit_ extends React.Component {
         zone_list           : res.point_zone,
         add_time_list       : res.add_time_list,
         dop_time_list       : res.dop_time_list,
-        actual_time_list    : res.actual_time_list
+        actual_time_list    : res.actual_time_list,
+        nal_zone_id         : res.nal_zone_id,
      })
 
   }
@@ -357,6 +372,7 @@ class СafeUprEdit_ extends React.Component {
       }
   }
 
+  // закрывал модалки активность кафе
   closeModalCafe(){
     this.setState({ modalStopReason: false });
 
@@ -373,6 +389,7 @@ class СafeUprEdit_ extends React.Component {
         is_сlosed_overload  : 0,
         is_сlosed_technic   : 0,
         comment             : '',
+        showComment         : false
       }) 
 
   }
@@ -387,8 +404,7 @@ class СafeUprEdit_ extends React.Component {
         is_сlosed_technic   : this.state.is_сlosed_technic  ? 1 : 0 ,  
         comment             : this.state.comment 
       } 
-      console.log('stopCafe ', data);
-
+    
       let res = await this.getData('stop_cafe', data);
 
       if (res.st === false) {
@@ -431,8 +447,8 @@ class СafeUprEdit_ extends React.Component {
   closeAddTime(){
       this.setState({ 
         modalAddTime: false,
-        time_start    : '17:00',
-        time_end      : '17:30',
+       // time_start    : '17:00',
+       // time_end      : '17:30',
         add_time_id   : 0,
        });
   } 
@@ -531,7 +547,7 @@ class СafeUprEdit_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={12}>
-              <MySelect data={this.state.tables} value={this.state.count_tables} func={(event) => { this.setState({ count_tables: event.target.value }) } }  label='Количество столов сборки' />
+              <MySelect is_none={false}  data={this.state.tables} value={this.state.count_tables} func={(event) => { this.setState({ count_tables: event.target.value }) } }  label='Количество столов сборки' />
           </Grid> 
 
           <Grid item xs={12} sm={4}>
@@ -566,7 +582,7 @@ class СafeUprEdit_ extends React.Component {
             <Button color="primary" variant="contained" onClick={this.save.bind(this)}>Сохранить</Button>
           </Grid> 
 
-          <Grid item xs={12} >
+          <Grid item xs={12} style={{marginBottom:'50px' }} >
 
             <Accordion>
               <AccordionSummary
@@ -599,37 +615,38 @@ class СafeUprEdit_ extends React.Component {
                 </AccordionDetails>
             </Accordion>
 
-            <Accordion>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-              >
-              <Typography>Дополнительное время</Typography>
-              </AccordionSummary>
-                <AccordionDetails>
-                    <div style={{width:'100%', overflow: 'scroll' }} >          
-                    <Table >
-                          <TableHead>
-                            <TableRow>
-                              <TableCell style={{width:'33%' }}>Зона</TableCell>
-                              <TableCell style={{width:'33%' }}>Промежуток</TableCell>
-                              <TableCell style={{width:'33%' }}>Время доставки</TableCell>
-                            </TableRow>
-                          </TableHead>
-
-                          <TableBody>
-                          { this.state.dop_time_list.map( (item, key) =>
-                              <TableRow key={key}>
-                                <TableCell>{item.name}</TableCell>
-                                <TableCell>{item.time_start} - {item.time_end}</TableCell>
-                                <TableCell>{item.time_dev} мин.</TableCell>
+            {this.state.dop_time_list.length > 0 ?                  
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                >
+                <Typography>Дополнительное время</Typography>
+                </AccordionSummary>
+                  <AccordionDetails>
+                      <div style={{width:'100%', overflow: 'scroll' }} >          
+                      <Table >
+                            <TableHead>
+                              <TableRow>
+                                <TableCell style={{width:'33%' }}>Зона</TableCell>
+                                <TableCell style={{width:'33%' }}>Промежуток</TableCell>
+                                <TableCell style={{width:'33%' }}>Время доставки</TableCell>
                               </TableRow>
-                            ) }
-                        </TableBody>
-                    </Table>
-                  </div>   
-                </AccordionDetails>
-            </Accordion>
+                            </TableHead>
 
+                            <TableBody>
+                            { this.state.dop_time_list.map( (item, key) =>
+                                <TableRow key={key}>
+                                  <TableCell>{item.name}</TableCell>
+                                  <TableCell>{item.time_start} - {item.time_end}</TableCell>
+                                  <TableCell>{item.time_dev} мин.</TableCell>
+                                </TableRow>
+                              ) }
+                          </TableBody>
+                      </Table>
+                    </div>   
+                  </AccordionDetails>
+              </Accordion>
+            : null }
           </Grid>      
                   
         </Grid>
