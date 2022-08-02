@@ -323,18 +323,19 @@ class СafeUprEdit_ extends React.Component {
       if(confirm('Вы действительное хотите сохранить данные?')){
 
         let data = {
-            zone_list: this.state.zone_list,
+            zone_list : this.state.zone_list,
+            point_id  : this.state.point_id,
         };
-        console.log('data=', data);
-
+        
         let res = await this.getData('stop_zone', data);
         if (res.st === false) {
           alert(res.text)
         } else {
-            console.log('ok');
+           
             this.setState({ 
               modalStopZone: false, 
             })
+            alert('Данные успешно сохранены!');
         }
 
       }
