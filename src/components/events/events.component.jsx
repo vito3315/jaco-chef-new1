@@ -390,7 +390,7 @@ class Events_ extends React.Component {
                 { this.state.dayEvents.map( (item, key) => 
                   <ListItem key={key}>
                     <ListItemText primary={item.title} />
-                    { parseInt(item.type) == 4 ? null :
+                    { ( parseInt(item.type) == 4 ||  parseInt(item.type) == 6) ? null :
                       <CloseIcon color="primary" onClick={this.delEvent.bind(this, item)} style={{ cursor: 'pointer' }} />
                     }
                   </ListItem>
