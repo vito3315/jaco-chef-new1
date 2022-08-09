@@ -127,7 +127,7 @@ class СafeUprEdit_ extends React.Component {
         actual_time_list    : res.actual_time_list,
         nal_zone_id         : res.nal_zone_id,
         point_id            : res.points[0].id ,
-        reason_list         : res.reason_list,
+        reason_list         : res.reason_list
     })
 
     document.title = res.module_info.name;
@@ -298,6 +298,8 @@ class СafeUprEdit_ extends React.Component {
         dop_time_list       : res.dop_time_list,
         actual_time_list    : res.actual_time_list,
         nal_zone_id         : res.nal_zone_id,
+        is_сlosed_overload  : res.point_info.is_сlosed_overload,
+        is_сlosed_technic   : res.point_info.is_сlosed_technic,
      })
 
   }
