@@ -26,7 +26,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 //import Paper from '@mui/material/Paper';
 
-//import CloseIcon from '@mui/icons-material/Close';
+import CloseIcon from '@mui/icons-material/Close';
 
 import { MyTextInput, MyDatePickerNew, MyTimePicker, MySelect, MyAutocomplite, MyCheckBox } from '../../stores/elements';
 //import { alertTitleClasses } from '@mui/material';
@@ -85,6 +85,9 @@ class СafeUprEdit_ extends React.Component {
       add_time_list       : [],
       add_time_id         : 0,
       tables              : [],
+      
+      reason_list         : [], // причины закрытия кафе
+      chooseReason        : null, // выбранная причина
 
       count_tables        : 0,
 
@@ -97,7 +100,9 @@ class СafeUprEdit_ extends React.Component {
       comment             : '',
 
       point_id            : 0,
-      is_load             : false
+      is_load             : false,
+
+      is_send_add_time    : false,
     };
   }
   
@@ -122,6 +127,7 @@ class СafeUprEdit_ extends React.Component {
         actual_time_list    : res.actual_time_list,
         nal_zone_id         : res.nal_zone_id,
         point_id            : res.points[0].id ,
+        reason_list         : res.reason_list,
     })
 
     document.title = res.module_info.name;
@@ -312,7 +318,9 @@ class СafeUprEdit_ extends React.Component {
       this.getPoint();
       setTimeout(() => {
         this.setState({
-          modalStopReason: true
+          modalStopReason : true,
+         // chooseReason    : null
+          //chooseReason    : this.state.reason_list[2] 
         })  
       }, 300)
   }
@@ -343,6 +351,7 @@ class СafeUprEdit_ extends React.Component {
 
   // закрывал модалки активность кафе
   closeModalCafe(){
+    
     this.setState({ modalStopReason: false });
 
     // если не выбрали причину закрытия кафе, возвращем галку Кафе работает
@@ -371,7 +380,7 @@ class СafeUprEdit_ extends React.Component {
         point_id            : this.state.point_id,
         is_сlosed_overload  : this.state.is_сlosed_overload ? 1 : 0 , 
         is_сlosed_technic   : this.state.is_сlosed_technic  ? 1 : 0 ,  
-        comment             : this.state.comment 
+        comment             : this.state.chooseReason 
       } 
     
       let res = await this.getData('stop_cafe', data);
@@ -388,31 +397,44 @@ class СafeUprEdit_ extends React.Component {
   }
 
   async saveAddTime() {
+
     if(confirm('Вы действительное хотите сохранить данные?')){
 
-      let data = {
-        nal_zone_id : this.state.nal_zone_id,
-        add_time_id : this.state.add_time_id,
-        time_start  : this.state.time_start,
-        time_end    : this.state.time_end,
-        point_id    : this.state.point_id,
-      };
-     
-      console.log('saveAddTime ', data);
+      if(!this.state.is_send_add_time){
 
-      let res = await this.getData('add_time', data);
+        // ставим флаг что отправили данные, защита от дабл клика
+        this.setState({
+            is_send_add_time : true,
+        });
 
-      if (res.st === false) {
-        alert(res.text)
-      } else {
-          this.closeAddTime();
-          this.getPoint();
-          alert('Данные успешно сохранены!');
-        }
+        let data = {
+          nal_zone_id : this.state.nal_zone_id,
+          add_time_id : this.state.add_time_id,
+          time_start  : this.state.time_start,
+          time_end    : this.state.time_end,
+          point_id    : this.state.point_id,    
+        };
+  
+        let res = await this.getData('add_time', data);
+
+        // убираем флаг
+        setTimeout(() => {
+          this.setState({
+            is_send_add_time : false,
+          })  
+        }, 300)
+
+        if (res.st === false) {
+          alert(res.text)
+        } else {
+            this.closeAddTime();
+            this.getPoint();
+            alert('Данные успешно сохранены!');
+          }
+      }
     }
   }
   
-
   // закрывал модалки добавления времени
   closeAddTime(){
     
@@ -424,6 +446,49 @@ class СafeUprEdit_ extends React.Component {
       nal_zone_id   : this.state.zone_list[0].id,
     });
   } 
+
+  // функция изменения времени в тайм пикере + проверка
+  changeTime(type, event){
+   
+    // проверяем что бы время окончания было меньше
+    if(type == 'time_end'){
+      let time_start = this.state.time_start;
+      if(event.target.value < time_start) {
+        return false;
+      }
+    }
+    
+    // проверяем что бы время начало было меньше окончания
+    if(type == 'time_start'){
+      let time_end = this.state.time_end;
+      if(event.target.value > time_end) {
+        return false;
+      }
+    }
+
+    this.setState({
+        [type]: event.target.value 
+    })
+  }
+
+  // удаления доп время
+  async delDopTime(id){
+
+    if(confirm('Вы действительное хотите удалить доп время?')){
+
+      let data = {
+        id : id,
+      };
+
+      let res = await this.getData('del_time', data);
+      if (res.st === false) {
+        alert(res.text)
+      } else {
+          this.getPoint();
+          alert('Доп. время успешно удалено');
+      }
+    }
+  }
 
   render(){
     return (
@@ -448,7 +513,7 @@ class СafeUprEdit_ extends React.Component {
                 </Grid>
                {this.state.showComment ? 
                   <Grid item xs={12} sm={12} >
-                      <MyTextInput value={this.state.comment} func={(event) => { this.setState({ comment: event.target.value }) }} label='Другое'  />
+                      <MyAutocomplite data={this.state.reason_list} value={this.state.chooseReason} func={(event, data) => { this.setState({ chooseReason: data }) }} multiple={false} label='Причина' />
                   </Grid>
                 : null}
             </Grid>
@@ -495,10 +560,10 @@ class СafeUprEdit_ extends React.Component {
                   <MySelect is_none={false} data={this.state.add_time_list} value={this.state.add_time_id} func={(event) => { this.setState({ add_time_id: event.target.value }) }} label='Доп время, мин' />
                 </Grid>
                 <Grid item xs={6} sm={6}>
-                    <MyTimePicker label="Время начала" value={this.state.time_start} func={(event) => { this.setState({ time_start: event.target.value }) }}  />
+                    <MyTimePicker label="Время начала" value={this.state.time_start}   func={this.changeTime.bind(this, 'time_start')}   />
                 </Grid>
                   <Grid item xs={6} sm={6}>
-                    <MyTimePicker label="Время окончания" value={this.state.time_end}   func={(event) => { this.setState({ time_end: event.target.value }) }}  />
+                    <MyTimePicker label="Время окончания" value={this.state.time_end}  func={this.changeTime.bind(this, 'time_end')}    />
                 </Grid>
             </Grid>
           </DialogContent>
@@ -602,6 +667,7 @@ class СafeUprEdit_ extends React.Component {
                                 <TableCell style={{width:'33%' }}>Зона</TableCell>
                                 <TableCell style={{width:'33%' }}>Промежуток</TableCell>
                                 <TableCell style={{width:'33%' }}>Время доставки</TableCell>
+                                <TableCell style={{width:'1%' }}></TableCell>
                               </TableRow>
                             </TableHead>
 
@@ -611,6 +677,7 @@ class СafeUprEdit_ extends React.Component {
                                   <TableCell>{item.name}</TableCell>
                                   <TableCell>{item.time_start} - {item.time_end}</TableCell>
                                   <TableCell>{item.time_dev} мин.</TableCell>
+                                  <TableCell> <CloseIcon onClick={this.delDopTime.bind(this, item.id)} /> </TableCell>
                                 </TableRow>
                               ) }
                           </TableBody>
