@@ -531,7 +531,7 @@ class СafeUprEdit_ extends React.Component {
           <DialogTitle>Поставить зону на стоп</DialogTitle>
           <DialogContent style={{ paddingTop: 10 }}>
             <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12}>
                   { this.state.zone_list.map((item, key) =>
                       <MyCheckBox key={key} label={item.name} value={parseInt(item.is_active) == 1 ? true : false} func={this.changeChekBoxZone.bind(this, 'zone_id', key)} />
                   )} 
