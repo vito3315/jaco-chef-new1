@@ -300,6 +300,7 @@ class СafeUprEdit_ extends React.Component {
         nal_zone_id         : res.nal_zone_id,
         is_сlosed_overload  : res.point_info.is_сlosed_overload,
         is_сlosed_technic   : res.point_info.is_сlosed_technic,
+        comment             : comment,
      })
 
   }
@@ -314,14 +315,20 @@ class СafeUprEdit_ extends React.Component {
 
   // открываем модалку закрытия кафе
   opneCloseCafeModal() {
-      console.log('opneCloseCafeModal');
-
       // дергаем актуальные данные
       this.getPoint();
       setTimeout(() => {
+
+        // показываем поле коммент 
+        if(this.state.is_сlosed_technic){
+          this.setState({
+            showComment : true
+          })  
+        }
+
         this.setState({
           modalStopReason : true,
-         // chooseReason    : null
+          //chooseReason    : null
           //chooseReason    : this.state.reason_list[2] 
         })  
       }, 300)

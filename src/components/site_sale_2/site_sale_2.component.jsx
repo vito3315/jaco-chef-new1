@@ -180,7 +180,8 @@ class SiteSale2_new_ extends React.Component {
         {id: 4, name: 'Отправить в смс'},
         {id: 5, name: 'Рассылка смс'},
         {id: 6, name: 'Отправить в ЛК (через 8)'},
-        {id: 7, name: 'Создать сертификат(ы)'},
+        {id: 7, name: 'Создать открытый сертификат(ы)'},
+        {id: 9, name: 'Создать скрытый сертификат(ы)'},
         {id: 8, name: 'Отправить через бота ВК'},
       ],
       promo_action_list: [],
@@ -485,7 +486,7 @@ class SiteSale2_new_ extends React.Component {
       }
       
       //сертификаты
-      if( parseInt(this.state.where_promo) == 7 ){
+      if( parseInt(this.state.where_promo) == 7 || parseInt(this.state.where_promo) == 9  ){
         this.setState({
           modalDialog: true,
           modalText: res.text,
@@ -1264,7 +1265,7 @@ class SiteSale2_new_ extends React.Component {
               null
             }
             
-            { parseInt(this.state.where_promo) == 7 ?
+            { parseInt(this.state.where_promo) == 7 || parseInt(this.state.where_promo) == 9 ?
               <Grid item xs={12} sm={12}>
                 <MyTextInput value={this.state.cert_text} func={ this.changeData.bind(this, 'cert_text') } label='Текст для описания сертификата' />
               </Grid>
