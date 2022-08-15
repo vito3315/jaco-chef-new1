@@ -300,7 +300,7 @@ class СafeUprEdit_ extends React.Component {
         nal_zone_id         : res.nal_zone_id,
         is_сlosed_overload  : res.point_info.is_сlosed_overload,
         is_сlosed_technic   : res.point_info.is_сlosed_technic,
-        comment             : comment,
+        comment             : res.comment,
      })
 
   }
@@ -458,23 +458,7 @@ class СafeUprEdit_ extends React.Component {
 
   // функция изменения времени в тайм пикере + проверка
   changeTime(type, event){
-   
-    // проверяем что бы время окончания было меньше
-    if(type == 'time_end'){
-      let time_start = this.state.time_start;
-      if(event.target.value < time_start) {
-        return false;
-      }
-    }
-    
-    // проверяем что бы время начало было меньше окончания
-    if(type == 'time_start'){
-      let time_end = this.state.time_end;
-      if(event.target.value > time_end) {
-        return false;
-      }
-    }
-
+     
     this.setState({
         [type]: event.target.value 
     })
