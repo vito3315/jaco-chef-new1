@@ -385,13 +385,14 @@ class СafeUprEdit_ extends React.Component {
   async stopCafe(){
     if(confirm('Вы действительное хотите сохранить данные?')){
 
+     
       let data = {
         point_id            : this.state.point_id,
         is_сlosed_overload  : this.state.is_сlosed_overload ? 1 : 0 , 
         is_сlosed_technic   : this.state.is_сlosed_technic  ? 1 : 0 ,  
         comment             : this.state.chooseReason 
       } 
-    
+
       let res = await this.getData('stop_cafe', data);
 
       if (res.st === false) {
@@ -400,6 +401,8 @@ class СafeUprEdit_ extends React.Component {
           this.setState({ 
               modalStopReason: false, 
           })
+           // дергаем актуальные данные
+          this.getPoint();
           alert('Данные успешно сохранены!');
       }
     }
