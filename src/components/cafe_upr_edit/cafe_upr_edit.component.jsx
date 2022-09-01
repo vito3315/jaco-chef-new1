@@ -28,7 +28,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import CloseIcon from '@mui/icons-material/Close';
 
-import { MyTextInput, MyDatePickerNew, MyTimePicker, MySelect, MyAutocomplite, MyCheckBox } from '../../stores/elements';
+import { MyTextInput, MyDatePickerNew, MyTimePicker, MySelect, MyAutocomplite2, MyCheckBox } from '../../stores/elements';
 //import { alertTitleClasses } from '@mui/material';
 
 const queryString = require('query-string');
@@ -509,9 +509,9 @@ class СafeUprEdit_ extends React.Component {
                 </Grid>
                {this.state.showComment ? 
                   <Grid item xs={12} sm={12} >
-                      <MyAutocomplite data={this.state.reason_list} value={this.state.chooseReason} func={(event, data) => { this.setState({ chooseReason: data }) }} multiple={false} label='Причина' />
+                      <MyAutocomplite2 id="cafe_upr_edit" data={this.state.reason_list} value={this.state.chooseReason} func={(event, data) => { this.setState({ chooseReason: data }) }} multiple={false} label='Причина'  freeSolo={true} />
                   </Grid>
-                : null}
+                : null} 
             </Grid>
           </DialogContent>
 

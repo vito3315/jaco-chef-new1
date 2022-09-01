@@ -146,6 +146,37 @@ export class MyAutocomplite2 extends React.PureComponent {
       )
     }
 
+    // для Управление точкой управляющего
+    if( this.props.id && this.props.id == 'cafe_upr_edit' ){
+      return (
+        <Stack spacing={3}>
+          <Autocomplete
+            freeSolo={ this.props.freeSolo ? this.props.freeSolo : false }
+            size="small"
+            //disableCloseOnSelect={true}
+            onBlur={this.props.onBlur ? this.props.onBlur : null}
+            id={ this.props.id ?? null }
+            
+            options={this.props.data.map((option) => option.name)}
+  
+            value={this.props.value}
+            onChange={this.props.func}
+            filterSelectedOptions
+            multiple={ this.props.multiple && this.props.multiple === true ? true : false }
+       
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={this.props.label}
+                placeholder={this.props.placeholder}
+              />
+            )}
+          />
+        </Stack>
+      )
+    }  
+
+
     return (
       <Stack spacing={3}>
         <Autocomplete

@@ -373,7 +373,14 @@ class SiteItems_ extends React.Component {
     });
   }  
 
-  async openItem(item, type = 'origin'){
+  async openItem(item, type = 'origin', is_hist = '', test, test2){
+    // todo
+    console.log('item=',item);
+    console.log('type='+type);
+    console.log('is_hist=',is_hist);
+    console.log('test=',test);
+    console.log('test=',test2);
+
     let data = {
       id: item.id,
       type: type,
@@ -1645,10 +1652,10 @@ class SiteItems_ extends React.Component {
                     <TabContext value={this.state.ItemTab1}>
                       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <TabList onChange={ this.changeTab1.bind(this) } variant="fullWidth">
-                          <Tab label="Текущая" value="0" />
-                          { this.state.openHist.map( (item, key) => 
+                        { this.state.openHist.map( (item, key) => 
                             <Tab key={key} label={item.date_start} value={item.id} />
                           ) }
+                          <Tab label="Текущая" value="0" />
                           <Tab label="Добавить" value="-1" />
                         </TabList>
                       </Box>
@@ -2485,7 +2492,7 @@ class SiteItems_ extends React.Component {
           </Grid>
 
           { this.state.cats.length == 0 ? null :
-            <SiteItemsTable timeUpdate={this.state.timeUpdate} cats={this.state.cats} changeSort={this.changeSort.bind(this)} saveSort={this.saveSort.bind(this)} changeDateUpdate={this.changeDateUpdate.bind(this)} openItem={this.openItem.bind(this)} />
+            <SiteItemsTable timeUpdate={this.state.timeUpdate} cats={this.state.cats} changeSort={this.changeSort.bind(this)} saveSort={this.saveSort.bind(this)} changeDateUpdate={this.changeDateUpdate.bind(this)} openItem={this.openItem.bind(1, this )} />
           }
 
         </Grid>
