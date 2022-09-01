@@ -2492,7 +2492,7 @@ class SiteItems_ extends React.Component {
           </Grid>
 
           { this.state.cats.length == 0 ? null :
-            <SiteItemsTable timeUpdate={this.state.timeUpdate} cats={this.state.cats} changeSort={this.changeSort.bind(this)} saveSort={this.saveSort.bind(this)} changeDateUpdate={this.changeDateUpdate.bind(this)} openItem={this.openItem.bind(1, this )} />
+            <SiteItemsTable timeUpdate={this.state.timeUpdate} cats={this.state.cats} changeSort={this.changeSort.bind(this)} saveSort={this.saveSort.bind(this)} changeDateUpdate={this.changeDateUpdate.bind(this)} openItem={this.openItem.bind(this )} />
           }
 
         </Grid>
