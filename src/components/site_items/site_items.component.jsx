@@ -147,7 +147,7 @@ class SiteItemsTable extends React.Component {
                     { cat.items.map( (it, k) =>
                       <TableRow key={k}>
                         <TableCell>{it.id}</TableCell>
-                        <TableCell onClick={this.props.openItem.bind(this, it, 'origin', 4)}>{it.name}</TableCell>
+                        <TableCell onClick={this.props.openItem.bind(this, it, 'hist')}>{it.name}</TableCell>
                         { it.date_update ?
                           <TableCell>
                             <MyDatePickerNew label="" value={ it.date_update } func={ this.props.changeDateUpdate.bind(this, key, k, it.date_update_id) } />
@@ -455,7 +455,7 @@ class SiteItems_ extends React.Component {
       item_items: items_items,
 
       openHist: res.hist,
-      ItemTab1 : res.hist.length > 0 ? res.hist[0].id : '0',
+      ItemTab1 : res.hist.length > 0 && type == 'hist' ? res.hist[0].id : '0',
       modalEdit: true,
 
       date_update: formatDate(res.item.date_start) ?? formatDate(new Date()),
