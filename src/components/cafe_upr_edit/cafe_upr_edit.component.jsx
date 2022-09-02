@@ -239,6 +239,13 @@ class СafeUprEdit_ extends React.Component {
       this.setState({
           [type]: event.target.checked 
       })
+      
+      // сразу убираем стоп у кафе
+      if(type == 'is_active' && event.target.checked  == true){
+        setTimeout(() => {
+            this.runCafe();
+        }, 250)
+      }
 
       if(type == 'is_сlosed_technic'){
         this.setState({
@@ -408,6 +415,28 @@ class СafeUprEdit_ extends React.Component {
     }
   }
 
+  // Cтоп кафе
+  async runCafe(){
+
+    console.log('run cafe');
+    let data = {
+      point_id   : this.state.point_id,
+      is_active  : this.state.is_active,
+    } 
+
+    let res = await this.getData('run_cafe', data);
+
+    if (res.st === false) {
+      alert(res.text)
+    } else {
+      this.setState({ 
+          modalStopReason: false, 
+      })
+      this.getPoint();
+      alert('Данные успешно сохранены!');
+    }
+  }
+  
   async saveAddTime() {
 
     if(confirm('Вы действительное хотите сохранить данные?')){

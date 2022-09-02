@@ -147,7 +147,7 @@ class SiteItemsTable extends React.Component {
                     { cat.items.map( (it, k) =>
                       <TableRow key={k}>
                         <TableCell>{it.id}</TableCell>
-                        <TableCell onClick={this.props.openItem.bind(this, it, 'origin')}>{it.name}</TableCell>
+                        <TableCell onClick={this.props.openItem.bind(this, it, 'origin', 4)}>{it.name}</TableCell>
                         { it.date_update ?
                           <TableCell>
                             <MyDatePickerNew label="" value={ it.date_update } func={ this.props.changeDateUpdate.bind(this, key, k, it.date_update_id) } />
@@ -373,14 +373,9 @@ class SiteItems_ extends React.Component {
     });
   }  
 
-  async openItem(item, type = 'origin', is_hist = '', test, test2){
+  async openItem(item, type = 'origin'){
     // todo
-    console.log('item=',item);
-    console.log('type='+type);
-    console.log('is_hist=',is_hist);
-    console.log('test=',test);
-    console.log('test=',test2);
-
+  
     let data = {
       id: item.id,
       type: type,
@@ -460,7 +455,7 @@ class SiteItems_ extends React.Component {
       item_items: items_items,
 
       openHist: res.hist,
-
+      ItemTab1 : res.hist.length > 0 ? res.hist[0].id : '0',
       modalEdit: true,
 
       date_update: formatDate(res.item.date_start) ?? formatDate(new Date()),
@@ -2492,7 +2487,7 @@ class SiteItems_ extends React.Component {
           </Grid>
 
           { this.state.cats.length == 0 ? null :
-            <SiteItemsTable timeUpdate={this.state.timeUpdate} cats={this.state.cats} changeSort={this.changeSort.bind(this)} saveSort={this.saveSort.bind(this)} changeDateUpdate={this.changeDateUpdate.bind(this)} openItem={this.openItem.bind(this )} />
+            <SiteItemsTable timeUpdate={this.state.timeUpdate} cats={this.state.cats} changeSort={this.changeSort.bind(this)} saveSort={this.saveSort.bind(this)} changeDateUpdate={this.changeDateUpdate.bind(this)} openItem={this.openItem.bind(this)} />
           }
 
         </Grid>
