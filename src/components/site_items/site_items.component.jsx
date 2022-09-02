@@ -147,7 +147,7 @@ class SiteItemsTable extends React.Component {
                     { cat.items.map( (it, k) =>
                       <TableRow key={k}>
                         <TableCell>{it.id}</TableCell>
-                        <TableCell onClick={this.props.openItem.bind(this, it, 'hist')}>{it.name}</TableCell>
+                        <TableCell onClick={this.props.openItem.bind(this, it,it.date_update ? 'hist' : 'origin')}>{it.name}</TableCell>
                         { it.date_update ?
                           <TableCell>
                             <MyDatePickerNew label="" value={ it.date_update } func={ this.props.changeDateUpdate.bind(this, key, k, it.date_update_id) } />
@@ -1397,6 +1397,8 @@ class SiteItems_ extends React.Component {
       ItemTab: value 
     })
 
+    console.log('t', this.state.item_pf);
+
     if( parseInt(value) == 1 ){
       setTimeout( () => {
         this.myDropzoneOld = new Dropzone("#for_img_edit_old", this.dropzoneOptions);
@@ -1918,7 +1920,7 @@ class SiteItems_ extends React.Component {
                               
                             </Grid>
 
-                          </TabPanel>
+                          </TabPanel> 
                           <TabPanel value="3">
 
                             <Grid container spacing={3}>
@@ -1964,6 +1966,7 @@ class SiteItems_ extends React.Component {
                             </Grid>
 
                           </TabPanel>
+                          
                           <TabPanel value="4">
 
                             <Grid container spacing={3}>
