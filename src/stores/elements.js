@@ -85,7 +85,7 @@ export class MyAutocomplite extends React.PureComponent {
         <Autocomplete
           size="small"
           disableCloseOnSelect={true}
-          freeSolo
+          //freeSolo
           //multiple={true}
           id={ this.props.id ?? null }
           options={this.props.data}
