@@ -151,6 +151,8 @@ class SiteUserManager_ extends React.Component {
 
         let data = await this.getData('get_all');
 
+        console.log(data);
+
         this.setState({
             module_name: data.module_info.name,
             point_list: data.points,
