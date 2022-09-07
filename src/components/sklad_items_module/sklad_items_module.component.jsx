@@ -566,7 +566,7 @@ class SkladItemsModule_ extends React.Component {
                         <MyTextInput label="Максимальное количество заказов в месяц (0 - без ограничений)" value={ this.state.itemEdit.item.max_count_in_m } func={ this.changeItem.bind(this, 'max_count_in_m') } />
                       </Grid>
                       <Grid item xs={12} sm={6}>
-                        <MySelect data={this.state.itemEdit.cats} value={this.state.itemEdit.item.cat_id} func={ this.changeItem.bind(this, 'cat_id') } label='Категория' />
+                        <MySelect data={this.state.itemEdit.cats} value={this.state.itemEdit.item.cat_id == '0' ? '' : this.state.itemEdit.item.cat_id} func={ this.changeItem.bind(this, 'cat_id') } label='Категория' />
                       </Grid>
                     </Grid>
                   </Grid>
@@ -661,7 +661,7 @@ class SkladItemsModule_ extends React.Component {
                         <MyAutocomplite label='Заготовка' 
                         multiple={false} 
                         data={this.state.itemEdit.pf_list}
-                        value={this.state.itemEdit.item.pf_id} 
+                        value={this.state.itemEdit.item.pf_id == '0' ? null : this.state.itemEdit.item.pf_id} 
                         func={ (event, value) => { 
                           let this_storages = this.state.itemEdit; 
                           this_storages.item.pf_id = value;
