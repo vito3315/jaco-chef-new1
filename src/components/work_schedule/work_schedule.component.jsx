@@ -230,8 +230,8 @@ class WorkSchedule_ extends React.Component {
       
       points: [],
       mounths: [],
-      point: '0',
-      mounth: '0',
+      point: '',
+      mounth: '',
       
       one: null,
       two: null,
@@ -648,7 +648,7 @@ class WorkSchedule_ extends React.Component {
   render(){ 
     return (
       <>
-        <Backdrop open={this.state.is_load}>
+        <Backdrop open={this.state.is_load} style={{ zIndex: 999 }}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
@@ -944,7 +944,7 @@ class WorkSchedule_ extends React.Component {
             <TabPanel value={this.state.tabTable} index={0}>
               { !this.state.one ? null :
                 <TableContainer component={Paper}>
-                  <Table aria-label="a dense table" id="table_graph_one">
+                  <Table id="table_graph_one">
                     
                     <TableBody>
                       
@@ -953,7 +953,7 @@ class WorkSchedule_ extends React.Component {
                           <HeaderItem key={key} bonus_other={this.state.one.bonus_other} changeLVDir={this.changeLVDir.bind(this)} changeDopBonus={this.changeDopBonus.bind(this)} kind={this.state.kind} show_zp={this.state.show_zp_one} lv_dir={this.state.lv_dir} lv_cafe={this.state.lv_cafe} dataKey={key} days={this.state.one.days} item={item} />
                             :
                           <TableRow key={key}>
-                            <TableCell style={{ minWidth: 140, minHeight: 38, position: 'absolute', backgroundColor: '#fff', marginLeft: '-1px', borderBottom: '2px solid #e5e5e5' }}>{item.data.user_name}</TableCell>
+                            <TableCell className='name_pinning'>{item.data.user_name}</TableCell>
                             <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
 
                             { this.state.kind == 'manager' ? null :

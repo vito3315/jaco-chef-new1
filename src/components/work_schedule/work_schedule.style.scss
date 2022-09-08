@@ -14,3 +14,14 @@
 div.css-19kzrtu{
     padding-right: 0px!important;
 }
+.name_pinning{
+    min-width: fit-content;
+    min-height: 38px;
+    position: absolute;
+    background-color: #fff;
+    margin-left: -1px;
+    border-bottom: 2px solid #e5e5e5;
+    display: flex!important;
+    justify-content: flex-start;
+    align-items: center;
+}
