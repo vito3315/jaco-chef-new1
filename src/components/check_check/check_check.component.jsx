@@ -8,6 +8,9 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import TableContainer from '@mui/material/TableContainer';
+
+import Paper from '@mui/material/Paper';
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -30,418 +33,353 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyAutocomplite, MyTextInput } from '../../stores/elements';
+import IconButton from '@mui/material/IconButton';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
+import {
+  MySelect,
+  MyDatePickerNew,
+  MyCheckBox,
+  MyAutocomplite,
+  MyTextInput,
+} from '../../stores/elements';
 
 const queryString = require('query-string');
+
+function formatDate(date) {
+  var d = new Date(date),
+    month = '' + (d.getMonth() + 1),
+    day = '' + d.getDate(),
+    year = d.getFullYear();
+
+  if (month.length < 2) month = '0' + month;
+  if (day.length < 2) day = '0' + day;
+
+  return [year, month, day].join('-');
+}
+
+class CheckCheckTable extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    // var array1 = nextProps.users;
+    // var array2 = this.props.users;
+
+    // var is_same = (array1.length == array2.length) && array1.every(function(element, index) {
+    //     return element === array2[index];
+    // });
+
+    // console.log(this.props)
+
+    return true;
+  }
+
+  render() {
+    return (
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>#</TableCell>
+              <TableCell>Номер заказа</TableCell>
+              <TableCell>Тип заказа</TableCell>
+              <TableCell>Номер кассы</TableCell>
+              <TableCell>Сумма заказа</TableCell>
+              <TableCell>Дата/Время заказа</TableCell>
+              <TableCell>Найти заказ</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {this.props.orders.map((item, key) => (
+              <TableRow key={key}>
+                <TableCell>{key + 1}</TableCell>
+                <TableCell>
+                <MyTextInput
+                    value = {item.number_order}
+                    // func={ this.changeItem.bind(this, 'name_for_vendor') }
+                  /> 
+                </TableCell>
+                <TableCell>{item.type}</TableCell>
+                <TableCell>{item.order_box}</TableCell>
+                <TableCell>{item.sum}</TableCell>
+                <TableCell>{item.date_order}</TableCell>
+                <TableCell>
+                  <Button onClick={this.props.openOrder.bind(this, item.id)}>
+                    <OpenInNewIcon className="icon" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  }
+}
+
+class CheckModalTable extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    // var array1 = nextProps.users;
+    // var array2 = this.props.users;
+
+    // var is_same = (array1.length == array2.length) && array1.every(function(element, index) {
+    //     return element === array2[index];
+    // });
+
+    return true;
+  }
+
+  render() {
+    return (
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>#</TableCell>
+              <TableCell>Номер заказа</TableCell>
+              <TableCell>Дата/Время заказа</TableCell>
+              <TableCell>Тип заказа</TableCell>
+              <TableCell>Сумма заказа</TableCell>
+              <TableCell>Выбрать</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {this.props.orders.map((item, key) => (
+              <TableRow key={key}>
+                <TableCell>{key + 1}</TableCell>
+                <TableCell>{item.number}</TableCell>
+                <TableCell>{item.date_order}</TableCell>
+                <TableCell>{item.type}</TableCell>
+                <TableCell>{item.sum}</TableCell>
+                <TableCell>
+                  <Button onClick={this.props.selectOrder.bind(this, item.id)}>
+                    <CheckCircleIcon className="icon" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  }
+}
 
 class CheckCheck_ extends React.Component {
   constructor(props) {
     super(props);
-        
+
     this.state = {
       module: 'check_check',
-      module_name: '',
+      module_name: 'Проверка чеков',
       is_load: false,
-      
-      cats: [],
-      allItems: [],
-      vendor_items: [],
 
-      modalItemEdit: false,
-      modalItemNew: false,
+      point_list: [
+        { id: -1, name: 'Все точки' },
+        {
+          base: 'jaco_rolls_1',
+          name: 'Тольятти, Ленинградская 47',
+          id: '1',
+          city_id: '1',
+        },
+        {
+          base: 'jaco_rolls_2',
+          name: 'Тольятти, Ворошилова 12а',
+          id: '2',
+          city_id: '1',
+        },
+        {
+          base: 'jaco_rolls_3',
+          name: 'Тольятти, Матросова 32',
+          id: '3',
+          city_id: '1',
+        },
+        {
+          base: 'jaco_rolls_6',
+          name: 'Тольятти, Цветной 1',
+          id: '6',
+          city_id: '1',
+        },
+        {
+          base: 'jaco_rolls_4',
+          name: 'Самара, Куйбышева 113',
+          id: '4',
+          city_id: '2',
+        },
+        {
+          base: 'jaco_rolls_5',
+          name: 'Самара, Победы 10',
+          id: '5',
+          city_id: '2',
+        },
+        {
+          base: 'jaco_rolls_7',
+          name: 'Самара, Молодёжная 2',
+          id: '7',
+          city_id: '2',
+        },
+      ],
+      point_id: 0,
 
-      itemEdit: null,
-      itemName: '',
+      select_list: [
+        { id: '1', name: 'выгрузить из налоговой' },
+        { id: '2', name: 'очистить для 1с' },
+        { id: '3', name: 'выгрузить для 1с' },
+        { id: '4', name: 'сверить сумму за месяц' },
+        { id: '5', name: 'сверить сумму по дням' },
+        { id: '6', name: 'есть у нас, но нету в налоговой' },
+        { id: '7', name: 'не завершенные заказы' },
+        { id: '8', name: 'очистить для 1с' },
+        { id: '9', name: 'удалить все данные' },
+      ],
 
-      checkArtDialog: false,
-      checkArtList: [],
+      date_start: formatDate(new Date()),
+      date_end: formatDate(new Date()),
 
-      freeItems: [],
+      allOrder: [
+        {
+          id: '1',
+          number: '123456',
+          date_order: '09.09.2022/15:24',
+          type: 'Доставка',
+          sum: '1000',
+          order_box: '1',
+        },
+        {
+          id: '2',
+          number: '223456',
+          date_order: '09.09.2022/10:57',
+          type: 'Доставка',
+          sum: '2000',
+          order_box: '2',
+        },
+        {
+          id: '3',
+          number: '323456',
+          date_order: '08.09.2022/17:13',
+          type: 'В зале',
+          sum: '3000',
+          order_box: '1',
+        },
+        {
+          id: '4',
+          number: '423456',
+          date_order: '07.09.2022/14:28',
+          type: 'На вынос',
+          sum: '1500',
+          order_box: '2',
+        },
+        {
+          id: '5',
+          number: '523456',
+          date_order: '06.09.2022/18:20',
+          type: 'Доставка',
+          sum: '5000',
+          order_box: '2',
+        },
+      ],
+      order: {},
 
-      searchItem: ''
+      modalOrder: false,
+
+      number_order: {},
+
+      // cats: [],
+      // allItems: [],- - выгрузить из налоговой
+
+      // vendor_items: [],
+
+      // modalItemEdit: false,
+      // modalItemNew: false,
+
+      // itemEdit: null,
+      // itemName: '',
+
+      // checkArtDialog: false,
+      // checkArtList: [],
+
+      // freeItems: [],
+
+      // searchItem: ''
     };
   }
-  
-  async componentDidMount(){
-    
-    let data = await this.getData('get_all');
-    
-    console.log(data)
 
-    this.setState({
-      module_name: data.module_info.name,
-      cats: data.cats,
-      freeItems: data.items_free
-    })
-    
-    document.title = data.module_info.name;
-  }
-  
-  getData = (method, data = {}, is_load = true) => {
-    
-    if( is_load == true ){
+  changeSort(type, event, data) {
+    // автокомлит для должностей - нужен в этом модуле???
+    if (type == 'app_id') {
       this.setState({
-        is_load: true
-      })
+        app_id: data != null ? data.id : 0,
+        app_filter: data,
+      });
+    } else {
+      this.setState({
+        [type]: event.target.value,
+      });
     }
-    
-    return fetch('https://jacochef.ru/api/index_new.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type':'application/x-www-form-urlencoded'},
-      body: queryString.stringify({
-        method: method, 
-        module: this.state.module,
-        version: 2,
-        login: localStorage.getItem('token'),
-        data: JSON.stringify( data )
-      })
-    }).then(res => res.json()).then(json => {
-      
-      if( json.st === false && json.type == 'redir' ){
-        window.location.pathname = '/';
-        return;
-      }
-      
-      if( json.st === false && json.type == 'auth' ){
-        window.location.pathname = '/auth';
-        return;
-      }
-      
-      setTimeout( () => {
-        this.setState({
-          is_load: false
-        })
-      }, 300 )
-      
-      return json;
-    })
-    .catch(err => { 
-      setTimeout( () => {
-        this.setState({
-          is_load: false
-        })
-      }, 300 )
-      console.log( err )
+
+    // setTimeout(() => {
+    //     this.getUsers();
+    // }, 300)
+  }
+
+  changeDateRange(data, event) {
+    this.setState({
+      [data]: formatDate(event),
     });
   }
-   
-  async changeCity(event){
-    let data = {
-      city: event.target.value
-    }
-    
-    let res = await this.getData('get_vendors', data);
-    
-    this.setState({
-      vendors: res,
-      city: event.target.value
-    })
-  }
-  
-  changeSort(data, event){
-    this.state.vendor_items.map( (item, key) => {
-      if( parseInt(item.item_id) == parseInt(data) ){
-        this.state.vendor_items[key]['sort'] = event.target.value;
-      }
-    })
-    
-    this.setState({
-      vendor_items: this.state.vendor_items
-    })
-  }
-  
-  changeItem(data, event){
-    let vendor = this.state.itemEdit;
-    
-    if( data == 'two_user' || data == 'w_item' || data == 'w_trash' || data == 'w_pf' || data == 'is_show' ){
-      vendor.item[data] = event.target.checked === true ? 1 : 0;
-    }else{
-      vendor.item[data] = event.target.value;
-    }
-    
-    this.setState({ 
-      itemEdit: vendor
-    })
-  }
 
-  async showEditItem(id){
-    let data = {
-      item_id: id
-    }
-    
-    let res = await this.getData('get_one', data);
+  async openOrder(id) {
+    const res = this.state.allOrder.find((el) => el.id === id);
+
+    // console.log(res)
+
+    // let res = await this.getData('getUser', data);
+
+    // хак для автокомплита
+    // res.user.app_id = res.appointment.find((app) =>
+    //     parseInt(app.id) == parseInt(res.user.app_id));
 
     this.setState({
-      modalItemEdit: true,
-      itemEdit: res,
-      itemName: res.item.name
-    })
-	
-	//todo тест
-	setTimeout( () => {
-        console.log('storages=' , this.state.itemEdit.storages);
-        console.log('this_storages=' , this.state.itemEdit.this_storages);
-      }, 300 )
-	
-	
-	
+      order: res,
+      // chose_app: res.user.app_id,
+      modalOrder: true,
+    });
+
+    // setTimeout(() => {
+    //     this.sortPoint();
+
+    //     this.myDropzone = new Dropzone("#for_img_edit", this.dropzoneOptions);
+    // }, 300)
   }
 
-  async saveEditItem(main_item_id = 0){
-    let data = {
-      id: this.state.itemEdit.item.id,
-      item: this.state.itemEdit,
-      storages: this.state.itemEdit.this_storages,
-      main_item_id: parseInt(main_item_id) == 0 ? this.state.itemEdit.item.id : parseInt(main_item_id)
-    }
-    
-    let res = await this.getData('saveEditItem', data);
-    
-    if( res.st === false ){
-      alert(res.text);
-    }else{
-      this.setState({ 
-        modalItemEdit: false, 
-        itemEdit: null,
-        checkArtDialog: false,
-        checkArtList: []
-      })
+  selectOrder(id) {
+    const number_order = this.state.allOrder;
 
-      res = await this.getData('get_all');
-    
-      this.setState({
-        cats: res.cats,
-        freeItems: res.items_free
-      })
-    }
-  }
+    const res = this.state.allOrder.find((el) => el.id === id);
 
-  async saveNewItem(main_item_id = 0){
-    let data = {
-      id: this.state.itemEdit.item.id,
-      item: this.state.itemEdit,
-      storages: this.state.itemEdit.this_storages,
-      main_item_id: parseInt(main_item_id) == 0 ? this.state.itemEdit.item.id : parseInt(main_item_id)
-    }
-    
-    let res = await this.getData('saveNewItem', data);
-    
-    if( res.st === false ){
-      alert(res.text);
-    }else{
-      this.setState({ 
-        modalItemNew: false, 
-        itemEdit: null,
-        checkArtDialog: false,
-        checkArtList: []
-      })
+    number_order.map((el) =>
+      this.state.order.id === el.id ? (el.number_order = res.number) : null
+    );
 
-      res = await this.getData('get_all');
-    
-      this.setState({
-        cats: res.cats,
-        freeItems: res.items_free
-      })
-    }
-  }
-
-  async checkArt(){
-    let data = {
-      id: this.state.itemEdit.item.id,
-      art: this.state.itemEdit.item.art,
-    }
-    
-    let res = await this.getData('checkArt', data);
-
-    if( res.st === false ){
-      this.setState({ 
-        checkArtDialog: true, 
-        checkArtList: res.data
-      })
-    }else{
-      this.saveEditItem(0);
-    }
-  }
-
-  async checkArtNew(){
-    let data = {
-      id: this.state.itemEdit.item.id,
-      art: this.state.itemEdit.item.art,
-    }
-    
-    let res = await this.getData('checkArt', data);
-
-    if( res.st === false ){
-
-      res.data.push({ id: -1, name: this.state.itemEdit.item.name })
-
-      this.setState({ 
-        checkArtDialog: true, 
-        checkArtList: res.data
-      })
-    }else{
-      this.saveNewItem(0);
-    }
-  }
-
-  chooseArt(item_id){
-    if( this.state.modalItemNew === true ){
-      this.saveNewItem(item_id);
-    }else{
-      this.saveEditItem(item_id);
-    }
-  }
-
-  async openModalItemNew(){
-    let res = await this.getData('get_all_for_new');
-
-    console.log( res )
+    console.log(number_order);
 
     this.setState({
-      modalItemNew: true,
-      itemEdit: res,
-    })
+      allOrder: number_order,
+      // chose_app: res.user.app_id,
+      modalOrder: false,
+    });
   }
 
-  async saveItem(item_id, type, value){
-    let data = {
-      item_id: item_id,
-      type: type,
-      value: value
-    };
-
-    let res = await this.getData('saveItem', data, false);
-
-    if( res.st === false ){
-      alert(res.text);
-    }else{
-      this.setState({ 
-        modalItemNew: false,
-        modalItemEdit: false, 
-        itemEdit: null,
-        checkArtDialog: false,
-        checkArtList: []
-      })
-
-      res = await this.getData('get_all');
-    
-      this.setState({
-        cats: res.cats,
-        freeItems: res.items_free
-      })
-    }
-  }
-
-  changeTableItem(item_id, type, event){
-    
-    if( parseInt(type) == 1 ){
-      let data = event.target.checked;
-
-      let items = this.state.cats;
-
-      items.map( (item, key) => {
-        item.cats.map( (cat, key_cat) => {
-          cat.items.map( (it, k) => {
-            if( parseInt( it.id ) == parseInt( item_id ) ){
-              items[ key ]['cats'][ key_cat ]['items'][ k ]['show_in_rev'] = data == true ? 1 : 0;
-            }
-          } )
-        } )
-      } )
-
-      this.setState({
-        cats: items
-      })
-
-      this.saveItem(item_id, 'show_in_rev', data == true ? 1 : 0);
-    }
-
-    if( parseInt(type) == 3 ){
-      let data = event.target.value;
-
-      let items = this.state.cats;
-
-      items.map( (item, key) => {
-        item.cats.map( (cat, key_cat) => {
-          cat.items.map( (it, k) => {
-            if( parseInt( it.id ) == parseInt( item_id ) ){
-              items[ key ]['cats'][ key_cat ]['items'][ k ]['handle_price'] = data;
-            }
-          } )
-        } )
-      } )
-
-      this.setState({
-        cats: items
-      })
-
-      this.saveItem(item_id, 'handle_price', data);
-    }
-
-
-
-    if( parseInt(type) == 2 ){
-      let data = event.target.value;
-      
-      let items = this.state.freeItems;
-
-      items.map( (item, key) => {
-        if( parseInt( item.id ) == parseInt( item_id ) ){
-          items[ key ]['show_in_rev'] = data == true ? 1 : 0;
-        }
-      } )
-
-      this.setState({
-        freeItems: items
-      })
-
-      this.saveItem(item_id, 'show_in_rev', data == true ? 1 : 0);
-    }
-
-    if( parseInt(type) == 4 ){
-      let data = event.target.value;
-      
-      let items = this.state.freeItems;
-
-      items.map( (item, key) => {
-        if( parseInt( item.id ) == parseInt( item_id ) ){
-          items[ key ]['handle_price'] = data;
-        }
-      } )
-
-      this.setState({
-        freeItems: items
-      })
-
-      this.saveItem(item_id, 'handle_price', data);
-    }
-    
-  }
-
-  async search(){
-    let data = {
-      item: this.state.searchItem
-    };
-
-    let res = await this.getData('get_all_search', data);
-
-    console.log( res )
-
-    this.setState({
-      cats: res.cats,
-      freeItems: res.items_free
-    })
-  }
-
-  render(){
+  render() {
     return (
       <>
-        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
+        {/* <Backdrop 
+        style={{ zIndex: 99 }} 
+        open={this.state.is_load}
+        >
           <CircularProgress color="inherit" />
-        </Backdrop>
-        
-        <Dialog onClose={ () => { this.setState({ checkArtDialog: false, checkArtList: [] }) } } open={this.state.checkArtDialog}>
+        </Backdrop> */}
+
+        {/* <Dialog onClose={ () => { this.setState({ checkArtDialog: false, checkArtList: [] }) } } open={this.state.checkArtDialog}>
           <DialogTitle>Такой код 1с уже задан у следующих позиций:</DialogTitle>
           <List sx={{ pt: 0 }}>
             {this.state.checkArtList.map((item, key) => (
@@ -450,365 +388,99 @@ class CheckCheck_ extends React.Component {
               </ListItem>
             ))}
           </List>
-        </Dialog>
+        </Dialog> */}
 
-        <Dialog
-          open={this.state.modalItemEdit}
-          fullWidth={true}
-          maxWidth={'md'}
-          onClose={ () => { this.setState({ modalItemEdit: false, itemEdit: null, checkArtDialog: false }) } }
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle>Редактирвоание товара {this.state.itemName}</DialogTitle>
-          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-            
-            <Grid container spacing={3}>
-              
-              {this.state.itemEdit ?
-                <>
-                  <Grid item xs={12}>
-                    <Grid container spacing={3}>
-                      <Grid item xs={12} sm={6}>
-                        <MyTextInput label="Название товара" value={ this.state.itemEdit.item.name } func={ this.changeItem.bind(this, 'name') } />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <MySelect data={this.state.itemEdit.pf_list} value={this.state.itemEdit.item.pf_id} func={ this.changeItem.bind(this, 'pf_id') } label='Заготовка' />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <MyTextInput label="Название товара для поставщика" value={ this.state.itemEdit.item.name_for_vendor } func={ this.changeItem.bind(this, 'name_for_vendor') } />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <MyTextInput label="Код для 1с" value={ this.state.itemEdit.item.art } func={ this.changeItem.bind(this, 'art') } />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <MyTextInput label="Максимальное количество заказов в месяц (0 - без ограничений)" value={ this.state.itemEdit.item.max_count_in_m } func={ this.changeItem.bind(this, 'max_count_in_m') } />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <MySelect data={this.state.itemEdit.cats} value={this.state.itemEdit.item.cat_id} func={ this.changeItem.bind(this, 'cat_id') } label='Категория' />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-
-                  
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Количество в упаковке" value={ this.state.itemEdit.item.pq } func={ this.changeItem.bind(this, 'pq') } />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MySelect data={this.state.itemEdit.ed_izmer} value={this.state.itemEdit.item.ed_izmer_id} func={ this.changeItem.bind(this, 'ed_izmer_id') } label='Ед измер' />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MySelect data={this.state.itemEdit.apps} value={this.state.itemEdit.item.app_id} func={ this.changeItem.bind(this, 'app_id') } label='Должность на кухне' />
-                  </Grid>
-
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Время приготовления ММ:SS (15:20)" value={ this.state.itemEdit.item.time_min } func={ this.changeItem.bind(this, 'time_min') } />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Дополнительное время ММ:SS (15:20)" value={ this.state.itemEdit.item.time_dop_min } func={ this.changeItem.bind(this, 'time_dop_min') } />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Время разгрузки ММ:SS.iiii (00:20.004)" value={ this.state.itemEdit.item.time_min_other } func={ this.changeItem.bind(this, 'time_min_other') } />
-                  </Grid>
-                  
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="% потерь" value={ this.state.itemEdit.item.los_percent } func={ this.changeItem.bind(this, 'los_percent') } />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="% заявки" value={ this.state.itemEdit.item.percent } func={ this.changeItem.bind(this, 'percent') } />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="% повышения ценника" value={ this.state.itemEdit.item.vend_percent } func={ this.changeItem.bind(this, 'vend_percent') } />
-                  </Grid>
-
-                  <Grid item xs={12} sm={3}>
-                    <MyCheckBox label="Вес заготовки" value={ parseInt(this.state.itemEdit.item.w_pf) == 1 ? true : false } func={ this.changeItem.bind(this, 'w_pf') } />
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <MyCheckBox label="Вес отхода" value={ parseInt(this.state.itemEdit.item.w_trash) == 1 ? true : false } func={ this.changeItem.bind(this, 'w_trash') } />
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <MyCheckBox label="Вес товара" value={ parseInt(this.state.itemEdit.item.w_item) == 1 ? true : false } func={ this.changeItem.bind(this, 'w_item') } />
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <MyCheckBox label="Два сотрудника" value={ parseInt(this.state.itemEdit.item.two_user) == 1 ? true : false } func={ this.changeItem.bind(this, 'two_user') } />
-                  </Grid>
-                  
-                  <Grid item xs={12}>
-                    <MyAutocomplite label='Места хранения' multiple={true} data={this.state.itemEdit.storages} value={this.state.itemEdit.this_storages} func={ (event, value) => { let this_storages = this.state.itemEdit; this_storages.this_storages = value; this.setState({ itemEdit: this_storages }) } } />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <MyCheckBox label="Активность" value={ parseInt(this.state.itemEdit.item.is_show) == 1 ? true : false } func={ this.changeItem.bind(this, 'is_show') } />
-                  </Grid>
-                </>
-                  :
-                null
-              }
-            </Grid>
-              
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.checkArt.bind(this)} color="primary">Сохранить</Button>
-          </DialogActions>
-        </Dialog>
-        
-        <Dialog
-          open={this.state.modalItemNew}
-          fullWidth={true}
-          maxWidth={'md'}
-          onClose={ () => { this.setState({ modalItemNew: false, itemEdit: null, checkArtDialog: false }) } }
-        >
-          <DialogTitle>Новый товар</DialogTitle>
-          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-            
-            <Grid container spacing={3}>
-              
-              {this.state.itemEdit ?
-                <>
-                  <Grid item xs={12}>
-                    <Grid container spacing={3}>
-                      <Grid item xs={12} sm={6}>
-                        <MyTextInput label="Название товара" value={ this.state.itemEdit.item.name } func={ this.changeItem.bind(this, 'name') } />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <MySelect data={this.state.itemEdit.pf_list} value={this.state.itemEdit.item.pf_id} func={ this.changeItem.bind(this, 'pf_id') } label='Заготовка' />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <MyTextInput label="Название товара для поставщика" value={ this.state.itemEdit.item.name_for_vendor } func={ this.changeItem.bind(this, 'name_for_vendor') } />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <MyTextInput label="Код для 1с" value={ this.state.itemEdit.item.art } func={ this.changeItem.bind(this, 'art') } />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <MyTextInput label="Максимальное количество заказов в месяц (0 - без ограничений)" value={ this.state.itemEdit.item.max_count_in_m } func={ this.changeItem.bind(this, 'max_count_in_m') } />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <MySelect data={this.state.itemEdit.cats} value={this.state.itemEdit.item.cat_id} func={ this.changeItem.bind(this, 'cat_id') } label='Категория' />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-
-                  
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Количество в упаковке" value={ this.state.itemEdit.item.pq } func={ this.changeItem.bind(this, 'pq') } />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MySelect data={this.state.itemEdit.ed_izmer} value={this.state.itemEdit.item.ed_izmer_id} func={ this.changeItem.bind(this, 'ed_izmer_id') } label='Ед измер' />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MySelect data={this.state.itemEdit.apps} value={this.state.itemEdit.item.app_id} func={ this.changeItem.bind(this, 'app_id') } label='Должность на кухне' />
-                  </Grid>
-
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Время приготовления ММ:SS (15:20)" value={ this.state.itemEdit.item.time_min } func={ this.changeItem.bind(this, 'time_min') } />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Дополнительное время ММ:SS (15:20)" value={ this.state.itemEdit.item.time_dop_min } func={ this.changeItem.bind(this, 'time_dop_min') } />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Время разгрузки ММ:SS.iiii (00:20.004)" value={ this.state.itemEdit.item.time_min_other } func={ this.changeItem.bind(this, 'time_min_other') } />
-                  </Grid>
-                  
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="% потерь" value={ this.state.itemEdit.item.los_percent } func={ this.changeItem.bind(this, 'los_percent') } />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="% заявки" value={ this.state.itemEdit.item.percent } func={ this.changeItem.bind(this, 'percent') } />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="% повышения ценника" value={ this.state.itemEdit.item.vend_percent } func={ this.changeItem.bind(this, 'vend_percent') } />
-                  </Grid>
-
-                  <Grid item xs={12} sm={3}>
-                    <MyCheckBox label="Вес заготовки" value={ parseInt(this.state.itemEdit.item.w_pf) == 1 ? true : false } func={ this.changeItem.bind(this, 'w_pf') } />
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <MyCheckBox label="Вес отхода" value={ parseInt(this.state.itemEdit.item.w_trash) == 1 ? true : false } func={ this.changeItem.bind(this, 'w_trash') } />
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <MyCheckBox label="Вес товара" value={ parseInt(this.state.itemEdit.item.w_item) == 1 ? true : false } func={ this.changeItem.bind(this, 'w_item') } />
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <MyCheckBox label="Два сотрудника" value={ parseInt(this.state.itemEdit.item.two_user) == 1 ? true : false } func={ this.changeItem.bind(this, 'two_user') } />
-                  </Grid>
-                  
-                  <Grid item xs={12}>
-                    <MyAutocomplite label='Места хранения' multiple={true} data={this.state.itemEdit.storages} value={this.state.itemEdit.this_storages} func={ (event, value) => { let this_storages = this.state.itemEdit; this_storages.this_storages = value; this.setState({ itemEdit: this_storages }) } } />
-                  </Grid>
-                </>
-                  :
-                null
-              }
-            </Grid>
-              
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.checkArtNew.bind(this)} color="primary">Сохранить</Button>
-          </DialogActions>
-        </Dialog>
-        
-        
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
-          
+
           <Grid item xs={12} sm={3}>
-            <Button onClick={this.openModalItemNew.bind(this)} variant="contained">Добавить товар</Button>
+            <MyDatePickerNew
+              label="Начало периода"
+              value={this.state.date_start}
+              func={this.changeDateRange.bind(this, 'date_start')}
+            />
           </Grid>
 
           <Grid item xs={12} sm={3}>
-            <MyTextInput label="Поиск" value={ this.state.searchItem } func={ ( event ) => { this.setState({ searchItem: event.target.value }) } } onBlur={ this.search.bind(this) } />
+            <MyDatePickerNew
+              label="Конец периода"
+              value={this.state.date_end}
+              func={this.changeDateRange.bind(this, 'date_end')}
+            />
           </Grid>
-        
+
+          <Grid item xs={12} sm={3}>
+            <MySelect
+              data={this.state.point_list}
+              value={this.state.point_id.id}
+              func={this.changeSort.bind(this, 'point_id')}
+              label="Точка"
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={3}>
+            <MySelect
+              data={this.state.select_list}
+              value={this.state.select_list.id}
+              // func={ this.changeItem.bind(this, 'app_id') }
+              label="Селект"
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={3}>
+            <Button
+              // onClick={this.openNewUser.bind(this)}
+              variant="contained"
+            >
+              Выполнить
+            </Button>
+          </Grid>
+
           <Grid item xs={12}>
-          
-            { this.state.cats.map( (item, key) =>
-              <Accordion key={key}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                >
-                  <Typography>{item.name}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  { item.cats.map( (cat, key_cat) => 
-                    <Accordion key={key_cat}>
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                      >
-                        <Typography>{cat.name}</Typography>
-                      </AccordionSummary>
-                      <AccordionDetails style={{ width: '100%', overflow: 'scroll' }}>
-                        
-                        <Table>
-                  
-                          <TableHead>
-                            <TableRow>
-                              <TableCell style={{ width: '2%' }}>id</TableCell>
-                  
-                              <TableCell style={{ width: '2%' }}></TableCell>
-                              <TableCell style={{ width: '3%' }}>Ревизия</TableCell>
-                  
-                              <TableCell style={{ width: '15%' }}>Товар</TableCell>
-                              <TableCell style={{ width: '10%' }}>% потерь</TableCell>
-                              <TableCell style={{ width: '10%' }}>% заявки</TableCell>
-                              <TableCell style={{ width: '15%' }}>Заготовка</TableCell>
-                  
-                              <TableCell style={{ width: '5%' }}>Ед. измер</TableCell>
-                  
-                              <TableCell style={{ width: '9%' }}>Место хранения</TableCell>
-                              <TableCell style={{ width: '9%', minWidth: 150 }}>Моя цена</TableCell>
-                            </TableRow>
-                          </TableHead>
-                  
-                          <TableBody>
-                            
-                            { cat.items.map( (it, k) =>
-                              <TableRow key={k}>
-                                <TableCell>{it.id}</TableCell>
-                                <TableCell> 
-                                  { parseInt(it.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> } 
-                                </TableCell>
-                                <TableCell>
-                                  <MyCheckBox label="" value={ parseInt(it.show_in_rev) == 1 ? true : false } func={ this.changeTableItem.bind(this, it.id, 1) } />
-                                </TableCell>
-                                <TableCell style={{ cursor: 'pointer' }} onClick={this.showEditItem.bind(this, it.id)}>{it.name}</TableCell>
-                                <TableCell>{it.los_percent} %</TableCell>
-                                <TableCell>{it.percent} %</TableCell>
-                                <TableCell>{it.pf_name}</TableCell>
-                  
-                                <TableCell>{it.ei_name}</TableCell>
-                                <TableCell>{it.storage_name}</TableCell>
-                                <TableCell>
-                                  <MyTextInput label="" value={it.handle_price} func={ this.changeTableItem.bind(this, it.id, 3) } />
-                                </TableCell>
-                              </TableRow>           
-                            ) }
-                          
-                          </TableBody>
-                        
-                        </Table>
-
-                      </AccordionDetails>
-                    </Accordion>
-                  ) }
-                </AccordionDetails>
-              </Accordion>
-            ) }
-            
-            { this.state.freeItems.length == 0 ? null :
-
-              <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                >
-                  <Typography>Без категории</Typography>
-                </AccordionSummary>
-                <AccordionDetails style={{ width: '100%', overflow: 'scroll' }}>
-                  
-                  <Table>
-                  
-                    <TableHead>
-                      <TableRow>
-                        <TableCell style={{ width: '2%' }}>id</TableCell>
-            
-                        <TableCell style={{ width: '2%' }}></TableCell>
-                        <TableCell style={{ width: '3%' }}>Ревизия</TableCell>
-            
-                        <TableCell style={{ width: '15%' }}>Товар</TableCell>
-                        <TableCell style={{ width: '10%' }}>% потерь</TableCell>
-                        <TableCell style={{ width: '10%' }}>% заявки</TableCell>
-                        <TableCell style={{ width: '15%' }}>Заготовка</TableCell>
-            
-                        <TableCell style={{ width: '5%' }}>Ед. измер</TableCell>
-            
-                        <TableCell style={{ width: '9%' }}>Место хранения</TableCell>
-                        <TableCell style={{ width: '9%', minWidth: 150 }}>Моя цена</TableCell>
-                      </TableRow>
-                    </TableHead>
-            
-                    <TableBody>
-                      
-                      { this.state.freeItems.map( (it, k) =>
-                        <TableRow key={k}>
-                          <TableCell>{it.id}</TableCell>
-                          <TableCell> 
-                            { parseInt(it.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> } 
-                          </TableCell>
-                          <TableCell>
-                            <MyCheckBox label="" value={ parseInt(it.show_in_rev) == 1 ? true : false } func={ this.changeTableItem.bind(this, it.id, 2) } />
-                          </TableCell>
-                          <TableCell style={{ cursor: 'pointer' }} onClick={this.showEditItem.bind(this, it.id)}>{it.name}</TableCell>
-                          <TableCell>{it.los_percent} %</TableCell>
-                          <TableCell>{it.percent} %</TableCell>
-                          <TableCell>{it.pf_name}</TableCell>
-            
-                          <TableCell>{it.ei_name}</TableCell>
-                          <TableCell>{it.storage_name}</TableCell>
-                          <TableCell>
-                            <MyTextInput label="" value={it.handle_price} func={ this.changeTableItem.bind(this, it.id, 4) } />
-                          </TableCell>
-                        </TableRow>           
-                      ) }
-                    
-                    </TableBody>
-                  
-                  </Table>
-
-                </AccordionDetails>
-              </Accordion>
-            }
-
+            {this.state.allOrder.length > 0 ? (
+              <CheckCheckTable
+                orders={this.state.allOrder}
+                openOrder={this.openOrder.bind(this)}
+              />
+            ) : null}
           </Grid>
         </Grid>
+
+        <Dialog
+          open={this.state.modalOrder}
+          fullWidth={true}
+          maxWidth={'md'}
+          onClose={() => {
+            this.setState({ modalOrder: false });
+          }}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle>Заказы</DialogTitle>
+          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+            <Grid container spacing={3}>
+              {this.state.allOrder && this.state.modalOrder === true ? (
+                <CheckModalTable
+                  orders={this.state.allOrder}
+                  selectOrder={this.selectOrder.bind(this)}
+                />
+              ) : null}
+            </Grid>
+          </DialogContent>
+          {/* <DialogActions>
+            <Button 
+            // onClick={this.checkArt.bind(this)} 
+            color="primary"
+            >Выбрать</Button>
+          </DialogActions> */}
+        </Dialog>
       </>
-    )
+    );
   }
 }
 
 export function CheckCheck() {
-  return (
-    <CheckCheck_ />
-  );
+  return <CheckCheck_ />;
 }
