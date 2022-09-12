@@ -147,7 +147,7 @@ class SiteItemsTable extends React.Component {
                     { cat.items.map( (it, k) =>
                       <TableRow key={k}>
                         <TableCell>{it.id}</TableCell>
-                        <TableCell onClick={this.props.openItem.bind(this, it,it.date_update ? 'hist' : 'origin')}>{it.name}</TableCell>
+                        <TableCell onClick={this.props.openItem.bind(this, it, it.date_update ? 'hist' : 'origin')}>{it.name}</TableCell>
                         { it.date_update ?
                           <TableCell>
                             <MyDatePickerNew label="" value={ it.date_update } func={ this.props.changeDateUpdate.bind(this, key, k, it.date_update_id) } />
@@ -374,8 +374,7 @@ class SiteItems_ extends React.Component {
   }  
 
   async openItem(item, type = 'origin'){
-    // todo
-  
+    
     let data = {
       id: item.id,
       type: type,
@@ -383,6 +382,7 @@ class SiteItems_ extends React.Component {
     };
 
     let res = await this.getData('get_one', data);
+
 
     var items_pf_stages_1 = [],
 			items_pf_stages_2 = [],
@@ -410,24 +410,29 @@ class SiteItems_ extends React.Component {
       })
     }
 
-
+    // todo
     if(res.item_pf.stage_1){
-			res.item_pf.stage_1.map(function(item){
-				items_pf_stages_1.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name']});
-			})
+			res.item_pf.stage_1.map(function(item){    
+        items_pf_stages_1.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'], type: item['type'] }); 
+        // if(item['pf_id']){
+        //   items_pf_stages_1.push({item_id: item['v'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'], type: item['type'] });   
+        // } else{
+        //   items_pf_stages_1.push({item_id: item['rec_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'], type: item['type'] }); 
+        // }
+      })
 		}
+
 		if(res.item_pf.stage_2){
 			res.item_pf.stage_2.map(function(item){
-				items_pf_stages_2.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name']});
+				items_pf_stages_2.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'] , type: item['type'] });
 			})
 		}
 		if(res.item_pf.stage_3){
 			res.item_pf.stage_3.map(function(item){
-				items_pf_stages_3.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name']});
+				items_pf_stages_3.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'], type: item['type'] });
 			})
 		}
 
-    
 		
 		if(res.item_items.this_items){
 			res.item_items.this_items.map(function(item){
@@ -435,7 +440,9 @@ class SiteItems_ extends React.Component {
 			})
 		}
 		
-
+    //todo
+    let ItemTab1 = res.hist.length > 0 && type == 'hist' ? res.hist[0].id : this.state.ItemTab1;
+    
 		this.setState({
       editItem: res.item,
       item_rec: res.item_rec,
@@ -455,7 +462,8 @@ class SiteItems_ extends React.Component {
       item_items: items_items,
 
       openHist: res.hist,
-      ItemTab1 : res.hist.length > 0 && type == 'hist' ? res.hist[0].id : '0',
+      //правка
+      ItemTab1 : ItemTab1,
       modalEdit: true,
 
       date_update: formatDate(res.item.date_start) ?? formatDate(new Date()),
@@ -567,8 +575,16 @@ class SiteItems_ extends React.Component {
     })
   }
 
+    // todo
   chooseStage(stage){
-    if( this.state.openMenuType == 'rec' ){
+        
+   
+    // определаем заготовка или рецепт
+    let type = this.state.openMenuitem.storage_id ? 'pf' : 'rec';
+   
+    // todo
+   if( this.state.openMenuType == 'rec' ){
+   // if( type == 'rec' ){
       let check = false;
 
       let rec = stage == 1 ? this.state.rec_stage_1 : stage == 2 ? this.state.rec_stage_2 : stage == 3 ? this.state.rec_stage_3 : [];
@@ -576,7 +592,8 @@ class SiteItems_ extends React.Component {
       rec = rec ? rec : [];	
       
       rec.map((this_item) => {
-        if(parseInt(this.state.openMenuitem.id) == parseInt(this_item.item_id) ){
+        if(parseInt(this.state.openMenuitem.id) == parseInt(this_item.item_id)) {
+          console.log('check ok=', this_item.item_id);
           check = true;
         }
       })
@@ -584,13 +601,13 @@ class SiteItems_ extends React.Component {
       if( !check ){
 
         rec.push({item_id: this.state.openMenuitem.id, name: this.state.openMenuitem.name, count: 0, sort: 0, ei_name: this.state.openMenuitem.ei_name});
-
+       
         if( stage == 1 ){
 					this.setState({
 						rec_stage_1: rec
 					});
 				}
-				
+       
 				if( stage == 2 ){
 					this.setState({
 						rec_stage_2: rec
@@ -606,6 +623,99 @@ class SiteItems_ extends React.Component {
     }
 
     if( this.state.openMenuType == 'pf' ){
+    //if( type == 'pf' ){
+      let check = false;
+
+      let rec = stage == 1 ? this.state.pf_stage_1 : stage == 2 ? this.state.pf_stage_2 : stage == 3 ? this.state.pf_stage_3 : [];
+
+      rec = rec ? rec : [];	
+
+      console.log('item=', this.state.openMenuitem); 
+
+      // проверка на добавленнный
+      rec.map((this_item) => {
+        if(parseInt(this.state.openMenuitem.id) == parseInt(this_item.item_id)){
+          check = true;
+        }
+      })
+
+      if( !check ){
+
+        //rec.push({item_id: this.state.openMenuitem.id, name: this.state.openMenuitem.name, count: 0, sort: 0, ei_name: this.state.openMenuitem.ei_name});
+        rec.push({item_id: this.state.openMenuitem.id, name: this.state.openMenuitem.name, 
+          count: 0, sort: 0, ei_name: this.state.openMenuitem.ei_name, type: this.state.openMenuitem.type});
+ 
+        if( stage == 1 ){
+					this.setState({
+						pf_stage_1: rec
+					});
+				}
+				
+				if( stage == 2 ){
+					this.setState({
+						pf_stage_2: rec
+					});
+				}
+				
+				if( stage == 3 ){
+					this.setState({
+						pf_stage_3: rec
+					});
+				}
+      }
+    }
+
+    this.closeMenu();
+  }
+
+  chooseStage_old(stage){
+  
+    // определаем заготовка или рецепт
+    let type = this.state.openMenuitem.storage_id ? 'pf' : 'rec';
+   
+    // todo
+   // if( this.state.openMenuType == 'rec' ){
+    if( type == 'rec' ){
+      let check = false;
+
+      let rec = stage == 1 ? this.state.rec_stage_1 : stage == 2 ? this.state.rec_stage_2 : stage == 3 ? this.state.rec_stage_3 : [];
+
+      rec = rec ? rec : [];	
+      
+      rec.map((this_item) => {
+        if(parseInt(this.state.openMenuitem.id) == parseInt(this_item.item_id)) {
+          console.log('check ok=', this_item.item_id);
+          check = true;
+        }
+      })
+
+      if( !check ){
+
+        rec.push({item_id: this.state.openMenuitem.id, name: this.state.openMenuitem.name, count: 0, sort: 0, ei_name: this.state.openMenuitem.ei_name});
+         //todo
+				console.log('rec=', rec);
+        if( stage == 1 ){
+					this.setState({
+						rec_stage_1: rec
+					});
+				}
+       
+				if( stage == 2 ){
+					this.setState({
+						rec_stage_2: rec
+					});
+				}
+				
+				if( stage == 3 ){
+					this.setState({
+						rec_stage_3: rec
+					});
+				}
+      }
+    }
+
+   // if( this.state.openMenuType == 'pf' ){
+    if( type == 'pf' ){
       let check = false;
 
       let rec = stage == 1 ? this.state.pf_stage_1 : stage == 2 ? this.state.pf_stage_2 : stage == 3 ? this.state.pf_stage_3 : [];
@@ -668,6 +778,7 @@ class SiteItems_ extends React.Component {
     }
   }
 
+  // todo rec pf
   changeData(type, arr, data, key, event){
     if( type == 'rec' ){
       let rec = arr == 'rec_stage_1' ? this.state.rec_stage_1 : arr == 'rec_stage_2' ? this.state.rec_stage_2 : arr == 'rec_stage_3' ? this.state.rec_stage_3 : [];
@@ -731,7 +842,8 @@ class SiteItems_ extends React.Component {
       });
     }
   }
-
+  
+  // todo rec pf
   delItem(type, arr, key){
     if( type == 'rec' ){
       let rec = arr == 'rec_stage_1' ? this.state.rec_stage_1 : arr == 'rec_stage_2' ? this.state.rec_stage_2 : arr == 'rec_stage_3' ? this.state.rec_stage_3 : [];
@@ -917,19 +1029,47 @@ class SiteItems_ extends React.Component {
       })
     }
 
+    // запихиваем рецепы в другой массив
+    let rec_1 = [], pf_1 = [];      
+    this.state.pf_stage_1.map((this_item) => {
+        if(this_item.type == 'pf'){
+          pf_1.push(this_item);
+        } else{
+          rec_1.push(this_item); 
+        }
+    })
+
+    let rec_2 = [], pf_2 = [];      
+    this.state.pf_stage_2.map((this_item) => {
+        if(this_item.type == 'pf'){
+          pf_2.push(this_item);
+        } else{
+          rec_2.push(this_item); 
+        }
+    })
+
+    let rec_3 = [], pf_3 = [];      
+    this.state.pf_stage_3.map((this_item) => {
+        if(this_item.type == 'pf'){
+          pf_3.push(this_item);
+        } else{
+          rec_3.push(this_item); 
+        }
+    })
+
     let data = {
       item: this.state.editItem,
-      rec_stage_1: this.state.rec_stage_1,
-      rec_stage_2: this.state.rec_stage_2,
-      rec_stage_3: this.state.rec_stage_3,
+      rec_stage_1: rec_1,
+      rec_stage_2: rec_2,
+      rec_stage_3: rec_3,
 
-      pf_stage_1: this.state.pf_stage_1,
-      pf_stage_2: this.state.pf_stage_2,
-      pf_stage_3: this.state.pf_stage_3,
+      pf_stage_1: pf_1,
+      pf_stage_2: pf_2,
+      pf_stage_3: pf_3,
 
       item_items: this.state.item_items,
     };
-
+    
     let res = await this.getData('saveEditItem', data);
 
     if( res.st === false ){
@@ -1441,11 +1581,16 @@ class SiteItems_ extends React.Component {
     this.setState({ 
       ItemTab1: value 
     })
-
+    console.log('changeTab1='+value);
     setTimeout( () => {
-      if( parseInt(value) == -1 || parseInt(value) == 0 ){
+      // правка от 11.09.22
+      //if( parseInt(value) == -1 || parseInt(value) == 0 ){
+      if(  parseInt(value) == 0 ){
+        console.log('tab origin');
         this.openItem(this.state.editItem, 'origin');
       }else{
+        console.log('tab hist');
+        //return false;
         this.openItem(this.state.editItem, 'hist');
       }
     }, 300 )
@@ -1665,7 +1810,6 @@ class SiteItems_ extends React.Component {
                           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                             <TabList onChange={ this.changeTab.bind(this) } variant="fullWidth">
                               <Tab label="Основные" value="1" />
-                              <Tab label="Рецепты" value="2" />
                               <Tab label="Заготовки" value="3" />
                               <Tab label="Позиции" value="4" />
                             </TabList>
@@ -1872,10 +2016,10 @@ class SiteItems_ extends React.Component {
                                     <MyCheckBox label="Активность" value={ parseInt(this.state.editItem.is_show) == 1 ? true : false } func={ this.changeItem.bind(this, 'is_show') } style={{ justifyContent: 'center' }} />
                                   </Grid>
                                   <Grid item xs={12} sm={4}>
-                                    <MyCheckBox label="На сайте" value={ parseInt(this.state.editItem.show_site) == 1 ? true : false } func={ this.changeItem.bind(this, 'show_site') } style={{ justifyContent: 'center' }} />
+                                    <MyCheckBox label="Сайт и контакт-центр" value={ parseInt(this.state.editItem.show_site) == 1 ? true : false } func={ this.changeItem.bind(this, 'show_site') } style={{ justifyContent: 'center' }} />
                                   </Grid>
                                   <Grid item xs={12} sm={4}>
-                                    <MyCheckBox label="На складе" value={ parseInt(this.state.editItem.show_program) == 1 ? true : false } func={ this.changeItem.bind(this, 'show_program') } style={{ justifyContent: 'center' }} />
+                                    <MyCheckBox label="На кассе" value={ parseInt(this.state.editItem.show_program) == 1 ? true : false } func={ this.changeItem.bind(this, 'show_program') } style={{ justifyContent: 'center' }} />
                                   </Grid>
                                 </Grid>
                               </Grid>
@@ -1883,44 +2027,7 @@ class SiteItems_ extends React.Component {
                             </Grid>
 
                           </TabPanel>
-                          <TabPanel value="2">
-
-                            <Grid container spacing={3}>
-
-                              { !this.state.item_rec ? null :
-                                <Grid item xs={12} sm={4}>
-                                  <Table size='small'>
-                                    <TableHead>
-                                      <TableRow>
-                                        <TableCell>Название</TableCell>
-                                        <TableCell></TableCell>
-                                      </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                      { this.state.item_rec.all.map( (item, key) =>
-                                        <TableRow key={key}>
-                                          <TableCell>{item.name}</TableCell>
-                                          <TableCell>
-                                            <DehazeIcon onClick={this.openMenu.bind(this, 'rec', item)} />
-                                          </TableCell>
-                                        </TableRow>
-                                      ) }
-                                    </TableBody>
-                                  </Table>
-                                </Grid>
-                              }
-
-                              { !this.state.item_rec ? null :
-                                <Grid item xs={12} sm={8}>
-                                  <TableStages title={'1 этап'} type={'rec'} arr={'rec_stage_1'} data={this.state.rec_stage_1} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
-                                  <TableStages title={'2 этап'} type={'rec'} arr={'rec_stage_2'} data={this.state.rec_stage_2} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
-                                  <TableStages title={'3 этап'} type={'rec'} arr={'rec_stage_3'} data={this.state.rec_stage_3} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
-                                </Grid>
-                              }
-                              
-                            </Grid>
-
-                          </TabPanel> 
+                          
                           <TabPanel value="3">
 
                             <Grid container spacing={3}>
@@ -2096,7 +2203,7 @@ class SiteItems_ extends React.Component {
                             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                               <TabList onChange={ this.changeTab.bind(this) } variant="fullWidth">
                                 <Tab label="Основные" value="1" />
-                                <Tab label="Рецепты" value="2" />
+                                
                                 <Tab label="Заготовки" value="3" />
                                 <Tab label="Позиции" value="4" />
                               </TabList>
