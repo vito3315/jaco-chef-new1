@@ -345,7 +345,7 @@ class VendorModule_ extends React.Component {
           open={this.state.modalItems}
           fullWidth={true}
           maxWidth={'md'}
-          onClose={ () => { this.setState({ modalItems: false }) } }
+          onClose={ () => { this.setState({ modalItems: false,  customAdd: 0 }) } }
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
@@ -360,7 +360,12 @@ class VendorModule_ extends React.Component {
                   <TableBody>
                     <TableRow style={{ height: 75 }}>
                       <TableCell>
-                        <MySelect data={this.state.allItems} value={this.state.customAdd} func={ (event) => { this.setState({ customAdd: event.target.value }) } } />
+                         <MyAutocomplite
+                        multiple={false} 
+                        data={this.state.allItems}
+                        value={this.state.customAdd === 0 ? null : this.state.customAdd} 
+                        func={ (event, value) => { this.setState({ customAdd: value }) } } 
+                          />
                       </TableCell>
                       <TableCell><AddIcon onClick={this.addItemCustom.bind(this)} style={{ cursor: 'pointer' }} /></TableCell>
                     </TableRow>
