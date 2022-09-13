@@ -290,7 +290,8 @@ class VendorModule_ extends React.Component {
   }
   
   addItemCustom(){
-    let item = this.state.allItems.find( (item1) => parseInt(item1.id) == parseInt(this.state.customAdd) );
+    
+    let item = this.state.allItems.find( (item1) => parseInt(item1.id) == parseInt(this.state.customAdd.id) );
     
     this.addItem(item);
   }

@@ -446,7 +446,7 @@ class Events_ extends React.Component {
             
             { this.state.calendar.map( (item, key) =>
             
-              <Grid item xs={12} sm={4} key={key} style={{ padding: 20 }}>
+              <Grid item xs={12} sm={6} key={key} style={{ padding: 20 }}>
                 <h1 style={{ textAlign: 'center' }}>{ item[0][0].mounth }</h1>
                 <TableContainer component={Paper}>
                   <Table aria-label="a dense table" style={{ overflow: 'hidden' }}>
