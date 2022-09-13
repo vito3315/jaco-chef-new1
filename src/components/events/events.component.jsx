@@ -34,6 +34,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { MySelect, MyCheckBox, MyTimePicker } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
 
+import Box from '@mui/material/Box';
+
 const queryString = require('query-string');
 
 class Events_ extends React.Component {
@@ -442,11 +444,11 @@ class Events_ extends React.Component {
             <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
           </Grid>
         
-          <Grid container direction="row" justifyContent="center" style={{ paddingTop: 20 }}>
+          <Grid container direction="row" justifyContent="center" style={{ paddingTop: 20, margin: '0 auto' }} >
             
             { this.state.calendar.map( (item, key) =>
             
-              <Grid item xs={12} sm={6} key={key} style={{ padding: 20 }}>
+              <Grid item sm={6} key={key} style={{ padding: 20 }} >
                 <h1 style={{ textAlign: 'center' }}>{ item[0][0].mounth }</h1>
                 <TableContainer component={Paper}>
                   <Table aria-label="a dense table" style={{ overflow: 'hidden' }}>
@@ -470,10 +472,10 @@ class Events_ extends React.Component {
                               key={k} 
                               onClick={ this.chooseDay.bind(this, day) } 
                               
-                              style={{ color: day.dir ? 'yellow' : day.holy ? '#c03' : '#000' }}
-                              
+                              style={{ color: day.dir ? 'yellow' : day.holy ? '#c03' : '#000', height: '6vw'}}
+
                               className={ day.event ? 'customCel' : 'tableCel' }
-                            > { day.day } </TableCell>
+                            >{ day.day }</TableCell>
                           ) }
                         </TableRow>
                       ) }
