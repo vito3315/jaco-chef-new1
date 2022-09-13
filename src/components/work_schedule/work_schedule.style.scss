@@ -15,7 +15,8 @@ div.css-19kzrtu{
     padding-right: 0px!important;
 }
 .name_pinning{
-    min-width: fit-content;
+    min-width: 140px!important;
+    width: fit-content;
     min-height: 38px;
     position: absolute;
     background-color: #fff;
@@ -24,4 +25,7 @@ div.css-19kzrtu{
     display: flex!important;
     justify-content: flex-start;
     align-items: center;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

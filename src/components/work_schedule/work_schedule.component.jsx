@@ -42,6 +42,8 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import PersonIcon from '@mui/icons-material/Person';
 import { blue } from '@mui/material/colors';
 
@@ -55,7 +57,13 @@ import Looks3Icon from '@mui/icons-material/Looks3';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import CheckIcon from '@mui/icons-material/Check';
 
-import { MySelect, MyCheckBox, MyTimePicker } from '../../stores/elements';
+import Divider from '@mui/material/Divider';
+import InboxIcon from '@mui/icons-material/Inbox';
+import DraftsIcon from '@mui/icons-material/Drafts';
+import SendIcon from '@mui/icons-material/Send';
+
+import { MySelect, MyCheckBox, MyTimePicker, MyDatePickerGraph, formatDate } from '../../stores/elements';
+import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 
 const queryString = require('query-string'); 
 
@@ -239,7 +247,8 @@ class WorkSchedule_ extends React.Component {
       test_two: [],
       
       isOpenModalH: false,
-      
+      isOpenModalM: false,
+
       userInfo: null,
       
       hList: [],
@@ -276,7 +285,10 @@ class WorkSchedule_ extends React.Component {
 
       lv_cafe: 0,
       lv_dir: 0,
-      arr_dir_lv: []
+      arr_dir_lv: [],
+
+      arrTimeAdd: [],
+      typeTimeAdd: 0
     };
   }
   
@@ -437,6 +449,27 @@ class WorkSchedule_ extends React.Component {
       show_bonus: res.show_bonus
     })
   }
+
+  async openM(item, this_date){
+    console.log( item )
+    
+    let data = {
+      smena_id: item.smena_id,
+      app_id: item.app_id,
+      user_id: item.id,
+      date: this_date,
+      date_start: item.date
+    };
+    
+    let res = await this.getData('get_user_day', data);
+    
+    console.log( res )
+    
+    this.setState({
+      isOpenModalM: true,
+      userInfo: res.h_info
+    })
+  }
   
   delTime(key_time){
     let userInfo = this.state.userInfo;
@@ -546,8 +579,6 @@ class WorkSchedule_ extends React.Component {
     
     let res = await this.getData('save_fastSmena', data);
     
-    console.log( res );
-
     if( res['st'] == true ){
       this.setState({
         mainMenu: false,
@@ -594,6 +625,12 @@ class WorkSchedule_ extends React.Component {
     })
   }
 
+  checkNewLvDir(LV){
+    if (confirm("Точно изменить уровень директора ?")) {
+      this.newLvDir(LV)
+    } 
+  }
+
   async newLvDir(LV){
     let data = {
       date: this.state.mounth,
@@ -622,6 +659,12 @@ class WorkSchedule_ extends React.Component {
     })
   }
 
+  checkDopBonus(type){
+    if (confirm("Точно ?")) {
+      this.dop_bonus(type)
+    } 
+  }
+
   async dop_bonus(type){
     let data = {
       date: this.state.mounth,
@@ -643,6 +686,65 @@ class WorkSchedule_ extends React.Component {
     }else{
       alert(res['text'])
     }
+  }
+
+  renderWeekPickerDay = (date, selectedDates, pickersDayProps) => {
+    pickersDayProps['selected'] = false;
+    pickersDayProps['aria-selected'] = false;
+
+    let arr = this.state.arrTimeAdd;
+    let res = arr.find( (item) => formatDate(item.date) == formatDate(date) );
+
+    if( res ){
+      let backgroundColor = '#fff';
+
+      if( parseInt(res.type) == 0 ){
+        backgroundColor = '#98e38d';
+      }else{
+        if( parseInt(res.type) == 1 ){
+          backgroundColor = '#3dcef2';
+        }else{
+          if( parseInt(res.type) == 2 ){
+            backgroundColor = '#1560bd';
+          }else{
+            backgroundColor = '#926eae';
+          }
+        }
+      }
+
+      return <PickersDay {...pickersDayProps} style={{ backgroundColor: backgroundColor, color: '#fff' }} onClick={ this.chooseDay.bind(this, date) } />;
+    }
+    
+    return <PickersDay {...pickersDayProps} onClick={ this.chooseDay.bind(this, date) }  />;
+  };
+
+  chooseDay(newValue, event){
+    let arr = this.state.arrTimeAdd;
+
+    let res = arr.find( (item) => formatDate(item.date) == formatDate(newValue) );
+
+    if( !res ){
+      arr.push({
+        date: formatDate(newValue),
+        type: this.state.typeTimeAdd
+      })
+
+      this.setState({
+        arrTimeAdd: arr
+      })
+    }else{
+      let newArr = arr.filter( (item) => formatDate(item.date) != formatDate(newValue) );
+
+      this.setState({
+        arrTimeAdd: newArr
+      })
+    }
+  }
+
+  chooseType(type){
+    this.setState({
+      typeTimeAdd: type
+    })
   }
 
   render(){ 
@@ -677,7 +779,7 @@ class WorkSchedule_ extends React.Component {
               </ListItemAvatar>
               <ListItemText primary="Сменить смену" />
             </ListItem>
-            <ListItem button>
+            <ListItem button style={{ display: 'none' }}>
               <ListItemAvatar>
                 <Avatar>
                   <HomeWorkIcon />
@@ -692,7 +794,7 @@ class WorkSchedule_ extends React.Component {
         <Dialog onClose={ () => { this.setState({ mainMenuH: false }) } } open={this.state.mainMenuH}>
           
           { !this.state.chooseUser ? null :
-            <DialogTitle>{this.state.chooseUser.user_name} {this.state.mounth} Часы</DialogTitle>
+            <DialogTitle>Часы {this.state.chooseUser.user_name} {this.state.mounth}</DialogTitle>
           }
           
           <List sx={{ pt: 0 }}>
@@ -737,7 +839,7 @@ class WorkSchedule_ extends React.Component {
         <Dialog onClose={ () => { this.setState({ mainMenuSmena: false }) } } open={this.state.mainMenuSmena}>
           
           { !this.state.chooseUser ? null :
-            <DialogTitle>{this.state.chooseUser.user_name} {this.state.mounth} Смена</DialogTitle>
+            <DialogTitle>Смена {this.state.chooseUser.user_name} {this.state.mounth}</DialogTitle>
           }
           
           <List sx={{ pt: 0 }}>
@@ -759,7 +861,7 @@ class WorkSchedule_ extends React.Component {
         <Dialog onClose={ () => { this.setState({ mainMenuPrice: false }) } } open={this.state.mainMenuPrice}>
           
           { !this.state.chooseUser ? null :
-            <DialogTitle>{this.state.chooseUser.user_name} {this.state.mounth} Часовая ставка</DialogTitle>
+            <DialogTitle>Часовая ставка {this.state.chooseUser.user_name} {this.state.mounth}</DialogTitle>
           }
           
           { !this.state.chooseUser ? null :
@@ -782,12 +884,11 @@ class WorkSchedule_ extends React.Component {
 
         <Dialog onClose={ () => { this.setState({ mainMenuLVDIR: false }) } } open={this.state.mainMenuLVDIR}>
           
-          <DialogTitle>{this.state.mounth} Уровень директора</DialogTitle>
+          <DialogTitle>Уровень директора {this.state.mounth}</DialogTitle>
           
-          <List sx={{ pt: 0 }}>
-            
+          <List style={{ overflow: 'scroll' }}>
             { this.state.arr_dir_lv.map( (item, key) =>
-              <ListItem key={key} button style={ parseFloat(this.state.lv_dir) == parseFloat(item) ? { backgroundColor: 'green', color: '#fff' } : {} } onClick={this.newLvDir.bind(this, item)}>
+              <ListItem key={key} button style={ parseFloat(this.state.lv_dir) == parseFloat(item) ? { backgroundColor: 'green', color: '#fff' } : {} } onClick={this.checkNewLvDir.bind(this, item)}>
                 <ListItemAvatar>
                   <Avatar>
                     <AssessmentIcon />
@@ -802,7 +903,7 @@ class WorkSchedule_ extends React.Component {
 
         <Dialog onClose={ () => { this.setState({ mainMenuDopBonus: false }) } } open={this.state.mainMenuDopBonus}>
           
-          <DialogTitle>{this.state.mounth} Командный бонус</DialogTitle>
+          <DialogTitle>Командный бонус {this.state.mounth}-{ parseInt(this.state.tabTable) == 0 ? '01' : '16' }</DialogTitle>
           
           <List sx={{ pt: 0 }}>
             
@@ -812,7 +913,7 @@ class WorkSchedule_ extends React.Component {
                   <CheckIcon style={{ color: '#fff' }} />
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText primary={'Выдать'} />
+              <ListItemText primary={'Выдать'} onClick={this.checkDopBonus.bind(this, 1)} />
             </ListItem>
             <ListItem button>
               <ListItemAvatar>
@@ -820,7 +921,7 @@ class WorkSchedule_ extends React.Component {
                   <CloseIcon style={{ color: '#fff' }} />
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText primary={'Отказать'} />
+              <ListItemText primary={'Отказать'} onClick={this.checkDopBonus.bind(this, 2)}/>
             </ListItem>
             
           </List>
@@ -832,8 +933,8 @@ class WorkSchedule_ extends React.Component {
             open={this.state.isOpenModalH}
             onClose={ () => { this.setState({ isOpenModalH: false }) } }
             scroll='paper'
-            aria-labelledby="scroll-dialog-title"
-            aria-describedby="scroll-dialog-description"
+            fullWidth={true}
+            maxWidth={'md'}
           >
             <DialogTitle id="scroll-dialog-title">{this.state.userInfo.user.app_name + ' ' + this.state.userInfo.user.user_name + ' ' + this.state.userInfo.date}</DialogTitle>
             <DialogContent dividers={true}>
@@ -916,6 +1017,82 @@ class WorkSchedule_ extends React.Component {
             </DialogActions>
           </Dialog>
         }
+
+        { !this.state.userInfo ? null :
+          <Dialog
+            open={this.state.isOpenModalM}
+            onClose={ () => { this.setState({ isOpenModalM: false }) } }
+            scroll='paper'
+            fullWidth={true}
+            maxWidth={'md'}
+          >
+            <DialogTitle id="scroll-dialog-title">{this.state.userInfo.user.app_name + ' ' + this.state.userInfo.user.user_name + ' ' + this.state.userInfo.date}</DialogTitle>
+            <DialogContent dividers={true}>
+              
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                  <List component="nav">
+
+                    <ListItemButton
+                      onClick={this.chooseType.bind(this, 0)}
+                      style={{ backgroundColor: '#98e38d', color: '#fff' }}
+                    >
+                      <ListItemText primary="10:00 - 22:00" />
+                      {this.state.typeTimeAdd === 0 ?
+                        <SendIcon />
+                          :
+                        null
+                      }
+                    </ListItemButton>
+
+                    <ListItemButton
+                      onClick={this.chooseType.bind(this, 1)}
+                      style={{ backgroundColor: '#3dcef2', color: '#fff' }}
+                    >
+                      <ListItemText primary="10:00 - 16:00" />
+                      {this.state.typeTimeAdd === 1 ?
+                        <SendIcon />
+                          :
+                        null
+                      }
+                    </ListItemButton>
+
+                    <ListItemButton
+                      onClick={this.chooseType.bind(this, 2)}
+                      style={{ backgroundColor: '#1560bd', color: '#fff' }}
+                    >
+                      <ListItemText primary="16:00 - 22:00" />
+                      {this.state.typeTimeAdd === 2 ?
+                        <SendIcon />
+                          :
+                        null
+                      }
+                    </ListItemButton>
+
+                    <ListItemButton
+                      style={{ backgroundColor: '#926eae', color: '#fff' }}
+                    >
+                      <ListItemText primary="Другое" />
+                    </ListItemButton>
+
+                  </List>
+                  
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Paper>
+                    <MyDatePickerGraph year={this.state.mounth} renderWeekPickerDay={this.renderWeekPickerDay} />
+                  </Paper>
+                  
+                </Grid>
+              </Grid>
+
+            </DialogContent>
+            <DialogActions style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Button style={{ backgroundColor: 'green', color: '#fff' }} onClick={this.saveDayHourse.bind(this)}>Сохранить</Button>
+              <Button style={{ backgroundColor: 'red', color: '#fff' }} onClick={() => { this.setState({ isOpenModalM: false }) }}>Отмена</Button>
+            </DialogActions>
+          </Dialog>
+        }
         
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
@@ -953,7 +1130,7 @@ class WorkSchedule_ extends React.Component {
                           <HeaderItem key={key} bonus_other={this.state.one.bonus_other} changeLVDir={this.changeLVDir.bind(this)} changeDopBonus={this.changeDopBonus.bind(this)} kind={this.state.kind} show_zp={this.state.show_zp_one} lv_dir={this.state.lv_dir} lv_cafe={this.state.lv_cafe} dataKey={key} days={this.state.one.days} item={item} />
                             :
                           <TableRow key={key}>
-                            <TableCell className='name_pinning'>{item.data.user_name}</TableCell>
+                            <TableCell className='name_pinning' onClick={ this.openM.bind(this, item.data, '') }>{item.data.user_name}</TableCell>
                             <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
 
                             { this.state.kind == 'manager' ? null :
@@ -1063,7 +1240,7 @@ class WorkSchedule_ extends React.Component {
                           <HeaderItem bonus_other={this.state.two.bonus_other} changeLVDir={this.changeLVDir.bind(this)} changeDopBonus={this.changeDopBonus.bind(this)} key={key} kind={this.state.kind} show_zp={this.state.show_zp_two} lv_dir={this.state.lv_dir} lv_cafe={this.state.lv_cafe} dataKey={key} days={this.state.two.days} item={item} />
                             :
                           <TableRow key={key}>
-                            <TableCell style={{ minWidth: 140, minHeight: 38, position: 'absolute', backgroundColor: '#fff', marginLeft: '-1px', borderBottom: '2px solid #e5e5e5' }}>{item.data.user_name}</TableCell>
+                            <TableCell className='name_pinning' onClick={ this.openM.bind(this, item.data, '') }>{item.data.user_name}</TableCell>
                             <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
 
                             { this.state.kind == 'manager' ? null :

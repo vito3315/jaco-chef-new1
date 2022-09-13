@@ -22,9 +22,12 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
 
+import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
+import { PickersDay } from '@mui/x-date-pickers/PickersDay';
+
 import Typography from '@mui/material/Typography';
 
-function formatDate(date) {
+export function formatDate(date) {
   var d = new Date(date),
       month = '' + (d.getMonth() + 1),
       day = '' + d.getDate(),
@@ -266,6 +269,10 @@ export class MyTextInput extends React.PureComponent {
   }
 }
 
+const inputProps = {
+  step: 600,
+};
+
 export class MyTimePicker extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -306,9 +313,7 @@ export class MyTimePicker extends React.PureComponent {
           shrink: true,
         }}
         step={600}
-        inputProps={{
-          step: 600, // 5 min
-        }}
+        inputProps={inputProps}
       />
     )
   }
@@ -366,6 +371,82 @@ export class MyDatePickerNew extends React.PureComponent {
           onChange={this.props.func}
           onBlur={this.props.onBlur ? this.props.onBlur : null}
           renderInput={(params) => <TextField variant="outlined" size={'small'} color='primary' style={{ width: '100%' }} {...params} />}
+        />
+      </LocalizationProvider>
+    )
+  }
+}
+
+export class MyDatePickerGraph extends React.PureComponent {
+  constructor(props) {
+    super(props);
+        
+    let data = this.props.year;
+    data = data.split('-')
+
+    this.state = {
+      activeValue: formatDate(this.props.year+'-01'),
+      minDate: new Date(data[0], parseInt(data[1])-1, 1),
+      maxDate: new Date(data[0], parseInt(data[1]), 0),
+      arr: []
+    };
+  }
+  
+  renderWeekPickerDay = (date, selectedDates, pickersDayProps) => {
+    pickersDayProps['selected'] = false;
+    pickersDayProps['aria-selected'] = false;
+
+    let arr = this.state.arr;
+    let res = arr.find( (item) => formatDate(item.date) == formatDate(date) );
+
+    if( res ){
+      return <PickersDay {...pickersDayProps} style={{ backgroundColor: 'yellow', color: 'red' }} onClick={ this.chooseDay.bind(this, date) } />;
+    }
+    
+    return <PickersDay {...pickersDayProps} onClick={ this.chooseDay.bind(this, date) }  />;
+  };
+
+  chooseDay(newValue, event){
+    let arr = this.state.arr;
+
+    let res = arr.find( (item) => formatDate(item.date) == formatDate(newValue) );
+
+    console.log( 'res', res )
+
+    if( !res ){
+      arr.push({
+        date: formatDate(newValue),
+        type: 1
+      })
+
+      this.setState({
+        arr: arr
+      })
+    }else{
+      let newArr = arr.filter( (item) => formatDate(item.date) != formatDate(newValue) );
+
+      this.setState({
+        arr: newArr
+      })
+    }
+  }
+
+  render(){
+    return (
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ruLocale}>
+        <StaticDatePicker
+          multiple={true}
+          minDate={formatDate(this.state.minDate)}
+          maxDate={formatDate(this.state.maxDate)}
+          displayStaticWrapperAs="desktop"
+          label="Week picker"
+          
+          renderDay={this.props.renderWeekPickerDay}
+          renderInput={(params) => <TextField {...params} />}
+          inputFormat="yyyy-MM-dd"
+          
+          value={this.state.activeValue}
+          onChange={ () => {} }
         />
       </LocalizationProvider>
     )
