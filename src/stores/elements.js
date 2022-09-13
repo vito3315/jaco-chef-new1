@@ -85,10 +85,11 @@ export class MyAutocomplite extends React.PureComponent {
         <Autocomplete
           size="small"
           disableCloseOnSelect={true}
+          //freeSolo
           //multiple={true}
           id={ this.props.id ?? null }
           options={this.props.data}
-          getOptionLabel={(option) => option.name}
+          getOptionLabel={(option) => option.name || ''}
           value={this.props.value}
           onChange={this.props.func}
           filterSelectedOptions
@@ -126,8 +127,6 @@ export class MyAutocomplite2 extends React.PureComponent {
             onBlur={this.props.onBlur ? this.props.onBlur : null}
             id={ this.props.id ?? null }
             options={this.props.data}
-            
-
             getOptionLabel={(option) => option.name}
             value={this.props.value}
             onChange={this.props.func}
@@ -241,7 +240,7 @@ export class MySelect extends React.PureComponent {
 export class MyTextInput extends React.PureComponent {
   constructor(props) {
     super(props);
-        
+   
     this.state = {
       type: 'text'
     };
@@ -249,7 +248,7 @@ export class MyTextInput extends React.PureComponent {
   
   render(){
     return (
-      <TextField 
+      <TextField
         label={this.props.label}
         value={this.props.value}
         onChange={this.props.func}

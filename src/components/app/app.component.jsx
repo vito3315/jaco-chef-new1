@@ -111,6 +111,7 @@ const SiteItems = React.lazy(() => import("../site_items"));
 const HotMap = React.lazy(() => import("../hot_map"));
 const ShowCook = React.lazy(() => import("../show_cook"));
 const СafeUprEdit = React.lazy(() => import("../cafe_upr_edit"));
+const CheckCheck = React.lazy(() => import("../check_check"));
 
 
 //import { HotMap } from '../hot_map';
@@ -405,6 +406,7 @@ export function App () {
                   
                   <Route path={'/show_cook'} exact={ true } element={ <ShowCook /> } />
                   <Route path={'/cafe_upr_edit'} exact={ true } element={ <СafeUprEdit /> } />
+                  <Route path={'/check_check'} exact={ true } element={ <CheckCheck /> } />
                   
                   <Route
                     component={ () =>

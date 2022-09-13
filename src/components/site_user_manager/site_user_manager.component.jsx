@@ -151,6 +151,8 @@ class SiteUserManager_ extends React.Component {
 
         let data = await this.getData('get_all');
 
+        console.log(data);
+
         this.setState({
             module_name: data.module_info.name,
             point_list: data.points,
@@ -893,7 +895,7 @@ class SiteUserManager_ extends React.Component {
                     <Grid item xs={12} sm={12}>
                         <h1>{this.state.module_name}</h1>
                     </Grid>
-
+                    { console.log(this.state) }
                     <Grid item xs={12} sm={6}>
                         <MySelect data={this.state.point_list} value={this.state.point_id} func={this.changeSort.bind(this, 'point_id')} label='Точка' />
                     </Grid>

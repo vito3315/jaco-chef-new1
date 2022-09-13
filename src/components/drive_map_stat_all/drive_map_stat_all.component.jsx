@@ -136,10 +136,8 @@ class DriveMapStatAll_ extends React.Component {
           preset: 'islands#blackDotIcon', 
           iconColor: 'black'
         })
-        
+
         this.map.geoObjects.add(myGeoObject);
-        
-        
         
         let json = {
           "type": "FeatureCollection",
@@ -198,6 +196,9 @@ class DriveMapStatAll_ extends React.Component {
         this.map.geoObjects.add(objectManager);
       });
     }else{
+
+      // дом в центре карты
+      this.map.setCenter([home.latitude, home.longitude]);
       
       let json = {
         "type": "FeatureCollection",
@@ -301,7 +302,6 @@ class DriveMapStatAll_ extends React.Component {
               </div>
             ) }
           </Grid>       
-          
           
           <Grid item xs={12} sm={12}>
             <div id="map" name="map" style={{ width: '100%', height: 700, paddingTop: 10 }} />
