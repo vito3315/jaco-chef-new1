@@ -45,16 +45,6 @@ const Home = React.lazy(() => import("../home"));
 const Auth = React.lazy(() => import("../auth"));
 const Reg = React.lazy(() => import("../registration"));
 
-//import { Home } from '../home';
-//import { Auth } from '../auth';
-//import { Reg } from '../registration';
-
-//import { LiveOrders } from '../live_orders';
-//import { Events } from '../events';
-//import { RasByBill } from '../ras_by_bill';
-//import { CategoryItems } from '../category_items';
-//import { VendorModule } from '../vendor_module';
-
 const LiveOrders = React.lazy(() => import("../live_orders"));
 const Events = React.lazy(() => import("../events"));
 const RasByBill = React.lazy(() => import("../ras_by_bill"));
@@ -65,10 +55,6 @@ const VendorItemPrice = React.lazy(() => import("../vendor_item_price"));
 const Tender = React.lazy(() => import("../tender"));
 const WorkSchedule = React.lazy(() => import("../work_schedule"));
 
-//import { VendorItemPrice } from '../vendor_item_price';
-//import { Tender } from '../tender';
-//import { WorkSchedule } from '../work_schedule';
-
 import { Revizion, RevizionNew } from '../revizion';
 import { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat, SiteSale2_StatList } from '../site_sale_2';
 
@@ -78,23 +64,11 @@ const Concenter = React.lazy(() => import("../concenter"));
 const SocialNetwork = React.lazy(() => import("../socialnetwork"));
 const CatWork = React.lazy(() => import("../cat_work"));
 
-//import { DriveMapStatAll } from '../drive_map_stat_all';
-//import { DriverStat } from '../driver_stat';
-//import { Concenter } from '../concenter';
-//import { SocialNetwork } from '../socialnetwork';
-//import { CatWork } from '../cat_work';
-
 const AppWorkPoint = React.lazy(() => import("../app_work_point"));
 const AppWork = React.lazy(() => import("../app_work"));
 const AppWorkShow = React.lazy(() => import("../app_work_show"));
 const SiteStatMarc = React.lazy(() => import("../site_stat_marc"));
 const AdvertisingCompany = React.lazy(() => import("../advertising_company"));
-
-//import { AppWorkPoint } from '../app_work_point';
-//import { AppWork } from '../app_work';
-//import { AppWorkShow } from '../app_work_show';
-//import { SiteStatMarc } from '../site_stat_marc';
-//import { AdvertisingCompany } from '../advertising_company';
 
 const RasBillAndCook = React.lazy(() => import("../ras_bill_and_cook"));
 const SkladItemsModule = React.lazy(() => import("../sklad_items_module"));
@@ -102,19 +76,18 @@ const SiteUserManager = React.lazy(() => import("../site_user_manager"));
 const PromoItemsStat = React.lazy(() => import("../promo_items_stat"));
 const SiteItems = React.lazy(() => import("../site_items"));
 
-//import { RasBillAndCook } from '../ras_bill_and_cook';
-//import { SkladItemsModule } from '../sklad_items_module';
-//import { SiteUserManager } from '../site_user_manager';
-//import { PromoItemsStat } from '../promo_items_stat';
-//import { SiteItems } from '../site_items';
-
 const HotMap = React.lazy(() => import("../hot_map"));
 const ShowCook = React.lazy(() => import("../show_cook"));
 const СafeUprEdit = React.lazy(() => import("../cafe_upr_edit"));
 const CheckCheck = React.lazy(() => import("../check_check"));
+const UserSmena = React.lazy(() => import("../user_smena"));
+
+const CountUsers = React.lazy(() => import("../count_users"));
+const Fines = React.lazy(() => import("../fines"));
+const EventTime1 = React.lazy(() => import("../event_time_1"));
 
 
-//import { HotMap } from '../hot_map';
+
 import { SiteSaleMin, SiteSaleMin_New, SiteSaleMin_Edit, SiteSaleMin_StatList } from '../site_sale_min';
 
 
@@ -407,6 +380,11 @@ export function App () {
                   <Route path={'/show_cook'} exact={ true } element={ <ShowCook /> } />
                   <Route path={'/cafe_upr_edit'} exact={ true } element={ <СafeUprEdit /> } />
                   <Route path={'/check_check'} exact={ true } element={ <CheckCheck /> } />
+                  <Route path={'/user_smena'} exact={ true } element={ <UserSmena /> } />
+                  <Route path={'/count_users'} exact={ true } element={ <CountUsers /> } />
+
+                  <Route path={'/fines'} exact={ true } element={ <Fines /> } />
+                  <Route path={'/event_time_1'} exact={ true } element={ <EventTime1 /> } />
                   
                   <Route
                     component={ () =>
