@@ -372,6 +372,8 @@ export class HotMap extends React.Component {
     isDrawing: !this.state.isDrawing
   })
 
+  ymaps.geoQuery(this.map.geoObjects).setOptions('strokeColor', 'rgb(187, 0, 37)')
+
   // Создаем многоугольник, используя класс GeoObject.
   this.myGeoObject = new ymaps.GeoObject({
     geometry: {
