@@ -29,6 +29,7 @@ function formatDate(date) {
 export class HotMap extends React.Component {
   map = null;
   heatmap = null;
+  myGeoObject = null;
 
   constructor(props) {
     super(props);
@@ -49,7 +50,10 @@ export class HotMap extends React.Component {
       statAllCount: '',
       statTrueCount: '',
 
-      is_new: 0
+      is_new: 0,
+
+      isDrawing: true,
+
     };
   }
   
@@ -121,6 +125,18 @@ export class HotMap extends React.Component {
   }
   
   async updateData(){
+
+    if(this.state.statAllCount) {
+       this.setState({
+        statAllCount: '',
+        statTrueCount: '',
+      })
+    }
+
+    this.setState({
+      isDrawing: true
+    })
+
     let data = {
       city_id: this.state.city_id,
       date_start: this.state.date_start,
@@ -190,7 +206,7 @@ export class HotMap extends React.Component {
 
         home.map( (item, key) => {
           //дом
-          let myGeoObject = new ymaps.GeoObject({
+          let myGeoObject1 = new ymaps.GeoObject({
             geometry: {
               type: "Point",
               coordinates: [item.home.latitude, item.home.longitude]
@@ -200,7 +216,7 @@ export class HotMap extends React.Component {
             iconColor: 'black'
           })
 
-          this.map.geoObjects.add(myGeoObject);
+          this.map.geoObjects.add(myGeoObject1);
 
           let points_zone = [];
 
@@ -218,43 +234,20 @@ export class HotMap extends React.Component {
 							strokeColor: 'rgb(187, 0, 37)',
 							strokeWidth: 5
 						});
+
 						this.map.geoObjects.add(myGeoObject2[poly]);
+
 					}
 
-        } )
-
-        // Создаем многоугольник, используя класс GeoObject.
-        var myGeoObject1 = new ymaps.GeoObject({
-          geometry: {
-            type: "Polygon",
-            coordinates: [  ],
-            fillRule: "nonZero"
-          }				
-        }, {
-          // Описываем опции геообъекта.
-          // Цвет заливки.
-          fillColor: '#00FF00',
-          // Цвет обводки.
-          strokeColor: '#0000FF',
-          // Общая прозрачность (как для заливки, так и для обводки).
-          opacity: 0.5,
-          // Ширина обводки.
-          strokeWidth: 5,
-          // Стиль обводки.
-          strokeStyle: 'shortdash'
-        });
-
-        this.map.geoObjects.add(myGeoObject1);
-
-        myGeoObject1.editor.startDrawing();
+          this.map.geoObjects.events.add('click', this.changeColorPolygon.bind(this));
+          
+        })
+        
       });
     }else{
       
-      
-
       this.map.geoObjects.removeAll()
       this.heatmap.destroy();
-      
 
       this.map.setCenter([home[0].home.latitude, home[0].home.longitude]);
 
@@ -287,7 +280,7 @@ export class HotMap extends React.Component {
 
       home.map( (item, key) => {
         //дом
-        let myGeoObject = new ymaps.GeoObject({
+        let myGeoObject1 = new ymaps.GeoObject({
           geometry: {
             type: "Point",
             coordinates: [item.home.latitude, item.home.longitude]
@@ -297,14 +290,14 @@ export class HotMap extends React.Component {
           iconColor: 'black'
         })
 
-        this.map.geoObjects.add(myGeoObject);
+        this.map.geoObjects.add(myGeoObject1);
 
         let points_zone = [];
 
         item.zone.map( (zon, k) => {
           points_zone.push( JSON.parse(zon['zone']) );
         } )
-        
+
         let myGeoObject2 = [];
 
         for(var poly = 0; poly < points_zone.length; poly++){
@@ -318,34 +311,9 @@ export class HotMap extends React.Component {
           this.map.geoObjects.add(myGeoObject2[poly]);
         }
 
+        this.map.geoObjects.events.add('click', this.changeColorPolygon.bind(this));
+
       } )
-
-      // Создаем многоугольник, используя класс GeoObject.
-      var myGeoObject1 = new ymaps.GeoObject({
-        geometry: {
-          type: "Polygon",
-          coordinates: [  ],
-          fillRule: "nonZero"
-        }				
-      }, {
-        // Описываем опции геообъекта.
-        // Цвет заливки.
-        fillColor: '#00FF00',
-        // Цвет обводки.
-        strokeColor: '#0000FF',
-        // Общая прозрачность (как для заливки, так и для обводки).
-        opacity: 0.5,
-        // Ширина обводки.
-        strokeWidth: 5,
-        // Стиль обводки.
-        strokeStyle: 'shortdash'
-      });
-
-      this.map.geoObjects.add(myGeoObject1);
-
-      myGeoObject1.editor.startDrawing();
-
-      //this.map.geoObjects.add(objectManager);
     }
   }
 
@@ -398,6 +366,67 @@ export class HotMap extends React.Component {
     })
   }
 
+  startDrawing() {
+
+  this.setState({ 
+    isDrawing: !this.state.isDrawing
+  })
+
+  ymaps.geoQuery(this.map.geoObjects).setOptions('strokeColor', 'rgb(187, 0, 37)')
+
+  // Создаем многоугольник, используя класс GeoObject.
+  this.myGeoObject = new ymaps.GeoObject({
+    geometry: {
+      type: "Polygon",
+      coordinates: [  ],
+      fillRule: "nonZero"
+    }				
+  }, {
+    // Описываем опции геообъекта.
+    // Цвет заливки.
+    fillColor: '#00FF00',
+    // Цвет обводки.
+    strokeColor: '#0000FF',
+    // Общая прозрачность (как для заливки, так и для обводки).
+    opacity: 0.5,
+    // Ширина обводки.
+    strokeWidth: 5,
+    // Стиль обводки.
+    strokeStyle: 'shortdash'
+  });
+
+  this.map.geoObjects.add(this.myGeoObject);
+
+  this.myGeoObject.editor.startDrawing();
+
+  }
+
+  stopDrawing() {
+
+    this.setState({ 
+      isDrawing: !this.state.isDrawing
+    })
+  
+    this.myGeoObject.editor.stopDrawing();
+  
+  }
+
+  changeColorPolygon(event) {
+
+    event.get('target').options.set({strokeColor: 'rgb(255, 255, 0)'})
+
+    const result = ymaps.geoQuery(this.map.geoObjects).search('options.strokeColor = "rgb(255, 255, 0)"')
+
+    if(result._objects.length > 1) {
+      result.setOptions('strokeColor', 'rgb(187, 0, 37)')
+    }
+
+    if(result) {
+      this.map.geoObjects.add(result._objects[0]);
+    }
+
+  }
+
   render(){
     return (
       <>
@@ -433,12 +462,16 @@ export class HotMap extends React.Component {
             <MyTimePicker label="Время до" value={this.state.time_end} func={ this.changeData.bind(this, 'time_end') } />
           </Grid>
 
-
           <Grid item xs={12} sm={6}>
             <Button variant="contained" onClick={this.getCount.bind(this)}>Подсчитать количество</Button>
           </Grid>
-          
 
+          <Grid item xs={12} sm={6}>
+            <Button variant="contained" 
+            onClick={this.state.isDrawing ? this.startDrawing.bind(this) : this.stopDrawing.bind(this)}
+            >{this.state.isDrawing ? 'Включить область редактирования' : 'Выключить область редактирования'}</Button>
+          </Grid>
+          
           <Grid item xs={12}>
             <Grid container spacing={3}>
               <Grid item xs={6}>
@@ -449,8 +482,6 @@ export class HotMap extends React.Component {
               </Grid>
             </Grid>
           </Grid>
-
-
 
           <Grid item xs={12} sm={12}>
             <div id="map" name="map" style={{ width: '100%', height: 700, paddingTop: 10 }} />
