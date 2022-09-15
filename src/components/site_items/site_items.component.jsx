@@ -414,11 +414,6 @@ class SiteItems_ extends React.Component {
     if(res.item_pf.stage_1){
 			res.item_pf.stage_1.map(function(item){    
         items_pf_stages_1.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'], type: item['type'] }); 
-        // if(item['pf_id']){
-        //   items_pf_stages_1.push({item_id: item['v'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'], type: item['type'] });   
-        // } else{
-        //   items_pf_stages_1.push({item_id: item['rec_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'], type: item['type'] }); 
-        // }
       })
 		}
 
@@ -577,8 +572,7 @@ class SiteItems_ extends React.Component {
 
     // todo
   chooseStage(stage){
-        
-   
+           
     // определаем заготовка или рецепт
     let type = this.state.openMenuitem.storage_id ? 'pf' : 'rec';
    
@@ -1030,8 +1024,9 @@ class SiteItems_ extends React.Component {
     }
 
     // запихиваем рецепы в другой массив
-    let rec_1 = [], pf_1 = [];      
-    this.state.pf_stage_1.map((this_item) => {
+    let rec_1 = [], pf_1 = [], item_1 = [];
+    item_1 = this.state.pf_stage_1.length > 0 ? this.state.pf_stage_1 : this.state.rec_stage_1;
+    item_1.map((this_item) => {
         if(this_item.type == 'pf'){
           pf_1.push(this_item);
         } else{
@@ -1039,8 +1034,9 @@ class SiteItems_ extends React.Component {
         }
     })
 
-    let rec_2 = [], pf_2 = [];      
-    this.state.pf_stage_2.map((this_item) => {
+    let rec_2 = [], pf_2 = [], item_2 = [];      
+    item_2 = this.state.pf_stage_2.length > 0 ? this.state.pf_stage_2 : this.state.rec_stage_2;
+    item_2.map((this_item) => {
         if(this_item.type == 'pf'){
           pf_2.push(this_item);
         } else{
@@ -1048,8 +1044,9 @@ class SiteItems_ extends React.Component {
         }
     })
 
-    let rec_3 = [], pf_3 = [];      
-    this.state.pf_stage_3.map((this_item) => {
+    let rec_3 = [], pf_3 = [], item_3 = [];       
+    item_3 = this.state.pf_stage_3.length > 0 ? this.state.pf_stage_3 : this.state.rec_stage_3;
+    item_3.map((this_item) => {
         if(this_item.type == 'pf'){
           pf_3.push(this_item);
         } else{
@@ -1187,16 +1184,47 @@ class SiteItems_ extends React.Component {
       })
     }
 
+    // запихиваем рецепы в другой массив
+    let rec_1 = [], pf_1 = [], item_1 = [];
+    item_1 = this.state.pf_stage_1.length > 0 ? this.state.pf_stage_1 : this.state.rec_stage_1;
+    item_1.map((this_item) => {
+        if(this_item.type == 'pf'){
+          pf_1.push(this_item);
+        } else{
+          rec_1.push(this_item); 
+        }
+    })
+
+    let rec_2 = [], pf_2 = [], item_2 = [];      
+    item_2 = this.state.pf_stage_2.length > 0 ? this.state.pf_stage_2 : this.state.rec_stage_2;
+    item_2.map((this_item) => {
+        if(this_item.type == 'pf'){
+          pf_2.push(this_item);
+        } else{
+          rec_2.push(this_item); 
+        }
+    })
+
+    let rec_3 = [], pf_3 = [], item_3 = [];       
+    item_3 = this.state.pf_stage_3.length > 0 ? this.state.pf_stage_3 : this.state.rec_stage_3;
+    item_3.map((this_item) => {
+        if(this_item.type == 'pf'){
+          pf_3.push(this_item);
+        } else{
+          rec_3.push(this_item); 
+        }
+    })
+
     let data = {
       dateUpdate: this.state.date_update,
       item: this.state.editItem,
-      rec_stage_1: this.state.rec_stage_1,
-      rec_stage_2: this.state.rec_stage_2,
-      rec_stage_3: this.state.rec_stage_3,
+      rec_stage_1: rec_1,
+      rec_stage_2: rec_2,
+      rec_stage_3: rec_3,
 
-      pf_stage_1: this.state.pf_stage_1,
-      pf_stage_2: this.state.pf_stage_2,
-      pf_stage_3: this.state.pf_stage_3,
+      pf_stage_1: pf_1,
+      pf_stage_2: pf_2,
+      pf_stage_3: pf_3,
 
       item_items: this.state.item_items,
     };
@@ -1537,8 +1565,6 @@ class SiteItems_ extends React.Component {
       ItemTab: value 
     })
 
-    console.log('t', this.state.item_pf);
-
     if( parseInt(value) == 1 ){
       setTimeout( () => {
         this.myDropzoneOld = new Dropzone("#for_img_edit_old", this.dropzoneOptions);
@@ -1581,16 +1607,13 @@ class SiteItems_ extends React.Component {
     this.setState({ 
       ItemTab1: value 
     })
-    console.log('changeTab1='+value);
+    
     setTimeout( () => {
       // правка от 11.09.22
       //if( parseInt(value) == -1 || parseInt(value) == 0 ){
       if(  parseInt(value) == 0 ){
-        console.log('tab origin');
         this.openItem(this.state.editItem, 'origin');
       }else{
-        console.log('tab hist');
-        //return false;
         this.openItem(this.state.editItem, 'hist');
       }
     }, 300 )
