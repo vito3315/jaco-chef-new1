@@ -45,22 +45,19 @@ class SkladItemsModuleModal extends React.Component{
     };
   }
 
-  componentDidUpdate(prevProps) {
+  static getDerivedStateFromProps(nextProps, prevState) {
 
-    if(!this.props.event) {
-      return;
+    if(!nextProps.event) {
+      return null;
     }
 
-    if (this.props.event.item.name !== prevProps?.event?.item.name) {
-      this.setState({
-        itemEdit: this.props.event,
-      });
+    if (nextProps.event !== prevState.event) {
+      return ({ itemEdit: nextProps.event }) // <- this is setState equivalent
     }
+    return null
   }
 
   changeItem(data, event){
-
-    console.log(this.state.itemEdit)
 
     let vendor = this.state.itemEdit;
     vendor.item[data] = event.target.value;
@@ -141,10 +138,16 @@ class SkladItemsModuleModal extends React.Component{
                     func={ this.changeItem.bind(this, 'max_count_in_m') } />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <MySelect 
-                    data={ this.state.itemEdit ? this.state.itemEdit.cats : []} 
-                    value={ this.state.itemEdit ? (this.state.itemEdit.item.cat_id === undefined ? '' : this.state.itemEdit.item.cat_id) : ''} 
-                    func={ this.changeItem.bind(this, 'cat_id') } label='Категория' />
+
+                  <MyAutocomplite label='Категория' 
+                    multiple={false} 
+                    data={this.state.itemEdit ? this.state.itemEdit.cats : []}
+                    value={this.state.itemEdit ? (this.state.itemEdit.item.cat_id === '0' ? '' : this.state.itemEdit.item.cat_id) : ''} 
+                    func={ (event, value) => { 
+                      let this_storages = this.state.itemEdit; 
+                      this_storages.item.cat_id = value;
+                      this.setState({ itemEdit: this_storages }) } } 
+                  />
                   </Grid>
                 </Grid>
               </Grid>
@@ -354,7 +357,7 @@ class SkladItemsModule_ extends React.Component {
 
       freeItems: [],
 
-      searchItem: '0'
+      searchItem: ''
 
     };
   }
@@ -453,8 +456,8 @@ class SkladItemsModule_ extends React.Component {
     
     let res = await this.getData('get_one', data);
     res.item.pf_id = res.pf_list.find(item => item.id === res.item.pf_id)
+    res.item.cat_id = res.cats.find(item => item.id === res.item.cat_id)
 
-    // console.log(res)
 
     this.setState({
       modalDialog: true,
@@ -473,9 +476,11 @@ class SkladItemsModule_ extends React.Component {
 
   async saveEditItem(itemEdit, main_item_id = 0){
 
-    let id = itemEdit.item.pf_id.id;
+    let pf_id = itemEdit.item.pf_id.id;
+    let cat_id = itemEdit.item.cat_id.id;
 
-    itemEdit.item.pf_id = id;
+    itemEdit.item.pf_id = pf_id;
+    itemEdit.item.cat_id = cat_id;
 
     let data = {
       id: itemEdit.item.id,
@@ -496,20 +501,24 @@ class SkladItemsModule_ extends React.Component {
         checkArtList: []
       })
 
-      res = await this.getData('get_all');
+      setTimeout( async () => {
+        res = await this.getData('get_all');
     
-      this.setState({
-        cats: res.cats,
-        freeItems: res.items_free
-      })
+        this.setState({
+          cats: res.cats,
+          freeItems: res.items_free
+        })
+      }, 300 )
     }
   }
 
   async saveNewItem(itemEdit, main_item_id = 0){
 
-    let id = itemEdit.item.pf_id.id;
+    let pf_id = itemEdit.item.pf_id.id;
+    let cat_id = itemEdit.item.cat_id.id;
 
-    itemEdit.item.pf_id = id;
+    itemEdit.item.pf_id = pf_id;
+    itemEdit.item.cat_id = cat_id;
 
     let data = {
       id: itemEdit.item.id,
@@ -530,16 +539,19 @@ class SkladItemsModule_ extends React.Component {
         checkArtList: []
       })
 
-      res = await this.getData('get_all');
+      setTimeout( async () => {
+        res = await this.getData('get_all');
     
-      this.setState({
-        cats: res.cats,
-        freeItems: res.items_free
-      })
+        this.setState({
+          cats: res.cats,
+          freeItems: res.items_free
+        })
+      }, 300 )
     }
   }
 
   async checkArt(itemEdit){
+
     let data = {
       id: itemEdit.item.id,
       art: itemEdit.item.art,
@@ -616,13 +628,15 @@ class SkladItemsModule_ extends React.Component {
         checkArtDialog: false,
         checkArtList: []
       })
-
-      res = await this.getData('get_all');
+      
+      setTimeout( async () => {
+        res = await this.getData('get_all');
     
-      this.setState({
-        cats: res.cats,
-        freeItems: res.items_free
-      })
+        this.setState({
+          cats: res.cats,
+          freeItems: res.items_free
+        })
+      }, 300 )
     }
   }
 
@@ -718,8 +732,6 @@ class SkladItemsModule_ extends React.Component {
     };
 
     let res = await this.getData('get_all_search', data);
-
-    // console.log( res )
 
     this.setState({
       cats: res.cats,
