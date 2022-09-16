@@ -147,7 +147,7 @@ class SiteItemsTable extends React.Component {
                     { cat.items.map( (it, k) =>
                       <TableRow key={k}>
                         <TableCell>{it.id}</TableCell>
-                        <TableCell onClick={this.props.openItem.bind(this, it, it.date_update ? 'hist' : 'origin')}>{it.name}</TableCell>
+                        <TableCell onClick={this.props.openItem.bind(this, it, it.date_update ? 'hist' : 'origin', true)}>{it.name}</TableCell>
                         { it.date_update ?
                           <TableCell>
                             <MyDatePickerNew label="" value={ it.date_update } func={ this.props.changeDateUpdate.bind(this, key, k, it.date_update_id) } />
@@ -373,7 +373,7 @@ class SiteItems_ extends React.Component {
     });
   }  
 
-  async openItem(item, type = 'origin'){
+  async openItem(item, type = 'origin', open_first = false){
     
     let data = {
       id: item.id,
@@ -436,7 +436,8 @@ class SiteItems_ extends React.Component {
 		}
 		
     //todo
-    let ItemTab1 = res.hist.length > 0 && type == 'hist' ? res.hist[0].id : this.state.ItemTab1;
+    console.log('open_first='+open_first);
+    let ItemTab1 = res.hist.length > 0 && open_first && type == 'hist' ? res.hist[0].id : this.state.ItemTab1;
     
 		this.setState({
       editItem: res.item,
@@ -470,9 +471,10 @@ class SiteItems_ extends React.Component {
     }, 300 )
   }
 
+ 
   async openNew(){
     let res = await this.getData('get_all_for_new');
-
+    console.log('it',res.item); 
     var items_pf_stages_1 = [],
 			items_pf_stages_2 = [],
 			items_pf_stages_3 = [],
@@ -1609,9 +1611,10 @@ class SiteItems_ extends React.Component {
     })
     
     setTimeout( () => {
+      console.log('v='+value)
       // правка от 11.09.22
-      //if( parseInt(value) == -1 || parseInt(value) == 0 ){
-      if(  parseInt(value) == 0 ){
+      if( parseInt(value) == -1 || parseInt(value) == 0 ){
+      // if(  parseInt(value) == 0 ){
         this.openItem(this.state.editItem, 'origin');
       }else{
         this.openItem(this.state.editItem, 'hist');
