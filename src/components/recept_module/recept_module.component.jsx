@@ -51,34 +51,16 @@ class ReceptModule_Modal_Container extends React.Component {
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    // console.log(nextProps.event)
-    // console.log(prevState.event)
 
     if (!nextProps.event) {
       return null;
     }
 
     if (nextProps.event !== prevState.event) {
-      return { item: nextProps.event }; // <- this is setState equivalent
+      return { item: nextProps.event };
     }
     return null;
   }
-
-  // componentDidUpdate(prevProps) {
-
-  //   console.log(this.props.event)
-
-  //   if(!this.props.event) {
-  //     return;
-  //   }
-
-  //   if (this.props.event !== prevProps.event) {
-  //     this.setState({
-  //       item: this.props.event,
-  //       // editMainNameMy: this.props.event.name,
-  //     });
-  //   }
-  // }
 
   searchPf(event) {
     this.setState({
@@ -242,7 +224,7 @@ class ReceptModule_Modal_Container extends React.Component {
                   ))}
                   <TableRow sx={{ '& td': { border: 0 } }}>
                     <TableCell>Всего:</TableCell>
-                    <TableCell></TableCell>
+                    <TableCell>{`${this.props.total} гр`}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -261,9 +243,9 @@ class ReceptModule_Modal_New extends React.Component {
     this.state = {
       item: null,
 
-      // recipe: [],
-
       quantity: '',
+
+      total: ''
     };
 
     console.log(this.state.item);
@@ -312,33 +294,40 @@ class ReceptModule_Modal_New extends React.Component {
 
     vendor.recipe.map(el => el.percent = (el.quantity / percent).toFixed(2));
 
-    // console.log(vendor.recipe);
+    const total = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0)
 
     this.setState({
       item: vendor,
       quantity: '',
+      total
     });
   }
 
   deleteIngredientsRecipe(id) {
-    // console.log(item)
 
     const vendor = this.state.item;
 
     const newVendor = vendor.recipe.filter((el) => el.id !== id);
 
-    // console.log(newVendor)
+    vendor.recipe = newVendor;
+
+    const percent = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0) / 100;
+
+    vendor.recipe.map(el => el.percent = (el.quantity / percent).toFixed(2));
+
+    const total = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0)
 
     this.setState({
       item: newVendor,
+      total
     });
   }
 
   onClose() {
     this.setState({
       item: null,
-      // recipe: [],
       quantity: '',
+      total: ''
     });
     this.props.onClose();
   }
@@ -357,10 +346,10 @@ class ReceptModule_Modal_New extends React.Component {
             method={this.props.method}
             event={this.state.item}
             changeItem={this.changeItem.bind(this)}
-            // recipe={this.state.recipe}
             addIngredientsRecipe={this.addIngredientsRecipe.bind(this)}
             changeQuantity={this.changeQuantity.bind(this)}
             deleteIngredientsRecipe={this.deleteIngredientsRecipe.bind(this)}
+            total={this.state.total}
           />
         </DialogContent>
         <DialogActions>
@@ -368,7 +357,6 @@ class ReceptModule_Modal_New extends React.Component {
             onClick={this.props.save.bind(
               this,
               this.state.item
-              // this.state.recipe
             )}
             color="primary"
           >
@@ -387,43 +375,25 @@ class ReceptModule_Modal_Edit extends React.Component {
     this.state = {
       item: null,
 
-      // recipe: [],
-
       ItemTab: '2',
 
       quantity: '',
+
+      total: ''
     };
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    // console.log(nextProps.event)
 
     if (!nextProps.event) {
       return null;
     }
 
     if (nextProps.event !== prevState.event) {
-      return {
-        item: nextProps.event,
-        // recipe: nextProps.event.recipe
-      }; // <- this is setState equivalent
+      return { item: nextProps.event }; 
     }
     return null;
   }
-
-  // componentDidUpdate(prevProps) {
-
-  //   if(!this.props.event) {
-  //     return;
-  //   }
-
-  //   if (this.props.event !== prevProps.event) {
-  //     this.setState({
-  //       item: this.props.event,
-  //       recipe: this.props.event.recipe,
-  //     });
-  //   }
-  // }
 
   changeItem(data, event) {
     let vendor = this.state.item;
@@ -466,27 +436,32 @@ class ReceptModule_Modal_Edit extends React.Component {
 
     vendor.recipe.map(el => el.percent = (el.quantity / percent).toFixed(2));
 
+    const total = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0)
+
     this.setState({
       recipe: vendor,
       quantity: '',
+      total
     });
   }
 
   deleteIngredientsRecipe(id) {
-    // console.log(nextProps.event)
-
-    // console.log(id);
 
     const vendor = this.state.item;
 
-    // console.log(vendor)
-
     const newVendor = vendor.recipe.filter((el) => el.id !== id);
 
-    // console.log(newVendor)
+    vendor.recipe = newVendor;
+
+    const percent = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0) / 100;
+
+    vendor.recipe.map(el => el.percent = (el.quantity / percent).toFixed(2));
+
+    const total = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0)
 
     this.setState({
       recipe: newVendor,
+      total
     });
   }
 
@@ -500,8 +475,8 @@ class ReceptModule_Modal_Edit extends React.Component {
     this.setState({
       item: null,
       ItemTab: '2',
-      // recipe: [],
       quantity: '',
+      total: ''
     });
 
     this.props.onClose();
@@ -548,12 +523,12 @@ class ReceptModule_Modal_Edit extends React.Component {
                     event={this.state.item}
                     changeItem={this.changeItem.bind(this)}
                     changeItemChecked={this.changeItemChecked.bind(this)}
-                    // recipe={this.state.recipe}
                     addIngredientsRecipe={this.addIngredientsRecipe.bind(this)}
                     changeQuantity={this.changeQuantity.bind(this)}
                     deleteIngredientsRecipe={this.deleteIngredientsRecipe.bind(
                       this
                     )}
+                    total={this.state.total}
                   />
                 </TabPanel>
 
@@ -572,12 +547,12 @@ class ReceptModule_Modal_Edit extends React.Component {
                     event={this.state.item}
                     changeItem={this.changeItem.bind(this)}
                     changeItemChecked={this.changeItemChecked.bind(this)}
-                    // recipe={this.state.recipe}
                     addIngredientsRecipe={this.addIngredientsRecipe.bind(this)}
                     changeQuantity={this.changeQuantity.bind(this)}
                     deleteIngredientsRecipe={this.deleteIngredientsRecipe.bind(
                       this
                     )}
+                    total={this.state.total}
                   />
                 </TabPanel>
               </TabContext>
@@ -588,8 +563,7 @@ class ReceptModule_Modal_Edit extends React.Component {
           <Button
             onClick={this.props.save.bind(
               this,
-              this.state.item,
-              this.state.recipe
+              this.state.item
             )}
             color="primary"
           >
