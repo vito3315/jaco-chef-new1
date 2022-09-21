@@ -3,498 +3,1255 @@ import React from 'react';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
+import Divider from '@mui/material/Divider';
+import Box from '@mui/material/Box';
+
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Tab from '@mui/material/Tab';
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
 
+import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
-
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
 
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyTimePicker } from '../../stores/elements';
-import Typography from '@mui/material/Typography';
-
-import Box from '@mui/material/Box';
+import {
+  MyCheckBox,
+  MyTextInput,
+  MyAutocomplite,
+  MyDatePickerNew,
+} from '../../stores/elements';
 
 const queryString = require('query-string');
+
+class ReceptModule_Modal_Container extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      item: null,
+      searchValue: '',
+    };
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    // console.log(nextProps.event)
+    // console.log(prevState.event)
+
+    if (!nextProps.event) {
+      return null;
+    }
+
+    if (nextProps.event !== prevState.event) {
+      return { item: nextProps.event }; // <- this is setState equivalent
+    }
+    return null;
+  }
+
+  // componentDidUpdate(prevProps) {
+
+  //   console.log(this.props.event)
+
+  //   if(!this.props.event) {
+  //     return;
+  //   }
+
+  //   if (this.props.event !== prevProps.event) {
+  //     this.setState({
+  //       item: this.props.event,
+  //       // editMainNameMy: this.props.event.name,
+  //     });
+  //   }
+  // }
+
+  searchPf(event) {
+    this.setState({
+      searchValue: event.target.value,
+    });
+  }
+
+  render() {
+    return (
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Grid container spacing={3} mb={2}>
+            <Grid item xs={12} sm={6}>
+              <MyTextInput
+                label="Наименование рецепта"
+                value={this.state.item.name}
+                func={this.props.changeItem.bind(this, 'name')}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <MyTextInput
+                label="Время приготовления 1кг (ММ:СС)"
+                value={this.state.item.time_stagе}
+                func={this.props.changeItem.bind(this, 'time_stagе')}
+              />
+            </Grid>
+          </Grid>
+          <Grid container spacing={3} mb={2}>
+            <Grid item xs={12} sm={6}>
+              <MyTextInput
+                label="Срок хранения"
+                value={this.state.item.term}
+                func={this.props.changeItem.bind(this, 'term')}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <MyAutocomplite
+                label="Должность на кухне"
+                multiple={false}
+                data={this.state.item.post}
+                value={this.state.item.post.id}
+                func={(event, value) => {
+                  let this_storages = this.state.item;
+                  this_storages.post.id = value;
+                  this.setState({ item: this_storages });
+                }}
+              />
+            </Grid>
+          </Grid>
+
+          <Grid item xs={12} mb={3}>
+            <MyAutocomplite
+              label="Места хранения"
+              multiple={true}
+              data={this.state.item.location}
+              value={this.state.item.location.id}
+              func={(event, value) => {
+                let this_storages = this.state.item;
+                this_storages.location.id = value;
+                this.setState({ item: this_storages });
+              }}
+            />
+          </Grid>
+
+          {this.props.method === 'Редактирование рецепта' ? (
+            <Grid item xs={12}>
+              <MyCheckBox
+                label="Активность"
+                value={parseInt(this.state.item.is_show) == 1 ? true : false}
+                func={this.props.changeItemChecked.bind(this, 'is_show')}
+              />
+            </Grid>
+          ) : null}
+
+          <Divider />
+
+          <Grid container spacing={3} mt={1}>
+            <Grid item xs={12} sm={6}>
+              <MyTextInput
+                label="Поиск"
+                value={this.state.searchValue}
+                func={this.searchPf.bind(this)}
+              />
+              <Table size="small" style={{ whiteSpace: 'nowrap' }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Название</TableCell>
+                    <TableCell>Кол-во</TableCell>
+                    <TableCell>Ед измер</TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {this.state.item.pf_list
+                    .filter((value) => {
+                      if (
+                        this.state.searchValue === '' ||
+                        this.state.searchValue.length < 2
+                      ) {
+                        return value;
+                      } else {
+                        return value.name
+                          .toLowerCase()
+                          .includes(this.state.searchValue.toLowerCase());
+                      }
+                    })
+                    .map((item, key) => (
+                      <TableRow key={key}>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>
+                          <MyTextInput
+                            type="number"
+                            defaultValue={''}
+                            func={this.props.changeQuantity.bind(this)}
+                          />
+                        </TableCell>
+                        <TableCell>{item.ed_izmer}</TableCell>
+                        <TableCell>
+                          <AddIcon
+                            onClick={this.props.addIngredientsRecipe.bind(
+                              this,
+                              item
+                            )}
+                            style={{ cursor: 'pointer' }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </Grid>
+
+            <Grid item xs={12} sm={6} mt={5}>
+              <Table size="small" style={{ whiteSpace: 'nowrap' }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Название</TableCell>
+                    <TableCell>Кол-во</TableCell>
+                    <TableCell>%</TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {this.state.item.recipe.map((item, key) => (
+                    <TableRow key={key}>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>
+                        {item.quantity} {item.ed_izmer}
+                      </TableCell>
+                      <TableCell>{`${item.percent} %`}</TableCell>
+                      <TableCell>
+                        <CloseIcon
+                          onClick={this.props.deleteIngredientsRecipe.bind(
+                            this,
+                            item.id
+                          )}
+                          style={{ cursor: 'pointer' }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  <TableRow sx={{ '& td': { border: 0 } }}>
+                    <TableCell>Всего:</TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+    );
+  }
+}
+
+class ReceptModule_Modal_New extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      item: null,
+
+      // recipe: [],
+
+      quantity: '',
+    };
+
+    console.log(this.state.item);
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (!nextProps.event) {
+      return null;
+    }
+
+    if (nextProps.event !== prevState.event) {
+      return { item: nextProps.event }; // <- this is setState equivalent
+    }
+    return null;
+  }
+
+  changeItem(data, event) {
+    let vendor = this.state.item;
+    vendor[data] = event.target.value;
+
+    this.setState({
+      item: vendor,
+    });
+  }
+
+  changeQuantity(event) {
+    this.setState({
+      quantity: event.target.value,
+    });
+  }
+
+  addIngredientsRecipe(item) {
+    const vendor = this.state.item;
+
+    const id = vendor.recipe.find((el) => el.id === item.id);
+
+    if (id || this.state.quantity < 1) {
+      return;
+    }
+
+    item.quantity = this.state.quantity;
+
+    vendor.recipe.push(item);
+
+    const percent = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0) / 100;
+
+    vendor.recipe.map(el => el.percent = (el.quantity / percent).toFixed(2));
+
+    // console.log(vendor.recipe);
+
+    this.setState({
+      item: vendor,
+      quantity: '',
+    });
+  }
+
+  deleteIngredientsRecipe(id) {
+    // console.log(item)
+
+    const vendor = this.state.item;
+
+    const newVendor = vendor.recipe.filter((el) => el.id !== id);
+
+    // console.log(newVendor)
+
+    this.setState({
+      item: newVendor,
+    });
+  }
+
+  onClose() {
+    this.setState({
+      item: null,
+      // recipe: [],
+      quantity: '',
+    });
+    this.props.onClose();
+  }
+
+  render() {
+    return (
+      <Dialog
+        open={this.props.open}
+        fullWidth={true}
+        maxWidth={'lg'}
+        onClose={this.onClose.bind(this)}
+      >
+        <DialogTitle>{this.props.method}</DialogTitle>
+        <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+          <ReceptModule_Modal_Container
+            method={this.props.method}
+            event={this.state.item}
+            changeItem={this.changeItem.bind(this)}
+            // recipe={this.state.recipe}
+            addIngredientsRecipe={this.addIngredientsRecipe.bind(this)}
+            changeQuantity={this.changeQuantity.bind(this)}
+            deleteIngredientsRecipe={this.deleteIngredientsRecipe.bind(this)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={this.props.save.bind(
+              this,
+              this.state.item
+              // this.state.recipe
+            )}
+            color="primary"
+          >
+            Сохранить
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+}
+
+class ReceptModule_Modal_Edit extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      item: null,
+
+      // recipe: [],
+
+      ItemTab: '2',
+
+      quantity: '',
+    };
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    // console.log(nextProps.event)
+
+    if (!nextProps.event) {
+      return null;
+    }
+
+    if (nextProps.event !== prevState.event) {
+      return {
+        item: nextProps.event,
+        // recipe: nextProps.event.recipe
+      }; // <- this is setState equivalent
+    }
+    return null;
+  }
+
+  // componentDidUpdate(prevProps) {
+
+  //   if(!this.props.event) {
+  //     return;
+  //   }
+
+  //   if (this.props.event !== prevProps.event) {
+  //     this.setState({
+  //       item: this.props.event,
+  //       recipe: this.props.event.recipe,
+  //     });
+  //   }
+  // }
+
+  changeItem(data, event) {
+    let vendor = this.state.item;
+    vendor[data] = event.target.value;
+
+    this.setState({
+      item: vendor,
+    });
+  }
+
+  changeItemChecked(data, event) {
+    let vendor = this.state.item;
+    vendor[data] = event.target.checked === true ? 1 : 0;
+
+    this.setState({
+      item: vendor,
+    });
+  }
+
+  changeQuantity(event) {
+    this.setState({
+      quantity: event.target.value,
+    });
+  }
+
+  addIngredientsRecipe(item) {
+    const vendor = this.state.item;
+
+    const id = vendor.recipe.find((el) => el.id === item.id);
+
+    if (id || this.state.quantity < 1) {
+      return;
+    }
+
+    item.quantity = this.state.quantity;
+
+    vendor.recipe.push(item);
+
+    const percent = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0) / 100;
+
+    vendor.recipe.map(el => el.percent = (el.quantity / percent).toFixed(2));
+
+    this.setState({
+      recipe: vendor,
+      quantity: '',
+    });
+  }
+
+  deleteIngredientsRecipe(id) {
+    // console.log(nextProps.event)
+
+    // console.log(id);
+
+    const vendor = this.state.item;
+
+    // console.log(vendor)
+
+    const newVendor = vendor.recipe.filter((el) => el.id !== id);
+
+    // console.log(newVendor)
+
+    this.setState({
+      recipe: newVendor,
+    });
+  }
+
+  changeTab(event, value) {
+    this.setState({
+      ItemTab: value,
+    });
+  }
+
+  onClose() {
+    this.setState({
+      item: null,
+      ItemTab: '2',
+      // recipe: [],
+      quantity: '',
+    });
+
+    this.props.onClose();
+  }
+
+  render() {
+    return (
+      <Dialog
+        open={this.props.open}
+        fullWidth={true}
+        maxWidth={'lg'}
+        onClose={this.onClose.bind(this)}
+      >
+        <DialogTitle>{this.props.method}</DialogTitle>
+        <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <TabContext value={this.state.ItemTab}>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                  <TabList
+                    onChange={this.changeTab.bind(this)}
+                    variant="fullWidth"
+                  >
+                    <Tab label="Дата обновления" value="1" />
+                    <Tab label="Текущая" value="2" />
+                    <Tab label="Добавить" value="3" />
+                  </TabList>
+                </Box>
+
+                <TabPanel value="1">
+                  <Grid container spacing={3} mb={2}>
+                    <Grid item xs={12} sm={4}>
+                      <MyDatePickerNew
+                        label="Дата обновления"
+                        // value={this.state.date_start}
+                        // func={this.changeDateRange.bind(this, 'date_start')}
+                      />
+                    </Grid>
+                  </Grid>
+                </TabPanel>
+                <TabPanel value="2">
+                  <ReceptModule_Modal_Container
+                    method={this.props.method}
+                    event={this.state.item}
+                    changeItem={this.changeItem.bind(this)}
+                    changeItemChecked={this.changeItemChecked.bind(this)}
+                    // recipe={this.state.recipe}
+                    addIngredientsRecipe={this.addIngredientsRecipe.bind(this)}
+                    changeQuantity={this.changeQuantity.bind(this)}
+                    deleteIngredientsRecipe={this.deleteIngredientsRecipe.bind(
+                      this
+                    )}
+                  />
+                </TabPanel>
+
+                <TabPanel value="3">
+                  <Grid container spacing={3} mb={2}>
+                    <Grid item xs={12} sm={4}>
+                      <MyDatePickerNew
+                        label="Дата обновления"
+                        // value={this.state.date_start}
+                        // func={this.changeDateRange.bind(this, 'date_start')}
+                      />
+                    </Grid>
+                  </Grid>
+                  <ReceptModule_Modal_Container
+                    method={this.props.method}
+                    event={this.state.item}
+                    changeItem={this.changeItem.bind(this)}
+                    changeItemChecked={this.changeItemChecked.bind(this)}
+                    // recipe={this.state.recipe}
+                    addIngredientsRecipe={this.addIngredientsRecipe.bind(this)}
+                    changeQuantity={this.changeQuantity.bind(this)}
+                    deleteIngredientsRecipe={this.deleteIngredientsRecipe.bind(
+                      this
+                    )}
+                  />
+                </TabPanel>
+              </TabContext>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={this.props.save.bind(
+              this,
+              this.state.item,
+              this.state.recipe
+            )}
+            color="primary"
+          >
+            Сохранить
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+}
+
+class ReceptModule_Table extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    // console.log(nextProps.recipes);
+    // console.log(this.props.recipes);
+
+    // var array1 = nextProps.recipes;
+    // var array2 = this.props.recipes;
+
+    // var is_same = (array1.length == array2.length) && array1.every(function(element, index) {
+    //   return element === array2[index];
+    // });
+
+    //console.log(is_same)
+
+    // return is_same;
+    return true;
+  }
+
+  render() {
+    return (
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell style={{ width: '2%' }}>#</TableCell>
+            <TableCell style={{ width: '2%' }}></TableCell>
+            <TableCell style={{ width: '3%' }}>Ревизия</TableCell>
+            <TableCell style={{ width: '30%' }}>Название</TableCell>
+            <TableCell style={{ width: '65%' }}>Место хранения</TableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          {this.props.recipes.map((item, i) => (
+            <TableRow key={i}>
+              <TableCell>{item.id}</TableCell>
+              <TableCell>
+                {parseInt(item.is_show) == 1 ? (
+                  <VisibilityIcon />
+                ) : (
+                  <VisibilityOffIcon />
+                )}
+              </TableCell>
+              <TableCell>
+                <MyCheckBox
+                  label=""
+                  value={parseInt(item.show_in_rev) == 1 ? true : false}
+                  //func={ this.props.changeTableItem.bind(this, it.id, this.props.type[0]) }
+                />
+              </TableCell>
+              <TableCell
+                style={{ cursor: 'pointer' }}
+                onClick={this.props.openModalRecipes.bind(
+                  this,
+                  'Редактирование рецепта',
+                  item.id
+                )}
+              >
+                {item.name}
+              </TableCell>
+              <TableCell>{item.location[0]}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    );
+  }
+}
 
 class ReceptModule_ extends React.Component {
   constructor(props) {
     super(props);
-        
+
     this.state = {
       module: 'recept_module',
       module_name: '',
       is_load: false,
-      
-      points: [],
-      point: '0',
-      mounth: '0',
-      mounths: [],
-      years: [],
-      year: '0',
-      
-      calendar: [],
-      modalDialog: false,
-      
-      chooseDayHoly: '',
-      events: [],
-      chooseEvent: 0,
-      
-      eventPoint1: 0,
-      everyYear1: false,
-      timeStart2: '10:00',
-      timeEnd2: '21:30',
-      
-      expanded: '',
-      dayEvents: [],
-      events_hist: []
+
+      item: {
+        allRecipes: [
+          {
+            id: '1',
+            is_show: 1,
+            show_in_rev: 0,
+            name: 'Паста вареная',
+            location: ['Кухня Пицца'],
+            time_stagе: '10:00',
+            term: '72 часа',
+            post: {
+              id: '2',
+              name: 'Повар',
+            },
+            recipe: [
+              {
+                id: '1',
+                name: '7Up 0.6 л',
+                ed_izmer: 'гр',
+                quantity: 10,
+              },
+              {
+                id: '2',
+                name: 'Бахилы полиэтиленовые',
+                ed_izmer: 'шт',
+                quantity: 5,
+              },
+            ],
+            pf_list: [
+              {
+                id: '1',
+                name: '7Up 0.6 л',
+                ed_izmer: 'гр',
+              },
+              {
+                id: '2',
+                name: 'Бахилы полиэтиленовые',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '3',
+                name: 'Васаби 5г.',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '4',
+                name: 'Вилка черная, одноразовая',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '6',
+                name: 'Aqua Minerale Не газ.',
+                ed_izmer: 'кг',
+              },
+              {
+                id: '7',
+                name: 'Губка металлическая',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '8',
+                name: 'Губки для посуды',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '9',
+                name: 'Зиплок 10*100',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '10',
+                name: 'Икра масаго красная',
+                ed_izmer: 'гр',
+              },
+              {
+                id: '11',
+                name: 'Имбирь 30 г.',
+                ed_izmer: 'шт',
+              },
+            ],
+          },
+          {
+            id: '3',
+            is_show: 1,
+            show_in_rev: 0,
+            name: 'Кляр',
+            location: ['Стеллаж'],
+            time_stagе: '15:00',
+            term: '30 часов',
+            post: {
+              id: '3',
+              name: 'Кухонный работник',
+            },
+            recipe: [
+              {
+                iid: '7',
+                name: 'Губка металлическая',
+                ed_izmer: 'шт',
+                quantity: 10,
+              },
+              {
+                id: '2',
+                name: 'Бахилы полиэтиленовые',
+                ed_izmer: 'шт',
+                quantity: 5,
+              },
+            ],
+            pf_list: [
+              {
+                id: '1',
+                name: '7Up 0.6 л',
+                ed_izmer: 'гр',
+              },
+              {
+                id: '2',
+                name: 'Бахилы полиэтиленовые',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '3',
+                name: 'Васаби 5г.',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '4',
+                name: 'Вилка черная, одноразовая',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '6',
+                name: 'Aqua Minerale Не газ.',
+                ed_izmer: 'кг',
+              },
+              {
+                id: '7',
+                name: 'Губка металлическая',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '8',
+                name: 'Губки для посуды',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '9',
+                name: 'Зиплок 10*100',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '10',
+                name: 'Икра масаго красная',
+                ed_izmer: 'гр',
+              },
+              {
+                id: '11',
+                name: 'Имбирь 30 г.',
+                ed_izmer: 'шт',
+              },
+            ],
+          },
+          {
+            id: '4',
+            is_show: 0,
+            show_in_rev: 1,
+            name: 'Лососевый замес',
+            location: ['Холодильник'],
+            time_stagе: '20:00',
+            term: '15 часов',
+            post: {
+              id: '2',
+              name: 'Повар',
+            },
+            recipe: [
+              {
+                id: '1',
+                name: '7Up 0.6 л',
+                ed_izmer: 'гр',
+                quantity: 10,
+              },
+              {
+                id: '4',
+                name: 'Вилка черная, одноразовая',
+                ed_izmer: 'шт',
+                quantity: 5,
+              },
+            ],
+            pf_list: [
+              {
+                id: '1',
+                name: '7Up 0.6 л',
+                ed_izmer: 'гр',
+              },
+              {
+                id: '2',
+                name: 'Бахилы полиэтиленовые',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '3',
+                name: 'Васаби 5г.',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '4',
+                name: 'Вилка черная, одноразовая',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '6',
+                name: 'Aqua Minerale Не газ.',
+                ed_izmer: 'кг',
+              },
+              {
+                id: '7',
+                name: 'Губка металлическая',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '8',
+                name: 'Губки для посуды',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '9',
+                name: 'Зиплок 10*100',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '10',
+                name: 'Икра масаго красная',
+                ed_izmer: 'гр',
+              },
+              {
+                id: '11',
+                name: 'Имбирь 30 г.',
+                ed_izmer: 'шт',
+              },
+            ],
+          },
+          {
+            id: '5',
+            is_show: 1,
+            show_in_rev: 0,
+            name: 'Соус Спайси',
+            location: ['Холодильник'],
+            time_stagе: '11:00',
+            term: '50 часов',
+            post: {
+              id: '3',
+              name: 'Кухонный работник',
+            },
+            recipe: [
+              {
+                id: '1',
+                name: '7Up 0.6 л',
+                ed_izmer: 'гр',
+                quantity: 10,
+              },
+              {
+                id: '3',
+                name: 'Васаби 5г.',
+                ed_izmer: 'шт',
+                quantity: 5,
+              },
+            ],
+            pf_list: [
+              {
+                id: '1',
+                name: '7Up 0.6 л',
+                ed_izmer: 'гр',
+              },
+              {
+                id: '2',
+                name: 'Бахилы полиэтиленовые',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '3',
+                name: 'Васаби 5г.',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '4',
+                name: 'Вилка черная, одноразовая',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '6',
+                name: 'Aqua Minerale Не газ.',
+                ed_izmer: 'кг',
+              },
+              {
+                id: '7',
+                name: 'Губка металлическая',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '8',
+                name: 'Губки для посуды',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '9',
+                name: 'Зиплок 10*100',
+                ed_izmer: 'шт',
+              },
+              {
+                id: '10',
+                name: 'Икра масаго красная',
+                ed_izmer: 'гр',
+              },
+              {
+                id: '11',
+                name: 'Имбирь 30 г.',
+                ed_izmer: 'шт',
+              },
+            ],
+          },
+        ],
+      },
+
+      modalDialogNew: false,
+      modalDialogEdit: false,
+      method: null,
+
+      itemNew: {
+        name: '',
+        time_stagе: '00:00',
+        term: '',
+        recipe: [],
+        location: [
+          {
+            id: '1',
+            name: 'Стеллаж',
+          },
+          {
+            id: '2',
+            name: 'Холодильник',
+          },
+          {
+            id: '3',
+            name: 'Кухня Роллы',
+          },
+        ],
+        post: [
+          {
+            id: '1',
+            name: 'Не требуется',
+          },
+          {
+            id: '2',
+            name: 'Повар',
+          },
+          {
+            id: '3',
+            name: 'Кухонный работник',
+          },
+        ],
+        pf_list: [
+          {
+            id: '1',
+            name: '7Up 0.6 л',
+            ed_izmer: 'гр',
+          },
+          {
+            id: '2',
+            name: 'Бахилы полиэтиленовые',
+            ed_izmer: 'шт',
+          },
+          {
+            id: '3',
+            name: 'Васаби 5г.',
+            ed_izmer: 'шт',
+          },
+          {
+            id: '4',
+            name: 'Вилка черная, одноразовая',
+            ed_izmer: 'шт',
+          },
+          {
+            id: '6',
+            name: 'Aqua Minerale Не газ.',
+            ed_izmer: 'кг',
+          },
+          {
+            id: '7',
+            name: 'Губка металлическая',
+            ed_izmer: 'шт',
+          },
+          {
+            id: '8',
+            name: 'Губки для посуды',
+            ed_izmer: 'шт',
+          },
+          {
+            id: '9',
+            name: 'Зиплок 10*100',
+            ed_izmer: 'шт',
+          },
+          {
+            id: '10',
+            name: 'Икра масаго красная',
+            ed_izmer: 'гр',
+          },
+          {
+            id: '11',
+            name: 'Имбирь 30 г.',
+            ed_izmer: 'шт',
+          },
+        ],
+      },
+
+      recipes: null,
     };
   }
-  
-  async componentDidMount(){
-    
+
+  async componentDidMount() {
     let data = await this.getData('get_all');
-    
-    console.log( data )
-    
+
     this.setState({
-      points: data.points,
-      point: data.points[0].id,
+      // points: data.points,
+      // point: data.points[0].id,
       module_name: data.module_info.name,
-      mounths: data.mounth,
-      mounth: data.this_m,
-      years: data.years,
-      year: data.this_y,
-    })
-    
+      // mounths: data.mounth,
+      // mounth: data.this_m,
+      // years: data.years,
+      // year: data.this_y,
+    });
+
     document.title = data.module_info.name;
-    
-    setTimeout( () => {
-      this.updateData();
-    }, 50 )
   }
-  
+
   getData = (method, data = {}) => {
-    
     this.setState({
-      is_load: true
-    })
-    
+      is_load: true,
+    });
+
     return fetch('https://jacochef.ru/api/index_new.php', {
       method: 'POST',
       headers: {
-        'Content-Type':'application/x-www-form-urlencoded'},
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
       body: queryString.stringify({
-        method: method, 
+        method: method,
         module: this.state.module,
         version: 2,
         login: localStorage.getItem('token'),
-        data: JSON.stringify( data )
-      })
-    }).then(res => res.json()).then(json => {
-      
-      if( json.st === false && json.type == 'redir' ){
-        window.location.pathname = '/';
-        return;
-      }
-      
-      if( json.st === false && json.type == 'auth' ){
-        window.location.pathname = '/auth';
-        return;
-      }
-      
-      setTimeout( () => {
-        this.setState({
-          is_load: false
-        })
-      }, 300 )
-      
-      return json;
+        data: JSON.stringify(data),
+      }),
     })
-    .catch(err => { 
-      console.log( err )
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.st === false && json.type == 'redir') {
+          window.location.pathname = '/';
+          return;
+        }
+
+        if (json.st === false && json.type == 'auth') {
+          window.location.pathname = '/auth';
+          return;
+        }
+
+        setTimeout(() => {
+          this.setState({
+            is_load: false,
+          });
+        }, 300);
+
+        return json;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  async openModalRecipes(method, id) {
+    // const item = this.state.item.find(el => el.id === id)
+
+    if (method === 'Новый рецепт') {
+      // let res = await this.getData('get_all_for_new');
+
+      // console.log(res)
+
+      this.setState({
+        modalDialogNew: true,
+        method,
+        // item:
+      });
+    } else {
+      const data = this.state.item;
+
+      const recipes = data.allRecipes.find((el) => el.id === id);
+
+      this.setState({
+        modalDialogEdit: true,
+        method,
+        recipes,
+      });
+    }
+  }
+
+  saveNewItem(newItem, recipe) {
+    // console.log(newItem)
+
+    // console.log(recipe)
+
+    this.setState({
+      modalDialogNew: false,
+      // item
     });
   }
-   
-  changePoint(event){
-    let data = event.target.value;
-    
-    this.setState({
-      point: data
-    })
-    
-    setTimeout( () => {
-      this.updateData();
-    }, 50 )
-  }
-  
-  changeMounth(event){
-    let data = event.target.value;
-    
-    this.setState({
-      mounth: data
-    })
-    
-    setTimeout( () => {
-      //this.updateData();
-    }, 50 )
-  }
-  
-  changeYear(event){
-    let data = event.target.value;
-    
-    this.setState({
-      year: data
-    })
-  }
-  
-  changeCheckOrders(event){
-    let data = event.target.checked;
-    
-    this.setState({
-      showReady: data
-    })
-  }
-  
-  async updateData(){
-    let data = {
-      m: this.state.mounth,
-      y: this.state.year,
-      point_id: this.state.point
-    };
-    
-    let res = await this.getData('get_calendar', data);
-    
-    console.log( res )
-    
-    this.setState({
-      calendar: res.year,
-    })
-  }
-  
-  async chooseDay(day){
-    
-    if( day.full_day ){
-    
-      this.setState({
-        chooseDay: null,
-        eventPoint1: this.state.point,
-        chooseEvent: 0,
-        everyYear1: false,
-        timeStart2: '10:00',
-        timeEnd2: '21:30',
-        modalDialog: false,
-        events_hist: []
-      })
-      
-      let data = {
-        date: day.full_day,
-        point_id: this.state.point
-      };
-      
-      let res = await this.getData('get_calendar_day', data);
-      
-      console.log( 'res', res )
-      
-      this.setState({
-        chooseDay: day,
-        chooseDayHoly: res.holy,
-        events: res.events,
-        events_hist: res.hist,
-        dayEvents: res.this_events,
-        modalDialog: true
-      })
-    }
-  }
-  
-  changeEvent(event){
-    let data = event.target.value;
-    
-    this.setState({
-      chooseEvent: data
-    })
-  }
-  
-  changePoint1(event){
-    let data = event.target.value;
-    
-    this.setState({
-      eventPoint1: data
-    })
-  }
-  
-  changeEveryYear1(event){
-    let data = event.target.checked;
-    
-    this.setState({
-      everyYear1: data
-    })
-  }
-  
-  changeTimeStart2(event){
-    let data = event.target.value;
-    
-    this.setState({
-      timeStart2: data
-    })
-  }
-  
-  changeTimeEnd2(event){
-    let data = event.target.value;
-    
-    this.setState({
-      timeEnd2: data
-    })
-  }
-  
-  async save(){
-    let data = {
-      date: this.state.chooseDay.full_day,
-      point_id: this.state.eventPoint1,
-      event: this.state.chooseEvent,
-      every_year: this.state.everyYear1 === true ? 1 : 0,
-      
-      time_start: this.state.timeStart2,
-      time_end: this.state.timeEnd2,
-    };
-    
-    let res = await this.getData('save_event', data);
-    
-    console.log( res )
-    
-    if( res.st === false ){
-      alert(res.text)
-    }else{
-      this.setState({
-        chooseDay: null,
-        eventPoint1: this.state.point,
-        chooseEvent: 0,
-        everyYear1: false,
-        timeStart2: '10:00',
-        timeEnd2: '21:30',
-        modalDialog: false
-      })
-      
-      setTimeout( () => {
-        this.updateData();
-      }, 300 )
-    }
-  }
-  
-  handleChange(data){
-    this.setState({
-      expanded: data
-    })
-  }
-  
-  async delEvent(event){
-    console.log( 'delEvent', event )
-    
-    if (confirm('Удалить событие "'+event.title+' '+event.date+'" ?')) {
-      let data = {
-        del_id: event.id
-      };
-      
-      let res = await this.getData('del_event', data);
-      
-      this.setState({
-        chooseDay: null,
-        eventPoint1: this.state.point,
-        chooseEvent: 0,
-        everyYear1: false,
-        timeStart2: '10:00',
-        timeEnd2: '21:30',
-        modalDialog: false
-      })
-      
-      setTimeout( () => {
-        this.updateData();
-      }, 300 )
-    } else {
-      
-    }
-    
 
+  saveEditItem(editItem, recipe) {
+    // console.log(editItem, recipe);
+
+    this.setState({
+      modalDialogEdit: false,
+      // item
+    });
   }
-  
-  render(){
+
+  render() {
     return (
       <>
         <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
-        
-        <Dialog
-          open={this.state.modalDialog}
-          onClose={ () => { this.setState({ modalDialog: false }) } }
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">{this.state.chooseDay ? this.state.chooseDay.full_day : ''}</DialogTitle>
-          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-            <DialogContentText id="alert-dialog-description">
-              
-              <Grid container spacing={3}>
-                
-                {this.state.chooseDayHoly.length == 0 ? null :
-                  <Grid item xs={12} sm={12}>
-                    <Typography component="span">{this.state.chooseDayHoly}</Typography>
-                  </Grid>
-                }
-                
-                <Grid item xs={12} sm={12}>
-                  <MySelect data={this.state.events} value={this.state.chooseEvent} func={ this.changeEvent.bind(this) } label='Событие' />
-                </Grid>
-                
-                <Grid item xs={12} sm={12}>
-                  <MySelect data={this.state.points} value={ this.state.eventPoint1 } func={ this.changePoint1.bind(this) } label='Точка' />
-                </Grid>
-                
-                { parseInt(this.state.chooseEvent) !== 2 ? null :
-                  <>
-                    <Grid item xs={6} sm={6}>
-                      <MyTimePicker value={ this.state.timeStart2 } func={ this.changeTimeStart2.bind(this) } label='Время начала работы' />
-                    </Grid>
-                    <Grid item xs={6} sm={6}>
-                      <MyTimePicker value={ this.state.timeEnd2 } func={ this.changeTimeEnd2.bind(this) } label='Время окончания работы' />
-                    </Grid>
-                  </>
-                }
-                
-                <Grid item xs={12} sm={12}>
-                  <MyCheckBox value={ this.state.everyYear1 } func={ this.changeEveryYear1.bind(this) } label='Каждый год' />
-                </Grid>
-                
-              </Grid>
-              
-              <List component="nav">
-                { this.state.dayEvents.map( (item, key) => 
-                  <ListItem key={key}>
-                    <ListItemText primary={item.title} />
-                    { ( parseInt(item.type) == 4 ||  parseInt(item.type) == 6) ? null :
-                      <CloseIcon color="primary" onClick={this.delEvent.bind(this, item)} style={{ cursor: 'pointer' }} />
-                    }
-                  </ListItem>
-                )}
-              </List>
-              
-              <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                  id="panel1a-header"
-                >
-                  <Typography>История</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <List component="nav">
-                    { this.state.events_hist.map( (item, key) => 
-                      <ListItem key={key}>
-                        <ListItemText primary={item.title} />
-                      </ListItem>
-                    )}
-                  </List>
-                </AccordionDetails>
-              </Accordion>
-              
-              
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={ this.save.bind(this) } color="primary">Сохранить</Button>
-          </DialogActions>
-        </Dialog>
-        
+
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
-          
-          <Grid item xs={12} sm={3}>
-            <MySelect  data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <MySelect  data={this.state.mounths} value={this.state.mounth} func={ this.changeMounth.bind(this) } label='Месяц' />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <MySelect  data={this.state.years} value={this.state.year} func={ this.changeYear.bind(this) } label='Год' />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
-          </Grid>
-        
-          <Grid container direction="row" justifyContent="center" style={{ paddingTop: 20, margin: '0 auto' }} >
-            
-            { this.state.calendar.map( (item, key) =>
-            
-              <Grid item sm={6} key={key} style={{ padding: 20 }} >
-                <h1 style={{ textAlign: 'center' }}>{ item[0][0].mounth }</h1>
-                <TableContainer component={Paper}>
-                  <Table aria-label="a dense table" style={{ overflow: 'hidden' }}>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Пн</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Вт</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Ср</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Чт</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Пт</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Сб</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Вс</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      
-                      { item.map( (mounth, m_key) =>
-                        <TableRow key={m_key}>
-                          { mounth.map( (day, k) =>
-                            <TableCell 
-                              key={k} 
-                              onClick={ this.chooseDay.bind(this, day) } 
-                              
-                              style={{ color: day.dir ? 'yellow' : day.holy ? '#c03' : '#000', height: '6vw'}}
 
-                              className={ day.event ? 'customCel' : 'tableCel' }
-                            >{ day.day }</TableCell>
-                          ) }
-                        </TableRow>
-                      ) }
-                      
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
-            )}
-            
+          <Grid item xs={12} sm={3} mb={3}>
+            <Button
+              onClick={this.openModalRecipes.bind(this, 'Новый рецепт')}
+              variant="contained"
+            >
+              Добавить рецепт
+            </Button>
           </Grid>
         </Grid>
+
+        <ReceptModule_Modal_New
+          open={this.state.modalDialogNew}
+          onClose={() => {
+            this.setState({ modalDialogNew: false });
+          }}
+          method={this.state.method}
+          event={this.state.itemNew}
+          save={this.saveNewItem.bind(this)}
+        />
+
+        <ReceptModule_Modal_Edit
+          open={this.state.modalDialogEdit}
+          onClose={() => {
+            this.setState({ modalDialogEdit: false });
+          }}
+          method={this.state.method}
+          event={this.state.recipes}
+          save={this.saveEditItem.bind(this)}
+        />
+
+        <Grid item xs={12}>
+          <ReceptModule_Table
+            recipes={this.state.item.allRecipes}
+            openModalRecipes={this.openModalRecipes.bind(this)}
+          />
+        </Grid>
       </>
-    )
+    );
   }
 }
 
 export function ReceptModule() {
-  return (
-    <ReceptModule_ />
-  );
+  return <ReceptModule_ />;
 }

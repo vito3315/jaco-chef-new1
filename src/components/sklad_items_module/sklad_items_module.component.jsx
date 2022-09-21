@@ -34,7 +34,7 @@ import { MySelect, MyCheckBox, MyAutocomplite, MyTextInput } from '../../stores/
 
 const queryString = require('query-string');
 
-class SkladItemsModuleModal extends React.Component{
+class SkladItemsModuleModal extends React.Component {
   constructor(props) {
     super(props);
 
@@ -46,6 +46,8 @@ class SkladItemsModuleModal extends React.Component{
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
+
+    console.log(nextProps)
 
     if(!nextProps.event) {
       return null;
@@ -265,7 +267,7 @@ class SkladItemsModuleModal extends React.Component{
   }
 }
 
-class SkladItemsModuleTable extends React.Component{
+class SkladItemsModuleTable extends React.Component {
   shouldComponentUpdate(nextProps) {
     
     var array1 = nextProps.items;
