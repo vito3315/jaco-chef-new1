@@ -171,12 +171,11 @@ class Fines_Modal extends React.Component {
     super(props);
 
     this.state = {
-      item: null
+      item: null,
     };
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-
     if (!nextProps.event) {
       return null;
     }
@@ -206,9 +205,8 @@ class Fines_Modal extends React.Component {
   }
 
   onClose() {
-
     this.setState({
-      item: null
+      item: null,
     });
 
     this.props.onClose();
@@ -224,96 +222,112 @@ class Fines_Modal extends React.Component {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{this.props.method}{this.props.itemName ? `: ${this.props.itemName}` : ''}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          {this.props.method}
+          {this.props.itemName ? `: ${this.props.itemName}` : ''}
+        </DialogTitle>
         <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-        <Grid container spacing={3}>
-        <Grid item xs={12}>
           <Grid container spacing={3}>
-            <Grid item xs={12} sm={8} mb={2}>
-              <MyTextInput
-                label="Наименование штрафа"
-                value={this.state.item.name}
-                func={this.changeItem.bind(this, 'name')}
-              />
-            </Grid>
-            </Grid>
-            {this.props.method === 'Новый штраф по отзывам' || this.props.method === 'Штраф по отзывам' ? (
-            <Grid container spacing={3}>
-            <Grid item xs={12} sm={4} mb={2}>
-              <MyTextInput
-                label="Процент за первый раз"
-                value={this.state.item.first_percent}
-                func={this.changeItem.bind(this, 'first_percent')}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4} mb={2}>
-              <MyTextInput
-                label="Процент за второй раз"
-                value={this.state.item.second_percent}
-                func={this.changeItem.bind(this, 'second_percent')}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4} mb={2}>
-              <MyTextInput
-                label="Процент за третий и последующие"
-                value={this.state.item.third_percent}
-                func={this.changeItem.bind(this, 'third_percent')}
-              />
-            </Grid>
-          </Grid>
-          ) : null}
+            <Grid item xs={12}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={8} mb={2}>
+                  <MyTextInput
+                    label="Наименование штрафа"
+                    value={this.state.item.name}
+                    func={this.changeItem.bind(this, 'name')}
+                  />
+                </Grid>
+              </Grid>
+              {this.props.method === 'Новый штраф по отзывам' ||
+              this.props.method === 'Штраф по отзывам' ? (
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={4} mb={2}>
+                    <MyTextInput
+                      label="Процент за первый раз"
+                      value={this.state.item.first_percent}
+                      func={this.changeItem.bind(this, 'first_percent')}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4} mb={2}>
+                    <MyTextInput
+                      label="Процент за второй раз"
+                      value={this.state.item.second_percent}
+                      func={this.changeItem.bind(this, 'second_percent')}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4} mb={2}>
+                    <MyTextInput
+                      label="Процент за третий и последующие"
+                      value={this.state.item.third_percent}
+                      func={this.changeItem.bind(this, 'third_percent')}
+                    />
+                  </Grid>
+                </Grid>
+              ) : null}
 
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={4}>
-              <MyTextInput
-                label="Размер штрафа за первый раз"
-                value={this.state.item.first}
-                func={this.changeItem.bind(this, 'first')}
-              />
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={4} mb={2}>
+                  <MyTextInput
+                    label="Размер штрафа за первый раз"
+                    value={this.state.item.first}
+                    func={this.changeItem.bind(this, 'first')}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4} mb={2}>
+                  <MyTextInput
+                    label="Размер штрафа за второй раз"
+                    value={this.state.item.second}
+                    func={this.changeItem.bind(this, 'second')}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4} mb={2}>
+                  <MyTextInput
+                    label="Размер штрафа за третий и последующие"
+                    value={this.state.item.third}
+                    func={this.changeItem.bind(this, 'third')}
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid container spacing={3}>
+                {this.props.method === 'Новый штраф по камерам' ||
+                this.props.method === 'Штраф по камерам' ? (
+               
+                  <Grid item xs={12} sm={3}>
+                    <MyCheckBox
+                      label="Картинка"
+                      value={
+                        parseInt(this.state.item.is_show) == 1 ? true : false
+                      }
+                      func={this.changeItemChecked.bind(this, 'is_show')}
+                    />
+                  </Grid>
+          
+                ) : null}
+
+                {this.props.method === 'Штраф по отзывам' ||
+                this.props.method === 'Штраф по камерам' ? (
+
+                  <Grid item xs={12} sm={3}>
+                    <MyCheckBox
+                      label="Активность"
+                      value={parseInt(this.state.item.is) == 1 ? true : false}
+                      func={this.changeItemChecked.bind(this, 'is')}
+                    />
+                  </Grid>
+
+                ) : null}
+              </Grid>
             </Grid>
-            <Grid item xs={12} sm={4}>
-              <MyTextInput
-                label="Размер штрафа за второй раз"
-                value={this.state.item.second}
-                func={this.changeItem.bind(this, 'second')}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <MyTextInput
-                label="Размер штрафа за третий и последующие"
-                value={this.state.item.third}
-                func={this.changeItem.bind(this, 'third')}
-              />
-            </Grid>
-            {this.props.method === 'Новый штраф по камерам' || this.props.method === 'Штраф по камерам'? (
-            <Grid item xs={12}>
-              <MyCheckBox
-                label="Картинка"
-                value={parseInt(this.state.item.is_show) == 1 ? true : false}
-                func={this.changeItemChecked.bind(this, 'is_show')}
-              />
-            </Grid>
-          ) : null}
-            {this.props.method === 'Штраф по отзывам' || this.props.method === 'Штраф по камерам'? (
-            <Grid item xs={12}>
-              <MyCheckBox
-                label="Активность"
-                value={parseInt(this.state.item.is) == 1 ? true : false}
-                func={this.changeItemChecked.bind(this, 'is')}
-              />
-            </Grid>
-          ) : null} 
           </Grid>
-        </Grid>
-      </Grid>
         </DialogContent>
         <DialogActions>
           <Button
-           onClick={this.props.save.bind(
-            this,
-            this.props.method,
-            this.state.item
-          )}
+            onClick={this.props.save.bind(
+              this,
+              this.props.method,
+              this.state.item
+            )}
             color="primary"
           >
             Сохранить
@@ -344,7 +358,7 @@ class Fines_ extends React.Component {
           second: '100',
           third: '200',
           is_show: 1,
-          is: 1
+          is: 1,
         },
         {
           id: '2',
@@ -353,7 +367,7 @@ class Fines_ extends React.Component {
           second: '100',
           third: '200',
           is_show: 1,
-          is: 1
+          is: 1,
         },
         {
           id: '3',
@@ -362,7 +376,7 @@ class Fines_ extends React.Component {
           second: '100',
           third: '200',
           is_show: 1,
-          is: 0
+          is: 0,
         },
         {
           id: '4',
@@ -371,7 +385,7 @@ class Fines_ extends React.Component {
           second: '100',
           third: '200',
           is_show: 0,
-          is: 0
+          is: 0,
         },
         {
           id: '5',
@@ -380,7 +394,7 @@ class Fines_ extends React.Component {
           second: '100',
           third: '200',
           is_show: 1,
-          is: 1
+          is: 1,
         },
       ],
 
@@ -395,7 +409,7 @@ class Fines_ extends React.Component {
           second: '100',
           third: '200',
           is_show: 1,
-          is: 0
+          is: 0,
         },
         {
           id: '2',
@@ -407,7 +421,7 @@ class Fines_ extends React.Component {
           second: '100',
           third: '200',
           is_show: 1,
-          is: 1
+          is: 1,
         },
         {
           id: '3',
@@ -419,7 +433,7 @@ class Fines_ extends React.Component {
           second: '100',
           third: '200',
           is_show: 1,
-          is: 1
+          is: 1,
         },
         {
           id: '4',
@@ -431,7 +445,7 @@ class Fines_ extends React.Component {
           second: '100',
           third: '200',
           is_show: 1,
-          is: 1
+          is: 1,
         },
         {
           id: '5',
@@ -443,24 +457,23 @@ class Fines_ extends React.Component {
           second: '100',
           third: '200',
           is_show: 1,
-          is: 0
+          is: 0,
         },
       ],
 
       event: {},
 
       newFine: {
-          id: '',
-          name: '',
-          first_percent: '',
-          second_percent: '',
-          third_percent: '',
-          first: '',
-          second: '',
-          third: '',
-          is_show: 0,
-      }
-
+        id: '',
+        name: '',
+        first_percent: '',
+        second_percent: '',
+        third_percent: '',
+        first: '',
+        second: '',
+        third: '',
+        is_show: 0,
+      },
     };
   }
 
@@ -530,32 +543,25 @@ class Fines_ extends React.Component {
   };
 
   openModal(method, event) {
-
     // console.log(method)
 
     if (method === 'Новый штраф по камерам') {
-
       this.setState({
         modalDialog: true,
         method,
         event: this.state.newFine,
       });
+    }
 
-    } 
-    
     if (method === 'Новый штраф по отзывам') {
-
       this.setState({
         modalDialog: true,
         method,
         event: this.state.newFine,
       });
-
-    } 
-
+    }
 
     if (method === 'Штраф по камерам') {
-
       // const data = this.state.cameras;
 
       // const event = data.find(el => el.id === id)
@@ -564,14 +570,11 @@ class Fines_ extends React.Component {
         modalDialog: true,
         method,
         event,
-        itemName: event.name
+        itemName: event.name,
       });
-
-    } 
-
+    }
 
     if (method === 'Штраф по отзывам') {
-
       // const data = this.state.reviews;
 
       // const event = data.find(el => el.id === id)
@@ -580,17 +583,14 @@ class Fines_ extends React.Component {
         modalDialog: true,
         method,
         event,
-        itemName: event.name
+        itemName: event.name,
       });
-
-    } 
-
+    }
   }
 
   saveItem(method, item) {
-
-    console.log(method)
-    console.log(item)
+    console.log(method);
+    console.log(item);
 
     this.setState({
       modalDialog: false,
