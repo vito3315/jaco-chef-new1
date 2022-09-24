@@ -7,7 +7,6 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableFooter from '@mui/material/TableFooter';
 import Paper from '@mui/material/Paper';
@@ -18,19 +17,15 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
-
-
 
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -43,9 +38,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import PersonIcon from '@mui/icons-material/Person';
-import { blue } from '@mui/material/colors';
 
 import HomeWorkIcon from '@mui/icons-material/HomeWork';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
@@ -56,13 +48,9 @@ import Looks3Icon from '@mui/icons-material/Looks3';
 
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import CheckIcon from '@mui/icons-material/Check';
-
-import Divider from '@mui/material/Divider';
-import InboxIcon from '@mui/icons-material/Inbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
 import SendIcon from '@mui/icons-material/Send';
 
-import { MySelect, MyCheckBox, MyTimePicker, MyDatePickerGraph, formatDate } from '../../stores/elements';
+import { MySelect, MyTextInput, MyTimePicker, MyDatePickerGraph, formatDate } from '../../stores/elements';
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 
 const queryString = require('query-string'); 
@@ -272,11 +260,14 @@ class WorkSchedule_ extends React.Component {
       mainMenuPrice: false,
       mainMenuLVDIR: false,
       mainMenuDopBonus: false,
+      mainMenuZP: false,
+      mainMenuPoints: false,
 
       show_zp_one: 0,
       show_zp_two: 0,
       kind: '',
 
+      myOtherPoints: [],
       myOtherSmens: [],
       
       chooseUser: null,
@@ -343,7 +334,7 @@ class WorkSchedule_ extends React.Component {
 
     setTimeout( () => {
       this.updateData();
-    }, 100 )
+    }, 300 )
   }
   
   getData = (method, data = {}) => {
@@ -450,24 +441,25 @@ class WorkSchedule_ extends React.Component {
     })
   }
 
-  async openM(item, this_date){
+  async openM(item){
     console.log( item )
     
     let data = {
       smena_id: item.smena_id,
       app_id: item.app_id,
       user_id: item.id,
-      date: this_date,
+      date: this.state.mounth,
       date_start: item.date
     };
     
-    let res = await this.getData('get_user_day', data);
+    let res = await this.getData('get_user_month', data);
     
     console.log( res )
     
     this.setState({
       isOpenModalM: true,
-      userInfo: res.h_info
+      userInfo: res.h_info,
+      arrTimeAdd: res.hourse_days
     })
   }
   
@@ -561,7 +553,9 @@ class WorkSchedule_ extends React.Component {
         mainMenuSmena: false
       })
 
-      this.updateData();
+      setTimeout( () => {
+        this.updateData();
+      }, 300 )
     }else{
       alert(res['text'])
     }
@@ -586,7 +580,10 @@ class WorkSchedule_ extends React.Component {
         mainMenuSmena: false
       })
 
-      this.updateData();
+      setTimeout( () => {
+        this.updateData();
+      }, 300 )
+      
     }else{
       alert(res['text'])
     }
@@ -614,6 +611,41 @@ class WorkSchedule_ extends React.Component {
       })
 
       this.updateData();
+    }else{
+      alert(res['text'])
+    }
+  }
+
+  checkFastPoint(point_id, smena_id){
+    if (confirm("Точно сменить точку с сегоднешнего дня ?")) {
+      this.fastPoint(point_id, smena_id)
+    }
+  }
+
+  async fastPoint(point_id, smena_id){
+    let data = {
+      new_point_id: point_id,
+      new_smena_id: smena_id,
+      user_id: this.state.chooseUser.id,
+      app_id: this.state.chooseUser.app_id,
+      smena_id: this.state.chooseUser.smena_id,
+    }
+    
+    let res = await this.getData('save_fastPoint', data);
+    
+    console.log( res );
+
+    if( res['st'] == true ){
+      this.setState({
+        mainMenu: false,
+        mainMenuPoints: false,
+        chooseUser: null
+      })
+
+      setTimeout( () => {
+        this.updateData();
+      }, 300 )
+      
     }else{
       alert(res['text'])
     }
@@ -647,7 +679,9 @@ class WorkSchedule_ extends React.Component {
         mainMenuLVDIR: false
       })
 
-      this.updateData();
+      setTimeout( () => {
+        this.updateData();
+      }, 300 )
     }else{
       alert(res['text'])
     }
@@ -724,9 +758,29 @@ class WorkSchedule_ extends React.Component {
     let res = arr.find( (item) => formatDate(item.date) == formatDate(newValue) );
 
     if( !res ){
+      let time_start = '';
+      let time_end = '';
+
+      if( parseInt(this.state.typeTimeAdd) == 0 ){
+        time_start = '10:00';
+        time_end = '22:00'
+      }
+
+      if( parseInt(this.state.typeTimeAdd) == 1 ){
+        time_start = '10:00';
+        time_end = '16:00'
+      }
+
+      if( parseInt(this.state.typeTimeAdd) == 2 ){
+        time_start = '16:00';
+        time_end = '22:00'
+      }
+
       arr.push({
         date: formatDate(newValue),
-        type: this.state.typeTimeAdd
+        type: this.state.typeTimeAdd,
+        time_start: time_start,
+        time_end: time_end
       })
 
       this.setState({
@@ -745,6 +799,85 @@ class WorkSchedule_ extends React.Component {
     this.setState({
       typeTimeAdd: type
     })
+  }
+
+  async saveUserM(){
+    let data = {
+     
+      dates: this.state.arrTimeAdd,
+      point_id: this.state.point,
+      date: this.state.mounth,
+
+      user_id: this.state.userInfo.user.user_id,
+      smena_id: this.state.userInfo.user.smena_id,
+      app_id: this.state.userInfo.user.app_id,
+    }
+    
+    let res = await this.getData('save_user_month', data);
+    
+    console.log( res );
+
+    if( res['st'] == true ){
+      this.setState({
+        isOpenModalM: false,
+        userInfo: null
+      })
+
+      setTimeout( () => {
+        this.updateData();
+      }, 300 )
+      
+    }else{
+      alert(res['text'])
+    }
+  }
+
+  openZP(user_id, smena_id, app_id, part, user){
+    console.log(user)
+
+    let fullPrice = parseInt(user.h_price) + parseInt(user.my_bonus) + parseInt(user.dop_bonus) - parseInt(user.err_price);
+
+    this.setState({
+      mainMenuZP: true,
+      userInfo: {
+        name: user.user_name,
+        app: user.full_app_name,
+        fullPrice: fullPrice,
+        given: user.given,
+        date: this.state.mounth + (parseInt(part) == 1 ? '-01' : '-16'),
+        user_id: user_id,
+        smena_id: smena_id,
+        app_id: app_id
+      }
+    })
+  }
+
+  async saveGive(){
+    let data = {
+      date: this.state.userInfo.date,
+      user_id: this.state.userInfo.user_id,
+      smena_id: this.state.userInfo.smena_id,
+      app_id: this.state.userInfo.app_id,
+      give_price: this.state.userInfo.given,
+    }
+
+    let res = await this.getData('save_user_give_price', data);
+    
+    console.log( res );
+
+    if( res['st'] == true ){
+      this.setState({
+        mainMenuZP: false,
+        userInfo: null
+      })
+
+      setTimeout( () => {
+        this.updateData();
+      }, 300 )
+      
+    }else{
+      alert(res['text'])
+    }
   }
 
   render(){ 
@@ -779,7 +912,7 @@ class WorkSchedule_ extends React.Component {
               </ListItemAvatar>
               <ListItemText primary="Сменить смену" />
             </ListItem>
-            <ListItem button style={{ display: 'none' }}>
+            <ListItem button onClick={ () => { this.setState({ mainMenu: false, mainMenuPoints: true, myOtherPoints: this.state.chooseUser.other_points }) } }>
               <ListItemAvatar>
                 <Avatar>
                   <HomeWorkIcon />
@@ -849,6 +982,28 @@ class WorkSchedule_ extends React.Component {
                 <ListItemAvatar>
                   <Avatar>
                     <AssessmentIcon />
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText primary={item.name} />
+              </ListItem>
+            ) }
+        
+          </List>
+        </Dialog>
+
+        <Dialog onClose={ () => { this.setState({ mainMenuPoints: false }) } } open={this.state.mainMenuPoints}>
+          
+          { !this.state.chooseUser ? null :
+            <DialogTitle>Смена точка с сегоднешнего дня {this.state.chooseUser.user_name}</DialogTitle>
+          }
+          
+          <List sx={{ pt: 0 }}>
+            
+            { this.state.myOtherPoints.map( (item, key) =>
+              <ListItem key={key} button >
+                <ListItemAvatar>
+                  <Avatar>
+                    <HomeWorkIcon />
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText primary={item.name} />
@@ -927,17 +1082,42 @@ class WorkSchedule_ extends React.Component {
           </List>
           
         </Dialog>
+
+        { !this.state.userInfo || this.state.mainMenuZP === false ? null :
+          <Dialog onClose={ () => { this.setState({ mainMenuZP: false, userInfo: null }) } } open={this.state.mainMenuZP}>
+            
+            <DialogTitle>{this.state.userInfo.app} {this.state.userInfo.name} {this.state.userInfo.date}</DialogTitle>
+
+            <DialogContent>
+              <Grid container spacing={3} style={{ marginTop: 10 }}>
+                <Grid item xs={12} sm={12}>
+                  <MyTextInput label="Выданная сумма" value={this.state.userInfo.given} func={ (event) => { let userInfo = this.state.userInfo; userInfo.given = event.target.value; this.setState({ userInfo: userInfo }) } } /> 
+                </Grid>
+
+                <Grid item xs={12} sm={12}>
+                  <span>Вся сумма: </span>
+                  <span style={{color: '#c03', borderBottom: '1px dotted #c03', cursor: 'pointer'}} onClick={ () => { let userInfo = this.state.userInfo; userInfo.given = userInfo.fullPrice; this.setState({ userInfo: userInfo }) } }>{this.state.userInfo.fullPrice}</span>
+                </Grid>
+              </Grid>
+            </DialogContent>
+            <DialogActions style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Button style={{ backgroundColor: 'green', color: '#fff' }} onClick={this.saveGive.bind(this)}>Сохранить</Button>
+              <Button style={{ backgroundColor: 'red', color: '#fff' }} onClick={() => { this.setState({ mainMenuZP: false, userInfo: null }) }}>Отмена</Button>
+            </DialogActions>
+          </Dialog>
+        }
         
-        { !this.state.userInfo ? null :
+        { !this.state.userInfo || this.state.isOpenModalH === false ? null :
           <Dialog
             open={this.state.isOpenModalH}
             onClose={ () => { this.setState({ isOpenModalH: false }) } }
             scroll='paper'
             fullWidth={true}
             maxWidth={'md'}
+            id={'OpenModalH'}
           >
             <DialogTitle id="scroll-dialog-title">{this.state.userInfo.user.app_name + ' ' + this.state.userInfo.user.user_name + ' ' + this.state.userInfo.date}</DialogTitle>
-            <DialogContent dividers={true}>
+            <DialogContent>
               
               <Typography style={{ marginBottom: 10 }}>{'Моя нагрузка: ' + this.state.userInfo.user.my_load_h + ' / Средняя нагрузка: ' + this.state.userInfo.user.all_load_h}</Typography>
               { this.state.show_bonus === false ? null :
@@ -1018,16 +1198,17 @@ class WorkSchedule_ extends React.Component {
           </Dialog>
         }
 
-        { !this.state.userInfo ? null :
+        { !this.state.userInfo || this.state.isOpenModalM === false ? null :
           <Dialog
             open={this.state.isOpenModalM}
             onClose={ () => { this.setState({ isOpenModalM: false }) } }
             scroll='paper'
             fullWidth={true}
             maxWidth={'md'}
+            id={'OpenModalM'}
           >
-            <DialogTitle id="scroll-dialog-title">{this.state.userInfo.user.app_name + ' ' + this.state.userInfo.user.user_name + ' ' + this.state.userInfo.date}</DialogTitle>
-            <DialogContent dividers={true}>
+            <DialogTitle>{this.state.userInfo.user.app_name + ' ' + this.state.userInfo.user.user_name}</DialogTitle>
+            <DialogContent>
               
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
@@ -1079,16 +1260,13 @@ class WorkSchedule_ extends React.Component {
                   
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Paper>
-                    <MyDatePickerGraph year={this.state.mounth} renderWeekPickerDay={this.renderWeekPickerDay} />
-                  </Paper>
-                  
+                  <MyDatePickerGraph year={this.state.mounth} renderWeekPickerDay={this.renderWeekPickerDay} />
                 </Grid>
               </Grid>
 
             </DialogContent>
             <DialogActions style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Button style={{ backgroundColor: 'green', color: '#fff' }} onClick={this.saveDayHourse.bind(this)}>Сохранить</Button>
+              <Button style={{ backgroundColor: 'green', color: '#fff' }} onClick={this.saveUserM.bind(this)}>Сохранить</Button>
               <Button style={{ backgroundColor: 'red', color: '#fff' }} onClick={() => { this.setState({ isOpenModalM: false }) }}>Отмена</Button>
             </DialogActions>
           </Dialog>
@@ -1130,7 +1308,7 @@ class WorkSchedule_ extends React.Component {
                           <HeaderItem key={key} bonus_other={this.state.one.bonus_other} changeLVDir={this.changeLVDir.bind(this)} changeDopBonus={this.changeDopBonus.bind(this)} kind={this.state.kind} show_zp={this.state.show_zp_one} lv_dir={this.state.lv_dir} lv_cafe={this.state.lv_cafe} dataKey={key} days={this.state.one.days} item={item} />
                             :
                           <TableRow key={key}>
-                            <TableCell className='name_pinning' onClick={ this.openM.bind(this, item.data, '') }>{item.data.user_name}</TableCell>
+                            <TableCell className='name_pinning' onClick={ this.openM.bind(this, item.data) }>{item.data.user_name}</TableCell>
                             <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
 
                             { this.state.kind == 'manager' ? null :
@@ -1150,12 +1328,17 @@ class WorkSchedule_ extends React.Component {
                                 <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
 
                                 { this.state.show_zp_one == 1 || this.state.show_zp_one == 0 ?
-                                  <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
+                                  <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
                                     :
                                   null
                                 }
 
-                                <TableCell style={{textAlign: 'center'}}>{item.data.given}</TableCell>
+                                {item.data.app_type == 'driver' ?
+                                  <TableCell style={{textAlign: 'center'}}></TableCell>
+                                    :
+                                  <TableCell style={{textAlign: 'center'}} onClick={this.openZP.bind(this, item.data.id, item.data.smena_id, item.data.app_id, 1, item.data)}>{item.data.given}</TableCell>
+                                }
+                                
                               </>
                             }
                           </TableRow>
@@ -1177,6 +1360,24 @@ class WorkSchedule_ extends React.Component {
                           <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
                         )}
                         
+                        { this.state.kind == 'manager' ? null :
+                          <>
+                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{this.state.one.other_summ.sum_dop_bonus_price}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{this.state.one.other_summ.sum_h_price}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{this.state.one.other_summ.sum_err_price}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{this.state.one.other_summ.sum_bonus_price}</TableCell>
+
+                            { this.state.show_zp_one == 1 || this.state.show_zp_one == 0 ?
+                              <TableCell style={{textAlign: 'center'}}>{this.state.one.other_summ.sum_to_given_price}</TableCell>
+                                :
+                              null
+                            }
+
+                            <TableCell style={{textAlign: 'center'}}>{this.state.one.other_summ.sum_given_price}</TableCell>
+                          </>
+                        }
+
                       </TableRow>
                       
                       <TableRow>
@@ -1191,6 +1392,24 @@ class WorkSchedule_ extends React.Component {
                           <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
                         )}
                         
+                        { this.state.kind == 'manager' ? null :
+                          <>
+                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                            { this.state.show_zp_one == 1 || this.state.show_zp_one == 0 ?
+                              <TableCell style={{textAlign: 'center'}}></TableCell>
+                                :
+                              null
+                            }
+
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                          </>
+                        }
+
                       </TableRow>
                       
                       <TableRow>
@@ -1205,6 +1424,23 @@ class WorkSchedule_ extends React.Component {
                           <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
                         )}
                         
+                        { this.state.kind == 'manager' ? null :
+                          <>
+                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                            { this.state.show_zp_one == 1 || this.state.show_zp_one == 0 ?
+                              <TableCell style={{textAlign: 'center'}}></TableCell>
+                                :
+                              null
+                            }
+
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                          </>
+                        }
                       </TableRow>
                       
                       <TableRow>
@@ -1219,6 +1455,23 @@ class WorkSchedule_ extends React.Component {
                           <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
                         )}
                         
+                        { this.state.kind == 'manager' ? null :
+                          <>
+                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                            { this.state.show_zp_one == 1 || this.state.show_zp_one == 0 ?
+                              <TableCell style={{textAlign: 'center'}}></TableCell>
+                                :
+                              null
+                            }
+
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                          </>
+                        }
                       </TableRow>
                       
                     </TableFooter>
@@ -1231,7 +1484,7 @@ class WorkSchedule_ extends React.Component {
             <TabPanel value={this.state.tabTable} index={1}>
               { !this.state.two ? null :
                 <TableContainer component={Paper}>
-                  <Table aria-label="a dense table" id="table_graph_two">
+                  <Table id="table_graph_two">
                     
                     <TableBody>
                       
@@ -1240,7 +1493,7 @@ class WorkSchedule_ extends React.Component {
                           <HeaderItem bonus_other={this.state.two.bonus_other} changeLVDir={this.changeLVDir.bind(this)} changeDopBonus={this.changeDopBonus.bind(this)} key={key} kind={this.state.kind} show_zp={this.state.show_zp_two} lv_dir={this.state.lv_dir} lv_cafe={this.state.lv_cafe} dataKey={key} days={this.state.two.days} item={item} />
                             :
                           <TableRow key={key}>
-                            <TableCell className='name_pinning' onClick={ this.openM.bind(this, item.data, '') }>{item.data.user_name}</TableCell>
+                            <TableCell className='name_pinning' onClick={ this.openM.bind(this, item.data) }>{item.data.user_name}</TableCell>
                             <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
 
                             { this.state.kind == 'manager' ? null :
@@ -1265,7 +1518,11 @@ class WorkSchedule_ extends React.Component {
                                   null
                                 }
 
-                                <TableCell style={{textAlign: 'center'}}>{item.data.given}</TableCell>
+                                {item.data.app_type == 'driver' ?
+                                  <TableCell style={{textAlign: 'center'}}></TableCell>
+                                    :
+                                  <TableCell style={{textAlign: 'center'}} onClick={this.openZP.bind(this, item.data.id, item.data.smena_id, item.data.app_id, 2, item.data)}>{item.data.given}</TableCell>
+                                }
                               </>
                             }
                           </TableRow>
@@ -1287,6 +1544,23 @@ class WorkSchedule_ extends React.Component {
                           <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
                         )}
                         
+                        { this.state.kind == 'manager' ? null :
+                          <>
+                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{this.state.two.other_summ.sum_dop_bonus_price}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{this.state.two.other_summ.sum_h_price}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{this.state.two.other_summ.sum_err_price}</TableCell>
+                            <TableCell style={{textAlign: 'center'}}>{this.state.two.other_summ.sum_bonus_price}</TableCell>
+
+                            { this.state.show_zp_two == 1 || this.state.show_zp_two == 0 ?
+                              <TableCell style={{textAlign: 'center'}}>{this.state.two.other_summ.sum_to_given_price}</TableCell>
+                                :
+                              null
+                            }
+
+                            <TableCell style={{textAlign: 'center'}}>{this.state.two.other_summ.sum_given_price}</TableCell>
+                          </>
+                        }
                       </TableRow>
                       
                       <TableRow>
@@ -1301,6 +1575,23 @@ class WorkSchedule_ extends React.Component {
                           <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
                         )}
                         
+                        { this.state.kind == 'manager' ? null :
+                          <>
+                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                            { this.state.show_zp_two == 1 || this.state.show_zp_two == 0 ?
+                              <TableCell style={{textAlign: 'center'}}></TableCell>
+                                :
+                              null
+                            }
+
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                          </>
+                        }
                       </TableRow>
                       
                       <TableRow>
@@ -1315,6 +1606,23 @@ class WorkSchedule_ extends React.Component {
                           <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
                         )}
                         
+                        { this.state.kind == 'manager' ? null :
+                          <>
+                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                            { this.state.show_zp_two == 1 || this.state.show_zp_two == 0 ?
+                              <TableCell style={{textAlign: 'center'}}></TableCell>
+                                :
+                              null
+                            }
+
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                          </>
+                        }
                       </TableRow>
                       
                       <TableRow>
@@ -1329,6 +1637,23 @@ class WorkSchedule_ extends React.Component {
                           <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
                         )}
                         
+                        { this.state.kind == 'manager' ? null :
+                          <>
+                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                            { this.state.show_zp_two == 1 || this.state.show_zp_two == 0 ?
+                              <TableCell style={{textAlign: 'center'}}></TableCell>
+                                :
+                              null
+                            }
+
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                          </>
+                        }
                       </TableRow>
                       
                     </TableFooter>
