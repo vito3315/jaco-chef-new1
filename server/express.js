@@ -25,7 +25,10 @@ app.get( /\.(js|css|map|ico|png|svg)$/, express.static( path.resolve( __dirname,
 
 // for any other requests, send `index.html` as a response
 app.use( '*', async ( req, res ) => {
-
+    
+    if (!/https/.test(req.protocol)){
+        res.redirect("https://" + req.headers.host + req.url);
+    }
     // get matched route
     //const matchRoute = routes.find( route => matchPath( req.originalUrl, route ) );
 
