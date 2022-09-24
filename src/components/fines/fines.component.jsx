@@ -6,495 +6,658 @@ import Button from '@mui/material/Button';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-
-import CloseIcon from '@mui/icons-material/Close';
-
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyTimePicker } from '../../stores/elements';
-import Typography from '@mui/material/Typography';
-
-import Box from '@mui/material/Box';
+import { MyTextInput, MyCheckBox } from '../../stores/elements';
 
 const queryString = require('query-string');
+
+class Fines_Table_Сameras extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    var array1 = nextProps.cameras;
+    var array2 = this.props.cameras;
+
+    var is_same =
+      array1.length == array2.length &&
+      array1.every(function (element, index) {
+        return element === array2[index];
+      });
+
+    return !is_same;
+  }
+
+  render() {
+    return (
+      <>
+        <Grid>Ошибки по камерам</Grid>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell style={{ width: '50%' }}>Наименование</TableCell>
+              <TableCell style={{ width: '15%' }}>
+                Размер штрафа за первый раз
+              </TableCell>
+              <TableCell style={{ width: '15%' }}>
+                Размер штрафа за второй раз
+              </TableCell>
+              <TableCell style={{ width: '15%' }}>
+                Размер штрафа за третий и последующие
+              </TableCell>
+              <TableCell style={{ width: '5%' }}></TableCell>
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {this.props.cameras.map((item, i) => (
+              <TableRow key={i}>
+                <TableCell
+                  style={{ cursor: 'pointer' }}
+                  onClick={this.props.openModal.bind(
+                    this,
+                    'Штраф по камерам',
+                    item
+                  )}
+                >
+                  {item.name}
+                </TableCell>
+                <TableCell>{`${item.first} руб`}</TableCell>
+                <TableCell>{`${item.second} руб`}</TableCell>
+                <TableCell>{`${item.third} руб`}</TableCell>
+                <TableCell>
+                  {parseInt(item.is_show) == 1 ? (
+                    <VisibilityIcon />
+                  ) : (
+                    <VisibilityOffIcon />
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </>
+    );
+  }
+}
+
+class Fines_Table_Reviews extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    var array1 = nextProps.reviews;
+    var array2 = this.props.reviews;
+
+    var is_same =
+      array1.length == array2.length &&
+      array1.every(function (element, index) {
+        return element === array2[index];
+      });
+
+    return !is_same;
+  }
+
+  render() {
+    return (
+      <>
+        <Grid mb={3}>Ошибки по камерам</Grid>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell style={{ width: '50%' }}>Наименование</TableCell>
+              <TableCell style={{ width: '15%' }}>
+                Процент за первый раз
+              </TableCell>
+              <TableCell style={{ width: '15%' }}>
+                Процент за второй раз
+              </TableCell>
+              <TableCell style={{ width: '15%' }}>
+                Процент за третий и последующие
+              </TableCell>
+              <TableCell style={{ width: '5%' }}></TableCell>
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {this.props.reviews.map((item, i) => (
+              <React.Fragment key={item.id}>
+                <TableRow>
+                  <TableCell
+                    style={{ cursor: 'pointer' }}
+                    rowSpan="2"
+                    onClick={this.props.openModal.bind(
+                      this,
+                      'Штраф по отзывам',
+                      item
+                    )}
+                  >
+                    {item.name}
+                  </TableCell>
+                  <TableCell>{`${item.first_percent} %`}</TableCell>
+                  <TableCell>{`${item.second_percent} %`}</TableCell>
+                  <TableCell>{`${item.third_percent} %`}</TableCell>
+                  <TableCell rowSpan="2">
+                    {parseInt(item.is_show) == 1 ? (
+                      <VisibilityIcon />
+                    ) : (
+                      <VisibilityOffIcon />
+                    )}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>{`${item.first} руб`}</TableCell>
+                  <TableCell>{`${item.second} руб`}</TableCell>
+                  <TableCell>{`${item.third} руб`}</TableCell>
+                </TableRow>
+              </React.Fragment>
+            ))}
+          </TableBody>
+        </Table>
+      </>
+    );
+  }
+}
+
+class Fines_Modal extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      item: null,
+    };
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (!nextProps.event) {
+      return null;
+    }
+
+    if (nextProps.event !== prevState.event) {
+      return { item: nextProps.event };
+    }
+    return null;
+  }
+
+  changeItem(data, event) {
+    let vendor = this.state.item;
+    vendor[data] = event.target.value;
+
+    this.setState({
+      item: vendor,
+    });
+  }
+
+  changeItemChecked(data, event) {
+    let vendor = this.state.item;
+    vendor[data] = event.target.checked === true ? 1 : 0;
+
+    this.setState({
+      item: vendor,
+    });
+  }
+
+  onClose() {
+    this.setState({
+      item: null,
+    });
+
+    this.props.onClose();
+  }
+
+  render() {
+    return (
+      <Dialog
+        open={this.props.open}
+        onClose={this.onClose.bind(this)}
+        fullWidth={true}
+        maxWidth={'lg'}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {this.props.method}
+          {this.props.itemName ? `: ${this.props.itemName}` : ''}
+        </DialogTitle>
+        <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={8} mb={2}>
+                  <MyTextInput
+                    label="Наименование штрафа"
+                    value={this.state.item.name}
+                    func={this.changeItem.bind(this, 'name')}
+                  />
+                </Grid>
+              </Grid>
+              {this.props.method === 'Новый штраф по отзывам' ||
+              this.props.method === 'Штраф по отзывам' ? (
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={4} mb={2}>
+                    <MyTextInput
+                      label="Процент за первый раз"
+                      value={this.state.item.first_percent}
+                      func={this.changeItem.bind(this, 'first_percent')}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4} mb={2}>
+                    <MyTextInput
+                      label="Процент за второй раз"
+                      value={this.state.item.second_percent}
+                      func={this.changeItem.bind(this, 'second_percent')}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4} mb={2}>
+                    <MyTextInput
+                      label="Процент за третий и последующие"
+                      value={this.state.item.third_percent}
+                      func={this.changeItem.bind(this, 'third_percent')}
+                    />
+                  </Grid>
+                </Grid>
+              ) : null}
+
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={4} mb={2}>
+                  <MyTextInput
+                    label="Размер штрафа за первый раз"
+                    value={this.state.item.first}
+                    func={this.changeItem.bind(this, 'first')}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4} mb={2}>
+                  <MyTextInput
+                    label="Размер штрафа за второй раз"
+                    value={this.state.item.second}
+                    func={this.changeItem.bind(this, 'second')}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4} mb={2}>
+                  <MyTextInput
+                    label="Размер штрафа за третий и последующие"
+                    value={this.state.item.third}
+                    func={this.changeItem.bind(this, 'third')}
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid container spacing={3}>
+                {this.props.method === 'Новый штраф по камерам' ||
+                this.props.method === 'Штраф по камерам' ? (
+               
+                  <Grid item xs={12} sm={3}>
+                    <MyCheckBox
+                      label="Картинка"
+                      value={
+                        parseInt(this.state.item.is_show) == 1 ? true : false
+                      }
+                      func={this.changeItemChecked.bind(this, 'is_show')}
+                    />
+                  </Grid>
+          
+                ) : null}
+
+                {this.props.method === 'Штраф по отзывам' ||
+                this.props.method === 'Штраф по камерам' ? (
+
+                  <Grid item xs={12} sm={3}>
+                    <MyCheckBox
+                      label="Активность"
+                      value={parseInt(this.state.item.is) == 1 ? true : false}
+                      func={this.changeItemChecked.bind(this, 'is')}
+                    />
+                  </Grid>
+
+                ) : null}
+              </Grid>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={this.props.save.bind(
+              this,
+              this.props.method,
+              this.state.item
+            )}
+            color="primary"
+          >
+            Сохранить
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+}
 
 class Fines_ extends React.Component {
   constructor(props) {
     super(props);
-        
+
     this.state = {
       module: 'fines',
       module_name: '',
       is_load: false,
-      
-      points: [],
-      point: '0',
-      mounth: '0',
-      mounths: [],
-      years: [],
-      year: '0',
-      
-      calendar: [],
+
       modalDialog: false,
-      
-      chooseDayHoly: '',
-      events: [],
-      chooseEvent: 0,
-      
-      eventPoint1: 0,
-      everyYear1: false,
-      timeStart2: '10:00',
-      timeEnd2: '21:30',
-      
-      expanded: '',
-      dayEvents: [],
-      events_hist: []
+      itemName: '',
+
+      cameras: [
+        {
+          id: '1',
+          name: 'Немытые руки',
+          first: '50',
+          second: '100',
+          third: '200',
+          is_show: 1,
+          is: 1,
+        },
+        {
+          id: '2',
+          name: 'Внешний вид',
+          first: '50',
+          second: '100',
+          third: '200',
+          is_show: 1,
+          is: 1,
+        },
+        {
+          id: '3',
+          name: 'Употребление продуктов компании',
+          first: '50',
+          second: '100',
+          third: '200',
+          is_show: 1,
+          is: 0,
+        },
+        {
+          id: '4',
+          name: 'Хищение продуктов',
+          first: '50',
+          second: '100',
+          third: '200',
+          is_show: 0,
+          is: 0,
+        },
+        {
+          id: '5',
+          name: 'Ингредиенты разложены или порезаны не по стандартам',
+          first: '50',
+          second: '100',
+          third: '200',
+          is_show: 1,
+          is: 1,
+        },
+      ],
+
+      reviews: [
+        {
+          id: '1',
+          name: 'Ошибка не выявлена',
+          first_percent: 0,
+          second_percent: 0,
+          third_percent: 0,
+          first: '50',
+          second: '100',
+          third: '200',
+          is_show: 1,
+          is: 0,
+        },
+        {
+          id: '2',
+          name: 'Извинение',
+          first_percent: 100,
+          second_percent: 100,
+          third_percent: 100,
+          first: '50',
+          second: '100',
+          third: '200',
+          is_show: 1,
+          is: 1,
+        },
+        {
+          id: '3',
+          name: 'Скидка 10%',
+          first_percent: 0,
+          second_percent: 0,
+          third_percent: 0,
+          first: '50',
+          second: '100',
+          third: '200',
+          is_show: 1,
+          is: 1,
+        },
+        {
+          id: '4',
+          name: 'Скидка 20%',
+          first_percent: 10,
+          second_percent: 10,
+          third_percent: 10,
+          first: '50',
+          second: '100',
+          third: '200',
+          is_show: 1,
+          is: 1,
+        },
+        {
+          id: '5',
+          name: 'Замена товара на аналогичный',
+          first_percent: 50,
+          second_percent: 50,
+          third_percent: 50,
+          first: '50',
+          second: '100',
+          third: '200',
+          is_show: 1,
+          is: 0,
+        },
+      ],
+
+      event: {},
+
+      newFine: {
+        id: '',
+        name: '',
+        first_percent: '',
+        second_percent: '',
+        third_percent: '',
+        first: '',
+        second: '',
+        third: '',
+        is_show: 0,
+      },
     };
   }
-  
-  async componentDidMount(){
-    
+
+  async componentDidMount() {
     let data = await this.getData('get_all');
-    
-    console.log( data )
-    
+
+    // console.log(data);
+
     this.setState({
-      points: data.points,
-      point: data.points[0].id,
+      //points: data.points,
+      ///point: data.points[0].id,
       module_name: data.module_info.name,
       mounths: data.mounth,
-      mounth: data.this_m,
-      years: data.years,
-      year: data.this_y,
-    })
-    
+      //mounth: data.this_m,
+      // years: data.years,
+      // year: data.this_y,
+    });
+
     document.title = data.module_info.name;
-    
-    setTimeout( () => {
-      this.updateData();
-    }, 50 )
+
+    // setTimeout( () => {
+    //   this.updateData();
+    // }, 50 )
   }
-  
+
   getData = (method, data = {}) => {
-    
     this.setState({
-      is_load: true
-    })
-    
+      is_load: true,
+    });
+
     return fetch('https://jacochef.ru/api/index_new.php', {
       method: 'POST',
       headers: {
-        'Content-Type':'application/x-www-form-urlencoded'},
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
       body: queryString.stringify({
-        method: method, 
+        method: method,
         module: this.state.module,
         version: 2,
         login: localStorage.getItem('token'),
-        data: JSON.stringify( data )
-      })
-    }).then(res => res.json()).then(json => {
-      
-      if( json.st === false && json.type == 'redir' ){
-        window.location.pathname = '/';
-        return;
-      }
-      
-      if( json.st === false && json.type == 'auth' ){
-        window.location.pathname = '/auth';
-        return;
-      }
-      
-      setTimeout( () => {
-        this.setState({
-          is_load: false
-        })
-      }, 300 )
-      
-      return json;
+        data: JSON.stringify(data),
+      }),
     })
-    .catch(err => { 
-      console.log( err )
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.st === false && json.type == 'redir') {
+          window.location.pathname = '/';
+          return;
+        }
+
+        if (json.st === false && json.type == 'auth') {
+          window.location.pathname = '/auth';
+          return;
+        }
+
+        setTimeout(() => {
+          this.setState({
+            is_load: false,
+          });
+        }, 300);
+
+        return json;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  openModal(method, event) {
+    // console.log(method)
+
+    if (method === 'Новый штраф по камерам') {
+      this.setState({
+        modalDialog: true,
+        method,
+        event: this.state.newFine,
+      });
+    }
+
+    if (method === 'Новый штраф по отзывам') {
+      this.setState({
+        modalDialog: true,
+        method,
+        event: this.state.newFine,
+      });
+    }
+
+    if (method === 'Штраф по камерам') {
+      // const data = this.state.cameras;
+
+      // const event = data.find(el => el.id === id)
+
+      this.setState({
+        modalDialog: true,
+        method,
+        event,
+        itemName: event.name,
+      });
+    }
+
+    if (method === 'Штраф по отзывам') {
+      // const data = this.state.reviews;
+
+      // const event = data.find(el => el.id === id)
+
+      this.setState({
+        modalDialog: true,
+        method,
+        event,
+        itemName: event.name,
+      });
+    }
+  }
+
+  saveItem(method, item) {
+    console.log(method);
+    console.log(item);
+
+    this.setState({
+      modalDialog: false,
+      // item
     });
   }
-   
-  changePoint(event){
-    let data = event.target.value;
-    
-    this.setState({
-      point: data
-    })
-    
-    setTimeout( () => {
-      this.updateData();
-    }, 50 )
-  }
-  
-  changeMounth(event){
-    let data = event.target.value;
-    
-    this.setState({
-      mounth: data
-    })
-    
-    setTimeout( () => {
-      //this.updateData();
-    }, 50 )
-  }
-  
-  changeYear(event){
-    let data = event.target.value;
-    
-    this.setState({
-      year: data
-    })
-  }
-  
-  changeCheckOrders(event){
-    let data = event.target.checked;
-    
-    this.setState({
-      showReady: data
-    })
-  }
-  
-  async updateData(){
-    let data = {
-      m: this.state.mounth,
-      y: this.state.year,
-      point_id: this.state.point
-    };
-    
-    let res = await this.getData('get_calendar', data);
-    
-    console.log( res )
-    
-    this.setState({
-      calendar: res.year,
-    })
-  }
-  
-  async chooseDay(day){
-    
-    if( day.full_day ){
-    
-      this.setState({
-        chooseDay: null,
-        eventPoint1: this.state.point,
-        chooseEvent: 0,
-        everyYear1: false,
-        timeStart2: '10:00',
-        timeEnd2: '21:30',
-        modalDialog: false,
-        events_hist: []
-      })
-      
-      let data = {
-        date: day.full_day,
-        point_id: this.state.point
-      };
-      
-      let res = await this.getData('get_calendar_day', data);
-      
-      console.log( 'res', res )
-      
-      this.setState({
-        chooseDay: day,
-        chooseDayHoly: res.holy,
-        events: res.events,
-        events_hist: res.hist,
-        dayEvents: res.this_events,
-        modalDialog: true
-      })
-    }
-  }
-  
-  changeEvent(event){
-    let data = event.target.value;
-    
-    this.setState({
-      chooseEvent: data
-    })
-  }
-  
-  changePoint1(event){
-    let data = event.target.value;
-    
-    this.setState({
-      eventPoint1: data
-    })
-  }
-  
-  changeEveryYear1(event){
-    let data = event.target.checked;
-    
-    this.setState({
-      everyYear1: data
-    })
-  }
-  
-  changeTimeStart2(event){
-    let data = event.target.value;
-    
-    this.setState({
-      timeStart2: data
-    })
-  }
-  
-  changeTimeEnd2(event){
-    let data = event.target.value;
-    
-    this.setState({
-      timeEnd2: data
-    })
-  }
-  
-  async save(){
-    let data = {
-      date: this.state.chooseDay.full_day,
-      point_id: this.state.eventPoint1,
-      event: this.state.chooseEvent,
-      every_year: this.state.everyYear1 === true ? 1 : 0,
-      
-      time_start: this.state.timeStart2,
-      time_end: this.state.timeEnd2,
-    };
-    
-    let res = await this.getData('save_event', data);
-    
-    console.log( res )
-    
-    if( res.st === false ){
-      alert(res.text)
-    }else{
-      this.setState({
-        chooseDay: null,
-        eventPoint1: this.state.point,
-        chooseEvent: 0,
-        everyYear1: false,
-        timeStart2: '10:00',
-        timeEnd2: '21:30',
-        modalDialog: false
-      })
-      
-      setTimeout( () => {
-        this.updateData();
-      }, 300 )
-    }
-  }
-  
-  handleChange(data){
-    this.setState({
-      expanded: data
-    })
-  }
-  
-  async delEvent(event){
-    console.log( 'delEvent', event )
-    
-    if (confirm('Удалить событие "'+event.title+' '+event.date+'" ?')) {
-      let data = {
-        del_id: event.id
-      };
-      
-      let res = await this.getData('del_event', data);
-      
-      this.setState({
-        chooseDay: null,
-        eventPoint1: this.state.point,
-        chooseEvent: 0,
-        everyYear1: false,
-        timeStart2: '10:00',
-        timeEnd2: '21:30',
-        modalDialog: false
-      })
-      
-      setTimeout( () => {
-        this.updateData();
-      }, 300 )
-    } else {
-      
-    }
-    
 
-  }
-  
-  render(){
+  render() {
     return (
       <>
         <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
-        
-        <Dialog
-          open={this.state.modalDialog}
-          onClose={ () => { this.setState({ modalDialog: false }) } }
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">{this.state.chooseDay ? this.state.chooseDay.full_day : ''}</DialogTitle>
-          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-            <DialogContentText id="alert-dialog-description">
-              
-              <Grid container spacing={3}>
-                
-                {this.state.chooseDayHoly.length == 0 ? null :
-                  <Grid item xs={12} sm={12}>
-                    <Typography component="span">{this.state.chooseDayHoly}</Typography>
-                  </Grid>
-                }
-                
-                <Grid item xs={12} sm={12}>
-                  <MySelect data={this.state.events} value={this.state.chooseEvent} func={ this.changeEvent.bind(this) } label='Событие' />
-                </Grid>
-                
-                <Grid item xs={12} sm={12}>
-                  <MySelect data={this.state.points} value={ this.state.eventPoint1 } func={ this.changePoint1.bind(this) } label='Точка' />
-                </Grid>
-                
-                { parseInt(this.state.chooseEvent) !== 2 ? null :
-                  <>
-                    <Grid item xs={6} sm={6}>
-                      <MyTimePicker value={ this.state.timeStart2 } func={ this.changeTimeStart2.bind(this) } label='Время начала работы' />
-                    </Grid>
-                    <Grid item xs={6} sm={6}>
-                      <MyTimePicker value={ this.state.timeEnd2 } func={ this.changeTimeEnd2.bind(this) } label='Время окончания работы' />
-                    </Grid>
-                  </>
-                }
-                
-                <Grid item xs={12} sm={12}>
-                  <MyCheckBox value={ this.state.everyYear1 } func={ this.changeEveryYear1.bind(this) } label='Каждый год' />
-                </Grid>
-                
-              </Grid>
-              
-              <List component="nav">
-                { this.state.dayEvents.map( (item, key) => 
-                  <ListItem key={key}>
-                    <ListItemText primary={item.title} />
-                    { ( parseInt(item.type) == 4 ||  parseInt(item.type) == 6) ? null :
-                      <CloseIcon color="primary" onClick={this.delEvent.bind(this, item)} style={{ cursor: 'pointer' }} />
-                    }
-                  </ListItem>
-                )}
-              </List>
-              
-              <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                  id="panel1a-header"
-                >
-                  <Typography>История</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <List component="nav">
-                    { this.state.events_hist.map( (item, key) => 
-                      <ListItem key={key}>
-                        <ListItemText primary={item.title} />
-                      </ListItem>
-                    )}
-                  </List>
-                </AccordionDetails>
-              </Accordion>
-              
-              
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={ this.save.bind(this) } color="primary">Сохранить</Button>
-          </DialogActions>
-        </Dialog>
-        
+
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
-          
-          <Grid item xs={12} sm={3}>
-            <MySelect  data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <MySelect  data={this.state.mounths} value={this.state.mounth} func={ this.changeMounth.bind(this) } label='Месяц' />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <MySelect  data={this.state.years} value={this.state.year} func={ this.changeYear.bind(this) } label='Год' />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
-          </Grid>
-        
-          <Grid container direction="row" justifyContent="center" style={{ paddingTop: 20, margin: '0 auto' }} >
-            
-            { this.state.calendar.map( (item, key) =>
-            
-              <Grid item sm={6} key={key} style={{ padding: 20 }} >
-                <h1 style={{ textAlign: 'center' }}>{ item[0][0].mounth }</h1>
-                <TableContainer component={Paper}>
-                  <Table aria-label="a dense table" style={{ overflow: 'hidden' }}>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Пн</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Вт</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Ср</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Чт</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Пт</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Сб</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Вс</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      
-                      { item.map( (mounth, m_key) =>
-                        <TableRow key={m_key}>
-                          { mounth.map( (day, k) =>
-                            <TableCell 
-                              key={k} 
-                              onClick={ this.chooseDay.bind(this, day) } 
-                              
-                              style={{ color: day.dir ? 'yellow' : day.holy ? '#c03' : '#000', height: '6vw'}}
 
-                              className={ day.event ? 'customCel' : 'tableCel' }
-                            >{ day.day }</TableCell>
-                          ) }
-                        </TableRow>
-                      ) }
-                      
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
-            )}
-            
+          <Grid item xs={12} sm={6}>
+            <Button
+              onClick={this.openModal.bind(this, 'Новый штраф по камерам')}
+              variant="contained"
+            >
+              Добавить ошибку по камерам
+            </Button>
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <Button
+              onClick={this.openModal.bind(this, 'Новый штраф по отзывам')}
+              variant="contained"
+            >
+              Добавить ошибку по отзывам
+            </Button>
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <Fines_Table_Сameras
+              cameras={this.state.cameras}
+              openModal={this.openModal.bind(this)}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <Fines_Table_Reviews
+              reviews={this.state.reviews}
+              openModal={this.openModal.bind(this)}
+            />
           </Grid>
         </Grid>
+
+        <Fines_Modal
+          open={this.state.modalDialog}
+          onClose={() => {
+            this.setState({ modalDialog: false });
+          }}
+          method={this.state.method}
+          event={this.state.event}
+          save={this.saveItem.bind(this)}
+          itemName={this.state.itemName}
+        />
       </>
-    )
+    );
   }
 }
 
 export function Fines() {
-  return (
-    <Fines_ />
-  );
+  return <Fines_ />;
 }
