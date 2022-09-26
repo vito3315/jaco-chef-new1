@@ -46,9 +46,6 @@ class SkladItemsModuleModal extends React.Component {
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-
-    console.log(nextProps)
-
     if(!nextProps.event) {
       return null;
     }
@@ -468,13 +465,7 @@ class SkladItemsModule_ extends React.Component {
       itemName: res.item.name,
     })
 	
-	//todo тест
-	setTimeout( () => {
-        console.log('storages=' , this.state.itemEdit.storages);
-        console.log('this_storages=' , this.state.itemEdit.this_storages);
-      }, 300 )
-	
-  }
+	}
 
   async saveEditItem(itemEdit, main_item_id = 0){
 
