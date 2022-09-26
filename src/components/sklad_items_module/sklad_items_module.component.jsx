@@ -504,12 +504,7 @@ class SkladItemsModule_ extends React.Component {
       })
 
       setTimeout( async () => {
-        res = await this.getData('get_all');
-    
-        this.setState({
-          cats: res.cats,
-          freeItems: res.items_free
-        })
+        this.search()
       }, 300 )
     }
   }
@@ -542,12 +537,7 @@ class SkladItemsModule_ extends React.Component {
       })
 
       setTimeout( async () => {
-        res = await this.getData('get_all');
-    
-        this.setState({
-          cats: res.cats,
-          freeItems: res.items_free
-        })
+        this.search()
       }, 300 )
     }
   }
@@ -564,7 +554,8 @@ class SkladItemsModule_ extends React.Component {
     if( res.st === false ){
       this.setState({ 
         checkArtDialog: true, 
-        checkArtList: res.data
+        checkArtList: res.data,
+        itemEdit: itemEdit,
       })
     }else{
       this.saveEditItem(itemEdit);
@@ -596,7 +587,7 @@ class SkladItemsModule_ extends React.Component {
     if( this.state.modalItemNew === true ){
       this.saveNewItem(item_id);
     }else{
-      this.saveEditItem(item_id);
+      this.saveEditItem(this.state.itemEdit, item_id);
     }
   }
 
