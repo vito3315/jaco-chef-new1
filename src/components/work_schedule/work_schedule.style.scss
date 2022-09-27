@@ -29,3 +29,9 @@ div.css-19kzrtu{
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+#OpenModalM > .MuiDialog-container > div, #OpenModalH > .MuiDialog-container > div{
+    @media (max-width: 600px) {
+        margin: 0px!important;
+    }
+}
