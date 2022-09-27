@@ -31,3 +31,18 @@ th[class*="tableCelHead"] {
 .tableCel:hover{
     background-color: #e5e5e5!important;
 }
+
+.OpenModalM {
+  @media (max-width: 600px) {
+    margin: 0px!important;
+    display: flex!important;
+    flex-direction: column!important;
+  }
+}
+
+
+.dialogTitle {
+  display: flex!important;
+  justify-content: space-between!important;
+  align-items: center!important;
+}
