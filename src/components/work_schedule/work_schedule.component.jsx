@@ -500,10 +500,14 @@ class WorkSchedule_ extends React.Component {
       this.setState({
         mainMenu: false,
         mainMenuH: false,
-        mainMenuSmena: false
+        mainMenuSmena: false,
+        isOpenModalH: false,
+        userInfo: null
       })
 
-      this.updateData();
+      setTimeout( () => {
+        this.updateData();
+      }, 300 )
     }else{
       alert(res['text'])
     }
