@@ -3,7 +3,6 @@ import React from 'react';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
 import Table from '@mui/material/Table';
@@ -12,15 +11,16 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+// import Accordion from '@mui/material/Accordion';
+// import AccordionSummary from '@mui/material/AccordionSummary';
+// import AccordionDetails from '@mui/material/AccordionDetails';
+// import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+// import Typography from '@mui/material/Typography';
 
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
-
 import Dialog from '@mui/material/Dialog';
+
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -302,7 +302,7 @@ class UserSmena_Modal extends React.Component {
 
           <Grid container spacing={3} mb={3} className="OpenModalM">
             <Grid item xs={6} sm={6}>
-              <Grid style={{ cursor: 'pointer' }} mt={3}>
+              <Grid mt={3}>
                 Оставшиеся сотрудники
               </Grid>
               <Table>
@@ -334,7 +334,7 @@ class UserSmena_Modal extends React.Component {
               <Divider />
             </Grid>
             <Grid item xs={6} sm={6}>
-              <Grid style={{ cursor: 'pointer' }} mt={3}>
+              <Grid mt={3}>
                 Сотрудники в смене
               </Grid>
               <Table>
@@ -369,7 +369,7 @@ class UserSmena_Modal extends React.Component {
             </Grid>
           </Grid>
 
-          {this.props.method === 'Редактирование смены' ? (
+          {/* {this.props.method === 'Редактирование смены' ? (
             <Accordion>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
@@ -430,16 +430,16 @@ class UserSmena_Modal extends React.Component {
                 ))}
               </AccordionDetails>
             </Accordion>
-          ) : null}
+          ) : null} */}
         </DialogContent>
 
-        <DialogActions>
+        <DialogActions className={this.props.method === 'Редактирование смены' ? "dialogTitle" : null}>
           {this.props.method === 'Редактирование смены' ? (
             <Button onClick={this.delete.bind(this)} color="primary">
               Удалить смену
             </Button>
           ) : null}
-          <Button onClick={this.save.bind(this)} color="primary">
+          <Button onClick={this.save.bind(this)} style={{ color: '#00a550'}}>
             Сохранить
           </Button>
         </DialogActions>
@@ -468,7 +468,7 @@ class UserSmena_Table extends React.Component {
         {this.props.event.map((item, i) => (
           <React.Fragment key={i}>
             <Grid
-              style={{ cursor: 'pointer', color: 'blue' }}
+              style={{ cursor: 'pointer' }}
               mt={3}
               onClick={this.props.openModal.bind(
                 this,
