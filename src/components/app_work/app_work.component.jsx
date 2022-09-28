@@ -271,7 +271,7 @@ class AppWork_ extends React.Component {
 
   async saveNew() {
 
-    let itemsNew = this.state.itemsEdit
+    let itemsNew = this.state.itemsNew
 
     itemsNew.item.type_new = this.state.itemsNew.item.type_new.id
     itemsNew.item.app_id = this.state.itemsNew.item.app_id.id
