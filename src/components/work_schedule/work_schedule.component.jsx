@@ -215,6 +215,807 @@ class HeaderItem extends React.Component {
   }
 }
 
+class WorkSchedule_Table extends React.Component {
+  shouldComponentUpdate(nextProps) {
+
+    // console.log(nextProps); // какие именно массивы данных сравнивать ?
+
+    // var array1 = nextProps.event;
+    // var array2 = this.props.event;
+
+    // var is_same =
+    //   array1.length == array2.length &&
+    //   array1.every(function (element, index) {
+    //     return element === array2[index];
+    //   });
+
+    // return !is_same;
+    return true;
+  }
+
+  render() {
+    return (
+      <Box sx={{ width: '100%' }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={this.props.tabTable} onChange={ this.props.onChange.bind(this) } centered >
+          <Tab label="С 1 по 15 числа" {...a11yProps(0)} />
+          <Tab label="С 16 по конец месяца" {...a11yProps(1)} />
+        </Tabs>
+      </Box>
+      <TabPanel value={this.props.tabTable} index={0}>
+        { !this.props.one ? null :
+          <TableContainer component={Paper}>
+            <Table id="table_graph_one">
+              
+              <TableBody>
+                
+                { this.props.test_one.map( (item, key) =>
+                  item.row == 'header' ?
+                    <HeaderItem key={key} bonus_other={this.props.one.bonus_other} changeLVDir={this.props.changeLVDir.bind(this)} changeDopBonus={this.props.changeDopBonus.bind(this)} kind={this.props.kind} show_zp={this.props.show_zp_one} lv_dir={this.props.lv_dir} lv_cafe={this.props.lv_cafe} dataKey={key} days={this.props.one.days} item={item} />
+                      :
+                    <TableRow key={key}>
+                      <TableCell className='name_pinning' onClick={ this.props.openM.bind(this, item.data) }>{item.data.user_name}</TableCell>
+                      <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
+
+                      { this.props.kind == 'manager' ? null :
+                        <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer', display: 'block', margin: 'auto' }} 
+                        onClick={this.props.onClick.bind(this)} /> </TableCell>
+                      }
+
+                      { item.data.dates.map( (date, date_k) =>
+                        <TableCell onClick={ this.props.openH.bind(this, item.data, date.date) } className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff', cursor: 'pointer' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
+                      ) }
+                      
+                      { this.props.kind == 'manager' ? null :
+                        <>
+                          <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}  onClick={this.props.onClick2.bind(this)}>{item.data.price_p_h}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
+
+                          { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
+                            <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
+                              :
+                            null
+                          }
+
+                          {item.data.app_type == 'driver' ?
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                              :
+                            <TableCell style={{textAlign: 'center'}} onClick={this.props.openZP.bind(this, item.data.id, item.data.smena_id, item.data.app_id, 1, item.data)}>{item.data.given}</TableCell>
+                          }
+                          
+                        </>
+                      }
+                    </TableRow>
+                ) }
+                
+                
+              </TableBody>
+              
+              <TableFooter sx={{ '& td': { color: 'rgba(0, 0, 0, 0.87)'  } }}>
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.one.bonus.map( (item, key) => 
+                    <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_dop_bonus_price}</TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_h_price}</TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_err_price}</TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_bonus_price}</TableCell>
+
+                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
+                        <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_to_given_price}</TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_given_price}</TableCell>
+                    </>
+                  }
+
+                </TableRow>
+                
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell>Роллов</TableCell>
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.one.bonus.map( (item, key) => 
+                    <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
+                        <TableCell style={{textAlign: 'center'}}></TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                    </>
+                  }
+
+                </TableRow>
+                
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell>Пиццы</TableCell>
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.one.bonus.map( (item, key) => 
+                    <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
+                        <TableCell style={{textAlign: 'center'}}></TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                    </>
+                  }
+                </TableRow>
+                
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell className="min_size">Заказы готовились больше 40 минут</TableCell>
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.one.order_stat.map( (item, key) => 
+                    <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
+                        <TableCell style={{textAlign: 'center'}}></TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                    </>
+                  }
+                </TableRow>
+                
+              </TableFooter>
+              
+              
+            </Table>
+          </TableContainer>
+        }
+      </TabPanel>
+      <TabPanel value={this.props.tabTable} index={1}>
+        { !this.props.two ? null :
+          <TableContainer component={Paper}>
+            <Table id="table_graph_two">
+              
+              <TableBody>
+                
+                { this.props.test_two.map( (item, key) =>
+                  item.row == 'header' ?
+                    <HeaderItem bonus_other={this.props.two.bonus_other} changeLVDir={this.props.changeLVDir.bind(this)} changeDopBonus={this.props.changeDopBonus.bind(this)} key={key} kind={this.props.kind} show_zp={this.props.show_zp_two} lv_dir={this.props.lv_dir} lv_cafe={this.props.lv_cafe} dataKey={key} days={this.props.two.days} item={item} />
+                      :
+                    <TableRow key={key}>
+                      <TableCell className='name_pinning' onClick={ this.props.openM.bind(this, item.data) }>{item.data.user_name}</TableCell>
+                      <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
+
+                      { this.props.kind == 'manager' ? null :
+                        <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer', display: 'block', margin: 'auto'}}  onClick={this.props.onClick.bind(this)} /> </TableCell>
+                      }
+
+                      { item.data.dates.map( (date, date_k) =>
+                        <TableCell onClick={ this.props.openH.bind(this, item.data, date.date) } className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff', cursor: 'pointer' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
+                      ) }
+                      
+                      { this.props.kind == 'manager' ? null :
+                        <>
+                          <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}  onClick={this.props.onClick2.bind(this)}>{item.data.price_p_h}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
+                          
+                          { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
+                            <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
+                              :
+                            null
+                          }
+
+                          {item.data.app_type == 'driver' ?
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                              :
+                            <TableCell style={{textAlign: 'center'}} onClick={this.props.openZP.bind(this, item.data.id, item.data.smena_id, item.data.app_id, 2, item.data)}>{item.data.given}</TableCell>
+                          }
+                        </>
+                      }
+                    </TableRow>
+                ) }
+                
+                
+              </TableBody>
+              
+              <TableFooter sx={{ '& td': { color: 'rgba(0, 0, 0, 0.87)'  } }}>
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.two.bonus.map( (item, key) => 
+                    <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_dop_bonus_price}</TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_h_price}</TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_err_price}</TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_bonus_price}</TableCell>
+
+                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
+                        <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_to_given_price}</TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_given_price}</TableCell>
+                    </>
+                  }
+                </TableRow>
+                
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell>Роллов</TableCell>
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.two.bonus.map( (item, key) => 
+                    <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
+                        <TableCell style={{textAlign: 'center'}}></TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                    </>
+                  }
+                </TableRow>
+                
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell>Пиццы</TableCell>
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.two.bonus.map( (item, key) => 
+                    <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
+                        <TableCell style={{textAlign: 'center'}}></TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                    </>
+                  }
+                </TableRow>
+                
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell className="min_size">Заказы готовились больше 40 минут</TableCell>
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.two.order_stat.map( (item, key) => 
+                    <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
+                        <TableCell style={{textAlign: 'center'}}></TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                    </>
+                  }
+                </TableRow>
+                
+              </TableFooter>
+              
+              
+            </Table>
+          </TableContainer>
+        }
+      </TabPanel>
+      
+    </Box>
+    );
+  }
+}
+
+class WorkSchedule_Table_without_functions extends React.Component {
+  shouldComponentUpdate(nextProps) {
+
+    // console.log(nextProps); // какие именно массивы данных сравнивать ?
+
+    // var array1 = nextProps.event;
+    // var array2 = this.props.event;
+
+    // var is_same =
+    //   array1.length == array2.length &&
+    //   array1.every(function (element, index) {
+    //     return element === array2[index];
+    //   });
+
+    // return !is_same;
+    return true;
+  }
+
+  render() {
+    return (
+      <Box sx={{ width: '100%' }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={this.props.tabTable} centered >
+          <Tab label="С 1 по 15 числа" {...a11yProps(0)} />
+          <Tab label="С 16 по конец месяца" {...a11yProps(1)} />
+        </Tabs>
+      </Box>
+      <TabPanel value={this.props.tabTable} index={0}>
+        { !this.props.one ? null :
+          <TableContainer component={Paper}>
+            <Table id="table_graph_one">
+              
+              <TableBody>
+                
+                { this.props.test_one.map( (item, key) =>
+                  item.row == 'header' ?
+                    <HeaderItem key={key} bonus_other={this.props.one.bonus_other} show_zp={this.props.show_zp_one} lv_dir={this.props.lv_dir} lv_cafe={this.props.lv_cafe} dataKey={key} days={this.props.one.days} item={item} />
+                      :
+                    <TableRow key={key}>
+                      <TableCell className='name_pinning'>{item.data.user_name}</TableCell>
+                      <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
+
+                      { this.props.kind == 'manager' ? null :
+                        <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer', display: 'block', margin: 'auto' }} /> </TableCell>
+                      }
+
+                      { item.data.dates.map( (date, date_k) =>
+                        <TableCell className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff', cursor: 'pointer' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
+                      ) }
+                      
+                      { this.props.kind == 'manager' ? null :
+                        <>
+                          <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}>{item.data.price_p_h}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
+
+                          { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
+                            <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
+                              :
+                            null
+                          }
+
+                          {item.data.app_type == 'driver' ?
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                              :
+                            <TableCell style={{textAlign: 'center'}}>{item.data.given}</TableCell>
+                          }
+                          
+                        </>
+                      }
+                    </TableRow>
+                ) }
+                
+                
+              </TableBody>
+              
+              <TableFooter sx={{ '& td': { color: 'rgba(0, 0, 0, 0.87)'  } }}>
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.one.bonus.map( (item, key) => 
+                    <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_dop_bonus_price}</TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_h_price}</TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_err_price}</TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_bonus_price}</TableCell>
+
+                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
+                        <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_to_given_price}</TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_given_price}</TableCell>
+                    </>
+                  }
+
+                </TableRow>
+                
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell>Роллов</TableCell>
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.one.bonus.map( (item, key) => 
+                    <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
+                        <TableCell style={{textAlign: 'center'}}></TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                    </>
+                  }
+
+                </TableRow>
+                
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell>Пиццы</TableCell>
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.one.bonus.map( (item, key) => 
+                    <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
+                        <TableCell style={{textAlign: 'center'}}></TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                    </>
+                  }
+                </TableRow>
+                
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell className="min_size">Заказы готовились больше 40 минут</TableCell>
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.one.order_stat.map( (item, key) => 
+                    <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
+                        <TableCell style={{textAlign: 'center'}}></TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                    </>
+                  }
+                </TableRow>
+                
+              </TableFooter>
+              
+              
+            </Table>
+          </TableContainer>
+        }
+      </TabPanel>
+      <TabPanel value={this.props.tabTable} index={1}>
+        { !this.props.two ? null :
+          <TableContainer component={Paper}>
+            <Table id="table_graph_two">
+              
+              <TableBody>
+                
+                { this.props.test_two.map( (item, key) =>
+                  item.row == 'header' ?
+                    <HeaderItem bonus_other={this.props.two.bonus_other} key={key} kind={this.props.kind} show_zp={this.props.show_zp_two} lv_dir={this.props.lv_dir} lv_cafe={this.props.lv_cafe} dataKey={key} days={this.props.two.days} item={item} />
+                      :
+                    <TableRow key={key}>
+                      <TableCell className='name_pinning'>{item.data.user_name}</TableCell>
+                      <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
+
+                      { this.props.kind == 'manager' ? null :
+                        <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer', display: 'block', margin: 'auto'}} /> </TableCell>
+                      }
+
+                      { item.data.dates.map( (date, date_k) =>
+                        <TableCell className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff', cursor: 'pointer' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
+                      ) }
+                      
+                      { this.props.kind == 'manager' ? null :
+                        <>
+                          <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}>{item.data.price_p_h}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
+                          <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
+                          
+                          { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
+                            <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
+                              :
+                            null
+                          }
+
+                          {item.data.app_type == 'driver' ?
+                            <TableCell style={{textAlign: 'center'}}></TableCell>
+                              :
+                            <TableCell style={{textAlign: 'center'}}>{item.data.given}</TableCell>
+                          }
+                        </>
+                      }
+                    </TableRow>
+                ) }
+                
+                
+              </TableBody>
+              
+              <TableFooter sx={{ '& td': { color: 'rgba(0, 0, 0, 0.87)'  } }}>
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.two.bonus.map( (item, key) => 
+                    <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_dop_bonus_price}</TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_h_price}</TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_err_price}</TableCell>
+                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_bonus_price}</TableCell>
+
+                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
+                        <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_to_given_price}</TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_given_price}</TableCell>
+                    </>
+                  }
+                </TableRow>
+                
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell>Роллов</TableCell>
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.two.bonus.map( (item, key) => 
+                    <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
+                        <TableCell style={{textAlign: 'center'}}></TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                    </>
+                  }
+                </TableRow>
+                
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell>Пиццы</TableCell>
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.two.bonus.map( (item, key) => 
+                    <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
+                        <TableCell style={{textAlign: 'center'}}></TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                    </>
+                  }
+                </TableRow>
+                
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell className="min_size">Заказы готовились больше 40 минут</TableCell>
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <TableCell></TableCell>
+                  }
+                  
+                  {this.props.two.order_stat.map( (item, key) => 
+                    <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
+                  )}
+                  
+                  { this.props.kind == 'manager' ? null :
+                    <>
+                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+
+                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
+                        <TableCell style={{textAlign: 'center'}}></TableCell>
+                          :
+                        null
+                      }
+
+                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                    </>
+                  }
+                </TableRow>
+                
+              </TableFooter>
+              
+              
+            </Table>
+          </TableContainer>
+        }
+      </TabPanel>
+      
+    </Box>
+    );
+  }
+}
+
 class WorkSchedule_ extends React.Component {
   constructor(props) {
     super(props);
@@ -400,7 +1201,7 @@ class WorkSchedule_ extends React.Component {
     
     let res = await this.getData('get_graph', data);
     
-    console.log( res )
+    // console.log( res )
     
     this.setState({
       one: res.date.one,
@@ -419,7 +1220,7 @@ class WorkSchedule_ extends React.Component {
   }
   
   async openH(item, this_date){
-    console.log( item )
+    // console.log( item )
     
     let data = {
       smena_id: item.smena_id,
@@ -431,7 +1232,7 @@ class WorkSchedule_ extends React.Component {
     
     let res = await this.getData('get_user_day', data);
     
-    console.log( res )
+    // console.log( res )
     
     this.setState({
       isOpenModalH: true,
@@ -442,7 +1243,7 @@ class WorkSchedule_ extends React.Component {
   }
 
   async openM(item){
-    console.log( item )
+    // console.log( item )
     
     let data = {
       smena_id: item.smena_id,
@@ -454,7 +1255,7 @@ class WorkSchedule_ extends React.Component {
     
     let res = await this.getData('get_user_month', data);
     
-    console.log( res )
+    // console.log( res )
     
     this.setState({
       isOpenModalM: true,
@@ -548,7 +1349,7 @@ class WorkSchedule_ extends React.Component {
     
     let res = await this.getData('save_fastTime', data);
     
-    console.log( res );
+    // console.log( res );
 
     if( res['st'] == true ){
       this.setState({
@@ -605,7 +1406,7 @@ class WorkSchedule_ extends React.Component {
     
     let res = await this.getData('save_userPriceH', data);
     
-    console.log( res );
+    // console.log( res );
 
     if( res['st'] == true ){
       this.setState({
@@ -637,7 +1438,7 @@ class WorkSchedule_ extends React.Component {
     
     let res = await this.getData('save_fastPoint', data);
     
-    console.log( res );
+    // console.log( res );
 
     if( res['st'] == true ){
       this.setState({
@@ -676,7 +1477,7 @@ class WorkSchedule_ extends React.Component {
     
     let res = await this.getData('save_dir_lv', data);
     
-    console.log( res );
+    // console.log( res );
 
     if( res['st'] == true ){
       this.setState({
@@ -713,7 +1514,7 @@ class WorkSchedule_ extends React.Component {
     
     let res = await this.getData('save_dop_bonus', data);
     
-    console.log( res );
+    // console.log( res );
 
     if( res['st'] == true ){
       this.setState({
@@ -819,7 +1620,7 @@ class WorkSchedule_ extends React.Component {
     
     let res = await this.getData('save_user_month', data);
     
-    console.log( res );
+    // console.log( res );
 
     if( res['st'] == true ){
       this.setState({
@@ -837,7 +1638,7 @@ class WorkSchedule_ extends React.Component {
   }
 
   openZP(user_id, smena_id, app_id, part, user){
-    console.log(user)
+    // console.log(user)
 
     let fullPrice = parseInt(user.h_price) + parseInt(user.my_bonus) + parseInt(user.dop_bonus) - parseInt(user.err_price);
 
@@ -867,7 +1668,7 @@ class WorkSchedule_ extends React.Component {
 
     let res = await this.getData('save_user_give_price', data);
     
-    console.log( res );
+    // console.log( res );
 
     if( res['st'] == true ){
       this.setState({
@@ -1123,7 +1924,7 @@ class WorkSchedule_ extends React.Component {
             <DialogTitle id="scroll-dialog-title">{this.state.userInfo.user.app_name + ' ' + this.state.userInfo.user.user_name + ' ' + this.state.userInfo.date}</DialogTitle>
             <DialogContent>
               
-              <Typography style={{ marginBottom: 10 }}>{'Моя нагрузка: ' + this.state.userInfo.user.my_load_h + ' / Средняя нагрузка: ' + this.state.userInfo.user.all_load_h}</Typography>
+              <Typography style={{ marginBottom: 10 }}>{'Нагрузка: ' + this.state.userInfo.user.my_load_h + ' / Средняя нагрузка: ' + this.state.userInfo.user.all_load_h}</Typography>
               { this.state.show_bonus === false ? null :
                 <Typography style={{ marginBottom: 20 }}>{'Бонус: ' + this.state.userInfo.user.bonus}</Typography>
               }
@@ -1137,7 +1938,7 @@ class WorkSchedule_ extends React.Component {
               }
               
               <Accordion 
-                style={{ marginTop: 10 }} 
+                style={{ marginTop: 20 }} 
                 expanded={this.state.openNewTimeAdd} 
                 onChange={ () => { this.setState({ openNewTimeAdd: !this.state.openNewTimeAdd }) } }>
                   
@@ -1150,9 +1951,12 @@ class WorkSchedule_ extends React.Component {
                 <AccordionDetails style={{ display: 'flex', flexDirection: 'row' }}>
                   
                   <MyTimePicker value={this.state.newTimeStart} func={ (event) => { this.setState({ newTimeStart: event.target.value }) } } label='Время начала работы' />
+                  <Typography width={'3%'}></Typography>
                   <MyTimePicker value={this.state.newTimeEnd} func={ (event) => { this.setState({ newTimeEnd: event.target.value }) } } label='Время окончания работы' />
+                  <Typography width={'3%'}></Typography>
+                  <Button style={{ minWidth: '12%', backgroundColor: 'red', color: '#fff', cursor: 'pointer' }} onClick={ this.addTime.bind(this) }>Добавить</Button>
                   
-                  <AddIcon style={{ minWidth: 50, minHeight: 38, cursor: 'pointer' }} onClick={ this.addTime.bind(this) } />
+                  {/* <AddIcon style={{ minWidth: 50, minHeight: 38, cursor: 'pointer' }} onClick={ this.addTime.bind(this) } /> */}
                   
                 </AccordionDetails>
               </Accordion>  
@@ -1167,18 +1971,19 @@ class WorkSchedule_ extends React.Component {
                   </AccordionSummary>
                   <AccordionDetails style={{ display: 'flex', flexDirection: 'row' }}>
                     <MyTimePicker value={item.time_start} func={ this.changeHourse.bind(this, 'time_start', key) } label='Время начала работы' />
+                    <Typography width={'3%'}></Typography>
                     <MyTimePicker value={item.time_end} func={ this.changeHourse.bind(this, 'time_end', key) } label='Время окончания работы' />
                   </AccordionDetails>
                 </Accordion>  
               ) }
               
-              
+              {!this.state.userInfo.hist.length ? null :
               <Accordion style={{ marginTop: 50 }} disabled>
                 <AccordionSummary>
                   <Typography>История</Typography>
                 </AccordionSummary>
               </Accordion>  
-              
+              }
               { this.state.userInfo.hist.map( (item, key) =>
                 <Accordion key={key}>
                   <AccordionSummary>
@@ -1291,386 +2096,39 @@ class WorkSchedule_ extends React.Component {
             <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
           </Grid>
           
-            
-              
-          <Box sx={{ width: '100%' }}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <Tabs value={this.state.tabTable} onChange={ (event, data) => { this.setState({ tabTable: data }) } } centered >
-                <Tab label="С 1 по 15 числа" {...a11yProps(0)} />
-                <Tab label="С 16 по конец месяца" {...a11yProps(1)} />
-              </Tabs>
-            </Box>
-            <TabPanel value={this.state.tabTable} index={0}>
-              { !this.state.one ? null :
-                <TableContainer component={Paper}>
-                  <Table id="table_graph_one">
-                    
-                    <TableBody>
-                      
-                      { this.state.test_one.map( (item, key) =>
-                        item.row == 'header' ?
-                          <HeaderItem key={key} bonus_other={this.state.one.bonus_other} changeLVDir={this.changeLVDir.bind(this)} changeDopBonus={this.changeDopBonus.bind(this)} kind={this.state.kind} show_zp={this.state.show_zp_one} lv_dir={this.state.lv_dir} lv_cafe={this.state.lv_cafe} dataKey={key} days={this.state.one.days} item={item} />
-                            :
-                          <TableRow key={key}>
-                            <TableCell className='name_pinning' onClick={ this.openM.bind(this, item.data) }>{item.data.user_name}</TableCell>
-                            <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
+          <WorkSchedule_Table 
+            tabTable={this.state.tabTable}
+            one={this.state.one}
+            test_one={this.state.test_one}
+            kind={this.state.kind}
+            show_zp_one={this.state.show_zp_one}
+            lv_dir={this.state.lv_dir}
+            lv_cafe={this.state.lv_cafe}
+            two={this.state.two}
+            test_two={this.state.test_two}
+            show_zp_two={this.state.show_zp_two}
+            changeLVDir={this.changeLVDir.bind(this)} 
+            changeDopBonus={this.changeDopBonus.bind(this)}
+            openM={this.openM.bind(this)}
+            openH={this.openH.bind(this)}
+            openZP={this.openZP.bind(this)}
+            onChange={ (event, data) => { this.setState({ tabTable: data }) } }
+            onClick={ () => { this.setState({ mainMenu: true, chooseUser: item.data }) } }
+            onClick2={ () => {this.setState({ mainMenuPrice: true, chooseUser: item.data }) } }
+          />
 
-                            { this.state.kind == 'manager' ? null :
-                              <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer' }} onClick={ () => { this.setState({ mainMenu: true, chooseUser: item.data }) } } /> </TableCell>
-                            }
-
-                            { item.data.dates.map( (date, date_k) =>
-                              <TableCell onClick={ this.openH.bind(this, item.data, date.date) } className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff', cursor: 'pointer' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
-                            ) }
-                            
-                            { this.state.kind == 'manager' ? null :
-                              <>
-                                <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}} onClick={ () => {this.setState({ mainMenuPrice: true, chooseUser: item.data }) } }>{item.data.price_p_h}</TableCell>
-                                <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
-                                <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
-                                <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
-                                <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
-
-                                { this.state.show_zp_one == 1 || this.state.show_zp_one == 0 ?
-                                  <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
-                                    :
-                                  null
-                                }
-
-                                {item.data.app_type == 'driver' ?
-                                  <TableCell style={{textAlign: 'center'}}></TableCell>
-                                    :
-                                  <TableCell style={{textAlign: 'center'}} onClick={this.openZP.bind(this, item.data.id, item.data.smena_id, item.data.app_id, 1, item.data)}>{item.data.given}</TableCell>
-                                }
-                                
-                              </>
-                            }
-                          </TableRow>
-                      ) }
-                      
-                      
-                    </TableBody>
-                    
-                    <TableFooter>
-                      <TableRow>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
-
-                        { this.state.kind == 'manager' ? null :
-                          <TableCell></TableCell>
-                        }
-                        
-                        {this.state.one.bonus.map( (item, key) => 
-                          <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
-                        )}
-                        
-                        { this.state.kind == 'manager' ? null :
-                          <>
-                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{this.state.one.other_summ.sum_dop_bonus_price}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{this.state.one.other_summ.sum_h_price}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{this.state.one.other_summ.sum_err_price}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{this.state.one.other_summ.sum_bonus_price}</TableCell>
-
-                            { this.state.show_zp_one == 1 || this.state.show_zp_one == 0 ?
-                              <TableCell style={{textAlign: 'center'}}>{this.state.one.other_summ.sum_to_given_price}</TableCell>
-                                :
-                              null
-                            }
-
-                            <TableCell style={{textAlign: 'center'}}>{this.state.one.other_summ.sum_given_price}</TableCell>
-                          </>
-                        }
-
-                      </TableRow>
-                      
-                      <TableRow>
-                        <TableCell></TableCell>
-                        <TableCell>Роллов</TableCell>
-                        
-                        { this.state.kind == 'manager' ? null :
-                          <TableCell></TableCell>
-                        }
-                        
-                        {this.state.one.bonus.map( (item, key) => 
-                          <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
-                        )}
-                        
-                        { this.state.kind == 'manager' ? null :
-                          <>
-                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-
-                            { this.state.show_zp_one == 1 || this.state.show_zp_one == 0 ?
-                              <TableCell style={{textAlign: 'center'}}></TableCell>
-                                :
-                              null
-                            }
-
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                          </>
-                        }
-
-                      </TableRow>
-                      
-                      <TableRow>
-                        <TableCell></TableCell>
-                        <TableCell>Пиццы</TableCell>
-                        
-                        { this.state.kind == 'manager' ? null :
-                          <TableCell></TableCell>
-                        }
-                        
-                        {this.state.one.bonus.map( (item, key) => 
-                          <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
-                        )}
-                        
-                        { this.state.kind == 'manager' ? null :
-                          <>
-                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-
-                            { this.state.show_zp_one == 1 || this.state.show_zp_one == 0 ?
-                              <TableCell style={{textAlign: 'center'}}></TableCell>
-                                :
-                              null
-                            }
-
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                          </>
-                        }
-                      </TableRow>
-                      
-                      <TableRow>
-                        <TableCell></TableCell>
-                        <TableCell className="min_size">Заказы готовились больше 40 минут</TableCell>
-                        
-                        { this.state.kind == 'manager' ? null :
-                          <TableCell></TableCell>
-                        }
-                        
-                        {this.state.one.order_stat.map( (item, key) => 
-                          <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
-                        )}
-                        
-                        { this.state.kind == 'manager' ? null :
-                          <>
-                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-
-                            { this.state.show_zp_one == 1 || this.state.show_zp_one == 0 ?
-                              <TableCell style={{textAlign: 'center'}}></TableCell>
-                                :
-                              null
-                            }
-
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                          </>
-                        }
-                      </TableRow>
-                      
-                    </TableFooter>
-                    
-                    
-                  </Table>
-                </TableContainer>
-              }
-            </TabPanel>
-            <TabPanel value={this.state.tabTable} index={1}>
-              { !this.state.two ? null :
-                <TableContainer component={Paper}>
-                  <Table id="table_graph_two">
-                    
-                    <TableBody>
-                      
-                      { this.state.test_two.map( (item, key) =>
-                        item.row == 'header' ?
-                          <HeaderItem bonus_other={this.state.two.bonus_other} changeLVDir={this.changeLVDir.bind(this)} changeDopBonus={this.changeDopBonus.bind(this)} key={key} kind={this.state.kind} show_zp={this.state.show_zp_two} lv_dir={this.state.lv_dir} lv_cafe={this.state.lv_cafe} dataKey={key} days={this.state.two.days} item={item} />
-                            :
-                          <TableRow key={key}>
-                            <TableCell className='name_pinning' onClick={ this.openM.bind(this, item.data) }>{item.data.user_name}</TableCell>
-                            <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
-
-                            { this.state.kind == 'manager' ? null :
-                              <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer' }} onClick={ () => { this.setState({ mainMenu: true, chooseUser: item.data }) } } /> </TableCell>
-                            }
-
-                            { item.data.dates.map( (date, date_k) =>
-                              <TableCell onClick={ this.openH.bind(this, item.data, date.date) } className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff', cursor: 'pointer' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
-                            ) }
-                            
-                            { this.state.kind == 'manager' ? null :
-                              <>
-                                <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}} onClick={ () => {this.setState({ mainMenuPrice: true, chooseUser: item.data }) } }>{item.data.price_p_h}</TableCell>
-                                <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
-                                <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
-                                <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
-                                <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
-                                
-                                { this.state.show_zp_two == 1 || this.state.show_zp_two == 0 ?
-                                  <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
-                                    :
-                                  null
-                                }
-
-                                {item.data.app_type == 'driver' ?
-                                  <TableCell style={{textAlign: 'center'}}></TableCell>
-                                    :
-                                  <TableCell style={{textAlign: 'center'}} onClick={this.openZP.bind(this, item.data.id, item.data.smena_id, item.data.app_id, 2, item.data)}>{item.data.given}</TableCell>
-                                }
-                              </>
-                            }
-                          </TableRow>
-                      ) }
-                      
-                      
-                    </TableBody>
-                    
-                    <TableFooter>
-                      <TableRow>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
-                        
-                        { this.state.kind == 'manager' ? null :
-                          <TableCell></TableCell>
-                        }
-                        
-                        {this.state.two.bonus.map( (item, key) => 
-                          <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
-                        )}
-                        
-                        { this.state.kind == 'manager' ? null :
-                          <>
-                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{this.state.two.other_summ.sum_dop_bonus_price}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{this.state.two.other_summ.sum_h_price}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{this.state.two.other_summ.sum_err_price}</TableCell>
-                            <TableCell style={{textAlign: 'center'}}>{this.state.two.other_summ.sum_bonus_price}</TableCell>
-
-                            { this.state.show_zp_two == 1 || this.state.show_zp_two == 0 ?
-                              <TableCell style={{textAlign: 'center'}}>{this.state.two.other_summ.sum_to_given_price}</TableCell>
-                                :
-                              null
-                            }
-
-                            <TableCell style={{textAlign: 'center'}}>{this.state.two.other_summ.sum_given_price}</TableCell>
-                          </>
-                        }
-                      </TableRow>
-                      
-                      <TableRow>
-                        <TableCell></TableCell>
-                        <TableCell>Роллов</TableCell>
-                        
-                        { this.state.kind == 'manager' ? null :
-                          <TableCell></TableCell>
-                        }
-                        
-                        {this.state.two.bonus.map( (item, key) => 
-                          <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
-                        )}
-                        
-                        { this.state.kind == 'manager' ? null :
-                          <>
-                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-
-                            { this.state.show_zp_two == 1 || this.state.show_zp_two == 0 ?
-                              <TableCell style={{textAlign: 'center'}}></TableCell>
-                                :
-                              null
-                            }
-
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                          </>
-                        }
-                      </TableRow>
-                      
-                      <TableRow>
-                        <TableCell></TableCell>
-                        <TableCell>Пиццы</TableCell>
-                        
-                        { this.state.kind == 'manager' ? null :
-                          <TableCell></TableCell>
-                        }
-                        
-                        {this.state.two.bonus.map( (item, key) => 
-                          <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
-                        )}
-                        
-                        { this.state.kind == 'manager' ? null :
-                          <>
-                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-
-                            { this.state.show_zp_two == 1 || this.state.show_zp_two == 0 ?
-                              <TableCell style={{textAlign: 'center'}}></TableCell>
-                                :
-                              null
-                            }
-
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                          </>
-                        }
-                      </TableRow>
-                      
-                      <TableRow>
-                        <TableCell></TableCell>
-                        <TableCell className="min_size">Заказы готовились больше 40 минут</TableCell>
-                        
-                        { this.state.kind == 'manager' ? null :
-                          <TableCell></TableCell>
-                        }
-                        
-                        {this.state.two.order_stat.map( (item, key) => 
-                          <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
-                        )}
-                        
-                        { this.state.kind == 'manager' ? null :
-                          <>
-                            <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-
-                            { this.state.show_zp_two == 1 || this.state.show_zp_two == 0 ?
-                              <TableCell style={{textAlign: 'center'}}></TableCell>
-                                :
-                              null
-                            }
-
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                          </>
-                        }
-                      </TableRow>
-                      
-                    </TableFooter>
-                    
-                    
-                  </Table>
-                </TableContainer>
-              }
-            </TabPanel>
-            
-          </Box>
-          
-          
+          {/* <WorkSchedule_Table_without_functions
+            tabTable={this.state.tabTable}
+            one={this.state.one}
+            test_one={this.state.test_one}
+            kind={this.state.kind}
+            show_zp_one={this.state.show_zp_one}
+            lv_dir={this.state.lv_dir}
+            lv_cafe={this.state.lv_cafe}
+            two={this.state.two}
+            test_two={this.state.test_two}
+            show_zp_two={this.state.show_zp_two}
+          /> */}
           
         </Grid>
       </>
