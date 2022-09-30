@@ -411,19 +411,36 @@ class SiteItems_ extends React.Component {
     // todo
     if(res.item_pf.stage_1){
 			res.item_pf.stage_1.map(function(item){    
-        items_pf_stages_1.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'], type: item['type'] }); 
+        console.log('open_type='+item['type']);
+
+        // правка от 30.09.22
+        if(item['type'] == 'rec'){
+          items_pf_stages_1.push({item_id: item['rec_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'], type: item['type'] }); 
+        } else{
+          items_pf_stages_1.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'], type: item['type'] }); 
+        }
       })
 		}
 
 		if(res.item_pf.stage_2){
 			res.item_pf.stage_2.map(function(item){
-				items_pf_stages_2.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'] , type: item['type'] });
-			})
+         // правка от 30.09.22
+        if(item['type'] == 'rec'){
+          items_pf_stages_2.push({item_id: item['rec_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'] , type: item['type'] });
+        } else {
+				  items_pf_stages_2.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'] , type: item['type'] });
+        }
+      })
 		}
 		if(res.item_pf.stage_3){
 			res.item_pf.stage_3.map(function(item){
-				items_pf_stages_3.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'], type: item['type'] });
-			})
+         // правка от 30.09.22
+        if(item['type'] == 'rec'){
+          items_pf_stages_3.push({item_id: item['rec_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'], type: item['type'] });
+        } else {
+				  items_pf_stages_3.push({item_id: item['pf_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name'], type: item['type'] });
+        }
+      })
 		}
 
 		
@@ -579,16 +596,28 @@ class SiteItems_ extends React.Component {
     let type = this.state.openMenuitem.storage_id ? 'pf' : 'rec';
    
     console.log('type=', this.state.openMenuitem.type);
+    console.log('test=');
 
     // todo
    if( this.state.openMenuitem.type == 'rec' ){
    // if( type == 'rec' ){
       let check = false;
 
-      let rec = stage == 1 ? this.state.rec_stage_1 : stage == 2 ? this.state.rec_stage_2 : stage == 3 ? this.state.rec_stage_3 : [];
+      // почему то код не работает !!
+     // let rec = stage == 1 ? this.state.rec_stage_1 : stage == 2 ? this.state.rec_stage_2 : stage == 3 ? this.state.rec_stage_3 : [];
+     let rec = [];
+     if(stage == 1){
+        rec =  this.state.rec_stage_1 ;
+      } else if(stage == 2 ){
+        rec = this.state.rec_stage_2 ;
+      } else if(stage == 3 ){
+        rec = this.state.rec_stage_3 ;
+      }
 
-      rec = rec ? rec : [];	
-      
+      //rec = rec ? rec : [];	
+      console.log('rec_add=', rec);
+      console.log('pf_stage_1=',  this.state.pf_stage_1)
+   
       rec.map((this_item) => {
         if(parseInt(this.state.openMenuitem.id) == parseInt(this_item.item_id)) {
           console.log('check ok=', this_item.item_id);
@@ -596,15 +625,32 @@ class SiteItems_ extends React.Component {
         }
       })
 
+      console.log('check='+ check);
+
       if( !check ){
 
         console.log( this.state.openMenuitem )
 
-        rec.push({item_id: this.state.openMenuitem.id, name: this.state.openMenuitem.name, count: 0, sort: 0, ei_name: this.state.openMenuitem.ei_name});
-       
+        rec.push({
+          item_id: this.state.openMenuitem.id, 
+          name: this.state.openMenuitem.name,
+          count: 0,
+          sort: 0,
+          ei_name: this.state.openMenuitem.ei_name,
+          type : 'rec'
+        });
+        
+        console.log('stage='+ stage);
+  
         if( stage == 1 ){
-					this.setState({
-						rec_stage_1: rec
+          // todo
+          console.log('add to stage3', rec);
+          let pf = this.state.pf_stage_1;
+          pf.push({item_id: this.state.openMenuitem.id, name: this.state.openMenuitem.name, count: 0, sort: 0, ei_name: this.state.openMenuitem.ei_name});
+          console.log('pf_stage_1', pf);
+          this.setState({
+						rec_stage_1: rec,
+            pf_stage_1: pf  
 					});
 				}
        
@@ -1036,6 +1082,7 @@ class SiteItems_ extends React.Component {
         if(this_item.type == 'pf'){
           pf_1.push(this_item);
         } else{
+          console.log('this_item=',this_item)
           rec_1.push(this_item); 
         }
     })
