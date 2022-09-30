@@ -12,28 +12,29 @@ import TableContainer from '@mui/material/TableContainer';
 
 import Paper from '@mui/material/Paper';
 
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+//import VisibilityIcon from '@mui/icons-material/Visibility';
+//import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
+//import List from '@mui/material/List';
+//import ListItem from '@mui/material/ListItem';
+//import ListItemText from '@mui/material/ListItemText';
 
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
+//import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+//import Accordion from '@mui/material/Accordion';
+//import AccordionSummary from '@mui/material/AccordionSummary';
+//import AccordionDetails from '@mui/material/AccordionDetails';
+//import Typography from '@mui/material/Typography';
+//import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-import Backdrop from '@mui/material/Backdrop';
-import CircularProgress from '@mui/material/CircularProgress';
+//import Backdrop from '@mui/material/Backdrop';
+//import CircularProgress from '@mui/material/CircularProgress';
 
-import IconButton from '@mui/material/IconButton';
+//import IconButton from '@mui/material/IconButton';
+import SaveIcon from '@mui/icons-material/Save';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
@@ -44,6 +45,8 @@ import {
   MyAutocomplite,
   MyTextInput,
 } from '../../stores/elements';
+import { AlignHorizontalLeftRounded } from '@mui/icons-material';
+//import { restore } from 'ignore-styles';
 
 const queryString = require('query-string');
 
@@ -81,11 +84,13 @@ class CheckCheckTable extends React.Component {
             <TableRow>
               <TableCell>#</TableCell>
               <TableCell>Номер заказа</TableCell>
+              <TableCell>Точка</TableCell>
               <TableCell>Тип заказа</TableCell>
               <TableCell>Номер кассы</TableCell>
               <TableCell>Сумма заказа</TableCell>
               <TableCell>Дата/Время заказа</TableCell>
               <TableCell>Найти заказ</TableCell>
+              <TableCell>Сохранить</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -94,17 +99,23 @@ class CheckCheckTable extends React.Component {
                 <TableCell>{key + 1}</TableCell>
                 <TableCell>
                 <MyTextInput
-                    value = {item.number_order}
+                    value = {item.order_id}
                     // func={ this.changeItem.bind(this, 'name_for_vendor') }
                   /> 
                 </TableCell>
+                <TableCell>{item.addr}</TableCell>
                 <TableCell>{item.type}</TableCell>
-                <TableCell>{item.order_box}</TableCell>
+                <TableCell>{item.kassa}</TableCell>
                 <TableCell>{item.sum}</TableCell>
-                <TableCell>{item.date_order}</TableCell>
+                <TableCell>{item.date} {item.time}</TableCell>
                 <TableCell>
-                  <Button onClick={this.props.openOrder.bind(this, item.id)}>
+                  <Button onClick={this.props.openModal.bind(this, item.sum, item.date, key, item.point_id  )}>
                     <OpenInNewIcon className="icon" />
+                  </Button>
+                </TableCell>
+                <TableCell>
+                  <Button onClick={this.props.saveOrder.bind(this, item.id, item.order_id, item.point_id  )}>
+                    <SaveIcon className="icon" />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -124,9 +135,11 @@ class CheckModalTable extends React.Component {
     // var is_same = (array1.length == array2.length) && array1.every(function(element, index) {
     //     return element === array2[index];
     // });
-
+    console.log('orders_in', this.props.orders);
     return true;
   }
+
+  
 
   render() {
     return (
@@ -136,6 +149,7 @@ class CheckModalTable extends React.Component {
             <TableRow>
               <TableCell>#</TableCell>
               <TableCell>Номер заказа</TableCell>
+              <TableCell>Точка</TableCell>
               <TableCell>Дата/Время заказа</TableCell>
               <TableCell>Тип заказа</TableCell>
               <TableCell>Сумма заказа</TableCell>
@@ -146,12 +160,13 @@ class CheckModalTable extends React.Component {
             {this.props.orders.map((item, key) => (
               <TableRow key={key}>
                 <TableCell>{key + 1}</TableCell>
-                <TableCell>{item.number}</TableCell>
-                <TableCell>{item.date_order}</TableCell>
+                <TableCell>{item.id}</TableCell>
+                <TableCell>{item.addr}</TableCell>
+                <TableCell>{item.date}</TableCell>
                 <TableCell>{item.type}</TableCell>
                 <TableCell>{item.sum}</TableCell>
                 <TableCell>
-                  <Button onClick={this.props.selectOrder.bind(this, item.id)}>
+                  <Button style={{cursor: 'pointer'}} onClick={this.props.selectOrder.bind(this, item.id)} > 
                     <CheckCircleIcon className="icon" />
                   </Button>
                 </TableCell>
@@ -167,6 +182,10 @@ class CheckModalTable extends React.Component {
 class CheckCheck_ extends React.Component {
   constructor(props) {
     super(props);
+
+    //todo
+    let date_start =  new Date();
+    date_start.setDate(date_start.getDate() - 5);
 
     this.state = {
       module: 'check_check',
@@ -219,22 +238,23 @@ class CheckCheck_ extends React.Component {
         },
       ],
       point_id: 0,
-
+      type : 0,
       select_list: [
         { id: '1', name: 'выгрузить из налоговой' },
-        { id: '2', name: 'очистить для 1с' },
-        { id: '3', name: 'выгрузить для 1с' },
-        { id: '4', name: 'сверить сумму за месяц' },
-        { id: '5', name: 'сверить сумму по дням' },
-        { id: '6', name: 'есть у нас, но нету в налоговой' },
-        { id: '7', name: 'не завершенные заказы' },
-        { id: '8', name: 'очистить для 1с' },
-        { id: '9', name: 'удалить все данные' },
+        { id: '2', name: 'удалить все данные' },
+        { id: '3', name: 'очистить для 1с' },
+        { id: '4', name: 'выгрузить для 1с' },
+        { id: '5', name: 'сверить сумму за месяц' },
+        { id: '6', name: 'сверить сумму по дням' },
+        { id: '7', name: 'есть у нас, но нету в налоговой' },
+        { id: '8', name: 'не завершенные заказы' },
+        { id: '9', name: 'очистить для 1с' },
       ],
 
-      date_start: formatDate(new Date()),
+      date_start: formatDate(date_start),
       date_end: formatDate(new Date()),
 
+      /*
       allOrder: [
         {
           id: '1',
@@ -277,32 +297,72 @@ class CheckCheck_ extends React.Component {
           order_box: '2',
         },
       ],
+      */
+      allOrder: [],
+      orders: [],
       order: {},
 
       modalOrder: false,
 
       number_order: {},
-
-      // cats: [],
-      // allItems: [],- - выгрузить из налоговой
-
-      // vendor_items: [],
-
-      // modalItemEdit: false,
-      // modalItemNew: false,
-
-      // itemEdit: null,
-      // itemName: '',
-
-      // checkArtDialog: false,
-      // checkArtList: [],
-
-      // freeItems: [],
-
-      // searchItem: ''
+     
     };
   }
 
+  getData = (method, data = {}, is_load = true) => {
+    
+    if( is_load == true ){
+      this.setState({
+        is_load: true
+      })
+    }
+    
+    return fetch('https://jacochef.ru/api/index_new.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type':'application/x-www-form-urlencoded'},
+      body: queryString.stringify({
+        method: method, 
+        module: this.state.module,
+        version: 2,
+        login: localStorage.getItem('token'),
+        data: JSON.stringify( data )
+      })
+    }).then(res => res.json()).then(json => {
+      
+      if( json.st === false && json.type == 'redir' ){
+        window.location.pathname = '/';
+        return;
+      }
+      
+      if( json.st === false && json.type == 'auth' ){
+        window.location.pathname = '/auth';
+        return;
+      }
+      
+      setTimeout( () => {
+        this.setState({
+          is_load: false
+        })
+      }, 300 )
+      
+      return json;
+    })
+    .catch(err => { 
+      setTimeout( () => {
+        this.setState({
+          is_load: false
+        })
+      }, 300 )
+      console.log( err )
+    });
+  }
+
+  async componentDidMount(){
+    console.log('test');
+  }
+
+  // функция которая присваивает значение в модуле
   changeSort(type, event, data) {
     // автокомлит для должностей - нужен в этом модуле???
     if (type == 'app_id') {
@@ -327,31 +387,45 @@ class CheckCheck_ extends React.Component {
     });
   }
 
+  // открыть todo
   async openOrder(id) {
-    const res = this.state.allOrder.find((el) => el.id === id);
+    //const res = this.state.allOrder.find((el) => el.id === id);
+    console.log('pointt_id',this.state.point_id);
+    console.log('type',this.state.type);
+    let data = {
+      date_start  : this.state.date_start,
+      date_end    : this.state.date_end,
+      point_id    : this.state.point_id,
+      type        : this.state.type
+    };
 
-    // console.log(res)
+    let res = await this.getData('show', data);
+    if(!res.st){
+      alert(res.text); 
+      return false;
+    }
+    
+    console.log('res_type',res.type);
 
-    // let res = await this.getData('getUser', data);
-
-    // хак для автокомплита
-    // res.user.app_id = res.appointment.find((app) =>
-    //     parseInt(app.id) == parseInt(res.user.app_id));
-
-    this.setState({
-      order: res,
-      // chose_app: res.user.app_id,
-      modalOrder: true,
-    });
-
-    // setTimeout(() => {
-    //     this.sortPoint();
-
-    //     this.myDropzone = new Dropzone("#for_img_edit", this.dropzoneOptions);
-    // }, 300)
+    // отображаем соообщение при удалении
+    if(res.to_del){
+      alert(res.text);
+    }
+    /* */
+    
+    if(res.orders){
+      this.setState({
+        allOrder: res.orders,
+        // chose_app: res.user.app_id,
+        //modalOrder: true,
+      });
+    }
+    
   }
 
-  selectOrder(id) {
+  // выбор заказа в модалке (передача order_id)
+  selectOrder(order_id) {
+    /*
     const number_order = this.state.allOrder;
 
     const res = this.state.allOrder.find((el) => el.id === id);
@@ -359,37 +433,70 @@ class CheckCheck_ extends React.Component {
     number_order.map((el) =>
       this.state.order.id === el.id ? (el.number_order = res.number) : null
     );
-
-    console.log(number_order);
+    */
+    let allOrder = this.state.allOrder;
+    let row_numb = this.state.row_numb;
+  
+    allOrder.map((el, i) => 
+      row_numb === i ?  el.order_id = order_id : 0
+    )
 
     this.setState({
-      allOrder: number_order,
+      allOrder: allOrder,
       // chose_app: res.user.app_id,
       modalOrder: false,
     });
   }
 
+
+  // модалка заказов
+  async openModal(sum, date, row_numb, point_id) {
+    
+    let data = {
+      sum         : sum,
+      point_id    : point_id,
+      date        : date,
+      type        : this.state.type,
+    };
+
+    console.log('modal_data', data)
+    console.log('row_numb', row_numb)
+    let res = await this.getData('find_order', data);
+
+    console.log('res', res)
+    this.setState({
+      modalOrder: true,
+      orders    : res.orders,
+      row_numb : row_numb,
+    });
+  }
+
+ // сохранении order_id
+ async saveOrder(id, order_id, point_id) {
+    let data = {
+      id         : id,
+      order_id   : order_id,
+      point_id   : point_id,
+    };
+
+    console.log('data', data); 
+    let res = await this.getData('saveItem', data);
+
+    if(res.st == true){
+      console.log('save ok'); 
+      this.openOrder();
+      alert('Данные сохранены');
+    } else{
+      console.log('save err'); 
+      alert(res.text);
+    }
+  
+ }
+
   render() {
     return (
       <>
-        {/* <Backdrop 
-        style={{ zIndex: 99 }} 
-        open={this.state.is_load}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop> */}
-
-        {/* <Dialog onClose={ () => { this.setState({ checkArtDialog: false, checkArtList: [] }) } } open={this.state.checkArtDialog}>
-          <DialogTitle>Такой код 1с уже задан у следующих позиций:</DialogTitle>
-          <List sx={{ pt: 0 }}>
-            {this.state.checkArtList.map((item, key) => (
-              <ListItem button onClick={this.chooseArt.bind(this, item.id)} key={key}>
-                <ListItemText primary={item.name} />
-              </ListItem>
-            ))}
-          </List>
-        </Dialog> */}
-
+      
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
@@ -423,15 +530,15 @@ class CheckCheck_ extends React.Component {
           <Grid item xs={12} sm={3}>
             <MySelect
               data={this.state.select_list}
-              value={this.state.select_list.id}
-              // func={ this.changeItem.bind(this, 'app_id') }
+              value={this.state.type}
+              func={ this.changeSort.bind(this, 'type') }
               label="Селект"
             />
           </Grid>
 
           <Grid item xs={12} sm={3}>
             <Button
-              // onClick={this.openNewUser.bind(this)}
+              onClick={this.openOrder.bind(this)}
               variant="contained"
             >
               Выполнить
@@ -442,7 +549,8 @@ class CheckCheck_ extends React.Component {
             {this.state.allOrder.length > 0 ? (
               <CheckCheckTable
                 orders={this.state.allOrder}
-                openOrder={this.openOrder.bind(this)}
+                openModal={this.openModal.bind(this)}
+                saveOrder={this.saveOrder.bind(this)}
               />
             ) : null}
           </Grid>
@@ -461,10 +569,11 @@ class CheckCheck_ extends React.Component {
           <DialogTitle>Заказы</DialogTitle>
           <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             <Grid container spacing={3}>
-              {this.state.allOrder && this.state.modalOrder === true ? (
+              {this.state.orders && this.state.modalOrder === true ? (
                 <CheckModalTable
-                  orders={this.state.allOrder}
+                  orders={this.state.orders}
                   selectOrder={this.selectOrder.bind(this)}
+                  
                 />
               ) : null}
             </Grid>

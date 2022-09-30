@@ -113,8 +113,6 @@ class SiteItemsTable extends React.Component {
   }
 
   render(){
-    console.log( 'render SiteItemsTable' )
-
     return (
       <Grid item xs={12}>
           {this.props.cats.map( (cat, key) =>
@@ -570,6 +568,8 @@ class SiteItems_ extends React.Component {
       openMenuType: type,
       openMenuitem: item
     })
+
+    console.log( item )
   }
 
     // todo
@@ -578,15 +578,20 @@ class SiteItems_ extends React.Component {
     // определаем заготовка или рецепт
     let type = this.state.openMenuitem.storage_id ? 'pf' : 'rec';
    
+    console.log('type=', this.state.openMenuitem.type);
+    console.log('test=');
+
     // todo
-   if( this.state.openMenuType == 'rec' ){
+   if( this.state.openMenuitem.type == 'rec' ){
    // if( type == 'rec' ){
       let check = false;
 
       let rec = stage == 1 ? this.state.rec_stage_1 : stage == 2 ? this.state.rec_stage_2 : stage == 3 ? this.state.rec_stage_3 : [];
 
       rec = rec ? rec : [];	
-      
+      console.log('rec_add=', rec);
+      console.log('pf_stage_1=',  this.state.pf_stage_1)
+   
       rec.map((this_item) => {
         if(parseInt(this.state.openMenuitem.id) == parseInt(this_item.item_id)) {
           console.log('check ok=', this_item.item_id);
@@ -594,13 +599,31 @@ class SiteItems_ extends React.Component {
         }
       })
 
+      console.log('check='+ check);
+
       if( !check ){
 
-        rec.push({item_id: this.state.openMenuitem.id, name: this.state.openMenuitem.name, count: 0, sort: 0, ei_name: this.state.openMenuitem.ei_name});
-       
+        console.log( this.state.openMenuitem )
+
+        rec.push({
+          item_id: this.state.openMenuitem.id, 
+          name: this.state.openMenuitem.name,
+          count: 0,
+          sort: 0,
+          ei_name: this.state.openMenuitem.ei_name
+        });
+        
+        console.log('stage='+ stage);
+  
         if( stage == 1 ){
-					this.setState({
-						rec_stage_1: rec
+          // todo
+          console.log('add to stage3', rec);
+          let pf = this.state.pf_stage_1;
+          pf.push({item_id: this.state.openMenuitem.id, name: this.state.openMenuitem.name, count: 0, sort: 0, ei_name: this.state.openMenuitem.ei_name});
+          console.log('pf_stage_1', pf);
+          this.setState({
+						rec_stage_1: rec,
+            pf_stage_1: pf  
 					});
 				}
        
@@ -618,7 +641,7 @@ class SiteItems_ extends React.Component {
       }
     }
 
-    if( this.state.openMenuType == 'pf' ){
+    if( this.state.openMenuitem.type == 'pf' ){
     //if( type == 'pf' ){
       let check = false;
 
@@ -1069,6 +1092,10 @@ class SiteItems_ extends React.Component {
       item_items: this.state.item_items,
     };
     
+    console.log( data );
+
+    //return;
+
     let res = await this.getData('saveEditItem', data);
 
     if( res.st === false ){

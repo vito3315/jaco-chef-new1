@@ -15,6 +15,17 @@ const { App } = require( '../src/components/app' );
 // import routes
 //const routes = require( './routes' );
 
+app.enable('trust proxy')
+
+app.use( (request, response, next) => {
+
+    if (!request.secure) {
+       return response.redirect("https://" + request.headers.host + request.url);
+    }
+
+    next();
+})
+
 // serve static assets
 app.get( /\.(js|css|map|ico|png|svg)$/, express.static( path.resolve( __dirname, '../dist' ) ) );
 

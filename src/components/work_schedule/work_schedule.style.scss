@@ -1,31 +1,52 @@
-#table_graph_one td, #table_graph_one th, #table_graph_two td, #table_graph_two th{
-    padding: 3px!important;
-    border-left: 1px solid #e5e5e5!important;
-    max-width: 110px!important;
-    min-height: 38px!important;
+#table_graph_one td,
+#table_graph_one th,
+#table_graph_two td,
+#table_graph_two th {
+  padding: 3px !important;
+  border-left: 1px solid #e5e5e5 !important;
+  max-width: 110px !important;
+  min-height: 38px !important;
 }
-.min_block{
-    width: 50px!important;
-    text-align: center!important;
+.min_block {
+  width: 50px !important;
+  text-align: center !important;
 }
-.min_size{
-    font-size: 0.6rem!important;
+.min_size {
+  font-size: 0.6rem !important;
 }
-div.css-19kzrtu{
-    padding-right: 0px!important;
+div.css-19kzrtu {
+  padding-right: 0px !important;
 }
-.name_pinning{
+.name_pinning {
+  min-width: 160px !important;
+  width: fit-content;
+  min-height: 38px;
+  position: absolute;
+  background-color: #fff;
+  margin-left: -1px;
+  border-bottom: 2px solid #e5e5e5;
+  display: flex !important;
+  justify-content: flex-start;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 20px;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .name_pinning {
     min-width: 140px!important;
-    width: fit-content;
-    min-height: 38px;
-    position: absolute;
-    background-color: #fff;
-    margin-left: -1px;
-    border-bottom: 2px solid #e5e5e5;
-    display: flex!important;
-    justify-content: flex-start;
-    align-items: center;
-    white-space: nowrap; 
-    overflow: hidden;
-    text-overflow: ellipsis;
+    width: max-content!important;;
+    display: table-cell!important;;
+}
+}
+
+#OpenModalM > .MuiDialog-container > div,
+#OpenModalH > .MuiDialog-container > div {
+  @media (max-width: 600px) {
+    margin: 0px !important;
+  }
 }
