@@ -18,30 +18,17 @@ div.css-19kzrtu {
   padding-right: 0px !important;
 }
 .name_pinning {
-  min-width: 160px !important;
-  width: fit-content;
+  min-width: 140px!important;
+  width: max-content;
+  display: table-cell;
   min-height: 38px;
   position: absolute;
   background-color: #fff;
   margin-left: -1px;
   border-bottom: 2px solid #e5e5e5;
-  display: flex !important;
-  justify-content: flex-start;
-  align-items: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 20px;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-@media (max-width: 600px) {
-  .name_pinning {
-    min-width: 140px!important;
-    width: max-content!important;;
-    display: table-cell!important;;
-}
 }
 
 #OpenModalM > .MuiDialog-container > div,

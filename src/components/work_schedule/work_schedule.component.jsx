@@ -50,10 +50,16 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import CheckIcon from '@mui/icons-material/Check';
 import SendIcon from '@mui/icons-material/Send';
 
-import { MySelect, MyTextInput, MyTimePicker, MyDatePickerGraph, formatDate } from '../../stores/elements';
+import {
+  MySelect,
+  MyTextInput,
+  MyTimePicker,
+  MyDatePickerGraph,
+  formatDate,
+} from '../../stores/elements';
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 
-const queryString = require('query-string'); 
+const queryString = require('query-string');
 
 function SimpleDialog(props) {
   const { onClose, selectedValue, open } = props;
@@ -69,8 +75,11 @@ function SimpleDialog(props) {
   return (
     <Dialog onClose={handleClose} open={open}>
       <List sx={{ pt: 0 }}>
-        
-        <ListItem autoFocus button onClick={() => handleListItemClick('addAccount')}>
+        <ListItem
+          autoFocus
+          button
+          onClick={() => handleListItemClick('addAccount')}
+        >
           <ListItemAvatar>
             <Avatar>
               <AccessTimeIcon />
@@ -78,8 +87,12 @@ function SimpleDialog(props) {
           </ListItemAvatar>
           <ListItemText primary="Сменить часы на месяц" />
         </ListItem>
-        
-        <ListItem autoFocus button onClick={() => handleListItemClick('addAccount')}>
+
+        <ListItem
+          autoFocus
+          button
+          onClick={() => handleListItemClick('addAccount')}
+        >
           <ListItemAvatar>
             <Avatar>
               <SyncAltIcon />
@@ -87,7 +100,11 @@ function SimpleDialog(props) {
           </ListItemAvatar>
           <ListItemText primary="Сменить смену" />
         </ListItem>
-        <ListItem autoFocus button onClick={() => handleListItemClick('addAccount')}>
+        <ListItem
+          autoFocus
+          button
+          onClick={() => handleListItemClick('addAccount')}
+        >
           <ListItemAvatar>
             <Avatar>
               <HomeWorkIcon />
@@ -95,7 +112,6 @@ function SimpleDialog(props) {
           </ListItemAvatar>
           <ListItemText primary="Сменить точку" />
         </ListItem>
-        
       </List>
     </Dialog>
   );
@@ -118,9 +134,7 @@ function TabPanel(props) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>{children}</Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -139,487 +153,443 @@ function a11yProps(index) {
 }
 
 class HeaderItem extends React.Component {
-  render(){
+  render() {
     return (
       <>
         <TableRow>
-          <TableCell style={{ minWidth: 140, minHeight: 38 }}>Ур. кафе: {this.props.lv_cafe}</TableCell>
-          <TableCell style={{ minWidth: 165, minHeight: 38 }}>Число месяца</TableCell>
+          <TableCell style={{ minWidth: 140, minHeight: 38 }}>
+            Ур. кафе: {this.props.lv_cafe}
+          </TableCell>
+          <TableCell style={{ minWidth: 165, minHeight: 38 }}>
+            Число месяца
+          </TableCell>
 
-          { this.props.kind == 'manager' ? null :
-            <TableCell></TableCell>
-          }
-          
-          {this.props.days.map( (item, key) => 
-            <TableCell className="min_block" style={{ backgroundColor: item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс' ? '#ffe9bd' : '#fff' }} key={key}>{item.date}</TableCell>
-          )}
-          
-          { this.props.kind == 'manager' ? null :
+          {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
+
+          {this.props.days.map((item, key) => (
+            <TableCell
+              className="min_block"
+              style={{
+                backgroundColor:
+                  item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс'
+                    ? '#ffe9bd'
+                    : '#fff',
+              }}
+              key={key}
+            >
+              {item.date}
+            </TableCell>
+          ))}
+
+          {this.props.kind == 'manager' ? null : (
             <>
               <TableCell></TableCell>
-              
-              { this.props.dataKey > 0 ? 
+
+              {this.props.dataKey > 0 ? (
                 <>
                   <TableCell style={{ textAlign: 'center' }}></TableCell>
                   <TableCell style={{ textAlign: 'center' }}></TableCell>
                 </>
-                  :
+              ) : (
                 <>
-                  <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.props.changeDopBonus}>{ !this.props.bonus_other ? '+ / -' : parseInt(this.props.bonus_other) == 1 ? <AddIcon style={{ fontSize: 30, color: 'green' }} /> : <CloseIcon style={{ fontSize: 30, color: 'red' }} /> }</TableCell>
-                  <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.props.changeLVDir}>Ур. дира: {this.props.lv_dir}</TableCell>
+                  <TableCell
+                    style={{ textAlign: 'center', cursor: 'pointer' }}
+                    onClick={this.props.changeDopBonus}
+                  >
+                    {!this.props.bonus_other ? (
+                      '+ / -'
+                    ) : parseInt(this.props.bonus_other) == 1 ? (
+                      <AddIcon style={{ fontSize: 30, color: 'green' }} />
+                    ) : (
+                      <CloseIcon style={{ fontSize: 30, color: 'red' }} />
+                    )}
+                  </TableCell>
+                  <TableCell
+                    style={{ textAlign: 'center', cursor: 'pointer' }}
+                    onClick={this.props.changeLVDir}
+                  >
+                    Ур. дира: {this.props.lv_dir}
+                  </TableCell>
                 </>
-              }
-                  
+              )}
+
               <TableCell></TableCell>
               <TableCell></TableCell>
               <TableCell></TableCell>
               <TableCell></TableCell>
             </>
-          }
-
+          )}
         </TableRow>
         <TableRow>
-          <TableCell style={{ minWidth: 140, minHeight: 38 }}>Сотрудник</TableCell>
-          <TableCell style={{ minWidth: 165, minHeight: 38 }}>Должность</TableCell>
-          
-          { this.props.kind == 'manager' ? null :
-            <TableCell></TableCell>
-          }
-          
-          {this.props.days.map( (item, key) => 
-            <TableCell className="min_block" style={{ backgroundColor: item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс' ? '#ffe9bd' : '#fff' }} key={key}>{item.day}</TableCell>
-          )}
-          
-          { this.props.kind == 'manager' ? null :
+          <TableCell style={{ minWidth: 140, minHeight: 38 }}>
+            Сотрудник
+          </TableCell>
+          <TableCell style={{ minWidth: 165, minHeight: 38 }}>
+            Должность
+          </TableCell>
+
+          {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
+
+          {this.props.days.map((item, key) => (
+            <TableCell
+              className="min_block"
+              style={{
+                backgroundColor:
+                  item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс'
+                    ? '#ffe9bd'
+                    : '#fff',
+              }}
+              key={key}
+            >
+              {item.day}
+            </TableCell>
+          ))}
+
+          {this.props.kind == 'manager' ? null : (
             <>
               <TableCell style={{ textAlign: 'center' }}>За 1ч</TableCell>
-              <TableCell style={{ textAlign: 'center' }}>Командный бонус</TableCell>
+              <TableCell style={{ textAlign: 'center' }}>
+                Командный бонус
+              </TableCell>
               <TableCell style={{ textAlign: 'center' }}>За часы</TableCell>
               <TableCell style={{ textAlign: 'center' }}>Ошибки</TableCell>
               <TableCell style={{ textAlign: 'center' }}>Бонус</TableCell>
-              { this.props.show_zp == 1 || this.props.show_zp == 0 ?
+              {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                 <TableCell style={{ textAlign: 'center' }}>Всего</TableCell>
-                  :
-                null
-              }
+              ) : null}
               <TableCell style={{ textAlign: 'center' }}>Выдано</TableCell>
             </>
-          }
+          )}
         </TableRow>
-        
+
         <TableRow style={{ backgroundColor: '#e5e5e5' }}>
-          <TableCell style={{ textAlign: 'center' }} colSpan={ this.props.days.length + 3 + 7 }>{this.props.item.data}</TableCell>
+          <TableCell
+            style={{ textAlign: 'center' }}
+            colSpan={this.props.days.length + 3 + 7}
+          >
+            {this.props.item.data}
+          </TableCell>
         </TableRow>
       </>
-    )
+    );
   }
 }
 
 class WorkSchedule_Table extends React.Component {
   shouldComponentUpdate(nextProps) {
+    var array1 = nextProps.test;
+    var array2 = this.props.test;
 
-    // console.log(nextProps); // какие именно массивы данных сравнивать ?
+    var is_same =
+      array1.length == array2.length &&
+      array1.every(function (element, index) {
+        return element === array2[index];
+      });
 
-    // var array1 = nextProps.event;
-    // var array2 = this.props.event;
-
-    // var is_same =
-    //   array1.length == array2.length &&
-    //   array1.every(function (element, index) {
-    //     return element === array2[index];
-    //   });
-
-    // return !is_same;
-    return true;
+    return !is_same;
   }
 
   render() {
     return (
-      <Box sx={{ width: '100%' }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={this.props.tabTable} onChange={ this.props.onChange.bind(this) } centered >
-          <Tab label="С 1 по 15 числа" {...a11yProps(0)} />
-          <Tab label="С 16 по конец месяца" {...a11yProps(1)} />
-        </Tabs>
-      </Box>
-      <TabPanel value={this.props.tabTable} index={0}>
-        { !this.props.one ? null :
-          <TableContainer component={Paper}>
-            <Table id="table_graph_one">
-              
-              <TableBody>
-                
-                { this.props.test_one.map( (item, key) =>
-                  item.row == 'header' ?
-                    <HeaderItem key={key} bonus_other={this.props.one.bonus_other} changeLVDir={this.props.changeLVDir.bind(this)} changeDopBonus={this.props.changeDopBonus.bind(this)} kind={this.props.kind} show_zp={this.props.show_zp_one} lv_dir={this.props.lv_dir} lv_cafe={this.props.lv_cafe} dataKey={key} days={this.props.one.days} item={item} />
-                      :
-                    <TableRow key={key}>
-                      <TableCell className='name_pinning' onClick={ this.props.openM.bind(this, item.data) }>{item.data.user_name}</TableCell>
-                      <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
+      <TableContainer component={Paper}>
+        <Table
+          id={
+            this.props.numberChoose === 1
+              ? 'table_graph_one'
+              : 'table_graph_two'
+          }
+        >
+          <TableBody>
+            {this.props.test.map((item, key) =>
+              item.row == 'header' ? (
+                <HeaderItem
+                  key={key}
+                  bonus_other={this.props.number.bonus_other}
+                  changeLVDir={this.props.changeLVDir.bind(this)}
+                  changeDopBonus={this.props.changeDopBonus.bind(this)}
+                  kind={this.props.kind}
+                  show_zp={this.props.show_zp}
+                  lv_dir={this.props.lv_dir}
+                  lv_cafe={this.props.lv_cafe}
+                  dataKey={key}
+                  days={this.props.number.days}
+                  item={item}
+                />
+              ) : (
+                <TableRow key={key}>
+                  <TableCell
+                    className="name_pinning"
+                    onClick={this.props.openM.bind(this, item.data)}
+                  >
+                    {item.data.user_name}
+                  </TableCell>
+                  <TableCell style={{ minWidth: 165, minHeight: 38 }}>
+                    {item.data.app_name}
+                  </TableCell>
 
-                      { this.props.kind == 'manager' ? null :
-                        <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer', display: 'block', margin: 'auto' }} 
-                        onClick={this.props.onClick.bind(this)} /> </TableCell>
-                      }
-
-                      { item.data.dates.map( (date, date_k) =>
-                        <TableCell onClick={ this.props.openH.bind(this, item.data, date.date) } className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff', cursor: 'pointer' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
-                      ) }
-                      
-                      { this.props.kind == 'manager' ? null :
-                        <>
-                          <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}  onClick={this.props.onClick2.bind(this)}>{item.data.price_p_h}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
-
-                          { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
-                            <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
-                              :
-                            null
-                          }
-
-                          {item.data.app_type == 'driver' ?
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                              :
-                            <TableCell style={{textAlign: 'center'}} onClick={this.props.openZP.bind(this, item.data.id, item.data.smena_id, item.data.app_id, 1, item.data)}>{item.data.given}</TableCell>
-                          }
-                          
-                        </>
-                      }
-                    </TableRow>
-                ) }
-                
-                
-              </TableBody>
-              
-              <TableFooter sx={{ '& td': { color: 'rgba(0, 0, 0, 0.87)'  } }}>
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
-
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.one.bonus.map( (item, key) => 
-                    <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
+                  {this.props.kind == 'manager' ? null : (
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {' '}
+                      <SyncAltIcon
+                        style={{
+                          cursor: 'pointer',
+                          display: 'block',
+                          margin: 'auto',
+                        }}
+                        onClick={this.props.mix.bind(this, item.data)}
+                      />{' '}
+                    </TableCell>
                   )}
-                  
-                  { this.props.kind == 'manager' ? null :
+
+                  {item.data.dates.map((date, date_k) => (
+                    <TableCell
+                      onClick={this.props.openH.bind(
+                        this,
+                        item.data,
+                        date.date
+                      )}
+                      className="min_block"
+                      style={{
+                        backgroundColor: date.info ? date.info.color : '#fff',
+                        cursor: 'pointer',
+                      }}
+                      key={date_k}
+                    >
+                      {date.info ? date.info.hours : ''}
+                    </TableCell>
+                  ))}
+
+                  {this.props.kind == 'manager' ? null : (
                     <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_dop_bonus_price}</TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_h_price}</TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_err_price}</TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_bonus_price}</TableCell>
+                      <TableCell
+                        style={{
+                          textAlign: 'center',
+                          minWidth: 70,
+                          cursor: 'pointer',
+                        }}
+                        onClick={this.props.pricePerHour.bind(this, item.data)}
+                      >
+                        {item.data.price_p_h}
+                      </TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>
+                        {item.data.dop_bonus}
+                      </TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>
+                        {item.data.h_price}
+                      </TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>
+                        {item.data.err_price}
+                      </TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>
+                        {item.data.my_bonus}
+                      </TableCell>
 
-                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
-                        <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_to_given_price}</TableCell>
-                          :
-                        null
-                      }
+                      {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                        <TableCell style={{ textAlign: 'center' }}>
+                          {parseInt(item.data.dop_bonus) +
+                            parseInt(item.data.dir_price) +
+                            parseInt(item.data.dir_price_dop) +
+                            parseInt(item.data.h_price) +
+                            parseInt(item.data.my_bonus) -
+                            parseInt(item.data.err_price) +
+                            ''}
+                        </TableCell>
+                      ) : null}
 
-                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_given_price}</TableCell>
+                      {item.data.app_type == 'driver' ? (
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                      ) : (
+                        <TableCell
+                          style={{ textAlign: 'center' }}
+                          onClick={this.props.openZP.bind(
+                            this,
+                            item.data.id,
+                            item.data.smena_id,
+                            item.data.app_id,
+                            this.props.numberChoose,
+                            item.data
+                          )}
+                        >
+                          {item.data.given}
+                        </TableCell>
+                      )}
                     </>
-                  }
-
-                </TableRow>
-                
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell>Роллов</TableCell>
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.one.bonus.map( (item, key) => 
-                    <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
                   )}
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-
-                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
-                        <TableCell style={{textAlign: 'center'}}></TableCell>
-                          :
-                        null
-                      }
-
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                    </>
-                  }
-
                 </TableRow>
-                
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell>Пиццы</TableCell>
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.one.bonus.map( (item, key) => 
-                    <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
-                  )}
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
+              )
+            )}
+          </TableBody>
 
-                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
-                        <TableCell style={{textAlign: 'center'}}></TableCell>
-                          :
-                        null
-                      }
+          <TableFooter sx={{ '& td': { color: 'rgba(0, 0, 0, 0.87)' } }}>
+            <TableRow>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
 
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                    </>
-                  }
-                </TableRow>
-                
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell className="min_size">Заказы готовились больше 40 минут</TableCell>
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.one.order_stat.map( (item, key) => 
-                    <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
-                  )}
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
+              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
 
-                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
-                        <TableCell style={{textAlign: 'center'}}></TableCell>
-                          :
-                        null
-                      }
+              {this.props.number.bonus.map((item, key) => (
+                <TableCell
+                  className="min_block min_size"
+                  style={{
+                    backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff',
+                  }}
+                  key={key}
+                >
+                  {item.res}
+                </TableCell>
+              ))}
 
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                    </>
-                  }
-                </TableRow>
-                
-              </TableFooter>
-              
-              
-            </Table>
-          </TableContainer>
-        }
-      </TabPanel>
-      <TabPanel value={this.props.tabTable} index={1}>
-        { !this.props.two ? null :
-          <TableContainer component={Paper}>
-            <Table id="table_graph_two">
-              
-              <TableBody>
-                
-                { this.props.test_two.map( (item, key) =>
-                  item.row == 'header' ?
-                    <HeaderItem bonus_other={this.props.two.bonus_other} changeLVDir={this.props.changeLVDir.bind(this)} changeDopBonus={this.props.changeDopBonus.bind(this)} key={key} kind={this.props.kind} show_zp={this.props.show_zp_two} lv_dir={this.props.lv_dir} lv_cafe={this.props.lv_cafe} dataKey={key} days={this.props.two.days} item={item} />
-                      :
-                    <TableRow key={key}>
-                      <TableCell className='name_pinning' onClick={ this.props.openM.bind(this, item.data) }>{item.data.user_name}</TableCell>
-                      <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
+              {this.props.kind == 'manager' ? null : (
+                <>
+                  <TableCell
+                    style={{
+                      textAlign: 'center',
+                      minWidth: 70,
+                      cursor: 'pointer',
+                    }}
+                  ></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {this.props.number.other_summ.sum_dop_bonus_price}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {this.props.number.other_summ.sum_h_price}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {this.props.number.other_summ.sum_err_price}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {this.props.number.other_summ.sum_bonus_price}
+                  </TableCell>
 
-                      { this.props.kind == 'manager' ? null :
-                        <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer', display: 'block', margin: 'auto'}}  onClick={this.props.onClick.bind(this)} /> </TableCell>
-                      }
+                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {this.props.number.other_summ.sum_to_given_price}
+                    </TableCell>
+                  ) : null}
 
-                      { item.data.dates.map( (date, date_k) =>
-                        <TableCell onClick={ this.props.openH.bind(this, item.data, date.date) } className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff', cursor: 'pointer' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
-                      ) }
-                      
-                      { this.props.kind == 'manager' ? null :
-                        <>
-                          <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}  onClick={this.props.onClick2.bind(this)}>{item.data.price_p_h}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
-                          
-                          { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
-                            <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
-                              :
-                            null
-                          }
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {this.props.number.other_summ.sum_given_price}
+                  </TableCell>
+                </>
+              )}
+            </TableRow>
 
-                          {item.data.app_type == 'driver' ?
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                              :
-                            <TableCell style={{textAlign: 'center'}} onClick={this.props.openZP.bind(this, item.data.id, item.data.smena_id, item.data.app_id, 2, item.data)}>{item.data.given}</TableCell>
-                          }
-                        </>
-                      }
-                    </TableRow>
-                ) }
-                
-                
-              </TableBody>
-              
-              <TableFooter sx={{ '& td': { color: 'rgba(0, 0, 0, 0.87)'  } }}>
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.two.bonus.map( (item, key) => 
-                    <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
-                  )}
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_dop_bonus_price}</TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_h_price}</TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_err_price}</TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_bonus_price}</TableCell>
+            <TableRow>
+              <TableCell></TableCell>
+              <TableCell>Роллов</TableCell>
 
-                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
-                        <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_to_given_price}</TableCell>
-                          :
-                        null
-                      }
+              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
 
-                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_given_price}</TableCell>
-                    </>
-                  }
-                </TableRow>
-                
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell>Роллов</TableCell>
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.two.bonus.map( (item, key) => 
-                    <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
-                  )}
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
+              {this.props.number.bonus.map((item, key) => (
+                <TableCell className="min_block min_size" key={key}>
+                  {item.count_rolls}
+                </TableCell>
+              ))}
 
-                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
-                        <TableCell style={{textAlign: 'center'}}></TableCell>
-                          :
-                        null
-                      }
+              {this.props.kind == 'manager' ? null : (
+                <>
+                  <TableCell
+                    style={{
+                      textAlign: 'center',
+                      minWidth: 70,
+                      cursor: 'pointer',
+                    }}
+                  ></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
 
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                    </>
-                  }
-                </TableRow>
-                
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell>Пиццы</TableCell>
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.two.bonus.map( (item, key) => 
-                    <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
-                  )}
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  ) : null}
 
-                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
-                        <TableCell style={{textAlign: 'center'}}></TableCell>
-                          :
-                        null
-                      }
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                </>
+              )}
+            </TableRow>
 
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                    </>
-                  }
-                </TableRow>
-                
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell className="min_size">Заказы готовились больше 40 минут</TableCell>
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.two.order_stat.map( (item, key) => 
-                    <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
-                  )}
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
+            <TableRow>
+              <TableCell></TableCell>
+              <TableCell>Пиццы</TableCell>
 
-                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
-                        <TableCell style={{textAlign: 'center'}}></TableCell>
-                          :
-                        null
-                      }
+              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
 
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                    </>
-                  }
-                </TableRow>
-                
-              </TableFooter>
-              
-              
-            </Table>
-          </TableContainer>
-        }
-      </TabPanel>
-      
-    </Box>
+              {this.props.number.bonus.map((item, key) => (
+                <TableCell className="min_block min_size" key={key}>
+                  {item.count_pizza}
+                </TableCell>
+              ))}
+
+              {this.props.kind == 'manager' ? null : (
+                <>
+                  <TableCell
+                    style={{
+                      textAlign: 'center',
+                      minWidth: 70,
+                      cursor: 'pointer',
+                    }}
+                  ></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+
+                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  ) : null}
+
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                </>
+              )}
+            </TableRow>
+
+            <TableRow>
+              <TableCell></TableCell>
+              <TableCell className="min_size">
+                Заказы готовились больше 40 минут
+              </TableCell>
+
+              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
+
+              {this.props.number.order_stat.map((item, key) => (
+                <TableCell className="min_block min_size" key={key}>
+                  {item.count_false}
+                </TableCell>
+              ))}
+
+              {this.props.kind == 'manager' ? null : (
+                <>
+                  <TableCell
+                    style={{
+                      textAlign: 'center',
+                      minWidth: 70,
+                      cursor: 'pointer',
+                    }}
+                  ></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+
+                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  ) : null}
+
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                </>
+              )}
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </TableContainer>
     );
   }
 }
 
 class WorkSchedule_Table_without_functions extends React.Component {
   shouldComponentUpdate(nextProps) {
-
-    // console.log(nextProps); // какие именно массивы данных сравнивать ?
+    // console.log(nextProps);
 
     // var array1 = nextProps.event;
     // var array2 = this.props.event;
@@ -636,382 +606,294 @@ class WorkSchedule_Table_without_functions extends React.Component {
 
   render() {
     return (
-      <Box sx={{ width: '100%' }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={this.props.tabTable} centered >
-          <Tab label="С 1 по 15 числа" {...a11yProps(0)} />
-          <Tab label="С 16 по конец месяца" {...a11yProps(1)} />
-        </Tabs>
-      </Box>
-      <TabPanel value={this.props.tabTable} index={0}>
-        { !this.props.one ? null :
-          <TableContainer component={Paper}>
-            <Table id="table_graph_one">
-              
-              <TableBody>
-                
-                { this.props.test_one.map( (item, key) =>
-                  item.row == 'header' ?
-                    <HeaderItem key={key} bonus_other={this.props.one.bonus_other} show_zp={this.props.show_zp_one} lv_dir={this.props.lv_dir} lv_cafe={this.props.lv_cafe} dataKey={key} days={this.props.one.days} item={item} />
-                      :
-                    <TableRow key={key}>
-                      <TableCell className='name_pinning'>{item.data.user_name}</TableCell>
-                      <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
+      <TableContainer component={Paper}>
+        <Table
+          id={
+            this.props.numberChoose === 1
+              ? 'table_graph_one'
+              : 'table_graph_two'
+          }
+        >
+          <TableBody>
+            {this.props.test.map((item, key) =>
+              item.row == 'header' ? (
+                <HeaderItem
+                  key={key}
+                  bonus_other={this.props.number.bonus_other}
+                  // changeLVDir={this.props.changeLVDir.bind(this)}
+                  // changeDopBonus={this.props.changeDopBonus.bind(this)}
+                  kind={this.props.kind}
+                  show_zp={this.props.show_zp}
+                  lv_dir={this.props.lv_dir}
+                  lv_cafe={this.props.lv_cafe}
+                  dataKey={key}
+                  days={this.props.number.days}
+                  item={item}
+                />
+              ) : (
+                <TableRow key={key}>
+                  <TableCell
+                    className="name_pinning"
+                    // onClick={this.props.openM.bind(this, item.data)}
+                  >
+                    {item.data.user_name}
+                  </TableCell>
+                  <TableCell style={{ minWidth: 165, minHeight: 38 }}>
+                    {item.data.app_name}
+                  </TableCell>
 
-                      { this.props.kind == 'manager' ? null :
-                        <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer', display: 'block', margin: 'auto' }} /> </TableCell>
-                      }
-
-                      { item.data.dates.map( (date, date_k) =>
-                        <TableCell className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff', cursor: 'pointer' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
-                      ) }
-                      
-                      { this.props.kind == 'manager' ? null :
-                        <>
-                          <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}>{item.data.price_p_h}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
-
-                          { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
-                            <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
-                              :
-                            null
-                          }
-
-                          {item.data.app_type == 'driver' ?
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                              :
-                            <TableCell style={{textAlign: 'center'}}>{item.data.given}</TableCell>
-                          }
-                          
-                        </>
-                      }
-                    </TableRow>
-                ) }
-                
-                
-              </TableBody>
-              
-              <TableFooter sx={{ '& td': { color: 'rgba(0, 0, 0, 0.87)'  } }}>
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
-
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.one.bonus.map( (item, key) => 
-                    <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
+                  {this.props.kind == 'manager' ? null : (
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {' '}
+                      <SyncAltIcon
+                        style={{
+                          cursor: 'pointer',
+                          display: 'block',
+                          margin: 'auto',
+                        }}
+                        // onClick={this.props.mix.bind(this, item.data)}
+                      />{' '}
+                    </TableCell>
                   )}
-                  
-                  { this.props.kind == 'manager' ? null :
+
+                  {item.data.dates.map((date, date_k) => (
+                    <TableCell
+                      // onClick={this.props.openH.bind(this, item.data, date.date)}
+                      className="min_block"
+                      style={{
+                        backgroundColor: date.info ? date.info.color : '#fff',
+                        cursor: 'pointer',
+                      }}
+                      key={date_k}
+                    >
+                      {date.info ? date.info.hours : ''}
+                    </TableCell>
+                  ))}
+
+                  {this.props.kind == 'manager' ? null : (
                     <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_dop_bonus_price}</TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_h_price}</TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_err_price}</TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_bonus_price}</TableCell>
+                      <TableCell
+                        style={{
+                          textAlign: 'center',
+                          minWidth: 70,
+                          cursor: 'pointer',
+                        }}
+                        // onClick={this.props.pricePerHour.bind(this, item.data)}
+                      >
+                        {item.data.price_p_h}
+                      </TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>
+                        {item.data.dop_bonus}
+                      </TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>
+                        {item.data.h_price}
+                      </TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>
+                        {item.data.err_price}
+                      </TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>
+                        {item.data.my_bonus}
+                      </TableCell>
 
-                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
-                        <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_to_given_price}</TableCell>
-                          :
-                        null
-                      }
+                      {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                        <TableCell style={{ textAlign: 'center' }}>
+                          {parseInt(item.data.dop_bonus) +
+                            parseInt(item.data.dir_price) +
+                            parseInt(item.data.dir_price_dop) +
+                            parseInt(item.data.h_price) +
+                            parseInt(item.data.my_bonus) -
+                            parseInt(item.data.err_price) +
+                            ''}
+                        </TableCell>
+                      ) : null}
 
-                      <TableCell style={{textAlign: 'center'}}>{this.props.one.other_summ.sum_given_price}</TableCell>
+                      {item.data.app_type == 'driver' ? (
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                      ) : (
+                        <TableCell
+                          style={{ textAlign: 'center' }}
+                          // onClick={this.props.openZP.bind(
+                          //   this,
+                          //   item.data.id,
+                          //   item.data.smena_id,
+                          //   item.data.app_id,
+                          //   this.props.numberChoose,
+                          //   item.data
+                          // )}
+                        >
+                          {item.data.given}
+                        </TableCell>
+                      )}
                     </>
-                  }
-
-                </TableRow>
-                
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell>Роллов</TableCell>
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.one.bonus.map( (item, key) => 
-                    <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
                   )}
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-
-                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
-                        <TableCell style={{textAlign: 'center'}}></TableCell>
-                          :
-                        null
-                      }
-
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                    </>
-                  }
-
                 </TableRow>
-                
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell>Пиццы</TableCell>
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.one.bonus.map( (item, key) => 
-                    <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
-                  )}
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
+              )
+            )}
+          </TableBody>
 
-                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
-                        <TableCell style={{textAlign: 'center'}}></TableCell>
-                          :
-                        null
-                      }
+          <TableFooter sx={{ '& td': { color: 'rgba(0, 0, 0, 0.87)' } }}>
+            <TableRow>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
 
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                    </>
-                  }
-                </TableRow>
-                
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell className="min_size">Заказы готовились больше 40 минут</TableCell>
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.one.order_stat.map( (item, key) => 
-                    <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
-                  )}
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
+              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
 
-                      { this.props.show_zp_one == 1 || this.props.show_zp_one == 0 ?
-                        <TableCell style={{textAlign: 'center'}}></TableCell>
-                          :
-                        null
-                      }
+              {this.props.number.bonus.map((item, key) => (
+                <TableCell
+                  className="min_block min_size"
+                  style={{
+                    backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff',
+                  }}
+                  key={key}
+                >
+                  {item.res}
+                </TableCell>
+              ))}
 
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                    </>
-                  }
-                </TableRow>
-                
-              </TableFooter>
-              
-              
-            </Table>
-          </TableContainer>
-        }
-      </TabPanel>
-      <TabPanel value={this.props.tabTable} index={1}>
-        { !this.props.two ? null :
-          <TableContainer component={Paper}>
-            <Table id="table_graph_two">
-              
-              <TableBody>
-                
-                { this.props.test_two.map( (item, key) =>
-                  item.row == 'header' ?
-                    <HeaderItem bonus_other={this.props.two.bonus_other} key={key} kind={this.props.kind} show_zp={this.props.show_zp_two} lv_dir={this.props.lv_dir} lv_cafe={this.props.lv_cafe} dataKey={key} days={this.props.two.days} item={item} />
-                      :
-                    <TableRow key={key}>
-                      <TableCell className='name_pinning'>{item.data.user_name}</TableCell>
-                      <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
+              {this.props.kind == 'manager' ? null : (
+                <>
+                  <TableCell
+                    style={{
+                      textAlign: 'center',
+                      minWidth: 70,
+                      cursor: 'pointer',
+                    }}
+                  ></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {this.props.number.other_summ.sum_dop_bonus_price}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {this.props.number.other_summ.sum_h_price}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {this.props.number.other_summ.sum_err_price}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {this.props.number.other_summ.sum_bonus_price}
+                  </TableCell>
 
-                      { this.props.kind == 'manager' ? null :
-                        <TableCell style={{ textAlign: 'center' }}> <SyncAltIcon style={{ cursor: 'pointer', display: 'block', margin: 'auto'}} /> </TableCell>
-                      }
+                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {this.props.number.other_summ.sum_to_given_price}
+                    </TableCell>
+                  ) : null}
 
-                      { item.data.dates.map( (date, date_k) =>
-                        <TableCell className="min_block" style={{ backgroundColor: date.info ? date.info.color : '#fff', cursor: 'pointer' }} key={date_k}>{date.info ? date.info.hours : ''}</TableCell>
-                      ) }
-                      
-                      { this.props.kind == 'manager' ? null :
-                        <>
-                          <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}>{item.data.price_p_h}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.dop_bonus}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.h_price}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.err_price}</TableCell>
-                          <TableCell style={{textAlign: 'center'}}>{item.data.my_bonus}</TableCell>
-                          
-                          { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
-                            <TableCell style={{textAlign: 'center'}}>{ ( parseInt(item.data.dop_bonus) + parseInt(item.data.dir_price_dop) + parseInt(item.data.h_price) + parseInt(item.data.my_bonus) - parseInt(item.data.err_price) )+'' }</TableCell>
-                              :
-                            null
-                          }
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {this.props.number.other_summ.sum_given_price}
+                  </TableCell>
+                </>
+              )}
+            </TableRow>
 
-                          {item.data.app_type == 'driver' ?
-                            <TableCell style={{textAlign: 'center'}}></TableCell>
-                              :
-                            <TableCell style={{textAlign: 'center'}}>{item.data.given}</TableCell>
-                          }
-                        </>
-                      }
-                    </TableRow>
-                ) }
-                
-                
-              </TableBody>
-              
-              <TableFooter sx={{ '& td': { color: 'rgba(0, 0, 0, 0.87)'  } }}>
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.two.bonus.map( (item, key) => 
-                    <TableCell className="min_block min_size" style={{ backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff' }} key={key}>{item.res}</TableCell>
-                  )}
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_dop_bonus_price}</TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_h_price}</TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_err_price}</TableCell>
-                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_bonus_price}</TableCell>
+            <TableRow>
+              <TableCell></TableCell>
+              <TableCell>Роллов</TableCell>
 
-                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
-                        <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_to_given_price}</TableCell>
-                          :
-                        null
-                      }
+              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
 
-                      <TableCell style={{textAlign: 'center'}}>{this.props.two.other_summ.sum_given_price}</TableCell>
-                    </>
-                  }
-                </TableRow>
-                
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell>Роллов</TableCell>
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.two.bonus.map( (item, key) => 
-                    <TableCell className="min_block min_size" key={key}>{item.count_rolls}</TableCell>
-                  )}
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
+              {this.props.number.bonus.map((item, key) => (
+                <TableCell className="min_block min_size" key={key}>
+                  {item.count_rolls}
+                </TableCell>
+              ))}
 
-                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
-                        <TableCell style={{textAlign: 'center'}}></TableCell>
-                          :
-                        null
-                      }
+              {this.props.kind == 'manager' ? null : (
+                <>
+                  <TableCell
+                    style={{
+                      textAlign: 'center',
+                      minWidth: 70,
+                      cursor: 'pointer',
+                    }}
+                  ></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
 
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                    </>
-                  }
-                </TableRow>
-                
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell>Пиццы</TableCell>
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.two.bonus.map( (item, key) => 
-                    <TableCell className="min_block min_size" key={key}>{item.count_pizza}</TableCell>
-                  )}
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
+                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  ) : null}
 
-                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
-                        <TableCell style={{textAlign: 'center'}}></TableCell>
-                          :
-                        null
-                      }
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                </>
+              )}
+            </TableRow>
 
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                    </>
-                  }
-                </TableRow>
-                
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell className="min_size">Заказы готовились больше 40 минут</TableCell>
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <TableCell></TableCell>
-                  }
-                  
-                  {this.props.two.order_stat.map( (item, key) => 
-                    <TableCell className="min_block min_size" key={key}>{item.count_false}</TableCell>
-                  )}
-                  
-                  { this.props.kind == 'manager' ? null :
-                    <>
-                      <TableCell style={{textAlign: 'center', minWidth: 70, cursor: 'pointer'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
+            <TableRow>
+              <TableCell></TableCell>
+              <TableCell>Пиццы</TableCell>
 
-                      { this.props.show_zp_two == 1 || this.props.show_zp_two == 0 ?
-                        <TableCell style={{textAlign: 'center'}}></TableCell>
-                          :
-                        null
-                      }
+              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
 
-                      <TableCell style={{textAlign: 'center'}}></TableCell>
-                    </>
-                  }
-                </TableRow>
-                
-              </TableFooter>
-              
-              
-            </Table>
-          </TableContainer>
-        }
-      </TabPanel>
-      
-    </Box>
+              {this.props.number.bonus.map((item, key) => (
+                <TableCell className="min_block min_size" key={key}>
+                  {item.count_pizza}
+                </TableCell>
+              ))}
+
+              {this.props.kind == 'manager' ? null : (
+                <>
+                  <TableCell
+                    style={{
+                      textAlign: 'center',
+                      minWidth: 70,
+                      cursor: 'pointer',
+                    }}
+                  ></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+
+                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  ) : null}
+
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                </>
+              )}
+            </TableRow>
+
+            <TableRow>
+              <TableCell></TableCell>
+              <TableCell className="min_size">
+                Заказы готовились больше 40 минут
+              </TableCell>
+
+              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
+
+              {this.props.number.order_stat.map((item, key) => (
+                <TableCell className="min_block min_size" key={key}>
+                  {item.count_false}
+                </TableCell>
+              ))}
+
+              {this.props.kind == 'manager' ? null : (
+                <>
+                  <TableCell
+                    style={{
+                      textAlign: 'center',
+                      minWidth: 70,
+                      cursor: 'pointer',
+                    }}
+                  ></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+
+                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  ) : null}
+
+                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                </>
+              )}
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </TableContainer>
     );
   }
 }
@@ -1019,41 +901,41 @@ class WorkSchedule_Table_without_functions extends React.Component {
 class WorkSchedule_ extends React.Component {
   constructor(props) {
     super(props);
-        
+
     this.state = {
       module: 'work_schedule',
       module_name: '',
       is_load: false,
-      
+
       points: [],
       mounths: [],
       point: '',
       mounth: '',
-      
+
       one: null,
       two: null,
       test_one: [],
       test_two: [],
-      
+
       isOpenModalH: false,
       isOpenModalM: false,
 
       userInfo: null,
-      
+
       hList: [],
       mList: [],
-      
+
       newTimeStart: '10:00',
       newTimeEnd: '22:00',
-      
+
       openNewTimeAdd: false,
-      
+
       otherAppList: [],
       otherApp: '',
-      
+
       testVal: '',
       testOpen: false,
-      
+
       mainMenu: false,
       mainMenuH: false,
       mainMenuSmena: false,
@@ -1070,7 +952,7 @@ class WorkSchedule_ extends React.Component {
 
       myOtherPoints: [],
       myOtherSmens: [],
-      
+
       chooseUser: null,
 
       tabTable: 1,
@@ -1080,133 +962,132 @@ class WorkSchedule_ extends React.Component {
       arr_dir_lv: [],
 
       arrTimeAdd: [],
-      typeTimeAdd: 0
+      typeTimeAdd: 0,
     };
   }
-  
-  async componentDidMount(){
-    let data = {
-      
-    };
-    
+
+  async componentDidMount() {
+    let data = {};
+
     let res = await this.getData('get_all', data);
-    
+
     let hList = [];
     let mList = [];
-    
-    for(let h = 0; h <= 23; h ++){
+
+    for (let h = 0; h <= 23; h++) {
       hList.push({
         id: h,
-        name: h
-      })
+        name: h,
+      });
     }
-    
-    for(let m = 0; m <= 50; m += 10){
+
+    for (let m = 0; m <= 50; m += 10) {
       mList.push({
         id: m,
-        name: m
-      })
+        name: m,
+      });
     }
-    
+
     this.setState({
       points: res.point_list,
       point: res.point_list[0].id,
-      
+
       mounths: res.mounths,
-      mounth: res.mounths.find( (item) => parseInt( item.is_active ) == 1 )['id'],
-      
+      mounth: res.mounths.find((item) => parseInt(item.is_active) == 1)['id'],
+
       hList: hList,
       mList: mList,
-      
-      module_name: res.module_info.name
-    })
-    
+
+      module_name: res.module_info.name,
+    });
+
     document.title = res.module_info.name;
-    
+
     let arr_dir_lv = [];
 
-    for(let i = 1; i <= 20; i ++){
+    for (let i = 1; i <= 20; i++) {
       arr_dir_lv.push(i);
     }
 
     this.setState({
-      arr_dir_lv: arr_dir_lv
-    })
+      arr_dir_lv: arr_dir_lv,
+    });
 
-    setTimeout( () => {
+    setTimeout(() => {
       this.updateData();
-    }, 300 )
+    }, 300);
   }
-  
+
   getData = (method, data = {}) => {
-    
     this.setState({
-      is_load: true
-    })
-    
+      is_load: true,
+    });
+
     return fetch('https://jacochef.ru/api/index_new.php', {
       method: 'POST',
       headers: {
-        'Content-Type':'application/x-www-form-urlencoded'},
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
       body: queryString.stringify({
-        method: method, 
+        method: method,
         module: this.state.module,
         version: 2,
         login: localStorage.getItem('token'),
-        data: JSON.stringify( data )
-      })
-    }).then(res => res.json()).then(json => {
-      
-      if( json.st === false && json.type == 'redir' ){
-        window.location.pathname = '/';
-        return;
-      }
-      
-      if( json.st === false && json.type == 'auth' ){
-        window.location.pathname = '/auth';
-        return;
-      }
-      
-      setTimeout( () => {
-        this.setState({
-          is_load: false
-        })
-      }, 300 )
-      
-      return json;
+        data: JSON.stringify(data),
+      }),
     })
-    .catch(err => { 
-      setTimeout( () => {
-        this.setState({
-          is_load: false
-        })
-      }, 300 )
-      console.log( err )
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.st === false && json.type == 'redir') {
+          window.location.pathname = '/';
+          return;
+        }
+
+        if (json.st === false && json.type == 'auth') {
+          window.location.pathname = '/auth';
+          return;
+        }
+
+        setTimeout(() => {
+          this.setState({
+            is_load: false,
+          });
+        }, 300);
+
+        return json;
+      })
+      .catch((err) => {
+        setTimeout(() => {
+          this.setState({
+            is_load: false,
+          });
+        }, 300);
+        console.log(err);
+      });
+  };
+
+  changeCheckOrders(event) {
+    let data = event.target.checked;
+
+    this.setState({
+      showReady: data,
     });
   }
-   
-  changeCheckOrders(event){
-    let data = event.target.checked;
-    
-    this.setState({
-      showReady: data
-    })
-  }
-  
-  async updateData(){
+
+  async updateData() {
     let data = {
       point_id: this.state.point,
-      mounth: this.state.mounth
+      mounth: this.state.mounth,
     };
-    
+
     let res = await this.getData('get_graph', data);
-    
+
     // console.log( res )
-    
+
     this.setState({
       one: res.date.one,
       two: res.date.two,
-      
+
       test_one: res.one,
       test_two: res.two,
 
@@ -1215,76 +1096,76 @@ class WorkSchedule_ extends React.Component {
       kind: res.kind,
 
       lv_cafe: res.lv_cafe,
-      lv_dir: res.lv_dir
-    })
+      lv_dir: res.lv_dir,
+    });
   }
-  
-  async openH(item, this_date){
-    // console.log( item )
-    
+
+  async openH(item, this_date) {
     let data = {
       smena_id: item.smena_id,
       app_id: item.app_id,
       user_id: item.id,
       date: this_date,
-      date_start: item.date
+      date_start: item.date,
     };
-    
+
     let res = await this.getData('get_user_day', data);
-    
+
     // console.log( res )
-    
+
     this.setState({
       isOpenModalH: true,
       userInfo: res.h_info,
       otherAppList: res.other_app,
-      show_bonus: res.show_bonus
-    })
+      show_bonus: res.show_bonus,
+    });
   }
 
-  async openM(item){
+  async openM(item) {
     // console.log( item )
-    
+
     let data = {
       smena_id: item.smena_id,
       app_id: item.app_id,
       user_id: item.id,
       date: this.state.mounth,
-      date_start: item.date
+      date_start: item.date,
     };
-    
+
     let res = await this.getData('get_user_month', data);
-    
+
     // console.log( res )
-    
+
     this.setState({
       isOpenModalM: true,
       userInfo: res.h_info,
-      arrTimeAdd: res.hourse_days
-    })
+      arrTimeAdd: res.hourse_days,
+    });
   }
-  
-  delTime(key_time){
+
+  delTime(key_time) {
     let userInfo = this.state.userInfo;
-    
-    userInfo.hours = userInfo.hours.filter( (item, key) => parseInt(key) != parseInt(key_time) );
-    
+
+    userInfo.hours = userInfo.hours.filter(
+      (item, key) => parseInt(key) != parseInt(key_time)
+    );
+
     this.setState({
-      userInfo: userInfo
-    })
+      userInfo: userInfo,
+    });
   }
-  
-  changeHourse(type, key, event){
+
+  changeHourse(type, key, event) {
     let userInfo = this.state.userInfo;
-    
-    userInfo.hours[ key ][ [type] ] = event.target.value;
-    
+
+    userInfo.hours[key][[type]] = event.target.value;
+
     this.setState({
-      userInfo: userInfo
-    })
+      userInfo: userInfo,
+    });
   }
-  
-  async saveDayHourse(){
+
+  async saveDayHourse() {
     let data = {
       date: this.state.userInfo.date,
       user_id: this.state.userInfo.user_id,
@@ -1292,238 +1173,240 @@ class WorkSchedule_ extends React.Component {
       app_id: this.state.userInfo.app_id,
       hours: this.state.userInfo.hours,
       new_app: this.state.userInfo.new_app,
-      mentor_id: this.state.userInfo.mentor_id
-    }
-    
+      mentor_id: this.state.userInfo.mentor_id,
+    };
+
     let res = await this.getData('save_user_day', data);
-    
-    if( res['st'] == true ){
+
+    if (res['st'] == true) {
       this.setState({
         mainMenu: false,
         mainMenuH: false,
         mainMenuSmena: false,
         isOpenModalH: false,
-        userInfo: null
-      })
+        userInfo: null,
+      });
 
-      setTimeout( () => {
+      setTimeout(() => {
         this.updateData();
-      }, 300 )
-    }else{
-      alert(res['text'])
+      }, 300);
+    } else {
+      alert(res['text']);
     }
   }
-  
-  addTime(){
+
+  addTime() {
     let userInfo = this.state.userInfo;
-    
-    let check = userInfo.hours.find( (item) => item.time_start == this.state.newTimeStart && item.time_end == this.state.newTimeEnd );
-    
-    if( check ){
+
+    let check = userInfo.hours.find(
+      (item) =>
+        item.time_start == this.state.newTimeStart &&
+        item.time_end == this.state.newTimeEnd
+    );
+
+    if (check) {
       this.setState({
-        openNewTimeAdd: false
-      })
-      
-      return ;
+        openNewTimeAdd: false,
+      });
+
+      return;
     }
-    
+
     userInfo.hours.push({
       time_start: this.state.newTimeStart,
-      time_end: this.state.newTimeEnd
-    })
-    
+      time_end: this.state.newTimeEnd,
+    });
+
     this.setState({
       userInfo: userInfo,
-      openNewTimeAdd: false
-    })
+      openNewTimeAdd: false,
+    });
   }
-  
-  async fastTime(type){
+
+  async fastTime(type) {
     let data = {
       type: type,
       user_id: this.state.chooseUser.id,
       app_id: this.state.chooseUser.app_id,
       smena_id: this.state.chooseUser.smena_id,
-      date: this.state.mounth
-    }
-    
+      date: this.state.mounth,
+    };
+
     let res = await this.getData('save_fastTime', data);
-    
+
     // console.log( res );
 
-    if( res['st'] == true ){
+    if (res['st'] == true) {
       this.setState({
         mainMenu: false,
         mainMenuH: false,
-        mainMenuSmena: false
-      })
+        mainMenuSmena: false,
+      });
 
-      setTimeout( () => {
+      setTimeout(() => {
         this.updateData();
-      }, 300 )
-    }else{
-      alert(res['text'])
+      }, 300);
+    } else {
+      alert(res['text']);
     }
   }
 
-  async fastSmena(smena_id){
+  async fastSmena(smena_id) {
     let data = {
       new_smena_id: smena_id,
       user_id: this.state.chooseUser.id,
       app_id: this.state.chooseUser.app_id,
       smena_id: this.state.chooseUser.smena_id,
       date: this.state.mounth,
-      part: this.state.tabTable
-    }
-    
+      part: this.state.tabTable,
+    };
+
     let res = await this.getData('save_fastSmena', data);
-    
-    if( res['st'] == true ){
+
+    if (res['st'] == true) {
       this.setState({
         mainMenu: false,
         mainMenuH: false,
-        mainMenuSmena: false
-      })
+        mainMenuSmena: false,
+      });
 
-      setTimeout( () => {
+      setTimeout(() => {
         this.updateData();
-      }, 300 )
-      
-    }else{
-      alert(res['text'])
+      }, 300);
+    } else {
+      alert(res['text']);
     }
   }
 
-  async changePriceH(price){
+  async changePriceH(price) {
     let data = {
       price: price,
       user_id: this.state.chooseUser.id,
       app_id: this.state.chooseUser.app_id,
       smena_id: this.state.chooseUser.smena_id,
       date: this.state.mounth,
-      part: this.state.tabTable
-    }
-    
+      part: this.state.tabTable,
+    };
+
     let res = await this.getData('save_userPriceH', data);
-    
+
     // console.log( res );
 
-    if( res['st'] == true ){
+    if (res['st'] == true) {
       this.setState({
         mainMenu: false,
         mainMenuH: false,
-        mainMenuPrice: false
-      })
+        mainMenuPrice: false,
+      });
 
       this.updateData();
-    }else{
-      alert(res['text'])
+    } else {
+      alert(res['text']);
     }
   }
 
-  checkFastPoint(point_id, smena_id){
-    if (confirm("Точно сменить точку с сегоднешнего дня ?")) {
-      this.fastPoint(point_id, smena_id)
+  checkFastPoint(point_id, smena_id) {
+    if (confirm('Точно сменить точку с сегоднешнего дня ?')) {
+      this.fastPoint(point_id, smena_id);
     }
   }
 
-  async fastPoint(point_id, smena_id){
+  async fastPoint(point_id, smena_id) {
     let data = {
       new_point_id: point_id,
       new_smena_id: smena_id,
       user_id: this.state.chooseUser.id,
       app_id: this.state.chooseUser.app_id,
       smena_id: this.state.chooseUser.smena_id,
-    }
-    
+    };
+
     let res = await this.getData('save_fastPoint', data);
-    
+
     // console.log( res );
 
-    if( res['st'] == true ){
+    if (res['st'] == true) {
       this.setState({
         mainMenu: false,
         mainMenuPoints: false,
-        chooseUser: null
-      })
+        chooseUser: null,
+      });
 
-      setTimeout( () => {
+      setTimeout(() => {
         this.updateData();
-      }, 300 )
-      
-    }else{
-      alert(res['text'])
+      }, 300);
+    } else {
+      alert(res['text']);
     }
   }
 
-  changeLVDir(){
+  changeLVDir() {
     this.setState({
-      mainMenuLVDIR: true
-    })
+      mainMenuLVDIR: true,
+    });
   }
 
-  checkNewLvDir(LV){
-    if (confirm("Точно изменить уровень директора ?")) {
-      this.newLvDir(LV)
-    } 
+  checkNewLvDir(LV) {
+    if (confirm('Точно изменить уровень директора ?')) {
+      this.newLvDir(LV);
+    }
   }
 
-  async newLvDir(LV){
+  async newLvDir(LV) {
     let data = {
       date: this.state.mounth,
       point_id: this.state.point,
-      dir_lv: LV
-    }
-    
+      dir_lv: LV,
+    };
+
     let res = await this.getData('save_dir_lv', data);
-    
+
     // console.log( res );
 
-    if( res['st'] == true ){
+    if (res['st'] == true) {
       this.setState({
-        mainMenuLVDIR: false
-      })
+        mainMenuLVDIR: false,
+      });
 
-      setTimeout( () => {
+      setTimeout(() => {
         this.updateData();
-      }, 300 )
-    }else{
-      alert(res['text'])
+      }, 300);
+    } else {
+      alert(res['text']);
     }
   }
 
-  changeDopBonus(){
+  changeDopBonus() {
     this.setState({
-      mainMenuDopBonus: true
-    })
+      mainMenuDopBonus: true,
+    });
   }
 
-  checkDopBonus(type){
-    if (confirm("Точно ?")) {
-      this.dop_bonus(type)
-    } 
+  checkDopBonus(type) {
+    if (confirm('Точно ?')) {
+      this.dop_bonus(type);
+    }
   }
 
-  async dop_bonus(type){
+  async dop_bonus(type) {
     let data = {
       date: this.state.mounth,
       part: this.state.tabTable,
       point_id: this.state.point,
-      type: type
-    }
-    
+      type: type,
+    };
+
     let res = await this.getData('save_dop_bonus', data);
-    
+
     // console.log( res );
 
-    if( res['st'] == true ){
+    if (res['st'] == true) {
       this.setState({
-        mainMenuDopBonus: false
-      })
+        mainMenuDopBonus: false,
+      });
 
       this.updateData();
-    }else{
-      alert(res['text'])
+    } else {
+      alert(res['text']);
     }
   }
 
@@ -1532,83 +1415,95 @@ class WorkSchedule_ extends React.Component {
     pickersDayProps['aria-selected'] = false;
 
     let arr = this.state.arrTimeAdd;
-    let res = arr.find( (item) => formatDate(item.date) == formatDate(date) );
+    let res = arr.find((item) => formatDate(item.date) == formatDate(date));
 
-    if( res ){
+    if (res) {
       let backgroundColor = '#fff';
 
-      if( parseInt(res.type) == 0 ){
+      if (parseInt(res.type) == 0) {
         backgroundColor = '#98e38d';
-      }else{
-        if( parseInt(res.type) == 1 ){
+      } else {
+        if (parseInt(res.type) == 1) {
           backgroundColor = '#3dcef2';
-        }else{
-          if( parseInt(res.type) == 2 ){
+        } else {
+          if (parseInt(res.type) == 2) {
             backgroundColor = '#1560bd';
-          }else{
+          } else {
             backgroundColor = '#926eae';
           }
         }
       }
 
-      return <PickersDay {...pickersDayProps} style={{ backgroundColor: backgroundColor, color: '#fff' }} onClick={ this.chooseDay.bind(this, date) } />;
+      return (
+        <PickersDay
+          {...pickersDayProps}
+          style={{ backgroundColor: backgroundColor, color: '#fff' }}
+          onClick={this.chooseDay.bind(this, date)}
+        />
+      );
     }
-    
-    return <PickersDay {...pickersDayProps} onClick={ this.chooseDay.bind(this, date) }  />;
+
+    return (
+      <PickersDay
+        {...pickersDayProps}
+        onClick={this.chooseDay.bind(this, date)}
+      />
+    );
   };
 
-  chooseDay(newValue, event){
+  chooseDay(newValue, event) {
     let arr = this.state.arrTimeAdd;
 
-    let res = arr.find( (item) => formatDate(item.date) == formatDate(newValue) );
+    let res = arr.find((item) => formatDate(item.date) == formatDate(newValue));
 
-    if( !res ){
+    if (!res) {
       let time_start = '';
       let time_end = '';
 
-      if( parseInt(this.state.typeTimeAdd) == 0 ){
+      if (parseInt(this.state.typeTimeAdd) == 0) {
         time_start = '10:00';
-        time_end = '22:00'
+        time_end = '22:00';
       }
 
-      if( parseInt(this.state.typeTimeAdd) == 1 ){
+      if (parseInt(this.state.typeTimeAdd) == 1) {
         time_start = '10:00';
-        time_end = '16:00'
+        time_end = '16:00';
       }
 
-      if( parseInt(this.state.typeTimeAdd) == 2 ){
+      if (parseInt(this.state.typeTimeAdd) == 2) {
         time_start = '16:00';
-        time_end = '22:00'
+        time_end = '22:00';
       }
 
       arr.push({
         date: formatDate(newValue),
         type: this.state.typeTimeAdd,
         time_start: time_start,
-        time_end: time_end
-      })
+        time_end: time_end,
+      });
 
       this.setState({
-        arrTimeAdd: arr
-      })
-    }else{
-      let newArr = arr.filter( (item) => formatDate(item.date) != formatDate(newValue) );
+        arrTimeAdd: arr,
+      });
+    } else {
+      let newArr = arr.filter(
+        (item) => formatDate(item.date) != formatDate(newValue)
+      );
 
       this.setState({
-        arrTimeAdd: newArr
-      })
+        arrTimeAdd: newArr,
+      });
     }
   }
 
-  chooseType(type){
+  chooseType(type) {
     this.setState({
-      typeTimeAdd: type
-    })
+      typeTimeAdd: type,
+    });
   }
 
-  async saveUserM(){
+  async saveUserM() {
     let data = {
-     
       dates: this.state.arrTimeAdd,
       point_id: this.state.point,
       date: this.state.mounth,
@@ -1616,31 +1511,34 @@ class WorkSchedule_ extends React.Component {
       user_id: this.state.userInfo.user.user_id,
       smena_id: this.state.userInfo.user.smena_id,
       app_id: this.state.userInfo.user.app_id,
-    }
-    
+    };
+
     let res = await this.getData('save_user_month', data);
-    
+
     // console.log( res );
 
-    if( res['st'] == true ){
+    if (res['st'] == true) {
       this.setState({
         isOpenModalM: false,
-        userInfo: null
-      })
+        userInfo: null,
+      });
 
-      setTimeout( () => {
+      setTimeout(() => {
         this.updateData();
-      }, 300 )
-      
-    }else{
-      alert(res['text'])
+      }, 300);
+    } else {
+      alert(res['text']);
     }
   }
 
-  openZP(user_id, smena_id, app_id, part, user){
-    // console.log(user)
+  openZP(user_id, smena_id, app_id, part, user) {
+    // console.log(user_id, smena_id, app_id, part, user)
 
-    let fullPrice = parseInt(user.h_price) + parseInt(user.my_bonus) + parseInt(user.dop_bonus) - parseInt(user.err_price);
+    let fullPrice =
+      parseInt(user.h_price) +
+      parseInt(user.my_bonus) +
+      parseInt(user.dop_bonus) -
+      parseInt(user.err_price);
 
     this.setState({
       mainMenuZP: true,
@@ -1652,55 +1550,81 @@ class WorkSchedule_ extends React.Component {
         date: this.state.mounth + (parseInt(part) == 1 ? '-01' : '-16'),
         user_id: user_id,
         smena_id: smena_id,
-        app_id: app_id
-      }
-    })
+        app_id: app_id,
+      },
+    });
   }
 
-  async saveGive(){
+  async saveGive() {
     let data = {
       date: this.state.userInfo.date,
       user_id: this.state.userInfo.user_id,
       smena_id: this.state.userInfo.smena_id,
       app_id: this.state.userInfo.app_id,
       give_price: this.state.userInfo.given,
-    }
+    };
 
     let res = await this.getData('save_user_give_price', data);
-    
+
     // console.log( res );
 
-    if( res['st'] == true ){
+    if (res['st'] == true) {
       this.setState({
         mainMenuZP: false,
-        userInfo: null
-      })
+        userInfo: null,
+      });
 
-      setTimeout( () => {
+      setTimeout(() => {
         this.updateData();
-      }, 300 )
-      
-    }else{
-      alert(res['text'])
+      }, 300);
+    } else {
+      alert(res['text']);
     }
   }
 
-  render(){ 
+  mix(item) {
+    // console.log(item)
+    this.setState({
+      mainMenu: true,
+      chooseUser: item,
+    });
+  }
+
+  pricePerHour(item) {
+    // console.log(item)
+    this.setState({
+      mainMenuPrice: true,
+      chooseUser: item,
+    });
+  }
+
+  render() {
     return (
       <>
         <Backdrop open={this.state.is_load} style={{ zIndex: 999 }}>
           <CircularProgress color="inherit" />
         </Backdrop>
-        
-        <Dialog onClose={ () => { this.setState({ mainMenu: false }) } } open={this.state.mainMenu}>
-          
-          { !this.state.chooseUser ? null :
-            <DialogTitle>{this.state.chooseUser.full_app_name} {this.state.chooseUser.user_name} {this.state.mounth}</DialogTitle>
-          }
-          
+
+        <Dialog
+          onClose={() => {
+            this.setState({ mainMenu: false });
+          }}
+          open={this.state.mainMenu}
+        >
+          {!this.state.chooseUser ? null : (
+            <DialogTitle>
+              {this.state.chooseUser.full_app_name}{' '}
+              {this.state.chooseUser.user_name} {this.state.mounth}
+            </DialogTitle>
+          )}
+
           <List sx={{ pt: 0 }}>
-            
-            <ListItem button onClick={ () => { this.setState({ mainMenu: false, mainMenuH: true }) } }>
+            <ListItem
+              button
+              onClick={() => {
+                this.setState({ mainMenu: false, mainMenuH: true });
+              }}
+            >
               <ListItemAvatar>
                 <Avatar>
                   <AccessTimeIcon />
@@ -1708,8 +1632,17 @@ class WorkSchedule_ extends React.Component {
               </ListItemAvatar>
               <ListItemText primary="Сменить часы на месяц" />
             </ListItem>
-            
-            <ListItem button onClick={ () => { this.setState({ mainMenu: false, mainMenuSmena: true, myOtherSmens: this.state.chooseUser.other_smens }) } }>
+
+            <ListItem
+              button
+              onClick={() => {
+                this.setState({
+                  mainMenu: false,
+                  mainMenuSmena: true,
+                  myOtherSmens: this.state.chooseUser.other_smens,
+                });
+              }}
+            >
               <ListItemAvatar>
                 <Avatar>
                   <SyncAltIcon />
@@ -1717,7 +1650,16 @@ class WorkSchedule_ extends React.Component {
               </ListItemAvatar>
               <ListItemText primary="Сменить смену" />
             </ListItem>
-            <ListItem button onClick={ () => { this.setState({ mainMenu: false, mainMenuPoints: true, myOtherPoints: this.state.chooseUser.other_points }) } }>
+            <ListItem
+              button
+              onClick={() => {
+                this.setState({
+                  mainMenu: false,
+                  mainMenuPoints: true,
+                  myOtherPoints: this.state.chooseUser.other_points,
+                });
+              }}
+            >
               <ListItemAvatar>
                 <Avatar>
                   <HomeWorkIcon />
@@ -1725,18 +1667,22 @@ class WorkSchedule_ extends React.Component {
               </ListItemAvatar>
               <ListItemText primary="Сменить точку" />
             </ListItem>
-            
           </List>
         </Dialog>
-        
-        <Dialog onClose={ () => { this.setState({ mainMenuH: false }) } } open={this.state.mainMenuH}>
-          
-          { !this.state.chooseUser ? null :
-            <DialogTitle>Часы {this.state.chooseUser.user_name} {this.state.mounth}</DialogTitle>
-          }
-          
+
+        <Dialog
+          onClose={() => {
+            this.setState({ mainMenuH: false });
+          }}
+          open={this.state.mainMenuH}
+        >
+          {!this.state.chooseUser ? null : (
+            <DialogTitle>
+              Часы {this.state.chooseUser.user_name} {this.state.mounth}
+            </DialogTitle>
+          )}
+
           <List sx={{ pt: 0 }}>
-            
             <ListItem button onClick={this.fastTime.bind(this, 1)}>
               <ListItemAvatar>
                 <Avatar>
@@ -1745,7 +1691,7 @@ class WorkSchedule_ extends React.Component {
               </ListItemAvatar>
               <ListItemText primary="С 1 числа 2/2 с 10 до 22 на месяц" />
             </ListItem>
-            
+
             <ListItem button onClick={this.fastTime.bind(this, 2)}>
               <ListItemAvatar>
                 <Avatar>
@@ -1770,20 +1716,28 @@ class WorkSchedule_ extends React.Component {
               </ListItemAvatar>
               <ListItemText primary="С 4 числа 2/2 с 10 до 22 на месяц" />
             </ListItem>
-            
           </List>
         </Dialog>
 
-        <Dialog onClose={ () => { this.setState({ mainMenuSmena: false }) } } open={this.state.mainMenuSmena}>
-          
-          { !this.state.chooseUser ? null :
-            <DialogTitle>Смена {this.state.chooseUser.user_name} {this.state.mounth}</DialogTitle>
-          }
-          
+        <Dialog
+          onClose={() => {
+            this.setState({ mainMenuSmena: false });
+          }}
+          open={this.state.mainMenuSmena}
+        >
+          {!this.state.chooseUser ? null : (
+            <DialogTitle>
+              Смена {this.state.chooseUser.user_name} {this.state.mounth}
+            </DialogTitle>
+          )}
+
           <List sx={{ pt: 0 }}>
-            
-            { this.state.myOtherSmens.map( (item, key) =>
-              <ListItem key={key} button onClick={this.fastSmena.bind(this, item.id)}>
+            {this.state.myOtherSmens.map((item, key) => (
+              <ListItem
+                key={key}
+                button
+                onClick={this.fastSmena.bind(this, item.id)}
+              >
                 <ListItemAvatar>
                   <Avatar>
                     <AssessmentIcon />
@@ -1791,21 +1745,25 @@ class WorkSchedule_ extends React.Component {
                 </ListItemAvatar>
                 <ListItemText primary={item.name} />
               </ListItem>
-            ) }
-        
+            ))}
           </List>
         </Dialog>
 
-        <Dialog onClose={ () => { this.setState({ mainMenuPoints: false }) } } open={this.state.mainMenuPoints}>
-          
-          { !this.state.chooseUser ? null :
-            <DialogTitle>Смена точка с сегоднешнего дня {this.state.chooseUser.user_name}</DialogTitle>
-          }
-          
+        <Dialog
+          onClose={() => {
+            this.setState({ mainMenuPoints: false });
+          }}
+          open={this.state.mainMenuPoints}
+        >
+          {!this.state.chooseUser ? null : (
+            <DialogTitle>
+              Смена точка с сегоднешнего дня {this.state.chooseUser.user_name}
+            </DialogTitle>
+          )}
+
           <List sx={{ pt: 0 }}>
-            
-            { this.state.myOtherPoints.map( (item, key) =>
-              <ListItem key={key} button >
+            {this.state.myOtherPoints.map((item, key) => (
+              <ListItem key={key} button>
                 <ListItemAvatar>
                   <Avatar>
                     <HomeWorkIcon />
@@ -1813,22 +1771,37 @@ class WorkSchedule_ extends React.Component {
                 </ListItemAvatar>
                 <ListItemText primary={item.name} />
               </ListItem>
-            ) }
-        
+            ))}
           </List>
         </Dialog>
-        
-        <Dialog onClose={ () => { this.setState({ mainMenuPrice: false }) } } open={this.state.mainMenuPrice}>
-          
-          { !this.state.chooseUser ? null :
-            <DialogTitle>Часовая ставка {this.state.chooseUser.user_name} {this.state.mounth}</DialogTitle>
-          }
-          
-          { !this.state.chooseUser ? null :
+
+        <Dialog
+          onClose={() => {
+            this.setState({ mainMenuPrice: false });
+          }}
+          open={this.state.mainMenuPrice}
+        >
+          {!this.state.chooseUser ? null : (
+            <DialogTitle>
+              Часовая ставка {this.state.chooseUser.user_name}{' '}
+              {this.state.mounth}
+            </DialogTitle>
+          )}
+
+          {!this.state.chooseUser ? null : (
             <List sx={{ pt: 0 }}>
-              
-              { this.state.chooseUser.price_arr.map( (item, key) =>
-                <ListItem key={key} button onClick={this.changePriceH.bind(this, item)} style={ parseFloat(this.state.chooseUser.price_p_h) == parseFloat(item) ? { backgroundColor: 'green', color: '#fff' } : {} }>
+              {this.state.chooseUser.price_arr.map((item, key) => (
+                <ListItem
+                  key={key}
+                  button
+                  onClick={this.changePriceH.bind(this, item)}
+                  style={
+                    parseFloat(this.state.chooseUser.price_p_h) ==
+                    parseFloat(item)
+                      ? { backgroundColor: 'green', color: '#fff' }
+                      : {}
+                  }
+                >
                   <ListItemAvatar>
                     <Avatar>
                       <AssessmentIcon />
@@ -1836,44 +1809,64 @@ class WorkSchedule_ extends React.Component {
                   </ListItemAvatar>
                   <ListItemText primary={item} />
                 </ListItem>
-              ) }
-          
+              ))}
             </List>
-          }
+          )}
         </Dialog>
 
-        <Dialog onClose={ () => { this.setState({ mainMenuLVDIR: false }) } } open={this.state.mainMenuLVDIR}>
-          
+        <Dialog
+          onClose={() => {
+            this.setState({ mainMenuLVDIR: false });
+          }}
+          open={this.state.mainMenuLVDIR}
+        >
           <DialogTitle>Уровень директора {this.state.mounth}</DialogTitle>
-          
+
           <List style={{ overflow: 'scroll' }}>
-            { this.state.arr_dir_lv.map( (item, key) =>
-              <ListItem key={key} button style={ parseFloat(this.state.lv_dir) == parseFloat(item) ? { backgroundColor: 'green', color: '#fff' } : {} } onClick={this.checkNewLvDir.bind(this, item)}>
+            {this.state.arr_dir_lv.map((item, key) => (
+              <ListItem
+                key={key}
+                button
+                style={
+                  parseFloat(this.state.lv_dir) == parseFloat(item)
+                    ? { backgroundColor: 'green', color: '#fff' }
+                    : {}
+                }
+                onClick={this.checkNewLvDir.bind(this, item)}
+              >
                 <ListItemAvatar>
                   <Avatar>
                     <AssessmentIcon />
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary={item+' уровень'} />
+                <ListItemText primary={item + ' уровень'} />
               </ListItem>
-            ) }
+            ))}
           </List>
-          
         </Dialog>
 
-        <Dialog onClose={ () => { this.setState({ mainMenuDopBonus: false }) } } open={this.state.mainMenuDopBonus}>
-          
-          <DialogTitle>Командный бонус {this.state.mounth}-{ parseInt(this.state.tabTable) == 0 ? '01' : '16' }</DialogTitle>
-          
+        <Dialog
+          onClose={() => {
+            this.setState({ mainMenuDopBonus: false });
+          }}
+          open={this.state.mainMenuDopBonus}
+        >
+          <DialogTitle>
+            Командный бонус {this.state.mounth}-
+            {parseInt(this.state.tabTable) == 0 ? '01' : '16'}
+          </DialogTitle>
+
           <List sx={{ pt: 0 }}>
-            
             <ListItem button>
               <ListItemAvatar>
                 <Avatar style={{ backgroundColor: 'green' }}>
                   <CheckIcon style={{ color: '#fff' }} />
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText primary={'Выдать'} onClick={this.checkDopBonus.bind(this, 1)} />
+              <ListItemText
+                primary={'Выдать'}
+                onClick={this.checkDopBonus.bind(this, 1)}
+              />
             </ListItem>
             <ListItem button>
               <ListItemAvatar>
@@ -1881,158 +1874,295 @@ class WorkSchedule_ extends React.Component {
                   <CloseIcon style={{ color: '#fff' }} />
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText primary={'Отказать'} onClick={this.checkDopBonus.bind(this, 2)}/>
+              <ListItemText
+                primary={'Отказать'}
+                onClick={this.checkDopBonus.bind(this, 2)}
+              />
             </ListItem>
-            
           </List>
-          
         </Dialog>
 
-        { !this.state.userInfo || this.state.mainMenuZP === false ? null :
-          <Dialog onClose={ () => { this.setState({ mainMenuZP: false, userInfo: null }) } } open={this.state.mainMenuZP}>
-            
-            <DialogTitle>{this.state.userInfo.app} {this.state.userInfo.name} {this.state.userInfo.date}</DialogTitle>
+        {!this.state.userInfo || this.state.mainMenuZP === false ? null : (
+          <Dialog
+            onClose={() => {
+              this.setState({ mainMenuZP: false, userInfo: null });
+            }}
+            open={this.state.mainMenuZP}
+          >
+            <DialogTitle>
+              {this.state.userInfo.app} {this.state.userInfo.name}{' '}
+              {this.state.userInfo.date}
+            </DialogTitle>
 
             <DialogContent>
               <Grid container spacing={3} style={{ marginTop: 10 }}>
                 <Grid item xs={12} sm={12}>
-                  <MyTextInput label="Выданная сумма" value={this.state.userInfo.given} func={ (event) => { let userInfo = this.state.userInfo; userInfo.given = event.target.value; this.setState({ userInfo: userInfo }) } } /> 
+                  <MyTextInput
+                    label="Выданная сумма"
+                    value={this.state.userInfo.given}
+                    func={(event) => {
+                      let userInfo = this.state.userInfo;
+                      userInfo.given = event.target.value;
+                      this.setState({ userInfo: userInfo });
+                    }}
+                  />
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
                   <span>Вся сумма: </span>
-                  <span style={{color: '#c03', borderBottom: '1px dotted #c03', cursor: 'pointer'}} onClick={ () => { let userInfo = this.state.userInfo; userInfo.given = userInfo.fullPrice; this.setState({ userInfo: userInfo }) } }>{this.state.userInfo.fullPrice}</span>
+                  <span
+                    style={{
+                      color: '#c03',
+                      borderBottom: '1px dotted #c03',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      let userInfo = this.state.userInfo;
+                      userInfo.given = userInfo.fullPrice;
+                      this.setState({ userInfo: userInfo });
+                    }}
+                  >
+                    {this.state.userInfo.fullPrice}
+                  </span>
                 </Grid>
               </Grid>
             </DialogContent>
-            <DialogActions style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Button style={{ backgroundColor: 'green', color: '#fff' }} onClick={this.saveGive.bind(this)}>Сохранить</Button>
-              <Button style={{ backgroundColor: 'red', color: '#fff' }} onClick={() => { this.setState({ mainMenuZP: false, userInfo: null }) }}>Отмена</Button>
+            <DialogActions
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Button
+                style={{ backgroundColor: 'green', color: '#fff' }}
+                onClick={this.saveGive.bind(this)}
+              >
+                Сохранить
+              </Button>
+              <Button
+                style={{ backgroundColor: 'red', color: '#fff' }}
+                onClick={() => {
+                  this.setState({ mainMenuZP: false, userInfo: null });
+                }}
+              >
+                Отмена
+              </Button>
             </DialogActions>
           </Dialog>
-        }
-        
-        { !this.state.userInfo || this.state.isOpenModalH === false ? null :
+        )}
+
+        {!this.state.userInfo || this.state.isOpenModalH === false ? null : (
           <Dialog
             open={this.state.isOpenModalH}
-            onClose={ () => { this.setState({ isOpenModalH: false }) } }
-            scroll='paper'
+            onClose={() => {
+              this.setState({ isOpenModalH: false });
+            }}
+            scroll="paper"
             fullWidth={true}
             maxWidth={'md'}
             id={'OpenModalH'}
           >
-            <DialogTitle id="scroll-dialog-title">{this.state.userInfo.user.app_name + ' ' + this.state.userInfo.user.user_name + ' ' + this.state.userInfo.date}</DialogTitle>
+            <DialogTitle id="scroll-dialog-title">
+              {this.state.userInfo.user.app_name +
+                ' ' +
+                this.state.userInfo.user.user_name +
+                ' ' +
+                this.state.userInfo.date}
+            </DialogTitle>
             <DialogContent>
-              
-              <Typography style={{ marginBottom: 10 }}>{'Нагрузка: ' + this.state.userInfo.user.my_load_h + ' / Средняя нагрузка: ' + this.state.userInfo.user.all_load_h}</Typography>
-              { this.state.show_bonus === false ? null :
-                <Typography style={{ marginBottom: 20 }}>{'Бонус: ' + this.state.userInfo.user.bonus}</Typography>
-              }
-              
-              { this.state.otherAppList.length == 0 ? null :
-                <MySelect data={this.state.otherAppList} value={this.state.userInfo.new_app} func={ (event) => { let userInfo = this.state.userInfo; userInfo.new_app = event.target.value; this.setState({ userInfo: userInfo }) } } label='Кем работает' />
-              }
-              
-              { this.state.userInfo.mentor_list.length == 0 ? null :
-                <MySelect data={this.state.userInfo.mentor_list} value={this.state.userInfo.mentor_id} func={ (event) => { let userInfo = this.state.userInfo; userInfo.mentor_id = event.target.value; this.setState({ userInfo: userInfo }) } } label='Кем работает' />
-              }
-              
-              <Accordion 
-                style={{ marginTop: 20 }} 
-                expanded={this.state.openNewTimeAdd} 
-                onChange={ () => { this.setState({ openNewTimeAdd: !this.state.openNewTimeAdd }) } }>
-                  
-                <AccordionSummary
-                  expandIcon={<AddIcon />}
-                >
+              <Typography style={{ marginBottom: 10 }}>
+                {'Нагрузка: ' +
+                  this.state.userInfo.user.my_load_h +
+                  ' / Средняя нагрузка: ' +
+                  this.state.userInfo.user.all_load_h}
+              </Typography>
+              {this.state.show_bonus === false ? null : (
+                <Typography style={{ marginBottom: 20 }}>
+                  {'Бонус: ' + this.state.userInfo.user.bonus}
+                </Typography>
+              )}
+
+              {this.state.otherAppList.length == 0 ? null : (
+                <MySelect
+                  data={this.state.otherAppList}
+                  value={this.state.userInfo.new_app}
+                  func={(event) => {
+                    let userInfo = this.state.userInfo;
+                    userInfo.new_app = event.target.value;
+                    this.setState({ userInfo: userInfo });
+                  }}
+                  label="Кем работает"
+                />
+              )}
+
+              {this.state.userInfo.mentor_list.length == 0 ? null : (
+                <MySelect
+                  data={this.state.userInfo.mentor_list}
+                  value={this.state.userInfo.mentor_id}
+                  func={(event) => {
+                    let userInfo = this.state.userInfo;
+                    userInfo.mentor_id = event.target.value;
+                    this.setState({ userInfo: userInfo });
+                  }}
+                  label="Кем работает"
+                />
+              )}
+
+              <Accordion
+                style={{ marginTop: 20 }}
+                expanded={this.state.openNewTimeAdd}
+                onChange={() => {
+                  this.setState({ openNewTimeAdd: !this.state.openNewTimeAdd });
+                }}
+              >
+                <AccordionSummary expandIcon={<AddIcon />}>
                   <AccessTimeIcon style={{ marginRight: 10 }} />
                   <Typography>Добавить время</Typography>
                 </AccordionSummary>
-                <AccordionDetails style={{ display: 'flex', flexDirection: 'row' }}>
-                  
-                  <MyTimePicker value={this.state.newTimeStart} func={ (event) => { this.setState({ newTimeStart: event.target.value }) } } label='Время начала работы' />
+                <AccordionDetails
+                  style={{ display: 'flex', flexDirection: 'row' }}
+                >
+                  <MyTimePicker
+                    value={this.state.newTimeStart}
+                    func={(event) => {
+                      this.setState({ newTimeStart: event.target.value });
+                    }}
+                    label="Время начала работы"
+                  />
                   <Typography width={'3%'}></Typography>
-                  <MyTimePicker value={this.state.newTimeEnd} func={ (event) => { this.setState({ newTimeEnd: event.target.value }) } } label='Время окончания работы' />
+                  <MyTimePicker
+                    value={this.state.newTimeEnd}
+                    func={(event) => {
+                      this.setState({ newTimeEnd: event.target.value });
+                    }}
+                    label="Время окончания работы"
+                  />
                   <Typography width={'3%'}></Typography>
-                  <Button style={{ minWidth: '12%', backgroundColor: 'red', color: '#fff', cursor: 'pointer' }} onClick={ this.addTime.bind(this) }>Добавить</Button>
-                  
+                  <Button
+                    style={{
+                      minWidth: '12%',
+                      backgroundColor: 'red',
+                      color: '#fff',
+                      cursor: 'pointer',
+                    }}
+                    onClick={this.addTime.bind(this)}
+                  >
+                    Добавить
+                  </Button>
+
                   {/* <AddIcon style={{ minWidth: 50, minHeight: 38, cursor: 'pointer' }} onClick={ this.addTime.bind(this) } /> */}
-                  
                 </AccordionDetails>
-              </Accordion>  
-              
-              { this.state.userInfo.hours.map( (item, key) =>
+              </Accordion>
+
+              {this.state.userInfo.hours.map((item, key) => (
                 <Accordion key={key}>
                   <AccordionSummary
-                    expandIcon={<CloseIcon onClick={ this.delTime.bind(this, key) } />}
+                    expandIcon={
+                      <CloseIcon onClick={this.delTime.bind(this, key)} />
+                    }
                   >
                     <AccessTimeIcon style={{ marginRight: 10 }} />
-                    <Typography>{item.time_start + ' - ' + item.time_end}</Typography>
+                    <Typography>
+                      {item.time_start + ' - ' + item.time_end}
+                    </Typography>
                   </AccordionSummary>
-                  <AccordionDetails style={{ display: 'flex', flexDirection: 'row' }}>
-                    <MyTimePicker value={item.time_start} func={ this.changeHourse.bind(this, 'time_start', key) } label='Время начала работы' />
+                  <AccordionDetails
+                    style={{ display: 'flex', flexDirection: 'row' }}
+                  >
+                    <MyTimePicker
+                      value={item.time_start}
+                      func={this.changeHourse.bind(this, 'time_start', key)}
+                      label="Время начала работы"
+                    />
                     <Typography width={'3%'}></Typography>
-                    <MyTimePicker value={item.time_end} func={ this.changeHourse.bind(this, 'time_end', key) } label='Время окончания работы' />
+                    <MyTimePicker
+                      value={item.time_end}
+                      func={this.changeHourse.bind(this, 'time_end', key)}
+                      label="Время окончания работы"
+                    />
                   </AccordionDetails>
-                </Accordion>  
-              ) }
-              
-              {!this.state.userInfo.hist.length ? null :
-              <Accordion style={{ marginTop: 50 }} disabled>
-                <AccordionSummary>
-                  <Typography>История</Typography>
-                </AccordionSummary>
-              </Accordion>  
-              }
-              { this.state.userInfo.hist.map( (item, key) =>
+                </Accordion>
+              ))}
+
+              {!this.state.userInfo.hist.length ? null : (
+                <Accordion style={{ marginTop: 50 }} disabled>
+                  <AccordionSummary>
+                    <Typography>История</Typography>
+                  </AccordionSummary>
+                </Accordion>
+              )}
+              {this.state.userInfo.hist.map((item, key) => (
                 <Accordion key={key}>
                   <AccordionSummary>
-                    <Typography>{item.date + ' - ' + item.user_name}</Typography>
+                    <Typography>
+                      {item.date + ' - ' + item.user_name}
+                    </Typography>
                   </AccordionSummary>
-                  <AccordionDetails style={{ display: 'flex', flexDirection: 'column' }}>
-                    
-                    { item.items.map( (it, k) =>
-                      <Typography key={k}>{it.time_start + ' - ' + it.time_end} {it.app_name == '' ? '' : ' - ' + it.app_name} </Typography>
-                    ) }
-                    
+                  <AccordionDetails
+                    style={{ display: 'flex', flexDirection: 'column' }}
+                  >
+                    {item.items.map((it, k) => (
+                      <Typography key={k}>
+                        {it.time_start + ' - ' + it.time_end}{' '}
+                        {it.app_name == '' ? '' : ' - ' + it.app_name}{' '}
+                      </Typography>
+                    ))}
                   </AccordionDetails>
-                </Accordion>  
-              ) }
-              
+                </Accordion>
+              ))}
             </DialogContent>
-            <DialogActions style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Button style={{ backgroundColor: 'green', color: '#fff' }} onClick={this.saveDayHourse.bind(this)}>Сохранить</Button>
-              <Button style={{ backgroundColor: 'red', color: '#fff' }} onClick={() => { this.setState({ isOpenModalH: false }) }}>Отмена</Button>
+            <DialogActions
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Button
+                style={{ backgroundColor: 'green', color: '#fff' }}
+                onClick={this.saveDayHourse.bind(this)}
+              >
+                Сохранить
+              </Button>
+              <Button
+                style={{ backgroundColor: 'red', color: '#fff' }}
+                onClick={() => {
+                  this.setState({ isOpenModalH: false });
+                }}
+              >
+                Отмена
+              </Button>
             </DialogActions>
           </Dialog>
-        }
+        )}
 
-        { !this.state.userInfo || this.state.isOpenModalM === false ? null :
+        {!this.state.userInfo || this.state.isOpenModalM === false ? null : (
           <Dialog
             open={this.state.isOpenModalM}
-            onClose={ () => { this.setState({ isOpenModalM: false }) } }
-            scroll='paper'
+            onClose={() => {
+              this.setState({ isOpenModalM: false });
+            }}
+            scroll="paper"
             fullWidth={true}
             maxWidth={'md'}
             id={'OpenModalM'}
           >
-            <DialogTitle>{this.state.userInfo.user.app_name + ' ' + this.state.userInfo.user.user_name}</DialogTitle>
+            <DialogTitle>
+              {this.state.userInfo.user.app_name +
+                ' ' +
+                this.state.userInfo.user.user_name}
+            </DialogTitle>
             <DialogContent>
-              
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <List component="nav">
-
                     <ListItemButton
                       onClick={this.chooseType.bind(this, 0)}
                       style={{ backgroundColor: '#98e38d', color: '#fff' }}
                     >
                       <ListItemText primary="10:00 - 22:00" />
-                      {this.state.typeTimeAdd === 0 ?
-                        <SendIcon />
-                          :
-                        null
-                      }
+                      {this.state.typeTimeAdd === 0 ? <SendIcon /> : null}
                     </ListItemButton>
 
                     <ListItemButton
@@ -2040,11 +2170,7 @@ class WorkSchedule_ extends React.Component {
                       style={{ backgroundColor: '#3dcef2', color: '#fff' }}
                     >
                       <ListItemText primary="10:00 - 16:00" />
-                      {this.state.typeTimeAdd === 1 ?
-                        <SendIcon />
-                          :
-                        null
-                      }
+                      {this.state.typeTimeAdd === 1 ? <SendIcon /> : null}
                     </ListItemButton>
 
                     <ListItemButton
@@ -2052,11 +2178,7 @@ class WorkSchedule_ extends React.Component {
                       style={{ backgroundColor: '#1560bd', color: '#fff' }}
                     >
                       <ListItemText primary="16:00 - 22:00" />
-                      {this.state.typeTimeAdd === 2 ?
-                        <SendIcon />
-                          :
-                        null
-                      }
+                      {this.state.typeTimeAdd === 2 ? <SendIcon /> : null}
                     </ListItemButton>
 
                     <ListItemButton
@@ -2064,80 +2186,136 @@ class WorkSchedule_ extends React.Component {
                     >
                       <ListItemText primary="Другое" />
                     </ListItemButton>
-
                   </List>
-                  
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <MyDatePickerGraph year={this.state.mounth} renderWeekPickerDay={this.renderWeekPickerDay} />
+                  <MyDatePickerGraph
+                    year={this.state.mounth}
+                    renderWeekPickerDay={this.renderWeekPickerDay}
+                  />
                 </Grid>
               </Grid>
-
             </DialogContent>
-            <DialogActions style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Button style={{ backgroundColor: 'green', color: '#fff' }} onClick={this.saveUserM.bind(this)}>Сохранить</Button>
-              <Button style={{ backgroundColor: 'red', color: '#fff' }} onClick={() => { this.setState({ isOpenModalM: false }) }}>Отмена</Button>
+            <DialogActions
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Button
+                style={{ backgroundColor: 'green', color: '#fff' }}
+                onClick={this.saveUserM.bind(this)}
+              >
+                Сохранить
+              </Button>
+              <Button
+                style={{ backgroundColor: 'red', color: '#fff' }}
+                onClick={() => {
+                  this.setState({ isOpenModalM: false });
+                }}
+              >
+                Отмена
+              </Button>
             </DialogActions>
           </Dialog>
-        }
-        
+        )}
+
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
-          
-          <Grid item xs={12} sm={6}>
-            <MySelect data={this.state.points} value={this.state.point} func={ (event) => { this.setState({ point: event.target.value }) } } label='Точка' />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <MySelect data={this.state.mounths} value={this.state.mounth} func={ (event) => { this.setState({ mounth: event.target.value }) } } label='Месяц' />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
-          </Grid>
-          
-          <WorkSchedule_Table 
-            tabTable={this.state.tabTable}
-            one={this.state.one}
-            test_one={this.state.test_one}
-            kind={this.state.kind}
-            show_zp_one={this.state.show_zp_one}
-            lv_dir={this.state.lv_dir}
-            lv_cafe={this.state.lv_cafe}
-            two={this.state.two}
-            test_two={this.state.test_two}
-            show_zp_two={this.state.show_zp_two}
-            changeLVDir={this.changeLVDir.bind(this)} 
-            changeDopBonus={this.changeDopBonus.bind(this)}
-            openM={this.openM.bind(this)}
-            openH={this.openH.bind(this)}
-            openZP={this.openZP.bind(this)}
-            onChange={ (event, data) => { this.setState({ tabTable: data }) } }
-            onClick={ () => { this.setState({ mainMenu: true, chooseUser: item.data }) } }
-            onClick2={ () => {this.setState({ mainMenuPrice: true, chooseUser: item.data }) } }
-          />
 
-          {/* <WorkSchedule_Table_without_functions
-            tabTable={this.state.tabTable}
-            one={this.state.one}
-            test_one={this.state.test_one}
-            kind={this.state.kind}
-            show_zp_one={this.state.show_zp_one}
-            lv_dir={this.state.lv_dir}
-            lv_cafe={this.state.lv_cafe}
-            two={this.state.two}
-            test_two={this.state.test_two}
-            show_zp_two={this.state.show_zp_two}
-          /> */}
-          
+          <Grid item xs={12} sm={6}>
+            <MySelect
+              data={this.state.points}
+              value={this.state.point}
+              func={(event) => {
+                this.setState({ point: event.target.value });
+              }}
+              label="Точка"
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <MySelect
+              data={this.state.mounths}
+              value={this.state.mounth}
+              func={(event) => {
+                this.setState({ mounth: event.target.value });
+              }}
+              label="Месяц"
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <Button variant="contained" onClick={this.updateData.bind(this)}>
+              Обновить данные
+            </Button>
+          </Grid>
+
+          <Box sx={{ width: '100%' }}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Tabs
+                value={this.state.tabTable}
+                onChange={(event, data) => {
+                  this.setState({ tabTable: data });
+                }}
+                centered
+              >
+                <Tab label="С 1 по 15 числа" {...a11yProps(0)} />
+                <Tab label="С 16 по конец месяца" {...a11yProps(1)} />
+              </Tabs>
+            </Box>
+
+            <TabPanel value={this.state.tabTable} index={0}>
+              {!this.state.one ? null : (
+                <WorkSchedule_Table
+                  number={this.state.one}
+                  numberChoose={1}
+                  test={this.state.test_one}
+                  show_zp={this.state.show_zp_one}
+                  kind={this.state.kind}
+                  lv_dir={this.state.lv_dir}
+                  lv_cafe={this.state.lv_cafe}
+                  changeLVDir={this.changeLVDir.bind(this)}
+                  changeDopBonus={this.changeDopBonus.bind(this)}
+                  openM={this.openM.bind(this)}
+                  openH={this.openH.bind(this)}
+                  openZP={this.openZP.bind(this)}
+                  mix={this.mix.bind(this)}
+                  pricePerHour={this.pricePerHour.bind(this)}
+                />
+              )}
+            </TabPanel>
+
+            <TabPanel value={this.state.tabTable} index={1}>
+              {!this.state.two ? null : (
+                <WorkSchedule_Table
+                  number={this.state.two}
+                  numberChoose={2}
+                  test={this.state.test_two}
+                  show_zp={this.state.show_zp_two}
+                  kind={this.state.kind}
+                  lv_dir={this.state.lv_dir}
+                  lv_cafe={this.state.lv_cafe}
+                  changeLVDir={this.changeLVDir.bind(this)}
+                  changeDopBonus={this.changeDopBonus.bind(this)}
+                  openM={this.openM.bind(this)}
+                  openH={this.openH.bind(this)}
+                  openZP={this.openZP.bind(this)}
+                  mix={this.mix.bind(this)}
+                  pricePerHour={this.pricePerHour.bind(this)}
+                />
+              )}
+            </TabPanel>
+          </Box>
         </Grid>
       </>
-    )
+    );
   }
 }
 
 export function WorkSchedule() {
-  return (
-    <WorkSchedule_ />
-  );
+  return <WorkSchedule_ />;
 }
