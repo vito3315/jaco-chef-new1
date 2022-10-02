@@ -94,6 +94,7 @@ class СafeUprEdit_ extends React.Component {
       cafe_handle_close   : '',
       cook_common_stol    : 0,
       summ_driver         : '',
+      summ_driver_min     : '',
 
       is_сlosed_overload  : 0,
       is_сlosed_technic   : 0,
@@ -127,7 +128,7 @@ class СafeUprEdit_ extends React.Component {
         dop_time_list       : res.dop_time_list,
         actual_time_list    : res.actual_time_list,
         nal_zone_id         : res.nal_zone_id,
-        point_id            : res.points[0].id ,
+        point_id            : res.points[0].id,
         reason_list         : res.reason_list
     })
 
@@ -603,123 +604,132 @@ class СafeUprEdit_ extends React.Component {
  
 
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={12}>
-              <h1>{this.state.module_name}</h1>
-          </Grid>
+          <Grid item>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={12}>
+                  <h1>{this.state.module_name}</h1>
+              </Grid>
 
-          <Grid item xs={12} sm={6}>
-              <MySelect is_none={false} data={this.state.points_list} value={this.state.point_id} func={this.changePoint.bind(this)} label='Точка' />
-          </Grid>
-
-          <Grid item xs={12} sm={12}>
-              <MySelect is_none={false}  data={this.state.tables} value={this.state.count_tables} func={(event) => { this.setState({ count_tables: event.target.value }) } }  label='Количество столов сборки' />
+              <Grid item xs={12} sm={6}>
+                  <MySelect is_none={false} data={this.state.points_list} value={this.state.point_id} func={this.changePoint.bind(this)} label='Точка' />
+              </Grid>
+            </Grid>
           </Grid> 
 
-          <Grid item xs={12} sm={4}>
-              <MyCheckBox label='Общий стол' value={this.state.cook_common_stol == 1 ? true : false} func={this.changeChekBox.bind(this, 'cook_common_stol')} />
-          </Grid>
+          <Grid item>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={4}>
+                  <MySelect is_none={false}  data={this.state.tables} value={this.state.count_tables} func={(event) => { this.setState({ count_tables: event.target.value }) } }  label='Количество столов сборки' />
+              </Grid> 
 
-          <Grid item xs={12} sm={4}>
-              <MyCheckBox  label='Кафе работает' value={this.state.is_active == 1 ? true : false}  func={this.changeChekBox.bind(this, 'is_active')} />
-          </Grid>
+              <Grid item xs={12} sm={8}>
+                  <MyCheckBox label='Общий стол' value={this.state.cook_common_stol == 1 ? true : false} func={this.changeChekBox.bind(this, 'cook_common_stol')} />
+              </Grid>
 
-          <Grid item xs={12} sm={4}>
-            <Button color="primary" onClick={this.stopZone.bind(this)}>Поставить зону на стоп</Button>
-          </Grid>
+              <Grid item xs={12} sm={4}>
+                  <MyCheckBox  label='Кафе работает' value={this.state.is_active == 1 ? true : false}  func={this.changeChekBox.bind(this, 'is_active')} />
+              </Grid>
 
-          <Grid item xs={12} sm={6}>
-            <MyTextInput value={this.state.phone_upr} func={(event) => { this.setState({ phone_upr: event.target.value }) } } label='Телефон управляющего' />
-          </Grid>   
+              <Grid item xs={12} sm={8}>
+                <Button color="primary" onClick={this.stopZone.bind(this)}>Поставить зону на стоп</Button>
+              </Grid>
 
-          <Grid item xs={12} sm={6}>
-            <MyTextInput value={this.state.phone_man} func={(event) => { this.setState({ phone_man: event.target.value }) } } label='Телефон менеджера' />
-          </Grid> 
+              <Grid item xs={12} sm={6}>
+                <MyTextInput value={this.state.phone_upr} func={(event) => { this.setState({ phone_upr: event.target.value }) } } label='Телефон управляющего' />
+              </Grid>   
 
-          <Grid item xs={12} sm={6}>
-            <MyTextInput value={this.state.summ_driver} func={(event) => { this.setState({ summ_driver: event.target.value }) } } label='Максимальная сумма нала для курьера' />
-          </Grid> 
+              <Grid item xs={12} sm={6}>
+                <MyTextInput value={this.state.phone_man} func={(event) => { this.setState({ phone_man: event.target.value }) } } label='Телефон менеджера' />
+              </Grid> 
 
-          <Grid item xs={12} sm={6}>
-            <MyTextInput value={this.state.summ_driver_min} func={(event) => { this.setState({ summ_driver_min: event.target.value }) } } label='Максимальная сумма нала для курьера стажера' />
-          </Grid> 
-          
-          <Grid item xs={12} sm={6}>
-            <Button color="primary" onClick={this.addTimeDelivery.bind(this)}>Добавить время на доставку</Button>
-          </Grid> 
+              <Grid item xs={12} sm={4}>
+                <MyTextInput value={this.state.summ_driver} func={(event) => { this.setState({ summ_driver: event.target.value }) } } label='Максимальная сумма нала для курьера' />
+              </Grid> 
 
-          <Grid item xs={12} sm={6}>
-            <Button color="primary" variant="contained" onClick={this.save.bind(this)}>Сохранить</Button>
-          </Grid> 
+              <Grid item xs={12} sm={4}>
+                <MyTextInput value={this.state.summ_driver_min} func={(event) => { this.setState({ summ_driver_min: event.target.value }) } } label='Максимальная сумма нала для курьера стажера' />
+              </Grid> 
+              
+              <Grid item xs={12} sm={4}>
+                <Button color="primary" onClick={this.addTimeDelivery.bind(this)}>Добавить время на доставку</Button>
+              </Grid> 
+              
 
-          <Grid item xs={12} style={{marginBottom:'50px' }} >
+              <Grid item xs={12} sm={6}>
+                <Button color="primary" variant="contained" onClick={this.save.bind(this)}>Сохранить</Button>
+              </Grid> 
 
-            <Accordion>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-              >
-              <Typography>Актуальное время</Typography>
-              </AccordionSummary>
-                <AccordionDetails>
-                    <div style={{width:'100%', overflow: 'scroll' }} >          
-                    <Table >
-                          <TableHead>
-                            <TableRow>
-                              <TableCell style={{width:'33%' }}>Зона</TableCell>
-                              <TableCell style={{width:'33%' }}>Промежуток</TableCell>
-                              <TableCell style={{width:'33%' }}>Время доставки</TableCell>
-                            </TableRow>
-                          </TableHead>
+              <Grid item xs={12} style={{marginBottom:'50px' }} >
 
-                          <TableBody>
-                          { this.state.actual_time_list.map( (item, key) =>
-                              <TableRow key={key}>
-                                <TableCell>{item.name}</TableCell>
-                                <TableCell>{item.time_start} - {item.time_end}</TableCell>
-                                <TableCell>{item.time_dev} мин.</TableCell>
-                              </TableRow>
-                            ) }
-                        </TableBody>
-                    </Table>
-                  </div>   
-                </AccordionDetails>
-            </Accordion>
-
-            {this.state.dop_time_list.length > 0 ?                  
-              <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                >
-                <Typography>Дополнительное время</Typography>
-                </AccordionSummary>
-                  <AccordionDetails>
-                      <div style={{width:'100%', overflow: 'scroll' }} >          
-                      <Table >
-                            <TableHead>
-                              <TableRow>
-                                <TableCell style={{width:'33%' }}>Зона</TableCell>
-                                <TableCell style={{width:'33%' }}>Промежуток</TableCell>
-                                <TableCell style={{width:'33%' }}>Время доставки</TableCell>
-                                <TableCell style={{width:'1%' }}></TableCell>
-                              </TableRow>
-                            </TableHead>
-
-                            <TableBody>
-                            { this.state.dop_time_list.map( (item, key) =>
-                                <TableRow key={key}>
-                                  <TableCell>{item.name}</TableCell>
-                                  <TableCell>{item.time_start} - {item.time_end}</TableCell>
-                                  <TableCell>{item.time_dev} мин.</TableCell>
-                                  <TableCell> <CloseIcon onClick={this.delDopTime.bind(this, item.id)} /> </TableCell>
+                <Accordion>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                  >
+                  <Typography>Актуальное время</Typography>
+                  </AccordionSummary>
+                    <AccordionDetails>
+                        <div style={{width:'100%', overflow: 'scroll' }} >          
+                        <Table >
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell style={{width:'33%' }}>Зона</TableCell>
+                                  <TableCell style={{width:'33%' }}>Промежуток</TableCell>
+                                  <TableCell style={{width:'33%' }}>Время доставки</TableCell>
                                 </TableRow>
-                              ) }
-                          </TableBody>
-                      </Table>
-                    </div>   
-                  </AccordionDetails>
-              </Accordion>
-            : null }
-          </Grid>      
-                  
+                              </TableHead>
+
+                              <TableBody>
+                              { this.state.actual_time_list.map( (item, key) =>
+                                  <TableRow key={key}>
+                                    <TableCell>{item.name}</TableCell>
+                                    <TableCell>{item.time_start} - {item.time_end}</TableCell>
+                                    <TableCell>{item.time_dev} мин.</TableCell>
+                                  </TableRow>
+                                ) }
+                            </TableBody>
+                        </Table>
+                      </div>   
+                    </AccordionDetails>
+                </Accordion>
+
+                {this.state.dop_time_list.length > 0 ?                  
+                  <Accordion>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                    <Typography>Дополнительное время</Typography>
+                    </AccordionSummary>
+                      <AccordionDetails>
+                          <div style={{width:'100%', overflow: 'scroll' }} >          
+                          <Table >
+                                <TableHead>
+                                  <TableRow>
+                                    <TableCell style={{width:'33%' }}>Зона</TableCell>
+                                    <TableCell style={{width:'33%' }}>Промежуток</TableCell>
+                                    <TableCell style={{width:'33%' }}>Время доставки</TableCell>
+                                    <TableCell style={{width:'1%' }}></TableCell>
+                                  </TableRow>
+                                </TableHead>
+
+                                <TableBody>
+                                { this.state.dop_time_list.map( (item, key) =>
+                                    <TableRow key={key}>
+                                      <TableCell>{item.name}</TableCell>
+                                      <TableCell>{item.time_start} - {item.time_end}</TableCell>
+                                      <TableCell>{item.time_dev} мин.</TableCell>
+                                      <TableCell> <CloseIcon onClick={this.delDopTime.bind(this, item.id)} /> </TableCell>
+                                    </TableRow>
+                                  ) }
+                              </TableBody>
+                          </Table>
+                        </div>   
+                      </AccordionDetails>
+                  </Accordion>
+                : null }
+              </Grid>      
+                      
+            </Grid>
+          </Grid>
         </Grid>
       </>
     )
