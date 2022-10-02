@@ -122,6 +122,7 @@ class СafeUprEdit_ extends React.Component {
         cafe_handle_close   : res.point_info.cafe_handle_close,
         cook_common_stol    : res.point_info.cook_common_stol,
         summ_driver         : res.point_info.summ_driver,
+        summ_driver_min     : res.point_info.summ_driver_min,
         add_time_list       : res.add_time_list,
         dop_time_list       : res.dop_time_list,
         actual_time_list    : res.actual_time_list,
@@ -189,6 +190,7 @@ class СafeUprEdit_ extends React.Component {
         cafe_handle_close   : this.state.cafe_handle_close,
         cook_common_stol    : this.state.cook_common_stol,
         summ_driver         : this.state.summ_driver,
+        summ_driver_min     : this.state.summ_driver_min,
         is_active           : this.state.is_active,
       };
      
@@ -286,7 +288,7 @@ class СafeUprEdit_ extends React.Component {
   // дергаем данные точки
   async getPoint() {
     let data = {
-        point_id: this.state.point_id,
+      point_id: this.state.point_id,
     };
   
     let res = await this.getData('get_stat', data);
@@ -300,6 +302,7 @@ class СafeUprEdit_ extends React.Component {
         cafe_handle_close   : res.point_info.cafe_handle_close,
         cook_common_stol    : res.point_info.cook_common_stol,
         summ_driver         : res.point_info.summ_driver,
+        summ_driver_min     : res.point_info.summ_driver_min,
         zone_list           : res.point_zone,
         add_time_list       : res.add_time_list,
         dop_time_list       : res.dop_time_list,
@@ -625,15 +628,19 @@ class СafeUprEdit_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-              <MyTextInput value={this.state.phone_upr} func={(event) => { this.setState({ phone_upr: event.target.value }) } } label='Телефон управляющего' />
+            <MyTextInput value={this.state.phone_upr} func={(event) => { this.setState({ phone_upr: event.target.value }) } } label='Телефон управляющего' />
           </Grid>   
 
           <Grid item xs={12} sm={6}>
-              <MyTextInput value={this.state.phone_man} func={(event) => { this.setState({ phone_man: event.target.value }) } } label='Телефон менеджера' />
+            <MyTextInput value={this.state.phone_man} func={(event) => { this.setState({ phone_man: event.target.value }) } } label='Телефон менеджера' />
           </Grid> 
 
           <Grid item xs={12} sm={6}>
-              <MyTextInput value={this.state.summ_driver} func={(event) => { this.setState({ summ_driver: event.target.value }) } } label='Максимальная сумма нала для курьера' />
+            <MyTextInput value={this.state.summ_driver} func={(event) => { this.setState({ summ_driver: event.target.value }) } } label='Максимальная сумма нала для курьера' />
+          </Grid> 
+
+          <Grid item xs={12} sm={6}>
+            <MyTextInput value={this.state.summ_driver_min} func={(event) => { this.setState({ summ_driver_min: event.target.value }) } } label='Максимальная сумма нала для курьера стажера' />
           </Grid> 
           
           <Grid item xs={12} sm={6}>
