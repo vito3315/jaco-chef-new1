@@ -617,7 +617,6 @@ class СafeUprEdit_ extends React.Component {
           </Grid> 
 
           <Grid item>
-            
             <Grid container spacing={3}>
               <Grid item xs={12} sm={4}>
                   <MySelect is_none={false}  data={this.state.tables} value={this.state.count_tables} func={(event) => { this.setState({ count_tables: event.target.value }) } }  label='Количество столов сборки' />
