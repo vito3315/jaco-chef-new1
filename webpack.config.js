@@ -2,7 +2,7 @@ const path = require( 'path' );
 const HTMLWebpackPlugin = require( 'html-webpack-plugin' );
 const MiniCssExtractPlugin = require( 'mini-css-extract-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+//const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require("compression-webpack-plugin");
 
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
@@ -38,7 +38,11 @@ module.exports = {
         pathinfo: false,
     },
 
-    
+    stats: {
+        preset: 'minimal',
+        moduleTrace: true,
+        errorDetails: true,
+    },
     
     // module/loaders configuration
     module: {
@@ -90,11 +94,11 @@ module.exports = {
             endYear: currentYear + 5,
         }),
 
-        new BundleAnalyzerPlugin({
+        /*new BundleAnalyzerPlugin({
             analyzerMode: 'disabled',
             generateStatsFile: true,
             statsOptions: { source: false }
-        }),
+        }),*/
 
         
 
