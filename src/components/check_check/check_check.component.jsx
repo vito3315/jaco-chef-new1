@@ -192,112 +192,17 @@ class CheckCheck_ extends React.Component {
       module_name: 'Проверка чеков',
       is_load: false,
 
-      point_list: [
-        { id: -1, name: 'Все точки' },
-        {
-          base: 'jaco_rolls_1',
-          name: 'Тольятти, Ленинградская 47',
-          id: '1',
-          city_id: '1',
-        },
-        {
-          base: 'jaco_rolls_2',
-          name: 'Тольятти, Ворошилова 12а',
-          id: '2',
-          city_id: '1',
-        },
-        {
-          base: 'jaco_rolls_3',
-          name: 'Тольятти, Матросова 32',
-          id: '3',
-          city_id: '1',
-        },
-        {
-          base: 'jaco_rolls_6',
-          name: 'Тольятти, Цветной 1',
-          id: '6',
-          city_id: '1',
-        },
-        {
-          base: 'jaco_rolls_4',
-          name: 'Самара, Куйбышева 113',
-          id: '4',
-          city_id: '2',
-        },
-        {
-          base: 'jaco_rolls_5',
-          name: 'Самара, Победы 10',
-          id: '5',
-          city_id: '2',
-        },
-        {
-          base: 'jaco_rolls_7',
-          name: 'Самара, Молодёжная 2',
-          id: '7',
-          city_id: '2',
-        },
-      ],
+      point_list: [],
+     
       point_id: 0,
       type : 0,
-      select_list: [
-        { id: '1', name: 'выгрузить из налоговой' },
-        { id: '2', name: 'удалить все данные' },
-        { id: '3', name: 'очистить для 1с' },
-        { id: '4', name: 'выгрузить для 1с' },
-        { id: '5', name: 'сверить сумму за месяц' },
-        { id: '6', name: 'сверить сумму по дням' },
-        { id: '7', name: 'есть у нас, но нету в налоговой' },
-        { id: '8', name: 'не завершенные заказы' },
-        { id: '9', name: 'очистить для 1с' },
-      ],
+      select_list: [],
 
+      kassa_list  : [],
+      
       date_start: formatDate(date_start),
       date_end: formatDate(new Date()),
 
-      /*
-      allOrder: [
-        {
-          id: '1',
-          number: '123456',
-          date_order: '09.09.2022/15:24',
-          type: 'Доставка',
-          sum: '1000',
-          order_box: '1',
-        },
-        {
-          id: '2',
-          number: '223456',
-          date_order: '09.09.2022/10:57',
-          type: 'Доставка',
-          sum: '2000',
-          order_box: '2',
-        },
-        {
-          id: '3',
-          number: '323456',
-          date_order: '08.09.2022/17:13',
-          type: 'В зале',
-          sum: '3000',
-          order_box: '1',
-        },
-        {
-          id: '4',
-          number: '423456',
-          date_order: '07.09.2022/14:28',
-          type: 'На вынос',
-          sum: '1500',
-          order_box: '2',
-        },
-        {
-          id: '5',
-          number: '523456',
-          date_order: '06.09.2022/18:20',
-          type: 'Доставка',
-          sum: '5000',
-          order_box: '2',
-        },
-      ],
-      */
       allOrder: [],
       orders: [],
       order: {},
@@ -359,7 +264,17 @@ class CheckCheck_ extends React.Component {
   }
 
   async componentDidMount(){
-    console.log('test');
+   
+    let res = await this.getData('get_points');
+
+    if(res.st == true){
+      this.setState({
+        kassa_list: res.kassa_list,
+        point_list: res.point_list,
+        select_list: res.type_list,
+      });
+    }
+   
   }
 
   // функция которая присваивает значение в модуле
@@ -389,14 +304,13 @@ class CheckCheck_ extends React.Component {
 
   // открыть todo
   async openOrder(id) {
-    //const res = this.state.allOrder.find((el) => el.id === id);
-    console.log('pointt_id',this.state.point_id);
-    console.log('type',this.state.type);
+   
     let data = {
       date_start  : this.state.date_start,
       date_end    : this.state.date_end,
       point_id    : this.state.point_id,
-      type        : this.state.type
+      type        : this.state.type,
+      kassa       : this.state.kassa,
     };
 
     let res = await this.getData('show', data);
@@ -407,8 +321,8 @@ class CheckCheck_ extends React.Component {
     
     console.log('res_type',res.type);
 
-    // отображаем соообщение при удалении
-    if(res.to_del){
+    // отображаем соообщение 
+    if(res.text){
       alert(res.text);
     }
     /* */
@@ -461,6 +375,7 @@ class CheckCheck_ extends React.Component {
 
     console.log('modal_data', data)
     console.log('row_numb', row_numb)
+    console.log('point_id', point_id)
     let res = await this.getData('find_order', data);
 
     console.log('res', res)
@@ -532,7 +447,15 @@ class CheckCheck_ extends React.Component {
               data={this.state.select_list}
               value={this.state.type}
               func={ this.changeSort.bind(this, 'type') }
-              label="Селект"
+              label="Тип"
+            />
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <MySelect
+              data={this.state.kassa_list}
+              value={this.state.kassa}
+              func={ this.changeSort.bind(this, 'kassa') }
+              label="Касса"
             />
           </Grid>
 
