@@ -435,94 +435,115 @@ class CountUsers_TablePanel extends React.Component {
 
   render() {
     return (
-      <>
-        <TabPanel value={this.props.value} style={{ padding: '0' }}>
-          <Grid item sm={12} mb={3}>
-            <Table size="small" style={{ whiteSpace: 'nowrap' }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell style={{ width: '30%' }}>Время</TableCell>
-                  <TableCell style={{ width: '30%' }}>Должность</TableCell>
-                  <TableCell style={{ width: '20%' }}>Кол-во</TableCell>
-                  <TableCell style={{ width: '20%' }}></TableCell>
-                </TableRow>
-              </TableHead>
-              {this.state.item.map((item, key) => (
-                <React.Fragment key={key}>
-                  <TableBody
-                    key={key + 100}
-                    sx={{
-                      '& td': { border: 0 },
-                      borderBottom: 1,
-                      borderColor: 'divider',
-                    }}
-                  >
-                    <TableRow>
-                      <TableCell rowSpan="5">
-                        <Grid item xs={6} sm={12} mb={2}>
-                          <MyTimePicker
-                            value={item.time_start}
-                            func={this.changeTimeStart.bind(this, item)}
-                            label="Время начала"
-                          />
-                        </Grid>
-                        <Grid item xs={6} sm={12}>
-                          <MyTimePicker
-                            value={item.time_end}
-                            func={this.changeTimeEnd.bind(this, item)}
-                            label="Время окончания"
-                          />
-                        </Grid>
-                      </TableCell>
-                    </TableRow>
-                    {item.data.map((el, i) => (
-                      <TableRow key={i + 1000}>
-                        <TableCell>{el.post}</TableCell>
-                        <TableCell>
-                          <MyTextInput
-                            value={el.quantity}
-                            type="number"
-                            func={this.changeItem.bind(this, el, item)}
-                          />
-                        </TableCell>
-                        {i !== 1 ? null : (
-                          <TableCell colSpan="5" align="center">
-                            <DeleteIcon
-                              fontSize="large"
-                              onClick={this.deleteItem.bind(
-                                this,
-                                item.id_table
-                              )}
-                              style={{ cursor: 'pointer' }}
-                            />
-                          </TableCell>
-                        )}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </React.Fragment>
-              ))}
-            </Table>
+      <TabPanel value={this.props.value} style={{ padding: '0' }}>
+        <Grid container spacing={3}>
+          
+          <Grid item xs={8} sm={3}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', height: '100%', minHeight: 120 }}>
+              <MyTimePicker
+                value={'00:00'}
+                func={()=> {}}
+                label="Время начала"
+              />
+              <MyTimePicker
+                value={'00:00'}
+                func={()=> {}}
+                label="Время окончания"
+              />
+            </div>
           </Grid>
-          <Grid item sm={12} className="button">
-            <Button
-              variant="contained"
-              style={{ whiteSpace: 'nowrap' }}
-              onClick={this.addItem.bind(this)}
-            >
-              Добавить период
-            </Button>
+          <Grid item xs={4} sm={0} sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'center', alignItems: 'center' }}>
+            <DeleteIcon
+              fontSize="large"
+              onClick={() => {}}
+              style={{ cursor: 'pointer' }}
+            />
+          </Grid>
+          <Grid item sm={8}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+              
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <span style={{ minWidth: 200 }}>Должность 1</span>
+                <MyTextInput
+                  value={0}
+                  type="number"
+                  func={ () => {} }
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <span style={{ minWidth: 200 }}>Должность 2</span>
+                <MyTextInput
+                  value={0}
+                  type="number"
+                  func={ () => {} }
+                />
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <span style={{ minWidth: 200 }}>Должность 3</span>
+                <MyTextInput
+                  value={0}
+                  type="number"
+                  func={ () => {} }
+                />
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <span style={{ minWidth: 200 }}>Должность 4</span>
+                <MyTextInput
+                  value={0}
+                  type="number"
+                  func={ () => {} }
+                />
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <span style={{ minWidth: 200 }}>Должность 5</span>
+                <MyTextInput
+                  value={0}
+                  type="number"
+                  func={ () => {} }
+                />
+              </div>
+              
+            </div>
+          </Grid>
+          
+          <Grid item xs={4} sm={1} sx={{ display: { xs: 'none', sm: 'flex' }, justifyContent: 'center', alignItems: 'center' }}>
+            <DeleteIcon
+              fontSize="large"
+              onClick={() => {}}
+              style={{ cursor: 'pointer' }}
+            />
+          </Grid>
 
-            <Button
-              variant="contained"
-              onClick={this.props.save.bind(this, this.state.item)}
-              style={{ backgroundColor: '#00a550', whiteSpace: 'nowrap' }}
-            >
-              Сохранить изменения
-            </Button>
+
+          
+          <Grid item sm={12} className="button">
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6} className="button">
+                <Button
+                  variant="contained"
+                  style={{ whiteSpace: 'nowrap' }}
+                  onClick={this.addItem.bind(this)}
+                >
+                  Добавить
+                </Button>
+              </Grid>
+
+              <Grid item xs={12} sm={6} className="button">
+                <Button
+                  variant="contained"
+                  onClick={this.props.save.bind(this, this.state.item)}
+                  style={{ backgroundColor: '#00a550', whiteSpace: 'nowrap' }}
+                >
+                  Сохранить изменения
+                </Button>
+              </Grid>
+            </Grid>
           </Grid>
-        </TabPanel>
-      </>
+        </Grid>
+      </TabPanel>
     );
   }
 }
@@ -979,85 +1000,78 @@ class CountUsers_ extends React.Component {
           save={this.saveItem.bind(this)}
         />
 
-        <Grid container spacing={3} mb={3}>
-          <Grid item xs={12} sm={12}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
-        </Grid>
-
-        <Grid item xs={12} sm container spacing={3}>
-          <Grid item xs container direction="column" spacing={3} mb={4} sm={7}>
-            {/* выбор и кнопка */}
-            <Grid
-              container
-              spacing={3}
-              direction="row"
-              wrap="nowrap"
-              item
-              xs
-              mb={4}
-            >
-              <Grid item sm={6}>
-                <MySelect
-                  data={this.state.points}
-                  value={this.state.point}
-                  func={this.changePoint.bind(this)}
-                  label="Точка"
-                />
-              </Grid>
-
-              <Grid item sm={2}>
-                <Button
-                  disabled={this.state.point < 1 ? true : false}
-                  variant="contained"
-                  style={{ whiteSpace: 'nowrap' }}
-                  onClick={this.openModal.bind(this, 'Особый день')}
-                >
-                  Добавить особый день
-                </Button>
-              </Grid>
-            </Grid>
-
-            {/* таблица */}
-
-            {this.state.point < 1 ? null : (
-              <Grid container spacing={3} p={4}>
-                <Grid item sm={12}>
-                  <TabContext value={this.state.ItemTab}>
-                    <Box
-                      sx={{
-                        borderBottom: 1,
-                        borderColor: 'divider',
-                        marginBottom: 3,
-                      }}
-                    >
-                      <TabList
-                        onChange={this.changeTab.bind(this)}
-                        variant="fullWidth"
-                      >
-                        <Tab label="Понедельник" value="1" />
-                        <Tab label="Вторник" value="2" />
-                        <Tab label="Среда" value="3" />
-                        <Tab label="Четверг" value="4" />
-                        <Tab label="Пятница" value="5" />
-                        <Tab label="Суббота" value="6" />
-                        <Tab label="Воскресенье" value="7" />
-                      </TabList>
-                    </Box>
-
-                    <CountUsers_TablePanel
-                      value={this.state.ItemTab}
-                      event={this.state.item}
-                      save={this.saveItem.bind(this)}
-                    />
-                  </TabContext>
-                </Grid>
-              </Grid>
-            )}
+        
+          <Grid item xs={12} sm={6}>
+            <MySelect
+              data={this.state.points}
+              value={this.state.point}
+              func={this.changePoint.bind(this)}
+              label="Точка"
+            />
           </Grid>
-          {/* аккордион */}
-          {this.state.point < 1 || !this.state.dataPoint.length ? null : (
-            <Grid item sm={5}>
+
+          <Grid item xs={12} sm={6}>
+            <Button
+              disabled={this.state.point < 1 ? true : false}
+              variant="contained"
+              style={{ whiteSpace: 'nowrap' }}
+              onClick={this.openModal.bind(this, 'Особый день')}
+            >
+              Добавить особый день
+            </Button>
+          </Grid>
+        
+
+          {/* таблица */}
+
+          {this.state.point < 1 ? null : (
+            
+            <Grid item xs={12} sm={8}>
+              <TabContext value={this.state.ItemTab}>
+                <Box
+                  sx={{
+                    borderBottom: 1,
+                    borderColor: 'divider',
+                    marginBottom: 3,
+                  }}
+                >
+                  <TabList
+                    onChange={this.changeTab.bind(this)}
+                    //variant="fullWidth"
+                    variant="scrollable"
+                    scrollButtons
+                    allowScrollButtonsMobile
+                  >
+                    <Tab label="Понедельник" value="1" />
+                    <Tab label="Вторник" value="2" />
+                    <Tab label="Среда" value="3" />
+                    <Tab label="Четверг" value="4" />
+                    <Tab label="Пятница" value="5" />
+                    <Tab label="Суббота" value="6" />
+                    <Tab label="Воскресенье" value="7" />
+                  </TabList>
+                </Box>
+
+                <CountUsers_TablePanel
+                  
+                  value={this.state.ItemTab}
+                  event={this.state.item}
+                  save={this.saveItem.bind(this)}
+                />
+              </TabContext>
+            </Grid>
+            
+          )}
+          
+
+            {/* аккордион */}
+            {this.state.point < 1 || !this.state.dataPoint.length ? null : (
+
+            <Grid item xs={12} sm={4}>
               <Accordion>
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
