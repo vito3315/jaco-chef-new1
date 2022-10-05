@@ -372,6 +372,7 @@ class Events_ extends React.Component {
                 { parseInt(this.state.chooseEvent) !== 2 ? null :
                   <>
                     <Grid item xs={6} sm={6}>
+                    {console.log(this.state.timeStart2)}
                       <MyTimePicker value={ this.state.timeStart2 } func={ this.changeTimeStart2.bind(this) } label='Время начала работы' />
                     </Grid>
                     <Grid item xs={6} sm={6}>

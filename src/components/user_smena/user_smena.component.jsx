@@ -184,6 +184,8 @@ class UserSmena_Modal extends React.Component {
       name: '',
       smenaName: '',
     });
+
+    this.props.onClose();
   }
 
   delete() {
