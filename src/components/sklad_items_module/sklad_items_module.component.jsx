@@ -264,8 +264,80 @@ class SkladItemsModuleModal extends React.Component {
   }
 }
 
-class SkladItemsModuleTable extends React.Component {
+function isEqual(object1, object2) {
+  const props1 = Object.getOwnPropertyNames(object1);
+  const props2 = Object.getOwnPropertyNames(object2);
+
+  if (props1.length !== props2.length) {
+    return false;
+  }
+
+  for (let i = 0; i < props1.length; i += 1) {
+    const prop = props1[i];
+
+    if (object1[prop] !== object2[prop]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+class SkladItemsModuleTableRow extends React.Component {
+
   shouldComponentUpdate(nextProps) {
+    
+    var array1 = nextProps.item;
+    var array2 = this.props.item;
+
+    /*if( parseInt(this.props.item.id) == 96 ){
+      console.log( array1, array2, isEqual(array1, array2) )
+    }*/
+
+    return isEqual(array1, array2);
+  }
+
+  render (){
+    const it = this.props.item;
+
+    console.log( 'render' )
+
+    return (  
+      <TableRow>
+        <TableCell>{it.id}</TableCell>
+        <TableCell> 
+        { parseInt(it.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> } 
+        </TableCell>
+        <TableCell>
+          <MyCheckBox label="" 
+          value={ parseInt(it.show_in_rev) == 1 ? true : false } 
+          func={ this.props.changeTableItem.bind(this, it.id, this.props.type[0], true) } 
+          />
+        </TableCell>
+        <TableCell 
+        style={{ cursor: 'pointer' }} 
+        onClick={this.props.showEditItem.bind(this, it.id, 'Редактирование товара')}
+        >{it.name}</TableCell>
+        <TableCell>{it.los_percent} %</TableCell>
+        <TableCell>{it.percent} %</TableCell>
+        <TableCell>{it.pf_name}</TableCell>
+        <TableCell>{it.ei_name}</TableCell>
+        <TableCell>{it.storage_name}</TableCell>
+        <TableCell>
+          <MyTextInput 
+          label="" 
+          value={it.handle_price} 
+          func={ this.props.changeTableItem.bind(this, it.id, this.props.type[1], false) }
+          onBlur={ this.props.changeTableItem.bind(this, it.id, this.props.type[1], true) } 
+          />
+        </TableCell>
+      </TableRow>           
+    )
+  }
+}
+
+class SkladItemsModuleTable extends React.Component {
+  /*shouldComponentUpdate(nextProps) {
     
     var array1 = nextProps.items;
     var array2 = this.props.items;
@@ -275,7 +347,7 @@ class SkladItemsModuleTable extends React.Component {
     });
 
       return !is_same;
-  }
+  }*/
 
   render (){
       return (  
@@ -298,34 +370,16 @@ class SkladItemsModuleTable extends React.Component {
                   
             <TableBody>
               {this.props.items.map( (it, k) =>
-                <TableRow key={k}>
-                  <TableCell>{it.id}</TableCell>
-                  <TableCell> 
-                  { parseInt(it.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> } 
-                  </TableCell>
-                  <TableCell>
-                    <MyCheckBox label="" 
-                    value={ parseInt(it.show_in_rev) == 1 ? true : false } 
-                    func={ this.props.changeTableItem.bind(this, it.id, this.props.type[0]) } 
-                    />
-                  </TableCell>
-                  <TableCell 
-                  style={{ cursor: 'pointer' }} 
-                  onClick={this.props.showEditItem.bind(this, it.id, 'Редактирование товара')}
-                  >{it.name}</TableCell>
-                  <TableCell>{it.los_percent} %</TableCell>
-                  <TableCell>{it.percent} %</TableCell>
-                  <TableCell>{it.pf_name}</TableCell>
-                  <TableCell>{it.ei_name}</TableCell>
-                  <TableCell>{it.storage_name}</TableCell>
-                  <TableCell>
-                    <MyTextInput 
-                    label="" 
-                    value={it.handle_price} 
-                    func={ this.props.changeTableItem.bind(this, it.id, this.props.type[1]) } 
-                    />
-                  </TableCell>
-                </TableRow>           
+                <SkladItemsModuleTableRow 
+                  item={it} 
+                  key={k} 
+                  type={this.props.type} 
+                  changeTableItem={this.props.changeTableItem.bind(this)} 
+                  showEditItem={this.props.showEditItem.bind(this)}
+                />
+
+
+                          
               ) } 
             </TableBody>
           </Table>
@@ -624,7 +678,7 @@ class SkladItemsModule_ extends React.Component {
     }
   }
 
-  changeTableItem(item_id, type, event){
+  changeTableItem(item_id, type, is_save = true, event){
     
     if( parseInt(type) == 1 ){
       let data = event.target.checked;
@@ -651,6 +705,8 @@ class SkladItemsModule_ extends React.Component {
     if( parseInt(type) == 3 ){
       let data = event.target.value;
 
+      console.log( data, item_id )
+
       let items = this.state.cats;
 
       items.map( (item, key) => {
@@ -663,11 +719,15 @@ class SkladItemsModule_ extends React.Component {
         } )
       } )
 
+      console.log( items )
+
       this.setState({
         cats: items
       })
 
-      this.saveItem(item_id, 'handle_price', data);
+      if( is_save === true ){
+        this.saveItem(item_id, 'handle_price', data);
+      }
     }
 
 
