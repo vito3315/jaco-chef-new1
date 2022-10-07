@@ -1671,9 +1671,7 @@ class WorkSchedule_ extends React.Component {
         </Dialog>
 
         <Dialog
-          onClose={() => {
-            this.setState({ mainMenuH: false });
-          }}
+          onClose={() => { this.setState({ mainMenuH: false }); }}
           open={this.state.mainMenuH}
         >
           {!this.state.chooseUser ? null : (
@@ -1720,9 +1718,7 @@ class WorkSchedule_ extends React.Component {
         </Dialog>
 
         <Dialog
-          onClose={() => {
-            this.setState({ mainMenuSmena: false });
-          }}
+          onClose={() => { this.setState({ mainMenuSmena: false }); }}
           open={this.state.mainMenuSmena}
         >
           {!this.state.chooseUser ? null : (
@@ -1750,9 +1746,7 @@ class WorkSchedule_ extends React.Component {
         </Dialog>
 
         <Dialog
-          onClose={() => {
-            this.setState({ mainMenuPoints: false });
-          }}
+          onClose={() => { this.setState({ mainMenuPoints: false }); }}
           open={this.state.mainMenuPoints}
         >
           {!this.state.chooseUser ? null : (
@@ -1776,9 +1770,7 @@ class WorkSchedule_ extends React.Component {
         </Dialog>
 
         <Dialog
-          onClose={() => {
-            this.setState({ mainMenuPrice: false });
-          }}
+          onClose={() => { this.setState({ mainMenuPrice: false }); }}
           open={this.state.mainMenuPrice}
         >
           {!this.state.chooseUser ? null : (
@@ -1815,9 +1807,7 @@ class WorkSchedule_ extends React.Component {
         </Dialog>
 
         <Dialog
-          onClose={() => {
-            this.setState({ mainMenuLVDIR: false });
-          }}
+          onClose={() => { this.setState({ mainMenuLVDIR: false }); }}
           open={this.state.mainMenuLVDIR}
         >
           <DialogTitle>Уровень директора {this.state.mounth}</DialogTitle>
@@ -1846,9 +1836,7 @@ class WorkSchedule_ extends React.Component {
         </Dialog>
 
         <Dialog
-          onClose={() => {
-            this.setState({ mainMenuDopBonus: false });
-          }}
+          onClose={() => { this.setState({ mainMenuDopBonus: false }); }}
           open={this.state.mainMenuDopBonus}
         >
           <DialogTitle>
