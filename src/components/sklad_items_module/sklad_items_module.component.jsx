@@ -46,6 +46,7 @@ class SkladItemsModuleModal extends React.Component {
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
+    //console.log(nextProps.event)
     if(!nextProps.event) {
       return null;
     }
@@ -101,7 +102,7 @@ class SkladItemsModuleModal extends React.Component {
       <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
         
         <Grid container spacing={3}>
-
+          {console.log(this.state.itemEdit)}
               <Grid item xs={12}>
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
