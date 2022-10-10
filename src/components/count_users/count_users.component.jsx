@@ -534,7 +534,6 @@ class CountUsers_TablePanel extends React.Component {
 
   render() {
     return (
-<<<<<<< HEAD
       <>
         <TabPanel value={this.props.value} style={{ padding: '0' }}>
           <Grid container spacing={3}>
@@ -1117,12 +1116,9 @@ class CountUsers_ extends React.Component {
           <Grid item xs={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
-<<<<<<< HEAD
 
           {/* выбор и кнопка */}
-=======
-        
->>>>>>> refs/remotes/origin/main
+
           <Grid item xs={12} sm={6}>
             <MySelect
               data={this.state.points}
@@ -1135,29 +1131,17 @@ class CountUsers_ extends React.Component {
           <Grid item xs={12} sm={6}>
             <Button
               disabled={this.state.point < 1 ? true : false}
-<<<<<<< HEAD
               variant={this.state.point < 1 ? 'outlined' : 'contained'}
-=======
-              variant="contained"
->>>>>>> refs/remotes/origin/main
               style={{ whiteSpace: 'nowrap' }}
               onClick={this.openModal.bind(this, 'Особый день')}
             >
               Добавить особый день
             </Button>
           </Grid>
-<<<<<<< HEAD
-=======
-        
->>>>>>> refs/remotes/origin/main
 
           {/* таблица */}
 
           {this.state.point < 1 ? null : (
-<<<<<<< HEAD
-=======
-            
->>>>>>> refs/remotes/origin/main
             <Grid item xs={12} sm={8}>
               <TabContext value={this.state.ItemTab}>
                 <Box
@@ -1185,30 +1169,17 @@ class CountUsers_ extends React.Component {
                 </Box>
 
                 <CountUsers_TablePanel
-<<<<<<< HEAD
-=======
-                  
->>>>>>> refs/remotes/origin/main
                   value={this.state.ItemTab}
                   event={this.state.item}
                   save={this.saveItem.bind(this)}
                 />
               </TabContext>
             </Grid>
-<<<<<<< HEAD
-          )}
 
-          {/* аккордион */}
-          {this.state.point < 1 || !this.state.dataPoint.length ? null : (
-=======
-            
           )}
-          
 
             {/* аккордион */}
             {this.state.point < 1 || !this.state.dataPoint.length ? null : (
-
->>>>>>> refs/remotes/origin/main
             <Grid item xs={12} sm={4}>
               <Accordion>
                 <AccordionSummary
