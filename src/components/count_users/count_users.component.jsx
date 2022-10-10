@@ -534,6 +534,7 @@ class CountUsers_TablePanel extends React.Component {
 
   render() {
     return (
+<<<<<<< HEAD
       <>
         <TabPanel value={this.props.value} style={{ padding: '0' }}>
           <Grid container spacing={3}>
@@ -653,6 +654,117 @@ class CountUsers_TablePanel extends React.Component {
           </Grid>
         </Grid>
       </>
+=======
+      <TabPanel value={this.props.value} style={{ padding: '0' }}>
+        <Grid container spacing={3}>
+          
+          <Grid item xs={8} sm={3}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', height: '100%', minHeight: 120 }}>
+              <MyTimePicker
+                value={'00:00'}
+                func={()=> {}}
+                label="Время начала"
+              />
+              <MyTimePicker
+                value={'00:00'}
+                func={()=> {}}
+                label="Время окончания"
+              />
+            </div>
+          </Grid>
+          <Grid item xs={4} sm={0} sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'center', alignItems: 'center' }}>
+            <DeleteIcon
+              fontSize="large"
+              onClick={() => {}}
+              style={{ cursor: 'pointer' }}
+            />
+          </Grid>
+          <Grid item sm={8}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+              
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <span style={{ minWidth: 200 }}>Должность 1</span>
+                <MyTextInput
+                  value={0}
+                  type="number"
+                  func={ () => {} }
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <span style={{ minWidth: 200 }}>Должность 2</span>
+                <MyTextInput
+                  value={0}
+                  type="number"
+                  func={ () => {} }
+                />
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <span style={{ minWidth: 200 }}>Должность 3</span>
+                <MyTextInput
+                  value={0}
+                  type="number"
+                  func={ () => {} }
+                />
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <span style={{ minWidth: 200 }}>Должность 4</span>
+                <MyTextInput
+                  value={0}
+                  type="number"
+                  func={ () => {} }
+                />
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <span style={{ minWidth: 200 }}>Должность 5</span>
+                <MyTextInput
+                  value={0}
+                  type="number"
+                  func={ () => {} }
+                />
+              </div>
+              
+            </div>
+          </Grid>
+          
+          <Grid item xs={4} sm={1} sx={{ display: { xs: 'none', sm: 'flex' }, justifyContent: 'center', alignItems: 'center' }}>
+            <DeleteIcon
+              fontSize="large"
+              onClick={() => {}}
+              style={{ cursor: 'pointer' }}
+            />
+          </Grid>
+
+
+          
+          <Grid item sm={12} className="button">
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6} className="button">
+                <Button
+                  variant="contained"
+                  style={{ whiteSpace: 'nowrap' }}
+                  onClick={this.addItem.bind(this)}
+                >
+                  Добавить
+                </Button>
+              </Grid>
+
+              <Grid item xs={12} sm={6} className="button">
+                <Button
+                  variant="contained"
+                  onClick={this.props.save.bind(this, this.state.item)}
+                  style={{ backgroundColor: '#00a550', whiteSpace: 'nowrap' }}
+                >
+                  Сохранить изменения
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </TabPanel>
+>>>>>>> refs/remotes/origin/main
     );
   }
 }
@@ -1116,8 +1228,12 @@ class CountUsers_ extends React.Component {
           <Grid item xs={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
+<<<<<<< HEAD
 
           {/* выбор и кнопка */}
+=======
+        
+>>>>>>> refs/remotes/origin/main
           <Grid item xs={12} sm={6}>
             <MySelect
               data={this.state.points}
@@ -1130,17 +1246,29 @@ class CountUsers_ extends React.Component {
           <Grid item xs={12} sm={6}>
             <Button
               disabled={this.state.point < 1 ? true : false}
+<<<<<<< HEAD
               variant={this.state.point < 1 ? 'outlined' : 'contained'}
+=======
+              variant="contained"
+>>>>>>> refs/remotes/origin/main
               style={{ whiteSpace: 'nowrap' }}
               onClick={this.openModal.bind(this, 'Особый день')}
             >
               Добавить особый день
             </Button>
           </Grid>
+<<<<<<< HEAD
+=======
+        
+>>>>>>> refs/remotes/origin/main
 
           {/* таблица */}
 
           {this.state.point < 1 ? null : (
+<<<<<<< HEAD
+=======
+            
+>>>>>>> refs/remotes/origin/main
             <Grid item xs={12} sm={8}>
               <TabContext value={this.state.ItemTab}>
                 <Box
@@ -1168,16 +1296,30 @@ class CountUsers_ extends React.Component {
                 </Box>
 
                 <CountUsers_TablePanel
+<<<<<<< HEAD
+=======
+                  
+>>>>>>> refs/remotes/origin/main
                   value={this.state.ItemTab}
                   event={this.state.item}
                   save={this.saveItem.bind(this)}
                 />
               </TabContext>
             </Grid>
+<<<<<<< HEAD
           )}
 
           {/* аккордион */}
           {this.state.point < 1 || !this.state.dataPoint.length ? null : (
+=======
+            
+          )}
+          
+
+            {/* аккордион */}
+            {this.state.point < 1 || !this.state.dataPoint.length ? null : (
+
+>>>>>>> refs/remotes/origin/main
             <Grid item xs={12} sm={4}>
               <Accordion>
                 <AccordionSummary

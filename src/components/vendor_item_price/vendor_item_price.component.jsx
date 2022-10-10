@@ -156,7 +156,7 @@ class VendorItemPrice_ extends React.Component {
   
   async save(){
     let data = {
-      vendor_id: this.state.vendor,
+      vendor_id: this.state.vendor.id,
       items: this.state.items,
       city_id: this.state.city,
       all_city: this.state.allCity === true ? 1 : 0,
