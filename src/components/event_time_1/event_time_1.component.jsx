@@ -2,6 +2,7 @@ import React from 'react';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -9,7 +10,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -18,483 +18,682 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import CloseIcon from '@mui/icons-material/Close';
 
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyTimePicker } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
+import Card from '@mui/material/Card';
+import Divider from '@mui/material/Divider';
 
-import Box from '@mui/material/Box';
+import { MySelect, MyAutocomplite, MyTimePicker, MyDatePickerNew } from '../../stores/elements';
 
 const queryString = require('query-string');
+
+function formatDate(date) {
+  var d = new Date(date),
+    month = '' + (d.getMonth() + 1),
+    day = '' + d.getDate(),
+    year = d.getFullYear();
+
+  if (month.length < 2) month = '0' + month;
+  if (day.length < 2) day = '0' + day;
+
+  return [year, month, day].join('-');
+}
+
+class EventTime1_Modal extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleResize = this.handleResize.bind(this);
+
+    this.state = {
+      item: {},
+      fullScreen: false,
+    };
+  }
+
+  componentDidUpdate(prevProps) {
+    // console.log(this.props.event);
+
+    if (!this.props.event) {
+      return;
+    }
+
+    if (this.props.event !== prevProps.event) {
+      this.setState({
+        item: this.props.event,
+      });
+    }
+  }
+
+  componentDidMount() {
+    this.handleResize();
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  handleResize() {
+    if (window.innerWidth < 601) {
+      this.setState({
+        fullScreen: true,
+      });
+    } else {
+      this.setState({
+        fullScreen: false,
+      });
+    }
+  }
+
+  changeTimeStart(data, event) {
+    // console.log(item)
+
+    const item = this.state.item;
+
+    item[data] = event.target.value;
+
+    this.setState({
+      item
+    });
+  }
+
+  changeTimeEnd(data, event) {
+    // console.log(item)
+
+    const item = this.state.item;
+
+    item[data] = event.target.value;
+
+    this.setState({
+      item
+    });
+  }
+
+  changeDateRange(data, value) {
+   
+    const item = this.state.item;
+
+    item[data] = formatDate(value);
+
+    this.setState({
+      item
+    });
+  }
+
+  save() {
+    this.props.save(this, this.state.item);
+
+    this.setState({
+      item: this.props.event ? this.props.event : {},
+    });
+
+    this.props.onClose();
+  }
+
+  onClose() {
+    this.setState({
+      item: this.props.event ? this.props.event : {},
+    });
+
+    this.props.onClose();
+  }
+
+  render() {
+    return (
+      <Dialog
+        open={this.props.open}
+        onClose={this.onClose.bind(this)}
+        fullScreen={this.state.fullScreen}
+        fullWidth={true}
+        maxWidth={this.props.method !== "Особый день" ? 'md' : 'lg'}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle className="button">
+          <Typography style={{ fontWeight: 'normal' }}>{this.props.method}</Typography>
+          {this.state.fullScreen ? (
+            <IconButton
+              onClick={this.onClose.bind(this)}
+              style={{ cursor: 'pointer' }}
+            >
+              <CloseIcon />
+            </IconButton>
+          ) : null}
+        </DialogTitle>
+
+        <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+          <Grid container spacing={3} mb={3} item xs={12}>
+          {this.props.method !== "Особый день" ? null :
+
+            <Grid item sm={3} xs={12}>
+              <MyDatePickerNew
+                label="Дата"
+                value={this.state.item.data}
+                func={this.changeDateRange.bind(this, 'data')}
+              />
+            </Grid>
+          }
+        
+          <Grid item sm={this.props.method !== "Особый день" ? 4 : 3} xs={6}>
+            <MyTimePicker
+              value={this.state.item.time_start}
+              func={this.changeTimeStart.bind(this, 'time_start')}
+              label="Время начала"
+            />
+          </Grid>
+          
+          <Grid item sm={this.props.method !== "Особый день" ? 4 : 3} xs={6}>
+            <MyTimePicker
+              value={this.state.item.time_end}
+              func={this.changeTimeEnd.bind(this, 'time_end')}
+              label="Время окончания"
+              />
+          </Grid>
+         
+          <Grid item sm={this.props.method !== "Особый день" ? 4 : 3} xs={12}>
+            <MyAutocomplite
+              label="Количество"
+              multiple={false}
+              freeSolo={true}
+              func={(event, value) => {
+                const item = this.state.item
+                item.quantity = value
+                this.setState({ item })}}
+              data={this.state.item.array}
+              value={this.state.item.quantity}
+            />
+          </Grid>
+          </Grid>
+        
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={this.save.bind(this)}>
+            Сохранить
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+}
 
 class EventTime1_ extends React.Component {
   constructor(props) {
     super(props);
-        
+
     this.state = {
       module: 'event_time_1',
       module_name: '',
       is_load: false,
-      
+
       points: [],
       point: '0',
-      mounth: '0',
-      mounths: [],
-      years: [],
-      year: '0',
-      
-      calendar: [],
       modalDialog: false,
-      
-      chooseDayHoly: '',
-      events: [],
-      chooseEvent: 0,
-      
-      eventPoint1: 0,
-      everyYear1: false,
-      timeStart2: '10:00',
-      timeEnd2: '21:30',
-      
-      expanded: '',
-      dayEvents: [],
-      events_hist: []
+      method: '',
+
+      item: [
+        {
+          id: '1',
+          id_row: '1',
+          data: '2022-10-05',
+          time_start: '19:30',
+          time_end: '20:30',
+          quantity: 10,
+        },
+        {
+          id: '1',
+          id_row: '2',
+          data: '2022-10-06',
+          time_start: '19:30',
+          time_end: '20:30',
+          quantity: 20,
+        },
+      ],
+
+      itemNew: {
+        id: '',
+        id_row: '',
+        data: '',
+        time_start: '',
+        time_end: '',
+        quantity: 0,
+        array: [{name: '5'}, {name: '10'}, {name: '15'}, {name: '20'}]
+      },
+
+      event: {},
+
+      cardData: [
+        {
+          id: '1',
+          day_id: '1',
+          day_week: 'Понедельник',
+          data: [
+            {
+              id_row: '1',
+              time_start: '19:30',
+              time_end: '20:30',
+              quantity: 20,
+            },
+            {
+              id_row: '2',
+              time_start: '20:30',
+              time_end: '21:30',
+              quantity: 30,
+            },
+          ],
+        },
+        {
+          id: '1',
+          day_id: '2',
+          day_week: 'Вторник',
+          data: [
+            {
+              id_row: '1',
+              time_start: '19:30',
+              time_end: '20:30',
+              quantity: 20,
+            },
+            {
+              id_row: '2',
+              time_start: '20:30',
+              time_end: '21:30',
+              quantity: 30,
+            },
+          ],
+        },
+        {
+          id: '1',
+          day_id: '3',
+          day_week: 'Среда',
+          data: [
+            {
+              id_row: '1',
+              time_start: '19:30',
+              time_end: '20:30',
+              quantity: 20,
+            },
+            {
+              id_row: '2',
+              time_start: '20:30',
+              time_end: '21:30',
+              quantity: 30,
+            },
+          ],
+        },
+        {
+          id: '1',
+          day_id: '4',
+          day_week: 'Четверг',
+          data: [
+            {
+              id_row: '1',
+              time_start: '19:30',
+              time_end: '20:30',
+              quantity: 20,
+            },
+            {
+              id_row: '2',
+              time_start: '20:30',
+              time_end: '21:30',
+              quantity: 30,
+            },
+          ],
+        },
+        {
+          id: '1',
+          day_id: '5',
+          day_week: 'Пятница',
+          data: [
+            {
+              id_row: '1',
+              time_start: '19:30',
+              time_end: '20:30',
+              quantity: 20,
+            },
+            {
+              id_row: '2',
+              time_start: '20:30',
+              time_end: '21:30',
+              quantity: 30,
+            },
+          ],
+        },
+        {
+          id: '1',
+          day_id: '6',
+          day_week: 'Суббота',
+          data: [
+            {
+              id_row: '1',
+              time_start: '19:30',
+              time_end: '20:30',
+              quantity: 20,
+            },
+            {
+              id_row: '2',
+              time_start: '20:30',
+              time_end: '21:30',
+              quantity: 30,
+            },
+          ],
+        },
+        {
+          id: '1',
+          day_id: '7',
+          day_week: 'Воскресенье',
+          data: [
+            {
+              id_row: '1',
+              time_start: '19:30',
+              time_end: '20:30',
+              quantity: 20,
+            },
+            {
+              id_row: '2',
+              time_start: '20:30',
+              time_end: '21:30',
+              quantity: 30,
+            },
+          ],
+        },
+      ],
     };
   }
-  
-  async componentDidMount(){
-    
+
+  async componentDidMount() {
     let data = await this.getData('get_all');
-    
-    console.log( data )
-    
+
+    // console.log( data )
+
     this.setState({
       points: data.points,
       point: data.points[0].id,
       module_name: data.module_info.name,
-      mounths: data.mounth,
-      mounth: data.this_m,
-      years: data.years,
-      year: data.this_y,
-    })
-    
-    document.title = data.module_info.name;
-    
-    setTimeout( () => {
-      this.updateData();
-    }, 50 )
+    });
+
+    // document.title = data.module_info.name;
+
+    // setTimeout( () => {
+    //   this.updateData();
+    // }, 50 )
   }
-  
+
   getData = (method, data = {}) => {
-    
     this.setState({
-      is_load: true
-    })
-    
+      is_load: true,
+    });
+
     return fetch('https://jacochef.ru/api/index_new.php', {
       method: 'POST',
       headers: {
-        'Content-Type':'application/x-www-form-urlencoded'},
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
       body: queryString.stringify({
-        method: method, 
+        method: method,
         module: this.state.module,
         version: 2,
         login: localStorage.getItem('token'),
-        data: JSON.stringify( data )
-      })
-    }).then(res => res.json()).then(json => {
-      
-      if( json.st === false && json.type == 'redir' ){
-        window.location.pathname = '/';
-        return;
-      }
-      
-      if( json.st === false && json.type == 'auth' ){
-        window.location.pathname = '/auth';
-        return;
-      }
-      
-      setTimeout( () => {
-        this.setState({
-          is_load: false
-        })
-      }, 300 )
-      
-      return json;
+        data: JSON.stringify(data),
+      }),
     })
-    .catch(err => { 
-      console.log( err )
-    });
-  }
-   
-  changePoint(event){
-    let data = event.target.value;
-    
-    this.setState({
-      point: data
-    })
-    
-    setTimeout( () => {
-      this.updateData();
-    }, 50 )
-  }
-  
-  changeMounth(event){
-    let data = event.target.value;
-    
-    this.setState({
-      mounth: data
-    })
-    
-    setTimeout( () => {
-      //this.updateData();
-    }, 50 )
-  }
-  
-  changeYear(event){
-    let data = event.target.value;
-    
-    this.setState({
-      year: data
-    })
-  }
-  
-  changeCheckOrders(event){
-    let data = event.target.checked;
-    
-    this.setState({
-      showReady: data
-    })
-  }
-  
-  async updateData(){
-    let data = {
-      m: this.state.mounth,
-      y: this.state.year,
-      point_id: this.state.point
-    };
-    
-    let res = await this.getData('get_calendar', data);
-    
-    console.log( res )
-    
-    this.setState({
-      calendar: res.year,
-    })
-  }
-  
-  async chooseDay(day){
-    
-    if( day.full_day ){
-    
-      this.setState({
-        chooseDay: null,
-        eventPoint1: this.state.point,
-        chooseEvent: 0,
-        everyYear1: false,
-        timeStart2: '10:00',
-        timeEnd2: '21:30',
-        modalDialog: false,
-        events_hist: []
-      })
-      
-      let data = {
-        date: day.full_day,
-        point_id: this.state.point
-      };
-      
-      let res = await this.getData('get_calendar_day', data);
-      
-      console.log( 'res', res )
-      
-      this.setState({
-        chooseDay: day,
-        chooseDayHoly: res.holy,
-        events: res.events,
-        events_hist: res.hist,
-        dayEvents: res.this_events,
-        modalDialog: true
-      })
-    }
-  }
-  
-  changeEvent(event){
-    let data = event.target.value;
-    
-    this.setState({
-      chooseEvent: data
-    })
-  }
-  
-  changePoint1(event){
-    let data = event.target.value;
-    
-    this.setState({
-      eventPoint1: data
-    })
-  }
-  
-  changeEveryYear1(event){
-    let data = event.target.checked;
-    
-    this.setState({
-      everyYear1: data
-    })
-  }
-  
-  changeTimeStart2(event){
-    let data = event.target.value;
-    
-    this.setState({
-      timeStart2: data
-    })
-  }
-  
-  changeTimeEnd2(event){
-    let data = event.target.value;
-    
-    this.setState({
-      timeEnd2: data
-    })
-  }
-  
-  async save(){
-    let data = {
-      date: this.state.chooseDay.full_day,
-      point_id: this.state.eventPoint1,
-      event: this.state.chooseEvent,
-      every_year: this.state.everyYear1 === true ? 1 : 0,
-      
-      time_start: this.state.timeStart2,
-      time_end: this.state.timeEnd2,
-    };
-    
-    let res = await this.getData('save_event', data);
-    
-    console.log( res )
-    
-    if( res.st === false ){
-      alert(res.text)
-    }else{
-      this.setState({
-        chooseDay: null,
-        eventPoint1: this.state.point,
-        chooseEvent: 0,
-        everyYear1: false,
-        timeStart2: '10:00',
-        timeEnd2: '21:30',
-        modalDialog: false
-      })
-      
-      setTimeout( () => {
-        this.updateData();
-      }, 300 )
-    }
-  }
-  
-  handleChange(data){
-    this.setState({
-      expanded: data
-    })
-  }
-  
-  async delEvent(event){
-    console.log( 'delEvent', event )
-    
-    if (confirm('Удалить событие "'+event.title+' '+event.date+'" ?')) {
-      let data = {
-        del_id: event.id
-      };
-      
-      let res = await this.getData('del_event', data);
-      
-      this.setState({
-        chooseDay: null,
-        eventPoint1: this.state.point,
-        chooseEvent: 0,
-        everyYear1: false,
-        timeStart2: '10:00',
-        timeEnd2: '21:30',
-        modalDialog: false
-      })
-      
-      setTimeout( () => {
-        this.updateData();
-      }, 300 )
-    } else {
-      
-    }
-    
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.st === false && json.type == 'redir') {
+          window.location.pathname = '/';
+          return;
+        }
 
+        if (json.st === false && json.type == 'auth') {
+          window.location.pathname = '/auth';
+          return;
+        }
+
+        setTimeout(() => {
+          this.setState({
+            is_load: false,
+          });
+        }, 300);
+
+        return json;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  changePoint(event) {
+    let data = event.target.value;
+
+    this.setState({
+      point: data,
+    });
+
+    // setTimeout( () => {
+    //   this.updateData();
+    // }, 50 )
   }
+
+  openModal(method, item, event) {
+
+    const itemNew = this.state.itemNew;
+
+    itemNew.id = this.state.point;
+    
+      this.setState({
+        modalDialog: true,
+        method,
+        event: itemNew
+      });
   
-  render(){
+  }
+
+  saveItem(event, item) {
+    console.log(item);
+    // console.log(data);
+  }
+
+  deleteItemAccordion(id) {
+    // console.log(id)
+  }
+
+  deleteItemCard(id) {
+    // console.log(id)
+  }
+
+  render() {
     return (
       <>
         <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
-        
-        <Dialog
-          open={this.state.modalDialog}
-          onClose={ () => { this.setState({ modalDialog: false }) } }
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">{this.state.chooseDay ? this.state.chooseDay.full_day : ''}</DialogTitle>
-          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-            <DialogContentText id="alert-dialog-description">
-              
-              <Grid container spacing={3}>
-                
-                {this.state.chooseDayHoly.length == 0 ? null :
-                  <Grid item xs={12} sm={12}>
-                    <Typography component="span">{this.state.chooseDayHoly}</Typography>
-                  </Grid>
-                }
-                
-                <Grid item xs={12} sm={12}>
-                  <MySelect data={this.state.events} value={this.state.chooseEvent} func={ this.changeEvent.bind(this) } label='Событие' />
-                </Grid>
-                
-                <Grid item xs={12} sm={12}>
-                  <MySelect data={this.state.points} value={ this.state.eventPoint1 } func={ this.changePoint1.bind(this) } label='Точка' />
-                </Grid>
-                
-                { parseInt(this.state.chooseEvent) !== 2 ? null :
-                  <>
-                    <Grid item xs={6} sm={6}>
-                      <MyTimePicker value={ this.state.timeStart2 } func={ this.changeTimeStart2.bind(this) } label='Время начала работы' />
-                    </Grid>
-                    <Grid item xs={6} sm={6}>
-                      <MyTimePicker value={ this.state.timeEnd2 } func={ this.changeTimeEnd2.bind(this) } label='Время окончания работы' />
-                    </Grid>
-                  </>
-                }
-                
-                <Grid item xs={12} sm={12}>
-                  <MyCheckBox value={ this.state.everyYear1 } func={ this.changeEveryYear1.bind(this) } label='Каждый год' />
-                </Grid>
-                
-              </Grid>
-              
-              <List component="nav">
-                { this.state.dayEvents.map( (item, key) => 
-                  <ListItem key={key}>
-                    <ListItemText primary={item.title} />
-                    { ( parseInt(item.type) == 4 ||  parseInt(item.type) == 6) ? null :
-                      <CloseIcon color="primary" onClick={this.delEvent.bind(this, item)} style={{ cursor: 'pointer' }} />
-                    }
-                  </ListItem>
-                )}
-              </List>
-              
-              <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                  id="panel1a-header"
-                >
-                  <Typography>История</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <List component="nav">
-                    { this.state.events_hist.map( (item, key) => 
-                      <ListItem key={key}>
-                        <ListItemText primary={item.title} />
-                      </ListItem>
-                    )}
-                  </List>
-                </AccordionDetails>
-              </Accordion>
-              
-              
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={ this.save.bind(this) } color="primary">Сохранить</Button>
-          </DialogActions>
-        </Dialog>
-        
-        <Grid container spacing={3}>
+
+        <Grid container spacing={3} mb={2}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
-          
-          <Grid item xs={12} sm={3}>
-            <MySelect  data={this.state.points} value={this.state.point} func={ this.changePoint.bind(this) } label='Точка' />
+        </Grid>
+
+        {/* модалка */}
+        <EventTime1_Modal 
+          open={this.state.modalDialog}
+          onClose={() => {
+            this.setState({ modalDialog: false });
+          }}
+          method={this.state.method}
+          event={this.state.event}
+          save={this.saveItem.bind(this)}
+        />
+
+        {/* выбор и кнопка */}
+        <Grid container spacing={3} justifyContent="center" direction="column">
+          <Grid
+            container
+            spacing={3}
+            justifyContent="center"
+            item
+            xs={12}
+          >
+            <Grid item xs={12} sm={4}>
+              <MySelect
+                data={this.state.points}
+                value={this.state.point}
+                func={this.changePoint.bind(this)}
+                label="Точка"
+              />
+            </Grid>
+            <Grid item xs={12} sm={2}>
+              <Button
+                disabled={this.state.point < 1 ? true : false}
+                variant={this.state.point < 1 ? 'outlined' : 'contained'}
+                style={{ whiteSpace: 'nowrap' }}
+                onClick={this.openModal.bind(this, 'Особый день')}
+              >
+                Добавить особый день
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={3}>
-            <MySelect  data={this.state.mounths} value={this.state.mounth} func={ this.changeMounth.bind(this) } label='Месяц' />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <MySelect  data={this.state.years} value={this.state.year} func={ this.changeYear.bind(this) } label='Год' />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <Button variant="contained" onClick={this.updateData.bind(this)}>Обновить данные</Button>
-          </Grid>
-        
-          <Grid container direction="row" justifyContent="center" style={{ paddingTop: 20, margin: '0 auto' }} >
-            
-            { this.state.calendar.map( (item, key) =>
-            
-              <Grid item sm={6} key={key} style={{ padding: 20 }} >
-                <h1 style={{ textAlign: 'center' }}>{ item[0][0].mounth }</h1>
-                <TableContainer component={Paper}>
-                  <Table aria-label="a dense table" style={{ overflow: 'hidden' }}>
+
+          {/* аккардион */}
+          {this.state.point < 1 ? null : (
+            <Grid container justifyContent="center" spacing={3} p={3}>
+              <Grid item sm={5} xs={12}>
+                <Accordion>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1a-content"
+                  >
+                    <Typography style={{ whiteSpace: 'nowrap' }}>
+                      Особые дни
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Accordion>
+                    <TableContainer>
+
+                      <Table size="small" style={{ whiteSpace: 'nowrap' }}>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell style={{ width: '30%' }}  >
+                              Дата
+                            </TableCell>
+                            <TableCell style={{ width: '30%' }}  >
+                              Время
+                            </TableCell>
+                            <TableCell style={{ width: '30%' }}  >
+                              Доставка
+                            </TableCell>
+                            <TableCell style={{ width: '10%' }}  ></TableCell>
+                          </TableRow>
+                        </TableHead>
+                        {this.state.item.map((item, key) => (
+                          <TableBody
+                            key={key + 100}
+                            sx={{
+                              '& td': { border: 0 },
+                              borderBottom: 1,
+                              borderColor: 'divider',
+                            }}
+                          >
+                            <TableRow>
+                              <TableCell  >{item.data}</TableCell>
+                              <TableCell  >
+                                {item.time_start} - {item.time_end}
+                              </TableCell>
+                              <TableCell  >{item.quantity}</TableCell>
+                              <TableCell  >
+                                <CloseIcon
+                                  onClick={this.deleteItemAccordion.bind(
+                                    this,
+                                    item.id_row
+                                  )}
+                                  style={{ cursor: 'pointer' }}
+                                />
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
+                        ))}
+                      </Table>
+                    </TableContainer>
+                
+                    </Accordion>
+                  </AccordionDetails>
+                </Accordion>
+              </Grid>
+            </Grid>
+          )}
+        </Grid>
+
+        {/* карточки/таблица */}
+        {this.state.point < 1 && this.state.cardData.length ? null : (
+          <Grid container item xs={12} spacing={3} direction="row">
+            {this.state.cardData.map((item, key) => (
+              <Grid item sm={3}  key={key}>
+                <Card
+                  variant="outlined"
+                  sx={{
+                    border: 1,
+                    boxShadow: 1,
+                    borderRadius: 2,
+                    p: 2,
+                  }}
+                >
+                  <Grid align="center">{item.day_week}</Grid>
+                  <Divider />
+                  <Table size="small" style={{ whiteSpace: 'nowrap' }}>
                     <TableHead>
                       <TableRow>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Пн</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Вт</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Ср</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Чт</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Пт</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Сб</TableCell>
-                        <TableCell style={{ textAlign: 'center', padding: 15 }}>Вс</TableCell>
+                        <TableCell style={{ maxWidth: '40%' }}>Время</TableCell>
+                        <TableCell style={{ maxWidth: '40%' }}>
+                          {' '}
+                          Доставка
+                        </TableCell>
+                        <TableCell style={{ maxWidth: '20%' }}></TableCell>
                       </TableRow>
                     </TableHead>
-                    <TableBody>
-                      
-                      { item.map( (mounth, m_key) =>
-                        <TableRow key={m_key}>
-                          { mounth.map( (day, k) =>
-                            <TableCell 
-                              key={k} 
-                              onClick={ this.chooseDay.bind(this, day) } 
-                              
-                              style={{ color: day.dir ? 'yellow' : day.holy ? '#c03' : '#000', height: '6vw'}}
-
-                              className={ day.event ? 'customCel' : 'tableCel' }
-                            >{ day.day }</TableCell>
-                          ) }
+                    {item.data.map((item, key) => (
+                      <TableBody
+                        key={key + 100}
+                        sx={{
+                          '& td': { border: 0 },
+                          borderBottom: 1,
+                          borderColor: 'divider',
+                        }}
+                      >
+                        <TableRow>
+                          <TableCell>
+                            {item.time_start} - {item.time_end}
+                          </TableCell>
+                          <TableCell>{item.quantity}</TableCell>
+                          <TableCell>
+                            <CloseIcon
+                              onClick={this.deleteItemCard.bind(
+                                this,
+                                item.id_row
+                              )}
+                              style={{ cursor: 'pointer' }}
+                            />
+                          </TableCell>
                         </TableRow>
-                      ) }
-                      
-                    </TableBody>
+                      </TableBody>
+                    ))}
                   </Table>
-                </TableContainer>
+                  <Button size="sm" fullWidth={true} onClick={this.openModal.bind(this, 'Добавить в текущие заказы')}>
+                    Добавить
+                  </Button>
+                </Card>
               </Grid>
-            )}
-            
+            ))}
           </Grid>
-        </Grid>
+        )}
       </>
-    )
+    );
   }
 }
 
 export function EventTime1() {
-  return (
-    <EventTime1_ />
-  );
+  return <EventTime1_ />;
 }
