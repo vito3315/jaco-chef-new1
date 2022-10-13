@@ -30,11 +30,16 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyAutocomplite, MyTextInput } from '../../stores/elements';
+import {
+  MySelect,
+  MyCheckBox,
+  MyAutocomplite,
+  MyTextInput,
+} from '../../stores/elements';
 
 const queryString = require('query-string');
 
-class SkladItemsModuleModal extends React.Component {
+class SkladItemsModule_Modal extends React.Component {
   constructor(props) {
     super(props);
 
@@ -46,6 +51,7 @@ class SkladItemsModuleModal extends React.Component {
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
+    // console.log(nextProps)
     if(!nextProps.event) {
       return null;
     }
@@ -101,7 +107,6 @@ class SkladItemsModuleModal extends React.Component {
       <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
         
         <Grid container spacing={3}>
-
               <Grid item xs={12}>
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
@@ -264,138 +269,15 @@ class SkladItemsModuleModal extends React.Component {
   }
 }
 
-function isEqual(object1, object2) {
-  const props1 = Object.getOwnPropertyNames(object1);
-  const props2 = Object.getOwnPropertyNames(object2);
-
-  if (props1.length !== props2.length) {
-    return false;
-  }
-
-  for (let i = 0; i < props1.length; i += 1) {
-    const prop = props1[i];
-
-    if (object1[prop] !== object2[prop]) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-class SkladItemsModuleTableRow extends React.Component {
-
-  shouldComponentUpdate(nextProps) {
-    
-    var array1 = nextProps.item;
-    var array2 = this.props.item;
-
-    /*if( parseInt(this.props.item.id) == 96 ){
-      console.log( array1, array2, isEqual(array1, array2) )
-    }*/
-
-    return isEqual(array1, array2);
-  }
-
-  render (){
-    const it = this.props.item;
-
-    console.log( 'render' )
-
-    return (  
-      <TableRow>
-        <TableCell>{it.id}</TableCell>
-        <TableCell> 
-        { parseInt(it.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> } 
-        </TableCell>
-        <TableCell>
-          <MyCheckBox label="" 
-          value={ parseInt(it.show_in_rev) == 1 ? true : false } 
-          func={ this.props.changeTableItem.bind(this, it.id, this.props.type[0], true) } 
-          />
-        </TableCell>
-        <TableCell 
-        style={{ cursor: 'pointer' }} 
-        onClick={this.props.showEditItem.bind(this, it.id, 'Редактирование товара')}
-        >{it.name}</TableCell>
-        <TableCell>{it.los_percent} %</TableCell>
-        <TableCell>{it.percent} %</TableCell>
-        <TableCell>{it.pf_name}</TableCell>
-        <TableCell>{it.ei_name}</TableCell>
-        <TableCell>{it.storage_name}</TableCell>
-        <TableCell>
-          <MyTextInput 
-          label="" 
-          value={it.handle_price} 
-          func={ this.props.changeTableItem.bind(this, it.id, this.props.type[1], false) }
-          onBlur={ this.props.changeTableItem.bind(this, it.id, this.props.type[1], true) } 
-          />
-        </TableCell>
-      </TableRow>           
-    )
-  }
-}
-
-class SkladItemsModuleTable extends React.Component {
-  /*shouldComponentUpdate(nextProps) {
-    
-    var array1 = nextProps.items;
-    var array2 = this.props.items;
-
-    var is_same = (array1.length == array2.length) && array1.every(function(element, index) {
-      return element === array2[index]; 
-    });
-
-      return !is_same;
-  }*/
-
-  render (){
-      return (  
-          <Table>
-
-            <TableHead>
-              <TableRow>
-                <TableCell style={{ width: '2%' }}>id</TableCell>
-                <TableCell style={{ width: '2%' }}></TableCell>
-                <TableCell style={{ width: '3%' }}>Ревизия</TableCell>  
-                <TableCell style={{ width: '15%' }}>Товар</TableCell>
-                <TableCell style={{ width: '10%' }}>% потерь</TableCell>
-                <TableCell style={{ width: '10%' }}>% заявки</TableCell>
-                <TableCell style={{ width: '15%' }}>Заготовка</TableCell>                 
-                <TableCell style={{ width: '5%' }}>Ед. измер</TableCell>                 
-                <TableCell style={{ width: '9%' }}>Место хранения</TableCell>
-                <TableCell style={{ width: '9%', minWidth: 150 }}>Моя цена</TableCell>
-              </TableRow>
-            </TableHead>
-                  
-            <TableBody>
-              {this.props.items.map( (it, k) =>
-                <SkladItemsModuleTableRow 
-                  item={it} 
-                  key={k} 
-                  type={this.props.type} 
-                  changeTableItem={this.props.changeTableItem.bind(this)} 
-                  showEditItem={this.props.showEditItem.bind(this)}
-                />
-
-
-                          
-              ) } 
-            </TableBody>
-          </Table>
-      )
-  }
-}
-
 class SkladItemsModule_ extends React.Component {
   constructor(props) {
     super(props);
-        
+
     this.state = {
       module: 'sklad_items_module',
       module_name: '',
       is_load: false,
-      
+
       cats: [],
       allItems: [],
       vendor_items: [],
@@ -410,119 +292,118 @@ class SkladItemsModule_ extends React.Component {
 
       freeItems: [],
 
-      searchItem: ''
+      searchItem: '',
 
+      show_in_rev: ''
     };
   }
-  
-  async componentDidMount(){
-    
+
+  async componentDidMount() {
     let data = await this.getData('get_all');
 
     this.setState({
       module_name: data.module_info.name,
       cats: data.cats,
-      freeItems: data.items_free
-    })
-    
+      freeItems: data.items_free,
+    });
+
     document.title = data.module_info.name;
   }
-  
+
   getData = (method, data = {}, is_load = true) => {
-    
-    if( is_load == true ){
+    if (is_load == true) {
       this.setState({
-        is_load: true
-      })
+        is_load: true,
+      });
     }
-    
+
     return fetch('https://jacochef.ru/api/index_new.php', {
       method: 'POST',
       headers: {
-        'Content-Type':'application/x-www-form-urlencoded'},
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
       body: queryString.stringify({
-        method: method, 
+        method: method,
         module: this.state.module,
         version: 2,
         login: localStorage.getItem('token'),
-        data: JSON.stringify( data )
-      })
-    }).then(res => res.json()).then(json => {
-      
-      if( json.st === false && json.type == 'redir' ){
-        window.location.pathname = '/';
-        return;
-      }
-      
-      if( json.st === false && json.type == 'auth' ){
-        window.location.pathname = '/auth';
-        return;
-      }
-      
-      setTimeout( () => {
-        this.setState({
-          is_load: false
-        })
-      }, 300 )
-      
-      return json;
+        data: JSON.stringify(data),
+      }),
     })
-    .catch(err => { 
-      setTimeout( () => {
-        this.setState({
-          is_load: false
-        })
-      }, 300 )
-      console.log( err )
-    });
-  }
-   
-  async changeCity(event){
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.st === false && json.type == 'redir') {
+          window.location.pathname = '/';
+          return;
+        }
+
+        if (json.st === false && json.type == 'auth') {
+          window.location.pathname = '/auth';
+          return;
+        }
+
+        setTimeout(() => {
+          this.setState({
+            is_load: false,
+          });
+        }, 300);
+
+        return json;
+      })
+      .catch((err) => {
+        setTimeout(() => {
+          this.setState({
+            is_load: false,
+          });
+        }, 300);
+        console.log(err);
+      });
+  };
+
+  async changeCity(event) {
     let data = {
-      city: event.target.value
-    }
-    
+      city: event.target.value,
+    };
+
     let res = await this.getData('get_vendors', data);
-    
+
     this.setState({
       vendors: res,
-      city: event.target.value
-    })
+      city: event.target.value,
+    });
   }
-  
-  changeSort(data, event){
-    this.state.vendor_items.map( (item, key) => {
-      if( parseInt(item.item_id) == parseInt(data) ){
+
+  changeSort(data, event) {
+    this.state.vendor_items.map((item, key) => {
+      if (parseInt(item.item_id) == parseInt(data)) {
         this.state.vendor_items[key]['sort'] = event.target.value;
       }
-    })
-    
+    });
+
     this.setState({
-      vendor_items: this.state.vendor_items
-    })
+      vendor_items: this.state.vendor_items,
+    });
   }
 
-  async showEditItem(id, method){
-    let data = {
-      item_id: id
-    }
-    
-    let res = await this.getData('get_one', data);
-    res.item.pf_id = res.pf_list.find(item => item.id === res.item.pf_id)
-    res.item.cat_id = res.cats.find(item => item.id === res.item.cat_id)
+  async showEditItem(id, method) {
 
+    let data = {
+      item_id: id,
+    };
+
+    let res = await this.getData('get_one', data);
+    res.item.pf_id = res.pf_list.find((item) => item.id === res.item.pf_id);
+    res.item.cat_id = res.cats.find((item) => item.id === res.item.cat_id);
 
     this.setState({
       modalDialog: true,
       method,
       itemEdit: res,
       itemName: res.item.name,
-    })
-	
-	}
+    });
+  }
 
-  async saveEditItem(itemEdit, main_item_id = 0){
-
+  async saveEditItem(itemEdit, main_item_id = 0) {
     let pf_id = itemEdit.item.pf_id.id;
     let cat_id = itemEdit.item.cat_id.id;
 
@@ -533,29 +414,29 @@ class SkladItemsModule_ extends React.Component {
       id: itemEdit.item.id,
       item: itemEdit.item,
       storages: itemEdit.this_storages,
-      main_item_id: parseInt(main_item_id) == 0 ? itemEdit.item.id : parseInt(main_item_id)
-    }
-    
+      main_item_id:
+        parseInt(main_item_id) == 0 ? itemEdit.item.id : parseInt(main_item_id),
+    };
+
     let res = await this.getData('saveEditItem', data);
-    
-    if( res.st === false ){
+
+    if (res.st === false) {
       alert(res.text);
-    }else{
-      this.setState({ 
-        modalDialog: false, 
+    } else {
+      this.setState({
+        modalDialog: false,
         itemEdit: null,
         checkArtDialog: false,
-        checkArtList: []
-      })
+        checkArtList: [],
+      });
 
-      setTimeout( async () => {
-        this.search()
-      }, 300 )
+      setTimeout(async () => {
+        this.search();
+      }, 300);
     }
   }
 
-  async saveNewItem(itemEdit, main_item_id = 0){
-
+  async saveNewItem(itemEdit, main_item_id = 0) {
     let pf_id = itemEdit.item.pf_id.id;
     let cat_id = itemEdit.item.cat_id.id;
 
@@ -566,231 +447,229 @@ class SkladItemsModule_ extends React.Component {
       id: itemEdit.item.id,
       item: itemEdit.item,
       storages: itemEdit.this_storages,
-      main_item_id: parseInt(main_item_id) == 0 ? itemEdit.item.id : parseInt(main_item_id)
-    }
-    
+      main_item_id:
+        parseInt(main_item_id) == 0 ? itemEdit.item.id : parseInt(main_item_id),
+    };
+
     let res = await this.getData('saveNewItem', data);
-    
-    if( res.st === false ){
+
+    if (res.st === false) {
       alert(res.text);
-    }else{
-      this.setState({ 
-        modalDialog: false, 
+    } else {
+      this.setState({
+        modalDialog: false,
         itemEdit: null,
         checkArtDialog: false,
-        checkArtList: []
-      })
+        checkArtList: [],
+      });
 
-      setTimeout( async () => {
-        this.search()
-      }, 300 )
+      setTimeout(async () => {
+        this.search();
+      }, 300);
     }
   }
 
-  async checkArt(itemEdit){
-
+  async checkArt(itemEdit) {
     let data = {
       id: itemEdit.item.id,
       art: itemEdit.item.art,
-    }
-    
+    };
+
     let res = await this.getData('checkArt', data);
 
-    if( res.st === false ){
-      this.setState({ 
-        checkArtDialog: true, 
+    if (res.st === false) {
+      this.setState({
+        checkArtDialog: true,
         checkArtList: res.data,
         itemEdit: itemEdit,
-      })
-    }else{
+      });
+    } else {
       this.saveEditItem(itemEdit);
     }
   }
 
-  async checkArtNew(itemEdit){
+  async checkArtNew(itemEdit) {
     let data = {
       id: itemEdit.item.id,
       art: itemEdit.item.art,
-    }
-    
+    };
+
     let res = await this.getData('checkArt', data);
 
-    if( res.st === false ){
+    if (res.st === false) {
+      res.data.push({ id: -1, name: this.state.itemEdit.item.name });
 
-      res.data.push({ id: -1, name: this.state.itemEdit.item.name })
-
-      this.setState({ 
-        checkArtDialog: true, 
-        checkArtList: res.data
-      })
-    }else{
+      this.setState({
+        checkArtDialog: true,
+        checkArtList: res.data,
+      });
+    } else {
       this.saveNewItem(itemEdit);
     }
   }
 
-  chooseArt(item_id){
-    if( this.state.modalItemNew === true ){
+  chooseArt(item_id) {
+    if (this.state.modalItemNew === true) {
       this.saveNewItem(item_id);
-    }else{
+    } else {
       this.saveEditItem(this.state.itemEdit, item_id);
     }
   }
 
-  async openModalItemNew(method){
+  async openModalItemNew(method) {
     let res = await this.getData('get_all_for_new');
 
     this.setState({
       modalDialog: true,
       itemEdit: res,
       itemName: '',
-      method
-    })
+      method,
+    });
   }
 
-  async saveItem(item_id, type, value){
+  async saveItem(item_id, type, value) {
     let data = {
       item_id: item_id,
       type: type,
-      value: value
+      value: value,
     };
 
     let res = await this.getData('saveItem', data, false);
 
-    if( res.st === false ){
+    if (res.st === false) {
       alert(res.text);
-    }else{
-      this.setState({ 
+    } else {
+      this.setState({
         modalItemNew: false,
-        modalItemEdit: false, 
+        modalItemEdit: false,
         itemEdit: null,
         checkArtDialog: false,
-        checkArtList: []
-      })
-      
-      setTimeout( async () => {
-        res = await this.getData('get_all');
-    
-        this.setState({
-          cats: res.cats,
-          freeItems: res.items_free
-        })
-      }, 300 )
+        checkArtList: [],
+      });
+
+      res = await this.getData('get_all');
+
+      this.setState({
+        cats: res.cats,
+        freeItems: res.items_free,
+      });
+      // setTimeout( async () => {
+      // }, 300 )
     }
   }
 
-  changeTableItem(item_id, type, is_save = true, event){
-    
-    if( parseInt(type) == 1 ){
+  changeTableItem(item_id, type, event) {
+
+    if (parseInt(type) == 1) {
       let data = event.target.checked;
 
       let items = this.state.cats;
 
-      items.map( (item, key) => {
-        item.cats.map( (cat, key_cat) => {
-          cat.items.map( (it, k) => {
-            if( parseInt( it.id ) == parseInt( item_id ) ){
-              items[ key ]['cats'][ key_cat ]['items'][ k ]['show_in_rev'] = data == true ? 1 : 0;
+      items.forEach(item => {
+        item.cats.forEach(cat => {
+          cat.items.forEach(it => {
+            if (parseInt(it.id) == parseInt(item_id)) {
+              it['show_in_rev'] = data == true ? 1 : 0;
             }
-          } )
-        } )
-      } )
+          });
+        });
+      });
 
       this.setState({
-        cats: items
-      })
+        cats: items,
+      });
 
       this.saveItem(item_id, 'show_in_rev', data == true ? 1 : 0);
     }
 
-    if( parseInt(type) == 3 ){
+    if (parseInt(type) == 3) {
       let data = event.target.value;
-
-      console.log( data, item_id )
 
       let items = this.state.cats;
 
-      items.map( (item, key) => {
-        item.cats.map( (cat, key_cat) => {
-          cat.items.map( (it, k) => {
-            if( parseInt( it.id ) == parseInt( item_id ) ){
-              items[ key ]['cats'][ key_cat ]['items'][ k ]['handle_price'] = data;
+      items.forEach((item, key) => {
+        item.cats.forEach((cat, key_cat) => {
+          cat.items.forEach((it, k) => {
+            if (parseInt(it.id) == parseInt(item_id)) {
+              it['handle_price'] = data;
             }
-          } )
-        } )
-      } )
-
-      console.log( items )
+          });
+        });
+      });
 
       this.setState({
-        cats: items
-      })
+        cats: items,
+      });
 
-      if( is_save === true ){
-        this.saveItem(item_id, 'handle_price', data);
-      }
+      this.saveItem(item_id, 'handle_price', data);
+      // if( is_save === true ){
+      // }
     }
 
-
-
-    if( parseInt(type) == 2 ){
+    if (parseInt(type) == 2) {
       let data = event.target.value;
-      
+
       let items = this.state.freeItems;
 
-      items.map( (item, key) => {
-        if( parseInt( item.id ) == parseInt( item_id ) ){
-          items[ key ]['show_in_rev'] = data == true ? 1 : 0;
+      items.map((item, key) => {
+        if (parseInt(item.id) == parseInt(item_id)) {
+          items[key]['show_in_rev'] = data == true ? 1 : 0;
         }
-      } )
+      });
 
       this.setState({
-        freeItems: items
-      })
+        freeItems: items,
+      });
 
       this.saveItem(item_id, 'show_in_rev', data == true ? 1 : 0);
     }
 
-    if( parseInt(type) == 4 ){
+    if (parseInt(type) == 4) {
       let data = event.target.value;
-      
+
       let items = this.state.freeItems;
 
-      items.map( (item, key) => {
-        if( parseInt( item.id ) == parseInt( item_id ) ){
-          items[ key ]['handle_price'] = data;
+      items.map((item, key) => {
+        if (parseInt(item.id) == parseInt(item_id)) {
+          items[key]['handle_price'] = data;
         }
-      } )
+      });
 
       this.setState({
-        freeItems: items
-      })
+        freeItems: items,
+      });
 
       this.saveItem(item_id, 'handle_price', data);
     }
-    
   }
 
-  async search(){
+  async search() {
     let data = {
-      item: this.state.searchItem
+      item: this.state.searchItem,
     };
 
     let res = await this.getData('get_all_search', data);
 
     this.setState({
       cats: res.cats,
-      freeItems: res.items_free
-    })
+      freeItems: res.items_free,
+    });
   }
 
-  render(){
+  render() {
+    console.log('render')
     return (
       <>
         <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
-        
-        <Dialog onClose={ () => { this.setState({ checkArtDialog: false, checkArtList: [] }) } } open={this.state.checkArtDialog}>
+
+        <Dialog
+          onClose={() => {
+            this.setState({ checkArtDialog: false, checkArtList: [] });
+          }}
+          open={this.state.checkArtDialog}
+        >
           <DialogTitle>Такой код 1с уже задан у следующих позиций:</DialogTitle>
           <List sx={{ pt: 0 }}>
             {this.state.checkArtList.map((item, key) => (
@@ -801,7 +680,7 @@ class SkladItemsModule_ extends React.Component {
           </List>
         </Dialog>
 
-        <SkladItemsModuleModal
+        <SkladItemsModule_Modal
           open={this.state.modalDialog}
           onClose={() => {
             this.setState({ modalDialog: false });
@@ -817,77 +696,158 @@ class SkladItemsModule_ extends React.Component {
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
-          
+
           <Grid item xs={12} sm={3}>
-            <Button onClick={this.openModalItemNew.bind(this, 'Новый товар')} variant="contained">Добавить товар</Button>
+            <Button onClick={this.openModalItemNew.bind(this, 'Новый товар')} variant="contained">
+              Добавить товар
+            </Button>
           </Grid>
 
           <Grid item xs={12} sm={3}>
-            <MyTextInput label="Поиск" value={ this.state.searchItem } func={ ( event ) => { this.setState({ searchItem: event.target.value }) } } onBlur={ this.search.bind(this) } />
+            <MyTextInput
+              label="Поиск"
+              value={this.state.searchItem}
+              func={(event) => {
+                this.setState({ searchItem: event.target.value });
+              }}
+              onBlur={this.search.bind(this)}
+            />
           </Grid>
-        
-          <Grid item xs={12} style={{ paddingBottom: '10px'}}>
-          
-            { this.state.cats.map( (item, key) =>
+
+          <Grid item xs={12} style={{ paddingBottom: '10px' }}>
+            {this.state.cats.map((item, key) => (
               <Accordion key={key}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography>{item.name}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  { item.cats.map( (cat, key_cat) => 
+                  {item.cats.map((category, key_cat) => (
                     <Accordion key={key_cat}>
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                      >
-                        <Typography>{cat.name}</Typography>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography>{category.name}</Typography>
                       </AccordionSummary>
                       <AccordionDetails style={{ width: '100%', overflow: 'scroll' }}>
-                        
-                     <SkladItemsModuleTable 
-                     items={cat.items} 
-                     changeTableItem={ this.changeTableItem.bind(this) } 
-                     showEditItem={ this.showEditItem.bind(this) }
-                     type={[1,3]}
-                     />
+                        <Table>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell style={{ width: '2%' }}>id</TableCell>
+                              <TableCell style={{ width: '2%' }}></TableCell>
+                              <TableCell style={{ width: '3%' }}>Ревизия</TableCell>
+                              <TableCell style={{ width: '15%' }}>Товар</TableCell>
+                              <TableCell style={{ width: '10%' }}> % потерь</TableCell>
+                              <TableCell style={{ width: '10%' }}>  % заявки</TableCell>
+                              <TableCell style={{ width: '15%' }}>     Заготовка</TableCell>
+                              <TableCell style={{ width: '5%' }}> Ед. измер</TableCell>
+                              <TableCell style={{ width: '9%' }}>Место хранения</TableCell>
+                              <TableCell style={{ width: '9%', minWidth: 150 }}>Моя цена</TableCell>
+                            </TableRow>
+                          </TableHead>
 
+                          <TableBody>
+                            {category.items.map((it, k) => (
+                              <TableRow key={k}>
+                                <TableCell>{it.id}</TableCell>
+                                <TableCell>{parseInt(it.is_show) == 1 ? ( <VisibilityIcon /> ) : ( <VisibilityOffIcon />)}
+                                </TableCell>
+                                <TableCell>
+                                  <MyCheckBox
+                                    label=""
+                                    value={parseInt(it.show_in_rev) == 1 ? true : false }
+                                    func={this.changeTableItem.bind( this, it.id, 1)}
+                                  />
+                                </TableCell>
+                                <TableCell
+                                  style={{ cursor: 'pointer' }}
+                                  onClick={this.showEditItem.bind(this, it.id, 'Редактирование товара')}
+                                >
+                                  {it.name}
+                                </TableCell>
+                                <TableCell>{it.los_percent} %</TableCell>
+                                <TableCell>{it.percent} %</TableCell>
+                                <TableCell>{it.pf_name}</TableCell>
+                                <TableCell>{it.ei_name}</TableCell>
+                                <TableCell>{it.storage_name}</TableCell>
+                                <TableCell>
+                                  <MyTextInput
+                                    label=""
+                                    value={it.handle_price}
+                                    func={this.changeTableItem.bind(this, it.id, 3)}
+                                    // onBlur={ this.changeTableItem.bind(this, it.id, this.props.type[1], true, cat.name) }
+                                  />
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
                       </AccordionDetails>
                     </Accordion>
-                  ) }
+                  ))}
                 </AccordionDetails>
               </Accordion>
-            ) }
-            { this.state.freeItems.length == 0 ? null :
-              
+            ))}
+            {this.state.freeItems.length == 0 ? null : (
               <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography>Без категории</Typography>
                 </AccordionSummary>
                 <AccordionDetails style={{ width: '100%', overflow: 'scroll' }}>
+                  <AccordionDetails
+                    style={{ width: '100%', overflow: 'scroll' }}
+                  >
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell style={{ width: '2%' }}>id</TableCell>
+                          <TableCell style={{ width: '2%' }}></TableCell>
+                          <TableCell style={{ width: '3%' }}>Ревизия</TableCell>
+                          <TableCell style={{ width: '15%' }}>Товар</TableCell>
+                          <TableCell style={{ width: '10%' }}>% потерь</TableCell>
+                          <TableCell style={{ width: '10%' }}>% заявки</TableCell>
+                          <TableCell style={{ width: '15%' }}>Заготовка</TableCell>
+                          <TableCell style={{ width: '5%' }}>Ед. измер</TableCell>
+                          <TableCell style={{ width: '9%' }}>Место хранения</TableCell>
+                          <TableCell style={{ width: '9%', minWidth: 150 }}>Моя цена</TableCell>
+                        </TableRow>
+                      </TableHead>
 
-                <SkladItemsModuleTable 
-                items={this.state.freeItems} 
-                changeTableItem={ this.changeTableItem.bind(this) } 
-                showEditItem={ this.showEditItem.bind(this) }
-                type={[2,4]}
-                />
-
+                      <TableBody>
+                        {this.state.freeItems.map((cat, key) => (
+                          <TableRow key={key}>
+                            <TableCell>{cat.id}</TableCell>
+                            <TableCell>{parseInt(cat.is_show) == 1 ? (<VisibilityIcon />) : (<VisibilityOffIcon />)}</TableCell>
+                            <TableCell>
+                              <MyCheckBox
+                                label=""
+                                value={ parseInt(cat.show_in_rev) == 1 ? true : false}
+                                func={this.changeTableItem.bind(this, cat.id, 2)}
+                              />
+                            </TableCell>
+                            <TableCell style={{ cursor: 'pointer' }} onClick={this.showEditItem.bind(this, cat.id, 'Редактирование товара')}>{cat.name}</TableCell>
+                            <TableCell>{cat.los_percent} %</TableCell>
+                            <TableCell>{cat.percent} %</TableCell>
+                            <TableCell>{cat.pf_name}</TableCell>
+                            <TableCell>{cat.ei_name}</TableCell>
+                            <TableCell>{cat.storage_name}</TableCell>
+                            <TableCell>
+                              <MyTextInput label="" value={cat.handle_price} func={this.changeTableItem.bind(this, cat.id, 4)}
+                                // onBlur={ this.changeTableItem.bind(this, it.id, this.props.type[1], true, cat.name) }
+                              />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </AccordionDetails>
                 </AccordionDetails>
               </Accordion>
-            }
-
+            )}
           </Grid>
         </Grid>
       </>
-    )
+    );
   }
 }
 
 export function SkladItemsModule() {
-  return (
-    <SkladItemsModule_ />
-  );
+  return <SkladItemsModule_ />;
 }
