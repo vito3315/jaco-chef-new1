@@ -181,44 +181,44 @@ class HeaderItem extends React.Component {
             </TableCell>
           ))}
 
-          {this.props.kind == 'manager' ? null : (
+          
+            
+          <TableCell></TableCell>
+
+          {this.props.dataKey > 0 ? (
             <>
-              <TableCell></TableCell>
-
-              {this.props.dataKey > 0 ? (
-                <>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                </>
-              ) : (
-                <>
-                  <TableCell
-                    style={{ textAlign: 'center', cursor: 'pointer' }}
-                    onClick={this.props.changeDopBonus}
-                  >
-                    {!this.props.bonus_other ? (
-                      '+ / -'
-                    ) : parseInt(this.props.bonus_other) == 1 ? (
-                      <AddIcon style={{ fontSize: 30, color: 'green' }} />
-                    ) : (
-                      <CloseIcon style={{ fontSize: 30, color: 'red' }} />
-                    )}
-                  </TableCell>
-                  <TableCell
-                    style={{ textAlign: 'center', cursor: 'pointer' }}
-                    onClick={this.props.changeLVDir}
-                  >
-                    Ур. дира: {this.props.lv_dir}
-                  </TableCell>
-                </>
-              )}
-
-              <TableCell></TableCell>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
+              <TableCell style={{ textAlign: 'center' }}></TableCell>
+              <TableCell style={{ textAlign: 'center' }}></TableCell>
+            </>
+          ) : (
+            <>
+              <TableCell
+                style={{ textAlign: 'center', cursor: 'pointer' }}
+                onClick={ this.props.kind == 'manager' || this.props.kind == 'dir' ? () => {} : this.props.bonus_other ? () => {} : this.props.changeDopBonus}
+              >
+                {!this.props.bonus_other ? (
+                  '+ / -'
+                ) : parseInt(this.props.bonus_other) == 1 ? (
+                  <AddIcon style={{ fontSize: 30, color: 'green' }} />
+                ) : (
+                  <CloseIcon style={{ fontSize: 30, color: 'red' }} />
+                )}
+              </TableCell>
+              <TableCell
+                style={{ textAlign: 'center', cursor: 'pointer' }}
+                onClick={ this.props.kind == 'manager' || this.props.kind == 'dir' ? () => {} : this.props.changeLVDir}
+              >
+                Ур. дира: {this.props.lv_dir}
+              </TableCell>
             </>
           )}
+
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+            
+          
         </TableRow>
         <TableRow>
           <TableCell style={{ minWidth: 140, minHeight: 38 }}>
@@ -245,21 +245,21 @@ class HeaderItem extends React.Component {
             </TableCell>
           ))}
 
-          {this.props.kind == 'manager' ? null : (
-            <>
-              <TableCell style={{ textAlign: 'center' }}>За 1ч</TableCell>
-              <TableCell style={{ textAlign: 'center' }}>
-                Командный бонус
-              </TableCell>
-              <TableCell style={{ textAlign: 'center' }}>За часы</TableCell>
-              <TableCell style={{ textAlign: 'center' }}>Ошибки</TableCell>
-              <TableCell style={{ textAlign: 'center' }}>Бонус</TableCell>
-              {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
-                <TableCell style={{ textAlign: 'center' }}>Всего</TableCell>
-              ) : null}
-              <TableCell style={{ textAlign: 'center' }}>Выдано</TableCell>
-            </>
-          )}
+          
+            
+          <TableCell style={{ textAlign: 'center' }}>За 1ч</TableCell>
+          <TableCell style={{ textAlign: 'center' }}>
+            Командный бонус
+          </TableCell>
+          <TableCell style={{ textAlign: 'center' }}>За часы</TableCell>
+          <TableCell style={{ textAlign: 'center' }}>Ошибки</TableCell>
+          <TableCell style={{ textAlign: 'center' }}>Бонус</TableCell>
+          {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+            <TableCell style={{ textAlign: 'center' }}>Всего</TableCell>
+          ) : null}
+          <TableCell style={{ textAlign: 'center' }}>Выдано</TableCell>
+            
+          
         </TableRow>
 
         <TableRow style={{ backgroundColor: '#e5e5e5' }}>
@@ -319,7 +319,7 @@ class WorkSchedule_Table extends React.Component {
                 <TableRow key={key}>
                   <TableCell
                     className="name_pinning"
-                    onClick={this.props.openM.bind(this, item.data)}
+                    onClick={ this.props.kind == 'manager' ? () => {} : this.props.openM.bind(this, item.data) }
                   >
                     {item.data.user_name}
                   </TableCell>
@@ -329,7 +329,6 @@ class WorkSchedule_Table extends React.Component {
 
                   {this.props.kind == 'manager' ? null : (
                     <TableCell style={{ textAlign: 'center' }}>
-                      {' '}
                       <SyncAltIcon
                         style={{
                           cursor: 'pointer',
@@ -337,7 +336,7 @@ class WorkSchedule_Table extends React.Component {
                           margin: 'auto',
                         }}
                         onClick={this.props.mix.bind(this, item.data)}
-                      />{' '}
+                      />
                     </TableCell>
                   )}
 
@@ -351,6 +350,7 @@ class WorkSchedule_Table extends React.Component {
                       className="min_block"
                       style={{
                         backgroundColor: date.info ? date.info.color : '#fff',
+                        color: date.info ? date.info.colorT : '#000',
                         cursor: 'pointer',
                       }}
                       key={date_k}
@@ -359,228 +359,230 @@ class WorkSchedule_Table extends React.Component {
                     </TableCell>
                   ))}
 
-                  {this.props.kind == 'manager' ? null : (
-                    <>
-                      <TableCell
-                        style={{
-                          textAlign: 'center',
-                          minWidth: 70,
-                          cursor: 'pointer',
-                        }}
-                        onClick={this.props.pricePerHour.bind(this, item.data)}
-                      >
-                        {item.data.price_p_h}
-                      </TableCell>
-                      <TableCell style={{ textAlign: 'center' }}>
-                        {item.data.dop_bonus}
-                      </TableCell>
-                      <TableCell style={{ textAlign: 'center' }}>
-                        {item.data.h_price}
-                      </TableCell>
-                      <TableCell style={{ textAlign: 'center' }}>
-                        {item.data.err_price}
-                      </TableCell>
-                      <TableCell style={{ textAlign: 'center' }}>
-                        {item.data.my_bonus}
-                      </TableCell>
+                  
+                  
+                  <TableCell
+                    style={{
+                      textAlign: 'center',
+                      minWidth: 70,
+                      cursor: 'pointer',
+                    }}
+                    onClick={ this.props.kind == 'manager' ? () => {} : this.props.pricePerHour.bind(this, item.data) }
+                  >
+                    {item.data.price_p_h}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {item.data.dop_bonus}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {item.data.h_price}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {item.data.err_price}
+                  </TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {item.data.my_bonus}
+                  </TableCell>
 
-                      {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
-                        <TableCell style={{ textAlign: 'center' }}>
-                          {parseInt(item.data.dop_bonus) +
-                            parseInt(item.data.dir_price) +
-                            parseInt(item.data.dir_price_dop) +
-                            parseInt(item.data.h_price) +
-                            parseInt(item.data.my_bonus) -
-                            parseInt(item.data.err_price) +
-                            ''}
-                        </TableCell>
-                      ) : null}
+                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {parseInt(item.data.dop_bonus) +
+                        parseInt(item.data.dir_price) +
+                        parseInt(item.data.dir_price_dop) +
+                        parseInt(item.data.h_price) +
+                        parseInt(item.data.my_bonus) -
+                        parseInt(item.data.err_price) +
+                        ''}
+                    </TableCell>
+                  ) : null}
 
-                      {item.data.app_type == 'driver' ? (
-                        <TableCell style={{ textAlign: 'center' }}></TableCell>
-                      ) : (
-                        <TableCell
-                          style={{ textAlign: 'center' }}
-                          onClick={this.props.openZP.bind(
-                            this,
-                            item.data.id,
-                            item.data.smena_id,
-                            item.data.app_id,
-                            this.props.numberChoose,
-                            item.data
-                          )}
-                        >
-                          {item.data.given}
-                        </TableCell>
+                  {item.data.app_type == 'driver' ? (
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  ) : (
+                    <TableCell
+                      style={{ textAlign: 'center' }}
+                      onClick={this.props.openZP.bind(
+                        this,
+                        item.data.id,
+                        item.data.smena_id,
+                        item.data.app_id,
+                        this.props.numberChoose,
+                        item.data
                       )}
-                    </>
+                    >
+                      {item.data.given}
+                    </TableCell>
                   )}
+                    
+                 
                 </TableRow>
               )
             )}
           </TableBody>
 
-          <TableFooter sx={{ '& td': { color: 'rgba(0, 0, 0, 0.87)' } }}>
-            <TableRow>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
+          {this.props.kind == 'other' ? null :
+            <TableFooter sx={{ '& td': { color: 'rgba(0, 0, 0, 0.87)' } }}>
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell></TableCell>
 
-              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
+                {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
 
-              {this.props.number.bonus.map((item, key) => (
-                <TableCell
-                  className="min_block min_size"
-                  style={{
-                    backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff',
-                  }}
-                  key={key}
-                >
-                  {item.res}
-                </TableCell>
-              ))}
-
-              {this.props.kind == 'manager' ? null : (
-                <>
+                {this.props.number.bonus.map((item, key) => (
                   <TableCell
+                    className="min_block min_size"
                     style={{
-                      textAlign: 'center',
-                      minWidth: 70,
-                      cursor: 'pointer',
+                      backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff',
                     }}
-                  ></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {this.props.number.other_summ.sum_dop_bonus_price}
+                    key={key}
+                  >
+                    {item.res}
                   </TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {this.props.number.other_summ.sum_h_price}
-                  </TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {this.props.number.other_summ.sum_err_price}
-                  </TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {this.props.number.other_summ.sum_bonus_price}
-                  </TableCell>
+                ))}
 
-                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                {this.props.kind == 'manager' ? null : (
+                  <>
+                    <TableCell
+                      style={{
+                        textAlign: 'center',
+                        minWidth: 70,
+                        cursor: 'pointer',
+                      }}
+                    ></TableCell>
                     <TableCell style={{ textAlign: 'center' }}>
-                      {this.props.number.other_summ.sum_to_given_price}
+                      {this.props.number.other_summ.sum_dop_bonus_price}
                     </TableCell>
-                  ) : null}
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {this.props.number.other_summ.sum_h_price}
+                    </TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {this.props.number.other_summ.sum_err_price}
+                    </TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {this.props.number.other_summ.sum_bonus_price}
+                    </TableCell>
 
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {this.props.number.other_summ.sum_given_price}
+                    {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                      <TableCell style={{ textAlign: 'center' }}>
+                        {this.props.number.other_summ.sum_to_given_price}
+                      </TableCell>
+                    ) : null}
+
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {this.props.number.other_summ.sum_given_price}
+                    </TableCell>
+                  </>
+                )}
+              </TableRow>
+
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell>Роллов</TableCell>
+
+                {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
+
+                {this.props.number.bonus.map((item, key) => (
+                  <TableCell className="min_block min_size" key={key}>
+                    {item.count_rolls}
                   </TableCell>
-                </>
-              )}
-            </TableRow>
+                ))}
 
-            <TableRow>
-              <TableCell></TableCell>
-              <TableCell>Роллов</TableCell>
-
-              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
-
-              {this.props.number.bonus.map((item, key) => (
-                <TableCell className="min_block min_size" key={key}>
-                  {item.count_rolls}
-                </TableCell>
-              ))}
-
-              {this.props.kind == 'manager' ? null : (
-                <>
-                  <TableCell
-                    style={{
-                      textAlign: 'center',
-                      minWidth: 70,
-                      cursor: 'pointer',
-                    }}
-                  ></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-
-                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                {this.props.kind == 'manager' ? null : (
+                  <>
+                    <TableCell
+                      style={{
+                        textAlign: 'center',
+                        minWidth: 70,
+                        cursor: 'pointer',
+                      }}
+                    ></TableCell>
                     <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  ) : null}
-
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                </>
-              )}
-            </TableRow>
-
-            <TableRow>
-              <TableCell></TableCell>
-              <TableCell>Пиццы</TableCell>
-
-              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
-
-              {this.props.number.bonus.map((item, key) => (
-                <TableCell className="min_block min_size" key={key}>
-                  {item.count_pizza}
-                </TableCell>
-              ))}
-
-              {this.props.kind == 'manager' ? null : (
-                <>
-                  <TableCell
-                    style={{
-                      textAlign: 'center',
-                      minWidth: 70,
-                      cursor: 'pointer',
-                    }}
-                  ></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-
-                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                     <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  ) : null}
-
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                </>
-              )}
-            </TableRow>
-
-            <TableRow>
-              <TableCell></TableCell>
-              <TableCell className="min_size">
-                Заказы готовились больше 40 минут
-              </TableCell>
-
-              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
-
-              {this.props.number.order_stat.map((item, key) => (
-                <TableCell className="min_block min_size" key={key}>
-                  {item.count_false}
-                </TableCell>
-              ))}
-
-              {this.props.kind == 'manager' ? null : (
-                <>
-                  <TableCell
-                    style={{
-                      textAlign: 'center',
-                      minWidth: 70,
-                      cursor: 'pointer',
-                    }}
-                  ></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-
-                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                     <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  ) : null}
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
 
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                </>
-              )}
-            </TableRow>
-          </TableFooter>
+                    {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                      <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    ) : null}
+
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  </>
+                )}
+              </TableRow>
+
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell>Пиццы</TableCell>
+
+                {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
+
+                {this.props.number.bonus.map((item, key) => (
+                  <TableCell className="min_block min_size" key={key}>
+                    {item.count_pizza}
+                  </TableCell>
+                ))}
+
+                {this.props.kind == 'manager' ? null : (
+                  <>
+                    <TableCell
+                      style={{
+                        textAlign: 'center',
+                        minWidth: 70,
+                        cursor: 'pointer',
+                      }}
+                    ></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+
+                    {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                      <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    ) : null}
+
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  </>
+                )}
+              </TableRow>
+
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell className="min_size">
+                  Заказы готовились больше 40 минут
+                </TableCell>
+
+                {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
+
+                {this.props.number.order_stat.map((item, key) => (
+                  <TableCell className="min_block min_size" key={key}>
+                    {item.count_false}
+                  </TableCell>
+                ))}
+
+                {this.props.kind == 'manager' ? null : (
+                  <>
+                    <TableCell
+                      style={{
+                        textAlign: 'center',
+                        minWidth: 70,
+                        cursor: 'pointer',
+                      }}
+                    ></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+
+                    {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                      <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    ) : null}
+
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  </>
+                )}
+              </TableRow>
+            </TableFooter>
+          }
         </Table>
       </TableContainer>
     );
@@ -643,17 +645,7 @@ class WorkSchedule_Table_without_functions extends React.Component {
                   </TableCell>
 
                   {this.props.kind == 'manager' ? null : (
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {' '}
-                      <SyncAltIcon
-                        style={{
-                          cursor: 'pointer',
-                          display: 'block',
-                          margin: 'auto',
-                        }}
-                        // onClick={this.props.mix.bind(this, item.data)}
-                      />{' '}
-                    </TableCell>
+                    <TableCell style={{ textAlign: 'center' }} />
                   )}
 
                   {item.data.dates.map((date, date_k) => (
@@ -662,6 +654,7 @@ class WorkSchedule_Table_without_functions extends React.Component {
                       className="min_block"
                       style={{
                         backgroundColor: date.info ? date.info.color : '#fff',
+                        color: date.info ? date.info.colorT : '#000',
                         cursor: 'pointer',
                       }}
                       key={date_k}
@@ -731,167 +724,169 @@ class WorkSchedule_Table_without_functions extends React.Component {
             )}
           </TableBody>
 
-          <TableFooter sx={{ '& td': { color: 'rgba(0, 0, 0, 0.87)' } }}>
-            <TableRow>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
+          {this.props.kind == 'other' ? null :
+            <TableFooter sx={{ '& td': { color: 'rgba(0, 0, 0, 0.87)' } }}>
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell></TableCell>
 
-              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
+                {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
 
-              {this.props.number.bonus.map((item, key) => (
-                <TableCell
-                  className="min_block min_size"
-                  style={{
-                    backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff',
-                  }}
-                  key={key}
-                >
-                  {item.res}
-                </TableCell>
-              ))}
-
-              {this.props.kind == 'manager' ? null : (
-                <>
+                {this.props.number.bonus.map((item, key) => (
                   <TableCell
+                    className="min_block min_size"
                     style={{
-                      textAlign: 'center',
-                      minWidth: 70,
-                      cursor: 'pointer',
+                      backgroundColor: item.type == 'cur' ? '#98e38d' : '#fff',
                     }}
-                  ></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {this.props.number.other_summ.sum_dop_bonus_price}
+                    key={key}
+                  >
+                    {item.res}
                   </TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {this.props.number.other_summ.sum_h_price}
-                  </TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {this.props.number.other_summ.sum_err_price}
-                  </TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {this.props.number.other_summ.sum_bonus_price}
-                  </TableCell>
+                ))}
 
-                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                {this.props.kind == 'manager' ? null : (
+                  <>
+                    <TableCell
+                      style={{
+                        textAlign: 'center',
+                        minWidth: 70,
+                        cursor: 'pointer',
+                      }}
+                    ></TableCell>
                     <TableCell style={{ textAlign: 'center' }}>
-                      {this.props.number.other_summ.sum_to_given_price}
+                      {this.props.number.other_summ.sum_dop_bonus_price}
                     </TableCell>
-                  ) : null}
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {this.props.number.other_summ.sum_h_price}
+                    </TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {this.props.number.other_summ.sum_err_price}
+                    </TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {this.props.number.other_summ.sum_bonus_price}
+                    </TableCell>
 
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {this.props.number.other_summ.sum_given_price}
+                    {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                      <TableCell style={{ textAlign: 'center' }}>
+                        {this.props.number.other_summ.sum_to_given_price}
+                      </TableCell>
+                    ) : null}
+
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {this.props.number.other_summ.sum_given_price}
+                    </TableCell>
+                  </>
+                )}
+              </TableRow>
+
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell>Роллов</TableCell>
+
+                {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
+
+                {this.props.number.bonus.map((item, key) => (
+                  <TableCell className="min_block min_size" key={key}>
+                    {item.count_rolls}
                   </TableCell>
-                </>
-              )}
-            </TableRow>
+                ))}
 
-            <TableRow>
-              <TableCell></TableCell>
-              <TableCell>Роллов</TableCell>
-
-              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
-
-              {this.props.number.bonus.map((item, key) => (
-                <TableCell className="min_block min_size" key={key}>
-                  {item.count_rolls}
-                </TableCell>
-              ))}
-
-              {this.props.kind == 'manager' ? null : (
-                <>
-                  <TableCell
-                    style={{
-                      textAlign: 'center',
-                      minWidth: 70,
-                      cursor: 'pointer',
-                    }}
-                  ></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-
-                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                {this.props.kind == 'manager' ? null : (
+                  <>
+                    <TableCell
+                      style={{
+                        textAlign: 'center',
+                        minWidth: 70,
+                        cursor: 'pointer',
+                      }}
+                    ></TableCell>
                     <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  ) : null}
-
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                </>
-              )}
-            </TableRow>
-
-            <TableRow>
-              <TableCell></TableCell>
-              <TableCell>Пиццы</TableCell>
-
-              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
-
-              {this.props.number.bonus.map((item, key) => (
-                <TableCell className="min_block min_size" key={key}>
-                  {item.count_pizza}
-                </TableCell>
-              ))}
-
-              {this.props.kind == 'manager' ? null : (
-                <>
-                  <TableCell
-                    style={{
-                      textAlign: 'center',
-                      minWidth: 70,
-                      cursor: 'pointer',
-                    }}
-                  ></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-
-                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                     <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  ) : null}
-
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                </>
-              )}
-            </TableRow>
-
-            <TableRow>
-              <TableCell></TableCell>
-              <TableCell className="min_size">
-                Заказы готовились больше 40 минут
-              </TableCell>
-
-              {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
-
-              {this.props.number.order_stat.map((item, key) => (
-                <TableCell className="min_block min_size" key={key}>
-                  {item.count_false}
-                </TableCell>
-              ))}
-
-              {this.props.kind == 'manager' ? null : (
-                <>
-                  <TableCell
-                    style={{
-                      textAlign: 'center',
-                      minWidth: 70,
-                      cursor: 'pointer',
-                    }}
-                  ></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-
-                  {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                     <TableCell style={{ textAlign: 'center' }}></TableCell>
-                  ) : null}
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
 
-                  <TableCell style={{ textAlign: 'center' }}></TableCell>
-                </>
-              )}
-            </TableRow>
-          </TableFooter>
+                    {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                      <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    ) : null}
+
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  </>
+                )}
+              </TableRow>
+
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell>Пиццы</TableCell>
+
+                {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
+
+                {this.props.number.bonus.map((item, key) => (
+                  <TableCell className="min_block min_size" key={key}>
+                    {item.count_pizza}
+                  </TableCell>
+                ))}
+
+                {this.props.kind == 'manager' ? null : (
+                  <>
+                    <TableCell
+                      style={{
+                        textAlign: 'center',
+                        minWidth: 70,
+                        cursor: 'pointer',
+                      }}
+                    ></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+
+                    {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                      <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    ) : null}
+
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  </>
+                )}
+              </TableRow>
+
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell className="min_size">
+                  Заказы готовились больше 40 минут
+                </TableCell>
+
+                {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
+
+                {this.props.number.order_stat.map((item, key) => (
+                  <TableCell className="min_block min_size" key={key}>
+                    {item.count_false}
+                  </TableCell>
+                ))}
+
+                {this.props.kind == 'manager' ? null : (
+                  <>
+                    <TableCell
+                      style={{
+                        textAlign: 'center',
+                        minWidth: 70,
+                        cursor: 'pointer',
+                      }}
+                    ></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+
+                    {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
+                      <TableCell style={{ textAlign: 'center' }}></TableCell>
+                    ) : null}
+
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  </>
+                )}
+              </TableRow>
+            </TableFooter>
+          }
         </Table>
       </TableContainer>
     );
@@ -955,7 +950,7 @@ class WorkSchedule_ extends React.Component {
 
       chooseUser: null,
 
-      tabTable: 1,
+      tabTable: 0,
 
       lv_cafe: 0,
       lv_dir: 0,
@@ -1082,7 +1077,7 @@ class WorkSchedule_ extends React.Component {
 
     let res = await this.getData('get_graph', data);
 
-    // console.log( res )
+    console.log( res )
 
     this.setState({
       one: res.date.one,
@@ -1097,6 +1092,8 @@ class WorkSchedule_ extends React.Component {
 
       lv_cafe: res.lv_cafe,
       lv_dir: res.lv_dir,
+
+      tabTable: localStorage.getItem('tabTable') ? parseInt(localStorage.getItem('tabTable')) : parseInt(res.part) - 1
     });
   }
 
@@ -1537,6 +1534,8 @@ class WorkSchedule_ extends React.Component {
     let fullPrice =
       parseInt(user.h_price) +
       parseInt(user.my_bonus) +
+      parseInt(user.dir_price) +
+      parseInt(user.dir_price_dop) +
       parseInt(user.dop_bonus) -
       parseInt(user.err_price);
 
@@ -1993,7 +1992,7 @@ class WorkSchedule_ extends React.Component {
                     userInfo.mentor_id = event.target.value;
                     this.setState({ userInfo: userInfo });
                   }}
-                  label="Кем работает"
+                  label="Наставник"
                 />
               )}
 
@@ -2216,6 +2215,7 @@ class WorkSchedule_ extends React.Component {
 
           <Grid item xs={12} sm={6}>
             <MySelect
+              is_none={false}
               data={this.state.points}
               value={this.state.point}
               func={(event) => {
@@ -2227,6 +2227,7 @@ class WorkSchedule_ extends React.Component {
 
           <Grid item xs={12} sm={6}>
             <MySelect
+              is_none={false}
               data={this.state.mounths}
               value={this.state.mounth}
               func={(event) => {
@@ -2247,6 +2248,7 @@ class WorkSchedule_ extends React.Component {
               <Tabs
                 value={this.state.tabTable}
                 onChange={(event, data) => {
+                  localStorage.setItem('tabTable', data)
                   this.setState({ tabTable: data });
                 }}
                 centered
@@ -2256,47 +2258,93 @@ class WorkSchedule_ extends React.Component {
               </Tabs>
             </Box>
 
-            <TabPanel value={this.state.tabTable} index={0}>
-              {!this.state.one ? null : (
-                <WorkSchedule_Table
-                  number={this.state.one}
-                  numberChoose={1}
-                  test={this.state.test_one}
-                  show_zp={this.state.show_zp_one}
-                  kind={this.state.kind}
-                  lv_dir={this.state.lv_dir}
-                  lv_cafe={this.state.lv_cafe}
-                  changeLVDir={this.changeLVDir.bind(this)}
-                  changeDopBonus={this.changeDopBonus.bind(this)}
-                  openM={this.openM.bind(this)}
-                  openH={this.openH.bind(this)}
-                  openZP={this.openZP.bind(this)}
-                  mix={this.mix.bind(this)}
-                  pricePerHour={this.pricePerHour.bind(this)}
-                />
-              )}
-            </TabPanel>
-
-            <TabPanel value={this.state.tabTable} index={1}>
-              {!this.state.two ? null : (
-                <WorkSchedule_Table
-                  number={this.state.two}
-                  numberChoose={2}
-                  test={this.state.test_two}
-                  show_zp={this.state.show_zp_two}
-                  kind={this.state.kind}
-                  lv_dir={this.state.lv_dir}
-                  lv_cafe={this.state.lv_cafe}
-                  changeLVDir={this.changeLVDir.bind(this)}
-                  changeDopBonus={this.changeDopBonus.bind(this)}
-                  openM={this.openM.bind(this)}
-                  openH={this.openH.bind(this)}
-                  openZP={this.openZP.bind(this)}
-                  mix={this.mix.bind(this)}
-                  pricePerHour={this.pricePerHour.bind(this)}
-                />
-              )}
-            </TabPanel>
+            { this.state.kind == 'other' ? 
+              <TabPanel value={this.state.tabTable} index={0}>
+                {!this.state.one ? null : (
+                  <WorkSchedule_Table_without_functions
+                    number={this.state.one}
+                    numberChoose={1}
+                    test={this.state.test_one}
+                    show_zp={this.state.show_zp_one}
+                    kind={this.state.kind}
+                    lv_dir={this.state.lv_dir}
+                    lv_cafe={this.state.lv_cafe}
+                    changeLVDir={this.changeLVDir.bind(this)}
+                    changeDopBonus={this.changeDopBonus.bind(this)}
+                    openM={this.openM.bind(this)}
+                    openH={this.openH.bind(this)}
+                    openZP={this.openZP.bind(this)}
+                    mix={this.mix.bind(this)}
+                    pricePerHour={this.pricePerHour.bind(this)}
+                  />
+                )}
+              </TabPanel> 
+                :
+              <TabPanel value={this.state.tabTable} index={0}>
+                {!this.state.one ? null : (
+                  <WorkSchedule_Table
+                    number={this.state.one}
+                    numberChoose={1}
+                    test={this.state.test_one}
+                    show_zp={this.state.show_zp_one}
+                    kind={this.state.kind}
+                    lv_dir={this.state.lv_dir}
+                    lv_cafe={this.state.lv_cafe}
+                    changeLVDir={this.changeLVDir.bind(this)}
+                    changeDopBonus={this.changeDopBonus.bind(this)}
+                    openM={this.openM.bind(this)}
+                    openH={this.openH.bind(this)}
+                    openZP={this.openZP.bind(this)}
+                    mix={this.mix.bind(this)}
+                    pricePerHour={this.pricePerHour.bind(this)}
+                  />
+                )}
+              </TabPanel>
+            }
+            
+            { this.state.kind == 'other' ? 
+              <TabPanel value={this.state.tabTable} index={1}>
+                {!this.state.two ? null : (
+                  <WorkSchedule_Table_without_functions
+                    number={this.state.two}
+                    numberChoose={2}
+                    test={this.state.test_two}
+                    show_zp={this.state.show_zp_two}
+                    kind={this.state.kind}
+                    lv_dir={this.state.lv_dir}
+                    lv_cafe={this.state.lv_cafe}
+                    changeLVDir={this.changeLVDir.bind(this)}
+                    changeDopBonus={this.changeDopBonus.bind(this)}
+                    openM={this.openM.bind(this)}
+                    openH={this.openH.bind(this)}
+                    openZP={this.openZP.bind(this)}
+                    mix={this.mix.bind(this)}
+                    pricePerHour={this.pricePerHour.bind(this)}
+                  />
+                )}
+              </TabPanel>
+                :
+              <TabPanel value={this.state.tabTable} index={1}>
+                {!this.state.two ? null : (
+                  <WorkSchedule_Table
+                    number={this.state.two}
+                    numberChoose={2}
+                    test={this.state.test_two}
+                    show_zp={this.state.show_zp_two}
+                    kind={this.state.kind}
+                    lv_dir={this.state.lv_dir}
+                    lv_cafe={this.state.lv_cafe}
+                    changeLVDir={this.changeLVDir.bind(this)}
+                    changeDopBonus={this.changeDopBonus.bind(this)}
+                    openM={this.openM.bind(this)}
+                    openH={this.openH.bind(this)}
+                    openZP={this.openZP.bind(this)}
+                    mix={this.mix.bind(this)}
+                    pricePerHour={this.pricePerHour.bind(this)}
+                  />
+                )}
+              </TabPanel>
+            }
           </Box>
         </Grid>
       </>
