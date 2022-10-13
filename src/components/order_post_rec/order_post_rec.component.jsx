@@ -24,7 +24,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect,git MyAutocomplite } from '../../stores/elements';
+import { MySelect, MyAutocomplite } from '../../stores/elements';
 
 const queryString = require('query-string');
 
