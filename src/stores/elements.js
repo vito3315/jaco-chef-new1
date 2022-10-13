@@ -88,8 +88,8 @@ export class MyAutocomplite extends React.PureComponent {
         <Autocomplete
           size="small"
           disableCloseOnSelect={true}
-          //freeSolo
-          //multiple={true}
+          // freeSolo
+          // multiple={true}
           id={ this.props.id ?? null }
           options={this.props.data}
           getOptionLabel={(option) => option.name || ''}

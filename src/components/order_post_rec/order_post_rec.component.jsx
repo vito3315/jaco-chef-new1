@@ -24,7 +24,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyTextInput } from '../../stores/elements';
+import { MySelect,git MyAutocomplite } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -97,12 +97,16 @@ class OrderPostRec_Modal extends React.Component {
  
         <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
         <Grid item xs={12} sm={4}>
-            <MySelect
+            <MyAutocomplite 
+              label='Точка' 
+              multiple={false} 
               data={this.state.points}
-              value={this.state.point}
-              func={this.changePoint.bind(this)}
-              label="Точка"
-            />
+              value={this.state.point} 
+              func={ (event, value) => { 
+              let point = this.state.point; 
+              point = value;
+              this.setState({ point }) } } 
+              />
           </Grid>
         </DialogContent>
 
@@ -2715,6 +2719,8 @@ class OrderPostRec_ extends React.Component {
         },
       ],
 
+      item: [],
+
       dataPoint: [],
 
       modalDialog: false,
@@ -2730,6 +2736,7 @@ class OrderPostRec_ extends React.Component {
       points: data.points,
       point: data.points[0].id,
       module_name: data.module_info.name,
+      item: [...this.state.cats[0].cats, ...this.state.cats[1].cats, ...this.state.freeItems]
     });
 
     document.title = data.module_info.name;
@@ -2799,9 +2806,12 @@ class OrderPostRec_ extends React.Component {
     // }, 50 )
   }
 
-  async search() {
+  async search(event) {
+
+    // console.log(event.target.value);
+
     let data = {
-      item: this.state.searchItem,
+      item: event.target.value
     };
 
     console.log(data);
@@ -2855,14 +2865,19 @@ class OrderPostRec_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={4}>
-            <MyTextInput
-              label="Поиск"
-              value={this.state.searchItem}
-              func={(event) => {
-                this.setState({ searchItem: event.target.value });
-              }}
-              onBlur={this.search.bind(this)}
-            />
+            <MyAutocomplite 
+              label='Поиск' 
+              freeSolo={true}
+              multiple={false} 
+              data={this.state.item}
+              value={''}
+              // func={ (event, value) => {
+              //   console.log(value)
+              //   let searchItem = this.state.searchItem; 
+              //   searchItem = value;
+              //   this.setState({ searchItem }) } } 
+              func={this.search.bind(this)}
+              />
           </Grid>
 
           <Grid item xs={12} sm={4}>
@@ -2875,7 +2890,7 @@ class OrderPostRec_ extends React.Component {
           </Grid>
 
           {this.state.point < 1 ? null : (
-          <Grid item xs={12} sm={8} mb={1}>
+          <Grid item xs={12} sm={12} mb={6}>
             {this.state.cats.map((item, key) => (
               <Accordion key={key}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -2903,9 +2918,7 @@ class OrderPostRec_ extends React.Component {
                             </TableHead>
                             <TableBody>
                               {category.items.map((it, key) => (
-                                <TableRow key={key} sx={{ '& td': { border: 0 } }}
-                                  style={ key % 2 ? { background: 'white' } : { background: '#e7e7e7' } }
-                                >
+                                <TableRow key={key} sx={{ '& td': { border: 0 } }} hover={true} >
                                   <TableCell>{it.id}</TableCell>
                                   <TableCell>{it.pf_name}</TableCell>
                                   <TableCell>{it.name}</TableCell>
@@ -2953,11 +2966,19 @@ class OrderPostRec_ extends React.Component {
 
                       <TableBody>
                       {this.state.freeItems.map((it, key) => (
-                        <TableRow key={key} sx={{ '& td': { border: 0 } }} style={ key % 2 ? { background: 'white' } : { background: '#e7e7e7' } } >
+                        <TableRow key={key} sx={{ '& td': { border: 0 } }} hover={true} >
                           <TableCell>{it.id}</TableCell>
                           <TableCell>{it.pf_name}</TableCell>
                           <TableCell>{it.name}</TableCell>
-                          <TableCell>{it.percent}</TableCell>
+                          <TableCell>
+                            {!Array.isArray(it.percent) ? it.percent : 
+                              <MySelect
+                                data={it.percent}
+                                value={it.percent[0].id}
+                                // func={this.changePoint.bind(this)}
+                              />
+                            }
+                          </TableCell>
                           <TableCell>{it.storage_name}</TableCell>
                          </TableRow>
                         ))}
@@ -2972,7 +2993,9 @@ class OrderPostRec_ extends React.Component {
           )}
 
           {this.state.point < 1 || !this.state.dataPoint.length ? null : (
-          <Grid item xs={12} sm={4} mb={1}>
+          <Grid pb={1} container justifyContent='center'>
+            <Grid item xs={10} sm={6}>
+
             <Accordion>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
@@ -2995,6 +3018,7 @@ class OrderPostRec_ extends React.Component {
                   ))}
               </AccordionDetails>
             </Accordion>
+            </Grid>
           </Grid>
           )}
         </Grid>
