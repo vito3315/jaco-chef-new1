@@ -301,6 +301,8 @@ class SkladItemsModule_ extends React.Component {
   async componentDidMount() {
     let data = await this.getData('get_all');
 
+    console.log(data)
+
     this.setState({
       module_name: data.module_info.name,
       cats: data.cats,
@@ -772,7 +774,7 @@ class SkladItemsModule_ extends React.Component {
                                     label=""
                                     value={it.handle_price}
                                     func={this.changeTableItem.bind(this, it.id, 3)}
-                                    // onBlur={ this.changeTableItem.bind(this, it.id, this.props.type[1], true, cat.name) }
+                                    onBlur={ this.changeTableItem.bind(this, it.id, 3) }
                                   />
                                 </TableCell>
                               </TableRow>
@@ -830,7 +832,7 @@ class SkladItemsModule_ extends React.Component {
                             <TableCell>{cat.storage_name}</TableCell>
                             <TableCell>
                               <MyTextInput label="" value={cat.handle_price} func={this.changeTableItem.bind(this, cat.id, 4)}
-                                // onBlur={ this.changeTableItem.bind(this, it.id, this.props.type[1], true, cat.name) }
+                                onBlur={ this.changeTableItem.bind(this, cat.id, 4) }
                               />
                             </TableCell>
                           </TableRow>
