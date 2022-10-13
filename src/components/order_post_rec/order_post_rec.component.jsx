@@ -24,7 +24,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyAutocomplite } from '../../stores/elements';
+import { MySelect, MyAutocomplite2, MyAutocomplite  } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -35,7 +35,7 @@ class OrderPostRec_Modal extends React.Component {
     this.state = {
     
       points: [],
-      point: '0',
+      point: [],
 
     };
   }
@@ -50,7 +50,7 @@ class OrderPostRec_Modal extends React.Component {
     if (this.props.points !== prevProps.points) {
       this.setState({
         points: this.props.points,
-        point: this.props.points[0].id,
+        //point: this.props.points[0].id,
       });
     }
   }
@@ -64,7 +64,7 @@ class OrderPostRec_Modal extends React.Component {
 
   }
 
-  save() {
+  /*save() {
     this.props.save(this.state.point);
 
     this.setState({
@@ -72,6 +72,12 @@ class OrderPostRec_Modal extends React.Component {
     });
 
     this.props.onClose();
+  }*/
+
+  choosePoint(event, value){
+    this.setState({
+        point: value
+    })
   }
 
   onClose() {
@@ -88,31 +94,27 @@ class OrderPostRec_Modal extends React.Component {
         open={this.props.open}
         onClose={this.onClose.bind(this)}
         fullWidth={true}
-        maxWidth={'md'}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+        maxWidth={'xs'}
       >
         <DialogTitle>
+            Где применить
         </DialogTitle>
  
         <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
         <Grid item xs={12} sm={4}>
             <MyAutocomplite 
               label='Точка' 
-              multiple={false} 
+              multiple={true} 
               data={this.state.points}
               value={this.state.point} 
-              func={ (event, value) => { 
-              let point = this.state.point; 
-              point = value;
-              this.setState({ point }) } } 
+              func={ this.choosePoint.bind(this) } 
               />
           </Grid>
         </DialogContent>
 
         <DialogActions>
           <Button 
-          onClick={this.save.bind(this, this.state.point)}
+          onClick={this.props.save.bind(this, this.state.point)}
           >
             Сохранить
           </Button>
@@ -2730,11 +2732,11 @@ class OrderPostRec_ extends React.Component {
   async componentDidMount() {
     let data = await this.getData('get_all');
 
-    // console.log( data )
+    console.log( data )
 
     this.setState({
-      points: data.points,
-      point: data.points[0].id,
+      points: data.point_list,
+      point: data.point_list[0].id,
       module_name: data.module_info.name,
       item: [...this.state.cats[0].cats, ...this.state.cats[1].cats, ...this.state.freeItems]
     });
@@ -2834,8 +2836,33 @@ class OrderPostRec_ extends React.Component {
     console.log(point);
   }
 
+  async save(points){
+    let data = {
+        items: this.state.cats,
+        points: points
+    };
+
+    console.log(data)
+
+    let res = await this.getData('save_edit', data);
+
+    setTimeout( () => {
+        this.update()
+    }, 300 )
+  }
+
+  async update(){
+    let data = await this.getData('get_all');
+
+    console.log( data )
+
+    this.setState({
+      item: [...this.state.cats[0].cats, ...this.state.cats[1].cats, ...this.state.freeItems]
+    });
+  }
+
   render() {
-    return (
+    return ( 
       <>
         <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
@@ -2847,7 +2874,7 @@ class OrderPostRec_ extends React.Component {
             this.setState({ modalDialog: false });
           }}
           points={this.state.points}
-          save={this.saveItem.bind(this)}
+          save={this.save.bind(this)}
         />
 
         <Grid container spacing={3}>
@@ -2865,7 +2892,7 @@ class OrderPostRec_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={4}>
-            <MyAutocomplite 
+            <MyAutocomplite2
               label='Поиск' 
               freeSolo={true}
               multiple={false} 
