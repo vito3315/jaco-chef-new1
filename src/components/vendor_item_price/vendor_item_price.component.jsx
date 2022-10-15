@@ -240,7 +240,7 @@ class VendorItemPrice_ extends React.Component {
                       <TableCell>{item.name}</TableCell>
                       <TableCell>{item.name_for_vendor}</TableCell>
                       <TableCell>
-                        <MyTextInput label="" value={item.comment} func={ this.update.bind(this, item.item_id, 'comment') } />
+                        <MyTextInput label="" value={item.comment} func={ this.update.bind(this, item.item_id, 'comment') } multiline={true} maxRows={5} />
                       </TableCell>
                       <TableCell>
                         <MyTextInput label="" value={item.full_price} func={ this.update.bind(this, item.item_id, 'full_price') } />
