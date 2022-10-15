@@ -240,13 +240,13 @@ class VendorItemPrice_ extends React.Component {
                       <TableCell>{item.name}</TableCell>
                       <TableCell>{item.name_for_vendor}</TableCell>
                       <TableCell>
-                        <MyTextInput label="" value={item.comment} func={ this.update.bind(this, item.item_id, 'comment') } />
+                        <MyTextInput label="" value={item.comment} func={ this.update.bind(this, item.item_id, 'comment') } multiline={true} maxRows={5} />
                       </TableCell>
                       <TableCell>
                         <MyTextInput label="" value={item.full_price} func={ this.update.bind(this, item.item_id, 'full_price') } />
                       </TableCell>
                       <TableCell>
-                        <MySelect data={item.pqs} value={ parseInt(item.rec_pq) == 0 ? '' : item.rec_pq } func={ this.update.bind(this, item.item_id, 'rec_pq') } label='' />
+                        <MySelect data={item.pqs} value={ item.rec_pq == 0 || item.rec_pq == '0' ? '' : item.rec_pq } func={ this.update.bind(this, item.item_id, 'rec_pq') } label='' />
                       </TableCell>
                       <TableCell>{item.price} / {item.ei_name}</TableCell>
                     </TableRow>
