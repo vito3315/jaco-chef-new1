@@ -39,6 +39,103 @@ import {
 
 const queryString = require('query-string');
 
+class SkladItemsModule_Modal_Edit extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      
+      itemEdit: [],
+
+    };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!this.props.event) {
+      return;
+    }
+
+    if (this.props.event !== prevProps.event) {
+      this.setState({
+        itemEdit: this.props.event
+      });
+    }
+  }
+
+  changeItem(data, event){
+
+    let vendor = this.state.itemEdit;
+    vendor.item[data] = event.target.value;
+    
+    this.setState({ 
+      itemEdit: vendor
+    })
+   
+  }
+
+  changeItemChecked(data, event){
+
+    let vendor = this.state.itemEdit;
+    vendor.item[data] = (event.target.checked === true ? 1 : 0);
+    
+    this.setState({ 
+      itemEdit: vendor
+    })
+   
+  }
+
+  onClose() {
+    this.setState({
+      itemEdit: []
+    });
+    // this.setState({
+    //   itemEdit: this.props.event ? this.props.event : null,
+    // });
+    this.props.onClose();
+  }
+
+  render() {
+    return (
+      <Dialog
+      open={this.props.open}
+      onClose={this.onClose.bind(this)}
+      fullWidth={true}
+      maxWidth={'xs'}
+    >
+      <DialogTitle>Изменить стоимость</DialogTitle>
+
+      <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={4}>
+          <MyCheckBox
+            label=""
+            // value={parseInt(it.show_in_rev) == 1 ? true : false }
+            // func={this.changeTableItem.bind( this, it.id, 1)}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <MyTextInput
+            label=""
+            // value={it.handle_price}
+            // func={this.changeTableItem.bind(this, it.id, 3)}
+            // onBlur={ this.changeTableItem.bind(this, it.id, 3) }
+          />
+        </Grid>
+      </Grid>
+      </DialogContent>
+
+      <DialogActions>
+        <Button 
+        // onClick={this.props.save.bind(this, this.state.point)}
+        >
+          Сохранить
+        </Button>
+      </DialogActions>
+    </Dialog>
+    );
+  }
+}
+
 class SkladItemsModule_Modal extends React.Component {
   constructor(props) {
     super(props);
@@ -283,6 +380,8 @@ class SkladItemsModule_ extends React.Component {
       vendor_items: [],
 
       modalDialog: false,
+      modalDialogEdit: false,
+
       method: null,
       itemEdit: null,
       itemName: '',
@@ -294,7 +393,7 @@ class SkladItemsModule_ extends React.Component {
 
       searchItem: '',
 
-      show_in_rev: ''
+      // show_in_rev: ''
     };
   }
 
@@ -518,6 +617,12 @@ class SkladItemsModule_ extends React.Component {
     }
   }
 
+  openModalItemEdit(id, type) {
+    this.setState({
+      modalDialogEdit: true
+    })
+  }
+
   async openModalItemNew(method) {
     let res = await this.getData('get_all_for_new');
 
@@ -694,6 +799,15 @@ class SkladItemsModule_ extends React.Component {
           itemName={this.state.itemName}
         />
 
+        <SkladItemsModule_Modal_Edit
+          open={this.state.modalDialogEdit}
+          onClose={() => {
+            this.setState({ modalDialogEdit: false });
+          }}
+          // event={this.state.itemEdit}
+          // itemName={this.state.itemName}
+        />
+
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
@@ -751,11 +865,12 @@ class SkladItemsModule_ extends React.Component {
                                 <TableCell>{it.id}</TableCell>
                                 <TableCell>{parseInt(it.is_show) == 1 ? ( <VisibilityIcon /> ) : ( <VisibilityOffIcon />)}
                                 </TableCell>
-                                <TableCell>
+                                <TableCell onClick={this.openModalItemEdit.bind(this)}>
                                   <MyCheckBox
                                     label=""
                                     value={parseInt(it.show_in_rev) == 1 ? true : false }
-                                    func={this.changeTableItem.bind( this, it.id, 1)}
+                                    // onClick={this.openModalItemEdit.bind(this)}
+                                    /// func={this.changeTableItem.bind( this, it.id, 1)}
                                   />
                                 </TableCell>
                                 <TableCell
@@ -769,13 +884,13 @@ class SkladItemsModule_ extends React.Component {
                                 <TableCell>{it.pf_name}</TableCell>
                                 <TableCell>{it.ei_name}</TableCell>
                                 <TableCell>{it.storage_name}</TableCell>
-                                <TableCell>
-                                  <MyTextInput
+                                <TableCell >{it.handle_price}
+                                  {/* <MyTextInput
                                     label=""
                                     value={it.handle_price}
                                     func={this.changeTableItem.bind(this, it.id, 3)}
                                     onBlur={ this.changeTableItem.bind(this, it.id, 3) }
-                                  />
+                                  /> */}
                                 </TableCell>
                               </TableRow>
                             ))}
