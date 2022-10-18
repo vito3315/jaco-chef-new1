@@ -113,6 +113,63 @@ class OrderPostRec_Modal extends React.Component {
   }
 }
 
+class OrderPostRec_TableItem extends React.Component {
+
+  shouldComponentUpdate(nextProps) {
+    return (nextProps.it.item_id_rec !== this.props.it.item_id_rec
+         || nextProps.it.vendor_id_rec !== this.props.it.vendor_id_rec);
+  }
+
+  render(){
+    const it = this.props.it;
+
+    return(
+      <TableRow
+        sx={{ '& td': { border: 0 } }}
+        hover={true}
+      >
+        <TableCell>{it.id}</TableCell>
+        <TableCell>{it.name}</TableCell>
+
+        <TableCell>
+          {it.items.length === 1 ? (
+            it.items[0].name
+          ) : (
+            <MySelect
+              data={it.items}
+              value={it.item_id_rec}
+              func={this.props.changeSelect.bind(
+                this,
+                it.id,
+                'item_id_rec',
+                1
+              )}
+            />
+          )}
+        </TableCell>
+
+        <TableCell>
+          {it.items.find(el => el.id === it.item_id_rec).pq ?? ''} {it.ei_name}
+        </TableCell>
+
+        <TableCell>
+          <MySelect
+            is_none={false}
+            data={it.items.find(el => el.id === it.item_id_rec).vendors ?? []}
+            value={it.vendor_id_rec}
+            func={this.props.changeSelect.bind(
+                  this,
+                  it.id,
+                  'vendor_id_rec',
+                  1
+                )}
+              />
+        </TableCell>
+      </TableRow>
+    )
+  }
+}
+
 class OrderPostRec_Table extends React.Component {
   constructor(props) {
     super(props);
@@ -121,6 +178,8 @@ class OrderPostRec_Table extends React.Component {
       items: [],
       cats: [],
       freeItems: [],
+
+      search: ''
     };
   }
 
@@ -139,13 +198,13 @@ class OrderPostRec_Table extends React.Component {
   }
 
   search(event) {
-    let searchValue;
+    let searchValue = event.target.value;
 
-    if (event.target.value) {
-      searchValue = event.target.value ?? '';
-    } else {
-      searchValue = event.target.innerText ?? '';
-    }
+    this.setState({
+      search: event.target.value
+    })
+
+    
 
     const catsFilter = this.state.cats;
 
@@ -189,6 +248,8 @@ class OrderPostRec_Table extends React.Component {
   }
 
   render() {
+    console.log( 'OrderPostRec_Table render' )
+
     return (
       <>
         <Grid item xs={12} sm={4}>
@@ -197,8 +258,9 @@ class OrderPostRec_Table extends React.Component {
             freeSolo={true}
             multiple={false}
             data={this.state.items}
-            value={''}
+            value={this.state.search}
             func={this.search.bind(this)}
+            onBlur={this.search.bind(this)}
           />
         </Grid>
 
@@ -250,48 +312,7 @@ class OrderPostRec_Table extends React.Component {
                               </TableHead>
                               <TableBody>
                                 {category.items.map((it, key) => (
-                                  <TableRow
-                                    key={key}
-                                    sx={{ '& td': { border: 0 } }}
-                                    hover={true}
-                                  >
-                                    <TableCell>{it.id}</TableCell>
-                                    <TableCell>{it.name}</TableCell>
-
-                                    <TableCell>
-                                      {it.items.length === 1 ? (
-                                        it.items[0].name
-                                      ) : (
-                                        <MySelect
-                                          data={it.items}
-                                          value={it.item_id_rec}
-                                          func={this.props.changeSelect.bind(
-                                            this,
-                                            it.id,
-                                            'item_id_rec',
-                                            1
-                                          )}
-                                        />
-                                      )}
-                                    </TableCell>
-
-                                    <TableCell>
-                                    {it.items.filter(el => el.id === it.item_id_rec)[0].pq ?? ''} {it.ei_name}
-                                    </TableCell>
-
-                                    <TableCell>
-                                      <MySelect
-                                        data={it.items.filter(el => el.id === it.item_id_rec)[0].vendors ?? []}
-                                        value={it.vendor_id_rec}
-                                        func={this.props.changeSelect.bind(
-                                              this,
-                                              it.id,
-                                              'vendor_id_rec',
-                                              1
-                                            )}
-                                          />
-                                    </TableCell>
-                                  </TableRow>
+                                  <OrderPostRec_TableItem key={key} it={it} changeSelect={this.props.changeSelect} />
                                 ))}
                               </TableBody>
                             </Table>
