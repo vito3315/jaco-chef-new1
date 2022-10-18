@@ -8,6 +8,7 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import TableContainer from '@mui/material/TableContainer';
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -45,52 +46,66 @@ class SkladItemsModule_Modal_Edit extends React.Component {
 
     this.state = {
       
-      itemEdit: [],
+      show_in_rev: '',
+      handle_price: ''
 
     };
   }
 
   componentDidUpdate(prevProps) {
-    if (!this.props.event) {
+    console.log(this.props)
+    if (!this.props) {
       return;
     }
 
-    if (this.props.event !== prevProps.event) {
+    if (this.props !== prevProps) {
       this.setState({
-        itemEdit: this.props.event
+        show_in_rev: this.props.show_in_rev,
+        handle_price: this.props.handle_price
       });
     }
   }
 
-  changeItem(data, event){
+  changeItem(event){
 
-    let vendor = this.state.itemEdit;
-    vendor.item[data] = event.target.value;
+    console.log(event.target.value)
+
+    let vendor = this.state.handle_price;
+    vendor = event.target.value;
     
     this.setState({ 
-      itemEdit: vendor
+      handle_price: vendor
+    })
+    
+  }
+
+  changeItemChecked(event){
+
+    console.log(event.target.checked)
+
+    let vendor = this.state.show_in_rev;
+    vendor = (event.target.checked === true ? 1 : 0);
+    
+    this.setState({ 
+      show_in_rev: vendor
     })
    
   }
 
-  changeItemChecked(data, event){
+  save() {
 
-    let vendor = this.state.itemEdit;
-    vendor.item[data] = (event.target.checked === true ? 1 : 0);
-    
-    this.setState({ 
-      itemEdit: vendor
-    })
-   
+    this.props.changeTableItem(this.props.id, this.props.type, this.state.show_in_rev, this.state.handle_price)
+
+    this.onClose();
   }
 
   onClose() {
+
     this.setState({
-      itemEdit: []
+      show_in_rev: '',
+      handle_price: ''
     });
-    // this.setState({
-    //   itemEdit: this.props.event ? this.props.event : null,
-    // });
+  
     this.props.onClose();
   }
 
@@ -100,33 +115,47 @@ class SkladItemsModule_Modal_Edit extends React.Component {
       open={this.props.open}
       onClose={this.onClose.bind(this)}
       fullWidth={true}
-      maxWidth={'xs'}
+      maxWidth={'sm'}
     >
-      <DialogTitle>Изменить стоимость</DialogTitle>
+      <DialogTitle>
+      Изменить цену и/или статус ревизии в товаре: <br/>
+      {this.props.itemName}
+      </DialogTitle>
 
       <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={4}>
-          <MyCheckBox
-            label=""
-            // value={parseInt(it.show_in_rev) == 1 ? true : false }
-            // func={this.changeTableItem.bind( this, it.id, 1)}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <MyTextInput
-            label=""
-            // value={it.handle_price}
-            // func={this.changeTableItem.bind(this, it.id, 3)}
-            // onBlur={ this.changeTableItem.bind(this, it.id, 3) }
-          />
-        </Grid>
-      </Grid>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell style={{ width: '30%' }}>Ревизия</TableCell>
+                  <TableCell style={{ width: '70%' }}>Моя цена</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow  sx={{ '& td': { border: 0 } }}>
+                  <TableCell>
+                    <MyCheckBox
+                      label=""
+                      value={parseInt(this.state.show_in_rev) == 1 ? true : false }
+                      func={this.changeItemChecked.bind(this)}
+                      />
+                  </TableCell>
+                  <TableCell>
+                  <MyTextInput
+                      label=""
+                      value={this.state.handle_price}
+                      func={this.changeItem.bind(this)}
+                  />
+                  </TableCell>
+                  </TableRow>
+                  </TableBody>
+            </Table>
+            </TableContainer>
       </DialogContent>
 
       <DialogActions>
         <Button 
-        // onClick={this.props.save.bind(this, this.state.point)}
+          onClick={this.save.bind(this)}
         >
           Сохранить
         </Button>
@@ -393,7 +422,10 @@ class SkladItemsModule_ extends React.Component {
 
       searchItem: '',
 
-      // show_in_rev: ''
+      show_in_rev: '',
+      handle_price: '',
+      id: '',
+      type: 0
     };
   }
 
@@ -617,9 +649,17 @@ class SkladItemsModule_ extends React.Component {
     }
   }
 
-  openModalItemEdit(id, type) {
+  openModalItemEdit(id, type, name, show_in_rev, handle_price) {
+
+    console.log(id, type, name, show_in_rev, handle_price)
+
     this.setState({
-      modalDialogEdit: true
+      modalDialogEdit: true,
+      show_in_rev,
+      handle_price,
+      id,
+      type,
+      itemName: name
     })
   }
 
@@ -665,10 +705,12 @@ class SkladItemsModule_ extends React.Component {
     }
   }
 
-  changeTableItem(item_id, type, event) {
+  changeTableItem(item_id, type, show_in_rev, handle_price) {
+
+    console.log(item_id, type, show_in_rev, handle_price)
 
     if (parseInt(type) == 1) {
-      let data = event.target.checked;
+      let data = show_in_rev;
 
       let items = this.state.cats;
 
@@ -690,7 +732,7 @@ class SkladItemsModule_ extends React.Component {
     }
 
     if (parseInt(type) == 3) {
-      let data = event.target.value;
+      let data = handle_price;
 
       let items = this.state.cats;
 
@@ -714,7 +756,7 @@ class SkladItemsModule_ extends React.Component {
     }
 
     if (parseInt(type) == 2) {
-      let data = event.target.value;
+      let data = show_in_rev;
 
       let items = this.state.freeItems;
 
@@ -732,7 +774,7 @@ class SkladItemsModule_ extends React.Component {
     }
 
     if (parseInt(type) == 4) {
-      let data = event.target.value;
+      let data = handle_price;
 
       let items = this.state.freeItems;
 
@@ -804,8 +846,12 @@ class SkladItemsModule_ extends React.Component {
           onClose={() => {
             this.setState({ modalDialogEdit: false });
           }}
-          // event={this.state.itemEdit}
-          // itemName={this.state.itemName}
+          id={this.state.id}
+          type={this.state.type}
+          itemName={this.state.itemName}
+          show_in_rev={this.state.show_in_rev}
+          handle_price={this.state.handle_price}
+          changeTableItem={this.changeTableItem.bind(this)}
         />
 
         <Grid container spacing={3}>
@@ -865,12 +911,10 @@ class SkladItemsModule_ extends React.Component {
                                 <TableCell>{it.id}</TableCell>
                                 <TableCell>{parseInt(it.is_show) == 1 ? ( <VisibilityIcon /> ) : ( <VisibilityOffIcon />)}
                                 </TableCell>
-                                <TableCell onClick={this.openModalItemEdit.bind(this)}>
+                                <TableCell onClick={this.openModalItemEdit.bind(this, it.id, 1, it.name, it.show_in_rev, it.handle_price)}>
                                   <MyCheckBox
                                     label=""
                                     value={parseInt(it.show_in_rev) == 1 ? true : false }
-                                    // onClick={this.openModalItemEdit.bind(this)}
-                                    /// func={this.changeTableItem.bind( this, it.id, 1)}
                                   />
                                 </TableCell>
                                 <TableCell
@@ -884,7 +928,8 @@ class SkladItemsModule_ extends React.Component {
                                 <TableCell>{it.pf_name}</TableCell>
                                 <TableCell>{it.ei_name}</TableCell>
                                 <TableCell>{it.storage_name}</TableCell>
-                                <TableCell >{it.handle_price}
+                                <TableCell onClick={this.openModalItemEdit.bind(this, it.id, 2, it.name, it.show_in_rev, it.handle_price)}>
+                                  {it.handle_price}
                                   {/* <MyTextInput
                                     label=""
                                     value={it.handle_price}
@@ -932,12 +977,16 @@ class SkladItemsModule_ extends React.Component {
                           <TableRow key={key}>
                             <TableCell>{cat.id}</TableCell>
                             <TableCell>{parseInt(cat.is_show) == 1 ? (<VisibilityIcon />) : (<VisibilityOffIcon />)}</TableCell>
-                            <TableCell>
+                            <TableCell>{ parseInt(cat.show_in_rev) == 1 ? true : false}
                               <MyCheckBox
                                 label=""
-                                value={ parseInt(cat.show_in_rev) == 1 ? true : false}
-                                func={this.changeTableItem.bind(this, cat.id, 2)}
+                                value={parseInt(cat.show_in_rev) == 1 ? true : false }
                               />
+                              {/* <MyCheckBox
+                                label=""
+                                value={ parseInt(cat.show_in_rev) == 1 ? true : false}
+                                // func={this.changeTableItem.bind(this, cat.id, 2)}
+                              /> */}
                             </TableCell>
                             <TableCell style={{ cursor: 'pointer' }} onClick={this.showEditItem.bind(this, cat.id, 'Редактирование товара')}>{cat.name}</TableCell>
                             <TableCell>{cat.los_percent} %</TableCell>
@@ -945,10 +994,11 @@ class SkladItemsModule_ extends React.Component {
                             <TableCell>{cat.pf_name}</TableCell>
                             <TableCell>{cat.ei_name}</TableCell>
                             <TableCell>{cat.storage_name}</TableCell>
-                            <TableCell>
-                              <MyTextInput label="" value={cat.handle_price} func={this.changeTableItem.bind(this, cat.id, 4)}
-                                onBlur={ this.changeTableItem.bind(this, cat.id, 4) }
-                              />
+                            <TableCell>{cat.handle_price} 
+                              {/* // <MyTextInput label="" value={cat.handle_price} 
+                                // func={this.changeTableItem.bind(this, cat.id, 4)}
+                                // onBlur={ this.changeTableItem.bind(this, cat.id, 4) }
+                              // /> */}
                             </TableCell>
                           </TableRow>
                         ))}

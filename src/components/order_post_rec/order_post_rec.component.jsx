@@ -173,7 +173,7 @@ class OrderPostRec_Table extends React.Component {
       });
 
       const freeItemsFilter = freeItems.filter((value) =>
-        value.pf_name.toLowerCase().includes(searchValue.toLowerCase())
+        value.it_name.toLowerCase().includes(searchValue.toLowerCase())
       );
 
       this.setState({
@@ -276,26 +276,20 @@ class OrderPostRec_Table extends React.Component {
                                     </TableCell>
 
                                     <TableCell>
-                                      {it.pq_rec} {it.ei_name}
+                                    {it.items.filter(el => el.id === it.item_id_rec)[0].pq ?? ''} {it.ei_name}
                                     </TableCell>
 
                                     <TableCell>
-                                      {it.vendors ? (
-                                        it.vendors.length === 1 ? (
-                                          it.vendors[0].name
-                                        ) : (
-                                          <MySelect
-                                            data={it.vendors}
-                                            value={it.vendor_id_rec}
-                                            func={this.props.changeSelect.bind(
+                                      <MySelect
+                                        data={it.items.filter(el => el.id === it.item_id_rec)[0].vendors ?? []}
+                                        value={it.vendor_id_rec}
+                                        func={this.props.changeSelect.bind(
                                               this,
                                               it.id,
                                               'vendor_id_rec',
                                               1
                                             )}
                                           />
-                                        )
-                                      ) : null}
                                     </TableCell>
                                   </TableRow>
                                 ))}
@@ -341,34 +335,28 @@ class OrderPostRec_Table extends React.Component {
                           hover={true}
                         >
                           <TableCell>{it.id}</TableCell>
-                          <TableCell>{it.pf_name}</TableCell>
+                          <TableCell>{it.name}</TableCell>
 
                           <TableCell>
-                            {!it.items ? it.name ? it.name : null : (
+                            {it.items.length === 1 ? it.items[0].name : (
                           <MySelect
                             data={it.items}
-                            value={it.item_id_rec}
+                            value={it.ids}
                             func={this.props.changeSelect.bind(this, it.id, 'item_id_rec', 2)}
                           />
                         )}
                           </TableCell>
 
                           <TableCell>
-                            {it.pq_rec} {it.ei_name}
+                          {it.items.filter(el => el.id === it.ids)[0].pq ?? ''} {it.ei_name}
                           </TableCell>
 
                           <TableCell>
-                            {it.vendors ? (
-                              it.vendors.length === 1 ? (
-                                it.vendors[0].name
-                                ) : (
                             <MySelect
-                              data={it.vendors}
+                              data={it.items.filter(el => el.id === it.ids)[0].vendors ?? []}
                               value={it.vendor_id_rec}
                               func={this.props.changeSelect.bind(this, it.id, 'vendor_id_rec', 2)}
                             />
-                          )
-                        ) : null}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -536,7 +524,7 @@ class OrderPostRec_ extends React.Component {
 
     // console.log(data);
 
-    // await this.getData('save_edit', data);
+    await this.getData('save_edit', data);
 
     setTimeout(() => {
       this.update();
