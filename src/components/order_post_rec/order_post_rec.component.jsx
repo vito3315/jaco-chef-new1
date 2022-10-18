@@ -142,7 +142,7 @@ class OrderPostRec_TableItem extends React.Component {
                 this,
                 it.id,
                 'item_id_rec',
-                1
+                this.props.type
               )}
             />
           )}
@@ -161,7 +161,7 @@ class OrderPostRec_TableItem extends React.Component {
                   this,
                   it.id,
                   'vendor_id_rec',
-                  1
+                  this.props.type
                 )}
               />
         </TableCell>
@@ -198,13 +198,23 @@ class OrderPostRec_Table extends React.Component {
   }
 
   search(event) {
-    let searchValue = event.target.value;
 
-    this.setState({
-      search: event.target.value
-    })
+    let searchValue;
 
-    
+    if (event.target.value) {
+      searchValue = event.target.value ?? '';
+
+      this.setState({
+      search: searchValue
+      });
+
+    } else {
+      searchValue = event.target.innerText ?? '';
+
+      this.setState({
+        search: searchValue
+        });
+    }
 
     const catsFilter = this.state.cats;
 
@@ -232,7 +242,7 @@ class OrderPostRec_Table extends React.Component {
       });
 
       const freeItemsFilter = freeItems.filter((value) =>
-        value.it_name.toLowerCase().includes(searchValue.toLowerCase())
+        value.name.toLowerCase().includes(searchValue.toLowerCase())
       );
 
       this.setState({
@@ -312,7 +322,7 @@ class OrderPostRec_Table extends React.Component {
                               </TableHead>
                               <TableBody>
                                 {category.items.map((it, key) => (
-                                  <OrderPostRec_TableItem key={key} it={it} changeSelect={this.props.changeSelect} />
+                                  <OrderPostRec_TableItem key={key} it={it} changeSelect={this.props.changeSelect} type={1}/>
                                 ))}
                               </TableBody>
                             </Table>
@@ -350,36 +360,7 @@ class OrderPostRec_Table extends React.Component {
 
                     <TableBody>
                       {this.state.freeItems.map((it, key) => (
-                        <TableRow
-                          key={key}
-                          sx={{ '& td': { border: 0 } }}
-                          hover={true}
-                        >
-                          <TableCell>{it.id}</TableCell>
-                          <TableCell>{it.name}</TableCell>
-
-                          <TableCell>
-                            {it.items.length === 1 ? it.items[0].name : (
-                          <MySelect
-                            data={it.items}
-                            value={it.ids}
-                            func={this.props.changeSelect.bind(this, it.id, 'item_id_rec', 2)}
-                          />
-                        )}
-                          </TableCell>
-
-                          <TableCell>
-                          {it.items.filter(el => el.id === it.ids)[0].pq ?? ''} {it.ei_name}
-                          </TableCell>
-
-                          <TableCell>
-                            <MySelect
-                              data={it.items.filter(el => el.id === it.ids)[0].vendors ?? []}
-                              value={it.vendor_id_rec}
-                              func={this.props.changeSelect.bind(this, it.id, 'vendor_id_rec', 2)}
-                            />
-                          </TableCell>
-                        </TableRow>
+                        <OrderPostRec_TableItem key={key} it={it} changeSelect={this.props.changeSelect} type={2}/>
                       ))}
                     </TableBody>
                   </Table>
