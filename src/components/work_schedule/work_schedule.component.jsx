@@ -989,6 +989,12 @@ class WorkSchedule_ extends React.Component {
       arrTimeAdd: [],
       typeTimeAdd: 0,
 
+      isShowErr: false,
+      isShowErrCam: false,
+
+      showErr: null,
+      showErrCam: null,
+
       errOrdersOneOrders: [],
       errOrdersTwoOrders: [],
       errOrdersOneCam: [],
@@ -1647,8 +1653,6 @@ class WorkSchedule_ extends React.Component {
       row_id: row_id
     };
 
-    console.log( data )
-
     let res = await this.getData('get_my_err_order', data);
 
     console.log( res )
@@ -1656,6 +1660,75 @@ class WorkSchedule_ extends React.Component {
     this.setState({
       showErr: res,
       isShowErr: true
+    })
+  }
+
+  fakeOrders(){
+    if (confirm('Точно обжаловать ?')) {
+      this.saveFakeOrders();
+    }
+  }
+
+  async saveFakeOrders(){
+    let data = {
+      err_id: this.state.showErr.err_id,
+      row_id: this.state.showErr.row_id,
+      order_id: this.state.showErr.order_id,
+      text: this.state.showErr.new_text_1
+    };
+
+    console.log( data )
+
+    let res = await this.getData('save_fake_orders', data);
+
+    if (res['st'] == true) {
+      this.setState({
+        isShowErr: false,
+        showErr: null,
+      });
+
+      setTimeout(() => {
+        this.updateData();
+      }, 300);
+    } else {
+      alert(res['text']);
+    }
+  }
+
+  async showErrCam(id){
+    let data = {
+      id: id
+    };
+
+    let res = await this.getData('get_my_err_cam', data);
+
+    console.log( res )
+
+    this.setState({
+      showErrCam: res,
+      isShowErrCam: true
+    })
+  }
+
+  fakeCam(){
+    if (confirm('Точно обжаловать ?')) {
+      this.saveFakeCam();
+    }
+  }
+
+  async saveFakeCam(){
+    let data = {
+      id: this.state.showErrCam.id,
+      text: this.state.showErrCam.text_one
+    };
+
+    let res = await this.getData('save_fake_cam', data);
+
+    console.log( res )
+
+    this.setState({
+      showErrCam: res,
+      isShowErrCam: true
     })
   }
 
@@ -2308,12 +2381,22 @@ class WorkSchedule_ extends React.Component {
                   <span>{this.state.showErr.my_price}</span>
                 </Grid>
 
+                <Grid item xs={12}>
+
+                  {this.state.showErr.imgs.map( (item, key) =>
+                    <a key={key} href={"https://jacochef.ru/src/img/err_orders/uploads/"+item} target='_blank'>
+                      <img src={"https://jacochef.ru/src/img/err_orders/uploads/"+item} style={{ maxHeight: 150, maxWidth: 150, margin: 10 }} />
+                    </a>
+                  )}
+
+                </Grid>
+
                 <Grid item xs={12} sm={6}>
                   {this.state.showErr.new_text_1.length > 0 && parseInt(this.state.showErr.is_edit) == 0 ?
-                    <Grid item xs={12} sm={4} className="cellErr">
+                    <div className="cellErr">
                       <b>Причина обжалования</b>
                       <span>{this.state.showErr.new_text_1}</span>
-                    </Grid>
+                    </div>
                       :
                     parseInt(this.state.showErr.is_edit) == 0 ? 
                       null 
@@ -2334,10 +2417,105 @@ class WorkSchedule_ extends React.Component {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   { this.state.showErr.new_text_2.length == 0 ? null :
-                    <Grid item xs={12} sm={4} className="cellErr">
+                    <div className="cellErr">
                       <b>Ответ обжалования</b>
                       <span>{this.state.showErr.new_text_2}</span>
-                    </Grid>
+                    </div>
+                  }
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  { this.state.showErr.new_text_1.length > 0 && parseInt(this.state.showErr.is_edit) == 1 ?
+                    <Button variant="contained" onClick={this.fakeOrders.bind(this)}>
+                      Обжаловать
+                    </Button>
+                      :
+                    null
+                  }
+                </Grid>
+
+              </Grid>
+            </DialogContent>
+            
+          </Dialog>
+        )}
+
+        {!this.state.showErrCam || this.state.isShowErrCam === false ? null : (
+          <Dialog
+            open={this.state.isShowErrCam}
+            onClose={() => {
+              this.setState({ isShowErrCam: false });
+            }}
+            scroll="paper"
+            fullWidth={true}
+            maxWidth={'md'}
+            id={'OpenModalM'}
+          >
+            <DialogTitle>
+              Ошибка №{this.state.showErrCam.id}
+            </DialogTitle>
+            <DialogContent>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6} className="cellErr">
+                  <b>Ошибка</b>
+                  <span>{this.state.showErrCam.fine_name}</span>
+                </Grid>
+                <Grid item xs={12} sm={6} className="cellErr">
+                  <b>Дата время ошибки</b>
+                  <span>{this.state.showErrCam.date_time_fine}</span>
+                </Grid>
+
+                <Grid item xs={12}>
+
+                  {this.state.showErrCam.imgs.map( (item, key) =>
+                    <a key={key} href={"https://jacochef.ru/src/img/fine_err/uploads/"+item} target='_blank'>
+                      <img src={"https://jacochef.ru/src/img/fine_err/uploads/"+item} style={{ maxHeight: 150, maxWidth: 150, margin: 10 }} />
+                    </a>
+                  )}
+
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  {this.state.showErrCam.text_one.length > 0 && parseInt(this.state.showErrCam.is_edit) == 0 ?
+                    <div className="cellErr">
+                      <b>Причина обжалования</b>
+                      <span>{this.state.showErrCam.text_one}</span>
+                    </div>
+                      :
+                    parseInt(this.state.showErrCam.is_edit) == 0 ? 
+                      null 
+                        :
+                      <MyTextInput
+                        label="Причина обжалования"
+                        multiline={true}
+                        disabled={ parseInt(this.state.showErrCam.is_edit) == 1 ? false : true }
+                        maxRows={5}
+                        value={this.state.showErrCam.text_one}
+                        func={(event) => {
+                          let userInfo = this.state.showErrCam;
+                          userInfo.text_one = event.target.value;
+                          this.setState({ showErrCam: userInfo });
+                        }}
+                      />
+                      
+                  }
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  { this.state.showErrCam.text_two.length == 0 ? null :
+                    <div className="cellErr">
+                      <b>Ответ обжалования</b>
+                      <span>{this.state.showErrCam.text_two}</span>
+                    </div>
+                  }
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  { this.state.showErrCam.text_one.length > 0 && parseInt(this.state.showErrCam.is_edit) == 1 ?
+                    <Button variant="contained" onClick={this.fakeCam.bind(this)}>
+                      Обжаловать
+                    </Button>
+                      :
+                    null
                   }
                 </Grid>
 
@@ -2529,11 +2707,11 @@ class WorkSchedule_ extends React.Component {
               }
               <TableFooter>
                 <TableRow>
-                  <TableCell>Общяя сумма</TableCell>
                   <TableCell></TableCell>
                   <TableCell></TableCell>
                   <TableCell></TableCell>
-                  <TableCell>0</TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
                   <TableCell></TableCell>
                 </TableRow>
               </TableFooter>
@@ -2554,7 +2732,7 @@ class WorkSchedule_ extends React.Component {
               {parseInt(this.state.tabTable) == 0 ?
                 <TableBody>
                   { this.state.errOrdersOneCam.map( (item, key) =>
-                    <TableRow key={key}>
+                    <TableRow key={key} onClick={this.showErrCam.bind(this, item.id)}>
                       <TableCell>{key+1}</TableCell>
                       <TableCell>{item.date_time_fine}</TableCell>
                       <TableCell>{item.fine_name}</TableCell>
@@ -2567,7 +2745,7 @@ class WorkSchedule_ extends React.Component {
                   :
                 <TableBody>
                   { this.state.errOrdersTwoCam.map( (item, key) =>
-                    <TableRow key={key}>
+                    <TableRow key={key} onClick={this.showErrCam.bind(this, item.id)}>
                       <TableCell>{key+1}</TableCell>
                       <TableCell>{item.date_time_fine}</TableCell>
                       <TableCell>{item.fine_name}</TableCell>
@@ -2580,11 +2758,10 @@ class WorkSchedule_ extends React.Component {
               }
               <TableFooter>
                 <TableRow>
-                  <TableCell>Общяя сумма</TableCell>
                   <TableCell></TableCell>
                   <TableCell></TableCell>
                   <TableCell></TableCell>
-                  <TableCell>0</TableCell>
+                  <TableCell></TableCell>
                   <TableCell></TableCell>
                 </TableRow>
               </TableFooter>
