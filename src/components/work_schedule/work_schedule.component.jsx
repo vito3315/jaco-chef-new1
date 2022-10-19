@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
 import Table from '@mui/material/Table';
+import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -49,6 +50,8 @@ import Looks3Icon from '@mui/icons-material/Looks3';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import CheckIcon from '@mui/icons-material/Check';
 import SendIcon from '@mui/icons-material/Send';
+import TimeToLeaveIcon from '@mui/icons-material/TimeToLeave';
+import InfoIcon from '@mui/icons-material/Info';
 
 import {
   MySelect,
@@ -213,13 +216,18 @@ class HeaderItem extends React.Component {
             </>
           )}
 
-          <TableCell></TableCell>
-          <TableCell></TableCell>
-          <TableCell></TableCell>
-          <TableCell></TableCell>
+          {true ? null :
+            <>
+              <TableCell style={{ textAlign: 'center' }}></TableCell>
+              <TableCell style={{ textAlign: 'center' }}></TableCell>
+              <TableCell style={{ textAlign: 'center' }}></TableCell>
+              <TableCell style={{ textAlign: 'center' }}></TableCell>
+            </>
+          }
             
           
         </TableRow>
+
         <TableRow>
           <TableCell style={{ minWidth: 140, minHeight: 38 }}>
             Сотрудник
@@ -248,15 +256,21 @@ class HeaderItem extends React.Component {
           
             
           <TableCell style={{ textAlign: 'center' }}>За 1ч</TableCell>
-          <TableCell style={{ textAlign: 'center' }}>
-            Командный бонус
-          </TableCell>
-          <TableCell style={{ textAlign: 'center' }}>За часы</TableCell>
-          <TableCell style={{ textAlign: 'center' }}>Ошибки</TableCell>
-          <TableCell style={{ textAlign: 'center' }}>Бонус</TableCell>
+
+          {true ? null :
+            <React.createFragment>
+              <TableCell style={{ textAlign: 'center' }}>Командный бонус</TableCell>
+              <TableCell style={{ textAlign: 'center' }}>За часы</TableCell>
+              <TableCell style={{ textAlign: 'center' }}>Ошибки</TableCell>
+              <TableCell style={{ textAlign: 'center' }}>Бонус</TableCell>
+            </React.createFragment>
+          }
+          
+
           {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
             <TableCell style={{ textAlign: 'center' }}>Всего</TableCell>
           ) : null}
+
           <TableCell style={{ textAlign: 'center' }}>Выдано</TableCell>
             
           
@@ -368,21 +382,16 @@ class WorkSchedule_Table extends React.Component {
                       cursor: 'pointer',
                     }}
                     onClick={ this.props.kind == 'manager' ? () => {} : this.props.pricePerHour.bind(this, item.data) }
-                  >
-                    {item.data.price_p_h}
-                  </TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {item.data.dop_bonus}
-                  </TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {item.data.h_price}
-                  </TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {item.data.err_price}
-                  </TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {item.data.my_bonus}
-                  </TableCell>
+                  >{item.data.price_p_h}</TableCell>
+
+                  {true ? null :
+                    <>
+                      <TableCell style={{ textAlign: 'center' }}>{item.data.dop_bonus}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{item.data.h_price}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{item.data.err_price}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{item.data.my_bonus}</TableCell>
+                    </>
+                  }
 
                   {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                     <TableCell style={{ textAlign: 'center' }}>
@@ -449,18 +458,15 @@ class WorkSchedule_Table extends React.Component {
                         cursor: 'pointer',
                       }}
                     ></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {this.props.number.other_summ.sum_dop_bonus_price}
-                    </TableCell>
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {this.props.number.other_summ.sum_h_price}
-                    </TableCell>
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {this.props.number.other_summ.sum_err_price}
-                    </TableCell>
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {this.props.number.other_summ.sum_bonus_price}
-                    </TableCell>
+
+                    {true ? null :
+                      <>
+                        <TableCell style={{ textAlign: 'center' }}>{this.props.number.other_summ.sum_dop_bonus_price}</TableCell>
+                        <TableCell style={{ textAlign: 'center' }}>{this.props.number.other_summ.sum_h_price}</TableCell>
+                        <TableCell style={{ textAlign: 'center' }}>{this.props.number.other_summ.sum_err_price}</TableCell>
+                        <TableCell style={{ textAlign: 'center' }}>{this.props.number.other_summ.sum_bonus_price}</TableCell>
+                      </>
+                    }
 
                     {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                       <TableCell style={{ textAlign: 'center' }}>
@@ -496,10 +502,15 @@ class WorkSchedule_Table extends React.Component {
                         cursor: 'pointer',
                       }}
                     ></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+
+                    {true ? null :
+                      <>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                      </>
+                    }
 
                     {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                       <TableCell style={{ textAlign: 'center' }}></TableCell>
@@ -531,10 +542,15 @@ class WorkSchedule_Table extends React.Component {
                         cursor: 'pointer',
                       }}
                     ></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+
+                    {true ? null :
+                      <>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                      </>
+                    }
 
                     {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                       <TableCell style={{ textAlign: 'center' }}></TableCell>
@@ -568,10 +584,15 @@ class WorkSchedule_Table extends React.Component {
                         cursor: 'pointer',
                       }}
                     ></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+
+                    {true ? null :
+                      <>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                      </>
+                    }
 
                     {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                       <TableCell style={{ textAlign: 'center' }}></TableCell>
@@ -675,18 +696,15 @@ class WorkSchedule_Table_without_functions extends React.Component {
                       >
                         {item.data.price_p_h}
                       </TableCell>
-                      <TableCell style={{ textAlign: 'center' }}>
-                        {item.data.dop_bonus}
-                      </TableCell>
-                      <TableCell style={{ textAlign: 'center' }}>
-                        {item.data.h_price}
-                      </TableCell>
-                      <TableCell style={{ textAlign: 'center' }}>
-                        {item.data.err_price}
-                      </TableCell>
-                      <TableCell style={{ textAlign: 'center' }}>
-                        {item.data.my_bonus}
-                      </TableCell>
+
+                      {true ? null :
+                        <>
+                          <TableCell style={{ textAlign: 'center' }}>{item.data.dop_bonus}</TableCell>
+                          <TableCell style={{ textAlign: 'center' }}>{item.data.h_price}</TableCell>
+                          <TableCell style={{ textAlign: 'center' }}>{item.data.err_price}</TableCell>
+                          <TableCell style={{ textAlign: 'center' }}>{item.data.my_bonus}</TableCell>
+                        </>
+                      }
 
                       {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                         <TableCell style={{ textAlign: 'center' }}>
@@ -753,18 +771,15 @@ class WorkSchedule_Table_without_functions extends React.Component {
                         cursor: 'pointer',
                       }}
                     ></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {this.props.number.other_summ.sum_dop_bonus_price}
-                    </TableCell>
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {this.props.number.other_summ.sum_h_price}
-                    </TableCell>
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {this.props.number.other_summ.sum_err_price}
-                    </TableCell>
-                    <TableCell style={{ textAlign: 'center' }}>
-                      {this.props.number.other_summ.sum_bonus_price}
-                    </TableCell>
+
+                    {true ? null :
+                      <>
+                        <TableCell style={{ textAlign: 'center' }}>{this.props.number.other_summ.sum_dop_bonus_price}</TableCell>
+                        <TableCell style={{ textAlign: 'center' }}>{this.props.number.other_summ.sum_h_price}</TableCell>
+                        <TableCell style={{ textAlign: 'center' }}>{this.props.number.other_summ.sum_err_price}</TableCell>
+                        <TableCell style={{ textAlign: 'center' }}>{this.props.number.other_summ.sum_bonus_price}</TableCell>
+                      </>
+                    }
 
                     {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                       <TableCell style={{ textAlign: 'center' }}>
@@ -800,10 +815,15 @@ class WorkSchedule_Table_without_functions extends React.Component {
                         cursor: 'pointer',
                       }}
                     ></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+
+                    {true ? null :
+                      <>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                      </>
+                    }
 
                     {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                       <TableCell style={{ textAlign: 'center' }}></TableCell>
@@ -835,10 +855,15 @@ class WorkSchedule_Table_without_functions extends React.Component {
                         cursor: 'pointer',
                       }}
                     ></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+
+                    {true ? null :
+                      <>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                      </>
+                    }
 
                     {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                       <TableCell style={{ textAlign: 'center' }}></TableCell>
@@ -872,10 +897,15 @@ class WorkSchedule_Table_without_functions extends React.Component {
                         cursor: 'pointer',
                       }}
                     ></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
-                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+
+                    {true ? null :
+                      <>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                      </>
+                    }
 
                     {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                       <TableCell style={{ textAlign: 'center' }}></TableCell>
@@ -958,6 +988,11 @@ class WorkSchedule_ extends React.Component {
 
       arrTimeAdd: [],
       typeTimeAdd: 0,
+
+      errOrdersOneOrders: [],
+      errOrdersTwoOrders: [],
+      errOrdersOneCam: [],
+      errOrdersTwoCam: []
     };
   }
 
@@ -1092,6 +1127,15 @@ class WorkSchedule_ extends React.Component {
 
       lv_cafe: res.lv_cafe,
       lv_dir: res.lv_dir,
+
+      errOrdersOneOrders: res.err.one.orders,
+      errOrdersTwoOrders: res.err.two.orders,
+
+      errOrdersOneCam: res.err.one.cam,
+      errOrdersTwoCam: res.err.two.cam,
+
+      isShowErr: false,
+      showErr: null,
 
       tabTable: localStorage.getItem('tabTable') ? parseInt(localStorage.getItem('tabTable')) : parseInt(res.part) - 1
     });
@@ -1595,6 +1639,24 @@ class WorkSchedule_ extends React.Component {
       mainMenuPrice: true,
       chooseUser: item,
     });
+  }
+
+  async showErrOrder(id, row_id){
+    let data = {
+      id: id,
+      row_id: row_id
+    };
+
+    console.log( data )
+
+    let res = await this.getData('get_my_err_order', data);
+
+    console.log( res )
+
+    this.setState({
+      showErr: res,
+      isShowErr: true
+    })
   }
 
   render() {
@@ -2208,6 +2270,83 @@ class WorkSchedule_ extends React.Component {
           </Dialog>
         )}
 
+        {!this.state.showErr || this.state.isShowErr === false ? null : (
+          <Dialog
+            open={this.state.isShowErr}
+            onClose={() => {
+              this.setState({ isShowErr: false });
+            }}
+            scroll="paper"
+            fullWidth={true}
+            maxWidth={'md'}
+            id={'OpenModalM'}
+          >
+            <DialogTitle>
+              Ошибка по заказу №{this.state.showErr.order_id}
+            </DialogTitle>
+            <DialogContent>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6} className="cellErr">
+                  <b>Ошибка заказа</b>
+                  <span>{this.state.showErr.order_desc}</span>
+                </Grid>
+                <Grid item xs={12} sm={6} className="cellErr">
+                  <b>Дата заказа</b>
+                  <span>{this.state.showErr.date_time_order}</span>
+                </Grid>
+
+                <Grid item xs={12} sm={4} className="cellErr">
+                  <b>Позиция</b>
+                  <span>{this.state.showErr.item_name}</span>
+                </Grid>
+                <Grid item xs={12} sm={4} className="cellErr">
+                  <b>Ошибка</b>
+                  <span>{this.state.showErr.pr_name}</span>
+                </Grid>
+                <Grid item xs={12} sm={4} className="cellErr">
+                  <b>Сумма</b>
+                  <span>{this.state.showErr.my_price}</span>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  {this.state.showErr.new_text_1.length > 0 && parseInt(this.state.showErr.is_edit) == 0 ?
+                    <Grid item xs={12} sm={4} className="cellErr">
+                      <b>Причина обжалования</b>
+                      <span>{this.state.showErr.new_text_1}</span>
+                    </Grid>
+                      :
+                    parseInt(this.state.showErr.is_edit) == 0 ? 
+                      null 
+                        :
+                      <MyTextInput
+                        label="Причина обжалования"
+                        multiline={true}
+                        disabled={ parseInt(this.state.showErr.is_edit) == 1 ? false : true }
+                        maxRows={5}
+                        value={this.state.showErr.new_text_1}
+                        func={(event) => {
+                          let userInfo = this.state.showErr;
+                          userInfo.new_text_1 = event.target.value;
+                          this.setState({ showErr: userInfo });
+                        }}
+                      />
+                  }
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  { this.state.showErr.new_text_2.length == 0 ? null :
+                    <Grid item xs={12} sm={4} className="cellErr">
+                      <b>Ответ обжалования</b>
+                      <span>{this.state.showErr.new_text_2}</span>
+                    </Grid>
+                  }
+                </Grid>
+
+              </Grid>
+            </DialogContent>
+            
+          </Dialog>
+        )}
+
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
@@ -2346,6 +2485,114 @@ class WorkSchedule_ extends React.Component {
               </TabPanel>
             }
           </Box>
+
+          <Grid item xs={12}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Номер заказа</TableCell>
+                  <TableCell>Дата заказа</TableCell>
+                  <TableCell>Ошибка</TableCell>
+                  <TableCell>Довоз</TableCell>
+                  <TableCell>Сумма ошибки</TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              </TableHead>
+              {parseInt(this.state.tabTable) == 0 ?
+                <TableBody>
+                  { this.state.errOrdersOneOrders.map( (item, key) =>
+                    <TableRow key={key} onClick={this.showErrOrder.bind(this, item.id, item.row_id)}>
+                      <TableCell>{item.order_id}</TableCell>
+                      <TableCell>{item.date_time_order}</TableCell>
+                      <TableCell>{item.err_name}</TableCell>
+                      <TableCell>{ parseInt(item.new_order_id) == 0 ? null : <TimeToLeaveIcon /> }</TableCell>
+                      <TableCell>{item.my_price}</TableCell>
+                      <TableCell> {parseInt(item.new_status) == 1 && parseInt(item.is_edit) == 1 ? <InfoIcon /> : null } </TableCell>
+                      
+                    </TableRow>
+                  ) }
+                </TableBody>
+                  :
+                <TableBody>
+                  { this.state.errOrdersTwoOrders.map( (item, key) =>
+                    <TableRow key={key} onClick={this.showErrOrder.bind(this, item.id, item.row_id)}>
+                      <TableCell>{item.order_id}</TableCell>
+                      <TableCell>{item.date_time_order}</TableCell>
+                      <TableCell>{item.err_name}</TableCell>
+                      <TableCell>{ parseInt(item.new_order_id) == 0 ? null : <TimeToLeaveIcon /> }</TableCell>
+                      <TableCell>{item.my_price}</TableCell>
+                      <TableCell> {parseInt(item.new_status) == 1 && parseInt(item.is_edit) == 1 ? <InfoIcon /> : null } </TableCell>
+                      
+                    </TableRow>
+                  ) }
+                </TableBody>
+              }
+              <TableFooter>
+                <TableRow>
+                  <TableCell>Общяя сумма</TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell>0</TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              </TableFooter>
+              
+            </Table>
+          </Grid>
+          <Grid item xs={12}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>#</TableCell>
+                  <TableCell>Дата время совершения ошибки</TableCell>
+                  <TableCell>Ошибка</TableCell>
+                  <TableCell>Сумма ошибки</TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              </TableHead>
+              {parseInt(this.state.tabTable) == 0 ?
+                <TableBody>
+                  { this.state.errOrdersOneCam.map( (item, key) =>
+                    <TableRow key={key}>
+                      <TableCell>{key+1}</TableCell>
+                      <TableCell>{item.date_time_fine}</TableCell>
+                      <TableCell>{item.fine_name}</TableCell>
+                      <TableCell>{item.price}</TableCell>
+                      <TableCell> {parseInt(item.is_edit) == 1 ? <InfoIcon /> : null } </TableCell>
+                      
+                    </TableRow>
+                  ) }
+                </TableBody>
+                  :
+                <TableBody>
+                  { this.state.errOrdersTwoCam.map( (item, key) =>
+                    <TableRow key={key}>
+                      <TableCell>{key+1}</TableCell>
+                      <TableCell>{item.date_time_fine}</TableCell>
+                      <TableCell>{item.fine_name}</TableCell>
+                      <TableCell>{item.price}</TableCell>
+                      <TableCell> {parseInt(item.is_edit) == 1 ? <InfoIcon /> : null } </TableCell>
+                      
+                    </TableRow>
+                  ) }
+                </TableBody>
+              }
+              <TableFooter>
+                <TableRow>
+                  <TableCell>Общяя сумма</TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell>0</TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              </TableFooter>
+              
+            </Table>
+          </Grid>
+
+
         </Grid>
       </>
     );
