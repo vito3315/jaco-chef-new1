@@ -114,7 +114,7 @@ class SkladItemsModule_Modal_Edit extends React.Component {
       maxWidth={'sm'}
     >
       <DialogTitle>
-      Изменить цену и/или статус ревизии в товаре: <br/>
+      Изменить цену и/или статус Ревизии в Товаре: <br/>
       {this.props.itemName}
       </DialogTitle>
 
@@ -899,7 +899,7 @@ class SkladItemsModule_ extends React.Component {
                                 <TableCell>{it.ei_name}</TableCell>
                                 <TableCell>{it.storage_name}</TableCell>
                                 <TableCell style={{ cursor: 'pointer' }} onClick={this.openModalItemEdit.bind(this, it.id, 1, it.name, it.show_in_rev, it.handle_price)}>
-                                  {it.handle_price}
+                                  <span style={{ borderBottom: '1px dotted red' }}>{it.handle_price}</span>
                                 </TableCell>
                               </TableRow>
                             ))}
@@ -954,7 +954,7 @@ class SkladItemsModule_ extends React.Component {
                             <TableCell>{cat.ei_name}</TableCell>
                             <TableCell>{cat.storage_name}</TableCell>
                             <TableCell style={{ cursor: 'pointer' }} onClick={this.openModalItemEdit.bind(this, cat.id, 2, cat.name, cat.show_in_rev, cat.handle_price)}>
-                              {cat.handle_price} 
+                            <span style={{ borderBottom: '1px dotted red' }}>{cat.handle_price}</span>
                             </TableCell>
                           </TableRow>
                         ))}

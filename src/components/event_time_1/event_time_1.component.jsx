@@ -465,11 +465,13 @@ class EventTime1_ extends React.Component {
       });
   };
 
-  changePoint(event) {
-    let data = event.target.value;
+  async changePoint(event) {
+    let point = event.target.value;
+
+    // let data = await this.getData('get_all', point);
 
     this.setState({
-      point: data,
+      point
     });
 
     // setTimeout( () => {
@@ -491,17 +493,24 @@ class EventTime1_ extends React.Component {
   
   }
 
-  saveItem(event, item) {
+  async saveItem(event, item) {
     console.log(item);
     // console.log(data);
+
+    // await this.getData('save_edit', data);
   }
 
-  deleteItemAccordion(id) {
+  async deleteItemAccordion(id) {
     // console.log(id)
+
+    // await this.getData('delete_item_acc', data);
   }
 
-  deleteItemCard(id) {
+  async deleteItemCard(id) {
     // console.log(id)
+
+    // await this.getData('delete_item_card', data);
+
   }
 
   render() {

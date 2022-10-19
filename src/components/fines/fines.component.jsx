@@ -588,9 +588,11 @@ class Fines_ extends React.Component {
     }
   }
 
-  saveItem(method, item) {
+  async saveItem(method, item) {
     console.log(method);
     console.log(item);
+
+    // await this.getData('save_edit', data);
 
     this.setState({
       modalDialog: false,
