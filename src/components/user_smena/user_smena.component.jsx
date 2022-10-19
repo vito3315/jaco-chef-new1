@@ -897,13 +897,17 @@ class UserSmena_ extends React.Component {
       });
   };
 
-  changePoint(event) {
+  async changePoint(event) {
+    const point = event.target.value;
+
     const data = this.state.shifts;
 
-    const smena = data.filter((el) => el.id === event.target.value);
+    const smena = data.filter((el) => el.id === point);
+
+    // let data = await this.getData('get_all', point);
 
     this.setState({
-      point: event.target.value,
+      point,
       smena,
     });
   }
@@ -934,12 +938,15 @@ class UserSmena_ extends React.Component {
     }
   }
 
-  saveItem(event, method, newSmena, smena, name) {
+  async saveItem(event, method, newSmena, smena, name) {
     // console.log(method);
     // console.log(newSmena);
     // console.log(smena);
 
     // if (method === 'Создание смены') {
+
+    // await this.getData('save_edit', data);
+
     const remaining = this.state.remaining;
 
     const shifts = this.state.shifts;
@@ -990,8 +997,10 @@ class UserSmena_ extends React.Component {
     // }
   }
 
-  deleteItem(smena) {
+  async deleteItem(smena) {
     // console.log(smena);
+
+     // await this.getData('delete_item', data);
 
     const remaining = this.state.remaining;
 

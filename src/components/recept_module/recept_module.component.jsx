@@ -1127,7 +1127,7 @@ class ReceptModule_ extends React.Component {
       });
   };
 
-  async openModalRecipes(method, id) {
+  openModalRecipes(method, id) {
     // const item = this.state.item.find(el => el.id === id)
 
     if (method === 'Новый рецепт') {
@@ -1153,10 +1153,12 @@ class ReceptModule_ extends React.Component {
     }
   }
 
-  saveNewItem(newItem, recipe) {
+  async saveNewItem(newItem, recipe) {
     // console.log(newItem)
 
     // console.log(recipe)
+
+    // await this.getData('save_new_item', data);
 
     this.setState({
       modalDialogNew: false,
@@ -1164,8 +1166,10 @@ class ReceptModule_ extends React.Component {
     });
   }
 
-  saveEditItem(editItem, recipe) {
+  async saveEditItem(editItem, recipe) {
     // console.log(editItem, recipe);
+
+    // await this.getData('save_edit', data);
 
     this.setState({
       modalDialogEdit: false,

@@ -941,8 +941,10 @@ class CountUsers_ extends React.Component {
       });
   };
 
-  changePoint(event) {
+  async changePoint(event) {
     const data = event.target.value;
+
+    // let data = await this.getData('get_all', data);
 
     const eventFilter = this.state.event;
 
@@ -1084,14 +1086,19 @@ class CountUsers_ extends React.Component {
     }
   }
 
-  saveItem(item, data) {
+  async saveItem(item, data) {
     // console.log(item);
     // console.log(data);
+
+    // await this.getData('save_edit', data);
+
   }
 
-  deleteItem(item, event) {
+  async deleteItem(item, event) {
     event.stopPropagation();
     // console.log(item)
+
+    // await this.getData('delete_item', data);
   }
 
   render() {
