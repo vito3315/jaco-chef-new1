@@ -123,6 +123,21 @@ class OrderPostRec_TableItem extends React.Component {
   render(){
     const it = this.props.it;
 
+    let vendors = [];
+    let item = it.items.filter(el => el.id === it.item_id_rec);
+
+    if( item.length > 0 ){
+      vendors = item[0].vendors;
+    }
+
+    let pq = vendors.find(el => el.id === it.vendor_id_rec);
+
+    if( pq ){
+      pq = pq.pq;
+    }else{
+      pq = '';
+    }
+
     return(
       <TableRow
         sx={{ '& td': { border: 0 } }}
@@ -149,13 +164,13 @@ class OrderPostRec_TableItem extends React.Component {
         </TableCell>
 
         <TableCell>
-          {it.items.find(el => el.id === it.item_id_rec).pq ?? ''} {it.ei_name}
+          {pq} {it.ei_name}
         </TableCell>
 
         <TableCell>
           <MySelect
             is_none={false}
-            data={it.items.find(el => el.id === it.item_id_rec).vendors ?? []}
+            data={vendors}
             value={it.vendor_id_rec}
             func={this.props.changeSelect.bind(
                   this,
@@ -479,6 +494,25 @@ class OrderPostRec_ extends React.Component {
     });
   }
 
+  findPQ(it){
+    let vendors = [];
+    let item = it.items.filter(el => el.id === it.item_id_rec);
+
+    if( item.length > 0 ){
+      vendors = item[0].vendors;
+    }
+
+    let pq = vendors.find(el => el.id === it.vendor_id_rec);
+
+    if( pq ){
+      pq = pq.pq;
+    }else{
+      pq = '';
+    }
+
+    return pq;
+  }
+
   changeSelect(id, key, type, event) {
     // console.log(id, key, type, event.target.value)
 
@@ -489,7 +523,13 @@ class OrderPostRec_ extends React.Component {
         cat.cats.forEach((it) => {
           it.items.forEach((el) => {
             if (el.id === id) {
+              
               el[key] = event.target.value;
+
+              if( key == 'vendor_id_rec' ){
+                //console.log( this.findPQ(el) )
+                el['pq'] = this.findPQ(el);
+              }
             }
           });
         });
