@@ -70,6 +70,8 @@ const AppWorkShow = React.lazy(() => import("../app_work_show"));
 const SiteStatMarc = React.lazy(() => import("../site_stat_marc"));
 const AdvertisingCompany = React.lazy(() => import("../advertising_company"));
 
+const ListFakeUsers = React.lazy(() => import("../list_fake_users"));
+
 const RasBillAndCook = React.lazy(() => import("../ras_bill_and_cook"));
 const SkladItemsModule = React.lazy(() => import("../sklad_items_module"));
 const SiteUserManager = React.lazy(() => import("../site_user_manager"));
@@ -366,6 +368,8 @@ export function App () {
                   <Route path={'/app_work_show'} exact={ true } element={ <AppWorkShow /> } />
                   <Route path={'/site_stat_marc'} exact={ true } element={ <SiteStatMarc /> } />
                   <Route path={'/advertising_company'} exact={ true } element={ <AdvertisingCompany /> } />
+
+                  <Route path={'/list_fake_users'} exact={ true } element={ <ListFakeUsers /> } />
 
                   <Route path={'/ras_bill_and_cook'} exact={ true } element={ <RasBillAndCook /> } />
                   <Route path={'/sklad_items_module'} exact={ true } element={ <SkladItemsModule /> } />
