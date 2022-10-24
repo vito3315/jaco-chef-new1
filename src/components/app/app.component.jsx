@@ -70,8 +70,6 @@ const AppWorkShow = React.lazy(() => import("../app_work_show"));
 const SiteStatMarc = React.lazy(() => import("../site_stat_marc"));
 const AdvertisingCompany = React.lazy(() => import("../advertising_company"));
 
-const ListFakeUsers = React.lazy(() => import("../list_fake_users"));
-
 const RasBillAndCook = React.lazy(() => import("../ras_bill_and_cook"));
 const SkladItemsModule = React.lazy(() => import("../sklad_items_module"));
 const SiteUserManager = React.lazy(() => import("../site_user_manager"));
@@ -90,7 +88,7 @@ const EventTime1 = React.lazy(() => import("../event_time_1"));
 const ReceptModule = React.lazy(() => import("../recept_module"));
 const OrderPostRec = React.lazy(() => import("../order_post_rec"));
 
-
+const ListFakeUsers = React.lazy(() => import("../list_fake_users"));
 
 import { SiteSaleMin, SiteSaleMin_New, SiteSaleMin_Edit, SiteSaleMin_StatList } from '../site_sale_min';
 
@@ -369,8 +367,6 @@ export function App () {
                   <Route path={'/site_stat_marc'} exact={ true } element={ <SiteStatMarc /> } />
                   <Route path={'/advertising_company'} exact={ true } element={ <AdvertisingCompany /> } />
 
-                  <Route path={'/list_fake_users'} exact={ true } element={ <ListFakeUsers /> } />
-
                   <Route path={'/ras_bill_and_cook'} exact={ true } element={ <RasBillAndCook /> } />
                   <Route path={'/sklad_items_module'} exact={ true } element={ <SkladItemsModule /> } />
                   <Route path={'/site_user_manager'} exact={ true } element={ <SiteUserManager /> } />
@@ -394,6 +390,8 @@ export function App () {
                   <Route path={'/recept_module'} exact={ true } element={ <ReceptModule /> } />
                   <Route path={'/order_post_rec'} exact={ true } element={ <OrderPostRec /> } />
                   
+                  <Route path={'/list_fake_users'} exact={ true } element={ <ListFakeUsers /> } />
+
                   <Route
                     component={ () =>
                       <Status code={404}>
