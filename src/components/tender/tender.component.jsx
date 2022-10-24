@@ -13,11 +13,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { MyAutocomplite } from '../../stores/elements';
 
-//import {AgGridColumn, AgGridReact} from 'ag-grid-react';
-
 const queryString = require('query-string');
 
-/*
+
 const dynamicCellStyle = params => {
   if( params.colDef.headerName == 'Цена' ){
     return { borderRight: '1px solid #bababa' };
@@ -49,7 +47,7 @@ class Tender_ extends React.Component {
   async componentDidMount(){
     let data = await this.getData('get_all');
     
-    let table = [];
+    /*let table = [];
     
     data.items.map( (main_cat, k1) => {
       
@@ -95,18 +93,13 @@ class Tender_ extends React.Component {
           table.push(tableItem)
         } )
       } )
-    } )
-    
-    
-    
-    
-    
+    } )*/
     
     this.setState({
       module_name: data.module_info.name,
-      testTable: table,
-      vendors: data['vendors'],
-      showVendors: data['vendors']
+      //testTable: table,
+      //vendors: data['vendors'],
+      //showVendors: data['vendors']
     })
     
     document.title = data.module_info.name;
@@ -235,6 +228,13 @@ class Tender_ extends React.Component {
   }
   
   render(){
+
+    return (
+      <Backdrop open={true}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    )
+
     return (
       <>
         <Backdrop open={this.state.is_load}>
@@ -301,10 +301,10 @@ class Tender_ extends React.Component {
       </>
     )
   }
-}*/
+}
 
 export function Tender() {
   return (
-    <></>
+    <Tender_ />
   );
 }
