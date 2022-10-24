@@ -181,7 +181,7 @@ class ListFakeUsers_ extends React.Component {
 
           <Grid item xs={12} sm={3} sx={{ order: { sm: 0, xs: 1 }}}>
             <MyDatePickerNew
-              label="Заказы от"
+              label="Делал заказ от"
               value={this.state.date_start_true}
               func={this.changeDateRange.bind(this, 'date_start_true')}
             />
@@ -189,7 +189,7 @@ class ListFakeUsers_ extends React.Component {
 
           <Grid item xs={12} sm={3} sx={{ order: { sm: 1, xs: 0 }}}>
             <MyDatePickerNew
-              label="Заказы до"
+              label="Делал заказ до"
               value={this.state.date_end_true}
               func={this.changeDateRange.bind(this, 'date_end_true')}
             />
@@ -209,7 +209,7 @@ class ListFakeUsers_ extends React.Component {
         <Grid container spacing={3} justifyContent="center" mb={3}>
           <Grid item xs={12} sm={3}>
             <MyDatePickerNew
-              label="Без заказов от"
+              label="Не заказывал от"
               value={this.state.date_start_false}
               func={this.changeDateRange.bind(this, 'date_start_false')}
             />
@@ -217,7 +217,7 @@ class ListFakeUsers_ extends React.Component {
 
           <Grid item xs={12} sm={3}>
             <MyDatePickerNew
-              label="Без заказов до"
+              label="Заказывал до"
               value={this.state.date_end_false}
               func={this.changeDateRange.bind(this, 'date_end_false')}
             />
