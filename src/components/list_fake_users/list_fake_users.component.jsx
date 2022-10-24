@@ -264,7 +264,7 @@ class ListFakeUsers_ extends React.Component {
 
           <Grid item xs={12} sm={3}>
             <MyAutocomplite
-              label="Точка"
+              label="Точки"
               multiple={true}
               data={this.state.points}
               value={this.state.point}

@@ -24,6 +24,14 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
+import Snackbar from '@mui/material/Snackbar';
+
+import MuiAlert from '@mui/material/Alert';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 import {
   MySelect,
   MyAutocomplite2,
@@ -94,7 +102,7 @@ class OrderPostRec_Modal extends React.Component {
         <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
           <Grid item xs={12} sm={4}>
             <MyAutocomplite
-              label="Точка"
+              label="Точки"
               multiple={true}
               data={this.state.points}
               value={this.state.point}
@@ -204,13 +212,57 @@ class OrderPostRec_Table extends React.Component {
     }
 
     if (this.props !== prevProps) {
-      this.setState({
-        cats: JSON.parse(JSON.stringify(this.props.cats)),
-        freeItems: JSON.parse(JSON.stringify(this.props.freeItems)),
-        items: this.props.items,
-      });
-    }
+
+      if(this.state.search) {
+
+        const searchValue = this.state.search;
+
+        const catsFilter = JSON.parse(JSON.stringify(this.props.cats));
+
+        const freeItems = JSON.parse(JSON.stringify(this.props.freeItems));
+
+        catsFilter.map((cat) => {
+          let arr = [];
+  
+          cat.cats.map((el) => {
+            el.items = el.items.filter((value) =>
+              value.name.toLowerCase().includes(searchValue.toLowerCase())
+            );
+  
+            if (!el.items.length) {
+              arr.push(el);
+            }
+  
+            return el;
+          });
+  
+          if (cat.cats.length === arr.length) {
+            cat.all = 0;
+          }
+        });
+  
+        const freeItemsFilter = freeItems.filter((value) =>
+          value.name.toLowerCase().includes(searchValue.toLowerCase())
+        );
+  
+        this.setState({
+          cats: catsFilter,
+          freeItems: freeItemsFilter,
+          items: this.props.items,
+        });
+
+      } else {
+
+        this.setState({
+          cats: JSON.parse(JSON.stringify(this.props.cats)),
+          freeItems: JSON.parse(JSON.stringify(this.props.freeItems)),
+          items: this.props.items,
+        });
+
+      }
+
   }
+}
 
   search(event) {
 
@@ -229,7 +281,7 @@ class OrderPostRec_Table extends React.Component {
       this.setState({
         search: searchValue
         });
-    }
+    } 
 
     const catsFilter = this.state.cats;
 
@@ -264,7 +316,9 @@ class OrderPostRec_Table extends React.Component {
         cats: catsFilter,
         freeItems: freeItemsFilter,
       });
+
     } else {
+      
       this.setState({
         cats: JSON.parse(JSON.stringify(this.props.cats)),
         freeItems: JSON.parse(JSON.stringify(this.props.freeItems)),
@@ -410,6 +464,9 @@ class OrderPostRec_ extends React.Component {
       hist: [],
 
       modalDialog: false,
+      snackbar: false,
+      st: false,
+      error: ''
     };
   }
 
@@ -566,11 +623,30 @@ class OrderPostRec_ extends React.Component {
 
     // console.log(data);
 
-    await this.getData('save_edit', data);
+    let res = await this.getData('save_edit', data);
 
-    setTimeout(() => {
-      this.update();
-    }, 300);
+    // console.log(res)
+
+    if(res.st) {
+
+      this.setState({
+        st: true,
+        snackbar: true,
+      });
+
+      setTimeout(() => {
+        this.update();
+      }, 300);
+
+    } else {
+
+      this.setState({
+        error: res.text,
+        snackbar: true,
+      });
+      
+    }
+
   }
 
   async update() {
@@ -596,6 +672,26 @@ class OrderPostRec_ extends React.Component {
         <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
+
+        <Snackbar 
+          open={this.state.snackbar} 
+          autoHideDuration={30000}
+          anchorOrigin={{  
+            vertical: 'top',
+            horizontal: 'center', 
+          }}
+          onClose={() => {
+            this.setState({ snackbar: false });
+          }}>
+          <Alert 
+            onClose={() => {
+            this.setState({ snackbar: false });
+            }} 
+            severity={ this.state.st ? "success" : "error" } 
+            sx={{ width: '100%' }}>
+             { this.state.st ? 'Данные успешно сохранены!' : `${this.state.error}` }
+          </Alert>
+        </Snackbar>
 
         <OrderPostRec_Modal
           open={this.state.modalDialog}
