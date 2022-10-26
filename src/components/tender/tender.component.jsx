@@ -17,6 +17,54 @@ import { MyAutocomplite, MySelect } from '../../stores/elements';
 
 const queryString = require('query-string');
 
+class TenderCell extends React.Component {
+  render(){
+
+    const item = this.props.item;
+    const vendor = this.props.vendor;
+
+    let price = this.props.vendor_items_price.find( (it) => parseInt(it.item_id) == parseInt(item.id) && parseInt(it.vendor_id) == parseInt(vendor.id) );
+
+    if( !price ){
+      price = '';
+    }else{
+      price = price.price;
+    }
+
+      /*<MySelect
+        data={this.state.towns}
+        value={this.state.town}
+        func={this.changeSelect.bind(this)}
+        label=""
+      />
+      
+        {`${Number(
+            vendor.price.find(
+              (it) => it.item_id === item.id
+            ).price
+          ).toFixed(2)} P`}
+      */
+
+    return (
+      <>
+        <TableCell className='tdcity'>
+          { price == '' ? null :
+            <MySelect
+              data={this.props.cities}
+              value={''}
+              func={ () => {} }
+              label=""
+            />
+          }
+        </TableCell>
+        <TableCell className='tdprice'>
+          {price}
+        </TableCell>
+      </>
+    )
+  }
+}
+
 class Tender_ extends React.Component {
   constructor(props) {
     super(props);
@@ -28,6 +76,7 @@ class Tender_ extends React.Component {
 
       cities: [],
       city: '',
+      newCities: [],
 
       towns: [
         { id: '1', name: 'Все' },
@@ -37,10 +86,14 @@ class Tender_ extends React.Component {
       town: '',
 
       vendors: [],
-      vendor: '',
+      vendor: [],
 
-      cats: []
+      vendor_items_price: [],
 
+      cats: [],
+
+      newCats: [],
+      newCat: ''
     };
   }
 
@@ -54,6 +107,7 @@ class Tender_ extends React.Component {
       cities: data.cities,
       city: data.cities[0].id,
       vendors: data.vendors,
+      newCats: data.cats
     });
 
     document.title = data.module_info.name;
@@ -114,37 +168,34 @@ class Tender_ extends React.Component {
   changeVendor(event, value) {
     this.setState({
       vendor: value,
+      newCat: ''
+    });
+  }
+
+  changeCat(event, value){
+    this.setState({
+      newCat: value,
+      vendor: [],
     });
   }
 
   async getDataTable() {
     const data = {
       city_id: this.state.city,
+      vendors: this.state.vendor,
+      cat: this.state.newCat
     };
 
     let res = await this.getData('get_data', data);
 
     console.log(res);
 
-    const vendors = this.state.vendors;
-
-    const items = res.vendor_items_price;
-
-    const vendors_items = vendors.map((el) => {
-      el.price = [];
-
-      items.forEach((it) => {
-        if (it.vendor_id === el.id) {
-          el.price.push(it);
-        }
-      });
-
-      return el;
-    });
-
     this.setState({
       cats: res.items,
-      vendors: vendors_items,
+      vendor_items_price: res.vendor_items_price,
+      vendors: res.vendors,
+      newCities: res.cities,
+      
     });
   }
 
@@ -178,13 +229,22 @@ class Tender_ extends React.Component {
             />
           </Grid>
 
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={6}>
             <MyAutocomplite
               label="Поставщик"
-              multiple={false}
+              multiple={true}
               data={this.state.vendors}
               value={this.state.vendor}
               func={this.changeVendor.bind(this)}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <MyAutocomplite
+              label="Категория"
+              multiple={false}
+              data={this.state.newCats}
+              value={this.state.newCat}
+              func={this.changeCat.bind(this)}
             />
           </Grid>
 
@@ -222,17 +282,19 @@ class Tender_ extends React.Component {
                         Самара
                       </TableCell>
                       {this.state.vendors.map((vendor, key) => (
-                        <React.Fragment key={key}>
-                          <TableCell
-                            style={{
-                              whiteSpace: 'nowrap',
-                              backgroundColor: '#d87093',
-                            }}
-                            colSpan={2}
-                          >
-                            {vendor.name}
-                          </TableCell>
-                        </React.Fragment>
+                        
+                        <TableCell
+                          key={key}
+                          style={{
+                            whiteSpace: 'nowrap',
+                            backgroundColor: '#d87093',
+                            minWidth: 300
+                          }}
+                          colSpan={2}
+                        >
+                          {vendor.name}
+                        </TableCell>
+                        
                       ))}
                     </TableRow>
                   </TableHead>
@@ -286,53 +348,8 @@ class Tender_ extends React.Component {
                                 <TableCell></TableCell>
                                 <TableCell></TableCell>
                                 {this.state.vendors.map((vendor, key) => (
-                                  <React.Fragment key={key}>
-                                    {vendor.price.find(
-                                      (it) => it.item_id === item.id
-                                    ) ? (
-                                      <>
-                                        <TableCell 
-                                        style={{ backgroundColor: 
-                                        this.state.town === '1' ? '#FFFF00' :
-                                        this.state.town === '2' ? '#FF4500' :
-                                        this.state.town === '3' ? '#8B008B' :
-                                        'none'
-                                      }}>
-                                          <MySelect
-                                            data={this.state.towns}
-                                            value={this.state.town}
-                                            func={this.changeSelect.bind(this)}
-                                            label=""
-                                          />
-                                        </TableCell>
-                                        <TableCell
-                                          style={{
-                                            whiteSpace: 'nowrap',
-                                            backgroundColor: '#00BFFF',
-                                            textAlign: 'center',
-                                          }}
-                                        >
-                                          {`${Number(
-                                            vendor.price.find(
-                                              (it) => it.item_id === item.id
-                                            ).price
-                                          ).toFixed(2)} P`}
-                                        </TableCell>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <TableCell></TableCell>
-                                        <TableCell
-                                          style={{
-                                            whiteSpace: 'nowrap',
-                                            color: 'rgba(0, 0, 0, 0.5)',
-                                          }}
-                                        >
-                                          нет
-                                        </TableCell>
-                                      </>
-                                    )}
-                                  </React.Fragment>
+                                  <TenderCell key={key} vendor_items_price={this.state.vendor_items_price} cities={this.state.newCities} item={item} vendor={vendor} />
+
                                 ))}
                               </TableRow>
                             ))}
