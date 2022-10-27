@@ -302,7 +302,7 @@ class ListFakeUsers_ extends React.Component {
                     {this.state.users.map((item, i) => (
                       <TableRow key={i}>
                         <TableCell>{i + 1}</TableCell>
-                        <TableCell></TableCell>
+                        <TableCell>{item.name}</TableCell>
                         <TableCell>{item.login}</TableCell>
                       </TableRow>
                     ))}
