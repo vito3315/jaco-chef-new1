@@ -17,11 +17,11 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 import Backdrop from '@mui/material/Backdrop';
@@ -299,7 +299,7 @@ class VendorModule_ extends React.Component {
   testChange(data, event){
     let vendor = this.state.openVendor;
     
-    if( data == 'bill_ex' || data == 'need_img_bill_ex' ){
+    if( data == 'bill_ex' || data == 'need_img_bill_ex' || data == 'is_show' || data == 'is_priority' ){
       vendor[data] = event.target.checked === true ? 1 : 0;
     }else{
       vendor[data] = event.target.value;
@@ -466,15 +466,21 @@ class VendorModule_ extends React.Component {
                     <MyTextInput label="Доп почта" value={ this.state.openVendor.email_2 } func={ this.testChange.bind(this, 'email_2') } />
                   </Grid>
                   
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} sm={4}>
+                    <MyCheckBox label="Активность" value={ parseInt(this.state.openVendor.is_show) == 1 ? true : false } func={ this.testChange.bind(this, 'is_show') } />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
                     <MyCheckBox label="Работа по счетам" value={ parseInt(this.state.openVendor.bill_ex) == 1 ? true : false } func={ this.testChange.bind(this, 'bill_ex') } />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} sm={4}>
                     <MyCheckBox label="Необходима картинка" value={ parseInt(this.state.openVendor.need_img_bill_ex) == 1 ? true : false } func={ this.testChange.bind(this, 'need_img_bill_ex') } />
                   </Grid>
                   
                   <Grid item xs={12} sm={6}>
                     <MyAutocomplite multiple={true} label='Города' data={this.state.allCities} value={this.state.vendorCities} func={ (event, value) => { console.log(value); this.setState({ vendorCities: value }) } } />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <MyCheckBox label="Приоритетный поставщик" value={ parseInt(this.state.openVendor.is_priority) == 1 ? true : false } func={ this.testChange.bind(this, 'is_priority') } />
                   </Grid>
                 </>
                   :
@@ -587,16 +593,18 @@ class VendorModule_ extends React.Component {
                 <TableHead>
                   <TableRow>
                     <TableCell component="th">Название</TableCell>
-                    <TableCell component="th">Назначенные товары</TableCell>
-                    <TableCell component="th"><VisibilityIcon /></TableCell>
+                    <TableCell component="th" style={{ textAlign: 'center' }}>Назначенные товары</TableCell>
+                    <TableCell component="th" style={{ textAlign: 'center' }}>Актиновсть</TableCell>
+                    <TableCell component="th" style={{ textAlign: 'center' }}>Приоритетный</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   { this.state.vendors.map( (item, key) => 
                     <TableRow key={key}>
                       <TableCell><Typography onClick={ this.openModalVendor.bind(this, item) } style={{ cursor: 'pointer', width: 'max-content' }}>{item.name}</Typography></TableCell>
-                      <TableCell><DirectionsCarIcon onClick={ this.openModalItems.bind(this, item) } style={{ cursor: 'pointer' }} /></TableCell>
-                      <TableCell>{ parseInt(item.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> }</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}><DirectionsCarIcon onClick={ this.openModalItems.bind(this, item) } style={{ cursor: 'pointer' }} /></TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> }</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.is_priority) == 1 ? <PriorityHighIcon /> : null }</TableCell>
                     </TableRow>
                   ) }
                 </TableBody>
