@@ -2638,6 +2638,32 @@ class SiteSale2_StatList_ extends React.Component {
                   <Typography>{item.name}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
+                  <span>Удаленных: {item.stat.is_delete_perc}%</span>
+                  <br />
+                  <span>Активированных: {item.stat.is_active_perc}%</span>
+                  <br />
+                  <span>Не активированных: {item.stat.is_nonactive_perc}%</span>
+                  <br />
+                  <span>------------------------------</span>
+                  <br />
+                  <span>Новых клиентов: {item.stat.is_new_perc}%</span>
+                  <br />
+                  <span>(относительно количества выписанных промиков)</span>
+                  <br />
+                  <span>------------------------------</span>
+                  <br />
+                  <span>Доставка: {item.stat.type_dev}%</span>
+                  <br />
+                  <span>Самовывоз: {item.stat.type_pic}%</span>
+                  <br />
+                  <span>Зал: {item.stat.type_hall}%</span>
+                  <br />
+                  <span>------------------------------</span>
+                  <br />
+                  <span>Оформил клиент: {item.stat.is_client}%</span>
+                  <br />
+                  <span>Оформил контакт-центр: {item.stat.is_center}%</span>
+                  <br />
                   <Table size={'small'} style={{ marginTop: 15 }}>
                     <TableBody>
                       { item.promo_list.map( (promo, k) =>
