@@ -13,6 +13,13 @@ import TableContainer from '@mui/material/TableContainer';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 import {
   MyCheckBox,
   MyAutocomplite,
@@ -48,6 +55,9 @@ class ListFakeUsers_ extends React.Component {
       items: [],
       item: [],
       users: [],
+
+      snackbar: false,
+      error: '',
 
       date_start_true: '',
       date_end_true: '',
@@ -118,6 +128,7 @@ class ListFakeUsers_ extends React.Component {
   };
 
   async getUsers() {
+
     const data = {
       point: this.state.point,
       date_start_true: this.state.date_start_true,
@@ -126,18 +137,30 @@ class ListFakeUsers_ extends React.Component {
       date_end_false: this.state.date_end_false,
       count_orders: this.state.count_orders,
       max_summ: this.state.max_summ,
-      items: this.state.items,
+      items: this.state.item,
       is_show_claim: this.state.is_show_claim,
       is_show_marketing: this.state.is_show_marketing,
     };
 
-    const users = await this.getData('get_users', data);
+    const res = await this.getData('get_users', data);
 
-    // console.log(users);
+    // console.log(res);
 
-    this.setState({
-      users,
-    });
+    if(res.st) {
+
+      this.setState({
+        users: res.users,
+      });
+
+    } else {
+
+      this.setState({
+        error: res.text,
+        snackbar: true,
+      });
+      
+    }
+
   }
 
   changeNumber(data, event) {
@@ -147,6 +170,7 @@ class ListFakeUsers_ extends React.Component {
   }
 
   changeItem(data, event, value) {
+
     this.setState({
       [data]: value,
     });
@@ -172,6 +196,26 @@ class ListFakeUsers_ extends React.Component {
         <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
+
+        <Snackbar 
+          open={this.state.snackbar} 
+          autoHideDuration={30000}
+          anchorOrigin={{  
+            vertical: 'top',
+            horizontal: 'center', 
+          }}
+          onClose={() => {
+            this.setState({ snackbar: false });
+          }}>
+          <Alert 
+            onClose={() => {
+            this.setState({ snackbar: false });
+            }} 
+            severity={ "error" } 
+            sx={{ width: '100%' }}>
+             {this.state.error}
+          </Alert>
+        </Snackbar>
 
           <Grid item xs={12} mb={3} >
             <h1>{this.state.module_name}</h1>
@@ -217,7 +261,7 @@ class ListFakeUsers_ extends React.Component {
 
           <Grid item xs={12} sm={3}>
             <MyDatePickerNew
-              label="Заказывал до"
+              label="Не заказывал до"
               value={this.state.date_end_false}
               func={this.changeDateRange.bind(this, 'date_end_false')}
             />
