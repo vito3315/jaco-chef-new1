@@ -31,7 +31,6 @@ class Tender_ extends React.Component {
       city: '',
 
       newCities: [],
-      newCiti: '',
 
       vendors: [],
       vendor: [],
@@ -135,12 +134,14 @@ class Tender_ extends React.Component {
 
     const res = await this.getData('get_data', data);
 
+    console.log(res)
+
     this.getDataTableCell(res);
 
   }
 
   getDataTableCell(res) {
-    const vendors = this.state.vendors;
+    const vendors = res.vendors;
 
     const items = res.vendor_items_price;
 
@@ -156,19 +157,39 @@ class Tender_ extends React.Component {
       return el;
     });
 
-   // console.log(vendors_items);
+   console.log(vendors_items);
 
     this.setState({
       cats: res.items,
       vendors: vendors_items,
       newCities: res.cities,
-      newCiti: res.cities[0].id,
     });
   }
 
-  changeSelect(event) {
+  changeSelect(id, event) {
+
+    // console.log(event.target.value, id)
+
+    const vendors = this.state.vendors;
+
+    const newCities = this.state.newCities;
+
+    vendors.forEach(vendor => {
+
+      if(vendor.id === id && vendor.city_list.length === 0) {
+        vendor.city_list.push(newCities.find(city => city.id === event.target.value))
+      }
+
+      if(vendor.id === id && vendor.city_list.length !== 0) {
+        const vendorFilter = vendor.city_list.filter(city => city.id !== event.target.value)
+        vendorFilter.unshift(newCities.find(city => city.id === event.target.value))
+        vendor.city_list = vendorFilter
+      }
+
+    })
+
     this.setState({
-      newCiti: event.target.value,
+      vendors
     });
   }
 
@@ -313,8 +334,8 @@ class Tender_ extends React.Component {
                                      <TableCell>
                                        <MySelect
                                          data={this.state.newCities}
-                                         value={this.state.newCiti}
-                                         func={this.changeSelect.bind(this)}
+                                         value={vendor.city_list.length ? vendor.city_list[0].id : ''}
+                                         func={this.changeSelect.bind(this, vendor.id)}
                                          label=""
                                        />
                                      </TableCell>
