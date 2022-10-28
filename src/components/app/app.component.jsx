@@ -56,7 +56,7 @@ const Tender = React.lazy(() => import("../tender"));
 const WorkSchedule = React.lazy(() => import("../work_schedule"));
 
 import { Revizion, RevizionNew } from '../revizion';
-import { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat, SiteSale2_StatList } from '../site_sale_2';
+import { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat, SiteSale2_StatList, SiteSale2_AnaliticList } from '../site_sale_2';
 
 const DriveMapStatAll = React.lazy(() => import("../drive_map_stat_all"));
 const DriverStat = React.lazy(() => import("../driver_stat"));
@@ -354,6 +354,7 @@ export function App () {
                   <Route path={'/site_sale_2/edit/:promoId'} exact={ true } element={ <SiteSale2_Edit /> } />
                   <Route path={'/site_sale_2/stat'} exact={ true } element={ <SiteSale2_Stat /> } />
                   <Route path={'/site_sale_2/stat_list'} exact={ true } element={ <SiteSale2_StatList /> } />
+                  <Route path={'/site_sale_2/analitic_list'} exact={ true } element={ <SiteSale2_AnaliticList /> } />
 
                   <Route path={'/drive_map_stat_all'} exact={ true } element={ <DriveMapStatAll /> } />
                   <Route path={'/driver_stat'} exact={ true } element={ <DriverStat /> } />
@@ -378,6 +379,7 @@ export function App () {
                   <Route path={'/site_sale_min/new'} exact={ true } element={ <SiteSaleMin_New /> } />
                   <Route path={'/site_sale_min/edit/:promoId'} exact={ true } element={ <SiteSaleMin_Edit /> } />
                   <Route path={'/site_sale_min/stat_list'} exact={ true } element={ <SiteSaleMin_StatList /> } />
+                  
                   
                   <Route path={'/show_cook'} exact={ true } element={ <ShowCook /> } />
                   <Route path={'/cafe_upr_edit'} exact={ true } element={ <СafeUprEdit /> } />

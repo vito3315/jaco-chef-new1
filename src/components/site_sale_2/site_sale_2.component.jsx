@@ -2229,6 +2229,10 @@ class SiteSale2_ extends React.Component {
               <Link to={"/site_sale_2/stat_list"} style={{ zIndex: 10, marginLeft: 20 }}>
                 <Button variant="contained">Выписанные промокоды</Button>
               </Link>
+
+              <Link to={"/site_sale_2/analitic_list"} style={{ zIndex: 10, marginLeft: 20 }}>
+                <Button variant="contained">Аналитика по выписанным промокодам</Button>
+              </Link>
               
             </Grid>
             
@@ -2638,6 +2642,187 @@ class SiteSale2_StatList_ extends React.Component {
                   <Typography>{item.name}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
+                  <Table size={'small'} style={{ marginTop: 15 }}>
+                    <TableBody>
+                      { item.promo_list.map( (promo, k) =>
+                        <TableRow key={k} style={{ backgroundColor: parseInt(promo.is_delete) == 1 ? '#c03' : 'white', color: parseInt(promo.is_delete) == 1 ? 'white' : 'black' }}>
+                          <TableCell style={{ color: 'inherit' }}>{k+1}</TableCell>
+                          <TableCell style={{ color: 'inherit', backgroundColor: parseInt(promo.count) == 0 ? 'green' : '#c03' }}>{promo.name}</TableCell>
+                          <TableCell style={{ color: 'inherit' }}>{promo.coment}</TableCell>
+                          <TableCell style={{ color: 'inherit' }}>{ parseInt(promo.count) == 0 ? <CheckIcon /> : <CloseIcon /> }</TableCell>
+                        </TableRow>
+                      ) }
+                    </TableBody>
+                    
+                  </Table>
+                </AccordionDetails>
+              </Accordion>
+            ) }
+            
+          </Grid>
+        
+        </Grid>
+      </>
+    )
+  }
+}
+
+class SiteSale2_AnaliticList_ extends React.Component {
+  click = false;
+  
+  constructor(props) {
+    super(props);
+        
+    this.state = {
+      module: 'site_sale_2',
+      module_name: '',
+      is_load: false,
+      
+      date_start: formatDate(new Date()),
+      date_end: formatDate(new Date()),
+      rangeDate: [formatDate(new Date()), formatDate(new Date())],
+
+      promo_list: []
+    };
+  }
+  
+  async componentDidMount(){
+    
+    let data = await this.getData('get_spam_list');
+    
+    console.log( data )
+    
+    this.setState({
+      module_name: data.module_info.name,
+      spam_list: data.spam_list
+    })
+    
+    document.title = data.module_info.name;
+  }
+  
+  getData = (method, data = {}) => {
+    
+    this.setState({
+      is_load: true
+    })
+    
+    return fetch('https://jacochef.ru/api/index_new.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type':'application/x-www-form-urlencoded'},
+      body: queryString.stringify({
+        method: method, 
+        module: this.state.module,
+        version: 2,
+        login: localStorage.getItem('token'),
+        data: JSON.stringify( data )
+      })
+    }).then(res => res.json()).then(json => {
+      
+      if( json.st === false && json.type == 'redir' ){
+        window.location.pathname = '/';
+        return;
+      }
+      
+      if( json.st === false && json.type == 'auth' ){
+        window.location.pathname = '/auth';
+        return;
+      }
+      
+      setTimeout( () => {
+        this.setState({
+          is_load: false
+        })
+      }, 300 )
+      
+      return json;
+    })
+    .catch(err => { 
+      console.log( err )
+      
+      setTimeout( () => {
+        this.setState({
+          is_load: false
+        })
+      }, 300 )
+    });
+  }
+  
+  async show(){
+    let data = {
+      spam_id: this.state.spam_id
+    }
+    
+    let res = await this.getData('get_spam_data', data);
+    
+    console.log( res )
+    
+    this.setState({
+      spam_list_data: res.spam_list,
+      spam_list_data_stat: res.stat
+    })
+  }
+
+  async getUsers(){
+    let data = {
+      dateStart: this.state.date_start,
+      dateEnd: this.state.date_end,
+    }
+    
+    let res = await this.getData('get_promo_users_analitic', data);
+    
+    this.setState({
+      promo_list: res.promo_list
+    })
+  }
+  
+  changeDateRange(data){
+    let dateStart = data[0] ? formatDate(data[0]) : '';
+    let dateEnd = data[1] ? formatDate(data[1]) : '';
+    
+    this.setState({
+      rangeDate: [dateStart, dateEnd],
+      date_start: dateStart,
+      date_end: dateEnd,
+    })
+  }
+
+  render(){
+    return (
+      <>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        
+        <Grid container>
+          <Grid item xs={12} sm={12}>
+            <h1>{this.state.module_name}</h1>
+          </Grid>
+          
+          
+          
+          <Grid container direction="row" style={{ paddingTop: 20 }} spacing={3}>
+            
+            <Grid item xs={12} sm={6} className="MyDaterange">
+              <MyDaterange startText="Дата от" endText="Дата до" value={this.state.rangeDate} func={ this.changeDateRange.bind(this) } />
+            </Grid>
+            
+            <Grid item xs={12} sm={3}>
+              <Button variant="contained" onClick={this.getUsers.bind(this)}>Обновить</Button>
+            </Grid>
+
+          </Grid>  
+          
+          <Grid item xs={12} sm={12} style={{ marginTop: 20 }}>
+            
+            { this.state.promo_list.map( (item, key) => 
+              <Accordion key={key} style={{ width: '100%' }}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                >
+                  <Typography>{item.name}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
                   <span>Удаленных: {item.stat.is_delete_perc}%</span>
                   <br />
                   <span>Активированных: {item.stat.is_active_perc}%</span>
@@ -2664,19 +2849,6 @@ class SiteSale2_StatList_ extends React.Component {
                   <br />
                   <span>Оформил контакт-центр: {item.stat.is_center}%</span>
                   <br />
-                  <Table size={'small'} style={{ marginTop: 15 }}>
-                    <TableBody>
-                      { item.promo_list.map( (promo, k) =>
-                        <TableRow key={k} style={{ backgroundColor: parseInt(promo.is_delete) == 1 ? '#c03' : 'white', color: parseInt(promo.is_delete) == 1 ? 'white' : 'black' }}>
-                          <TableCell style={{ color: 'inherit' }}>{k+1}</TableCell>
-                          <TableCell style={{ color: 'inherit', backgroundColor: parseInt(promo.count) == 0 ? 'green' : '#c03' }}>{promo.name}</TableCell>
-                          <TableCell style={{ color: 'inherit' }}>{promo.coment}</TableCell>
-                          <TableCell style={{ color: 'inherit' }}>{ parseInt(promo.count) == 0 ? <CheckIcon /> : <CloseIcon /> }</TableCell>
-                        </TableRow>
-                      ) }
-                    </TableBody>
-                    
-                  </Table>
                 </AccordionDetails>
               </Accordion>
             ) }
@@ -2718,5 +2890,11 @@ export function SiteSale2_Stat () {
 export function SiteSale2_StatList () {
   return (
     <SiteSale2_StatList_ />
+  );
+}
+
+export function SiteSale2_AnaliticList () {
+  return (
+    <SiteSale2_AnaliticList_ />
   );
 }
