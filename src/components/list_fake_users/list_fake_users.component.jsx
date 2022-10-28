@@ -177,8 +177,9 @@ class ListFakeUsers_ extends React.Component {
   }
 
   changeDateRange(data, event) {
+
     this.setState({
-      [data]: formatDate(event),
+      [data]: event ? formatDate(event) : '',
     });
   }
 
