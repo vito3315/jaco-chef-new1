@@ -42,6 +42,12 @@ class Reg_ extends React.Component {
         };
     }
 
+    componentDidMount() {
+        if((window.location.protocol == 'http:' || window.location.protocol == 'http') && window.location.hostname != 'localhost'){
+            window.location.href = 'https://jacosoft-dop.ru'+window.location.pathname;
+        }
+    }
+
     getData = (method, data = {}) => {
 
         this.setState({

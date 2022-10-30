@@ -92,8 +92,6 @@ const ListFakeUsers = React.lazy(() => import("../list_fake_users"));
 
 import { SiteSaleMin, SiteSaleMin_New, SiteSaleMin_Edit, SiteSaleMin_StatList } from '../site_sale_min';
 
-
-
 const theme = createTheme({
     palette: {
       primary: {
@@ -122,7 +120,10 @@ class Header extends React.Component {
   }
   
   async componentDidMount(){
-    
+    if((window.location.protocol == 'http:' || window.location.protocol == 'http') && window.location.hostname != 'localhost'){
+      window.location.href = 'https://jacosoft-dop.ru/'+window.location.pathname;
+    }
+
     let data = await this.getData('get_all');
     
     this.setState({
