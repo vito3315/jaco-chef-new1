@@ -9,7 +9,7 @@ const {Helmet} = require("react-helmet");
 const app = express();
 const { App } = require( '../src/components/app' );
 
-/*app.enable('trust proxy')
+app.enable('trust proxy')
 
 app.use( (request, response, next) => {
     if (!request.secure) {
@@ -17,7 +17,7 @@ app.use( (request, response, next) => {
     }
 
     next();
-})*/
+})
 
 app.get( /\.(js|css|map|ico|png|svg)$/, express.static( path.resolve( __dirname, '../dist' ) ) );
 
