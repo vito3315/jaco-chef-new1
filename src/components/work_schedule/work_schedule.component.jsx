@@ -637,7 +637,7 @@ class WorkSchedule_Table_without_functions extends React.Component {
 
                   {item.data.dates.map((date, date_k) => (
                     <TableCell
-                      // onClick={this.props.openH.bind(this, item.data, date.date)}
+                      onClick={this.props.openH.bind(this, item.data, date.date)}
                       className="min_block"
                       style={{
                         backgroundColor: date.info ? date.info.color : '#fff',
@@ -882,6 +882,7 @@ class WorkSchedule_ extends React.Component {
 
       isOpenModalH: false,
       isOpenModalM: false,
+      isOpenModalHMini: false,
 
       userInfo: null,
 
@@ -1096,7 +1097,7 @@ class WorkSchedule_ extends React.Component {
 
     let res = await this.getData('get_user_day', data);
 
-    // console.log( res )
+    console.log( res )
 
     this.setState({
       isOpenModalH: true,
@@ -1106,8 +1107,29 @@ class WorkSchedule_ extends React.Component {
     });
   }
 
+  async openHMini(item, this_date) {
+    let data = {
+      smena_id: item.smena_id,
+      app_id: item.app_id,
+      user_id: item.id,
+      date: this_date,
+      date_start: item.date,
+    };
+
+    let res = await this.getData('get_user_day', data);
+
+    console.log( res )
+
+    this.setState({
+      isOpenModalHMini: true,
+      userInfo: res.h_info,
+      //otherAppList: res.other_app,
+      //show_bonus: res.show_bonus,
+    });
+  }
+
   async openM(item) {
-    // console.log( item )
+    console.log( item )
 
     let data = {
       smena_id: item.smena_id,
@@ -1117,9 +1139,11 @@ class WorkSchedule_ extends React.Component {
       date_start: item.date,
     };
 
+    console.log( data )
+
     let res = await this.getData('get_user_month', data);
 
-    // console.log( res )
+    console.log( res )
 
     this.setState({
       isOpenModalM: true,
@@ -2197,6 +2221,83 @@ class WorkSchedule_ extends React.Component {
           </Dialog>
         )}
 
+        {!this.state.userInfo || this.state.isOpenModalHMini === false ? null : (
+          <Dialog
+            open={this.state.isOpenModalHMini}
+            onClose={() => {
+              this.setState({ isOpenModalHMini: false });
+            }}
+            scroll="paper"
+            fullWidth={true}
+            maxWidth={'md'}
+            id={'OpenModalH'}
+          >
+            <DialogTitle id="scroll-dialog-title">
+              {this.state.userInfo.user.app_name +
+                ' ' +
+                this.state.userInfo.user.user_name +
+                ' ' +
+                this.state.userInfo.date}
+            </DialogTitle>
+            <DialogContent>
+              
+              {this.state.userInfo.hours.map((item, key) => (
+                <Accordion key={key}>
+                  <AccordionSummary>
+                    <AccessTimeIcon style={{ marginRight: 10 }} />
+                    <Typography>
+                      {item.time_start + ' - ' + item.time_end}
+                    </Typography>
+                  </AccordionSummary>
+                </Accordion>
+              ))}
+
+              {!this.state.userInfo.hist.length ? null : (
+                <Accordion style={{ marginTop: 50 }} disabled>
+                  <AccordionSummary>
+                    <Typography>История</Typography>
+                  </AccordionSummary>
+                </Accordion>
+              )}
+              {this.state.userInfo.hist.map((item, key) => (
+                <Accordion key={key}>
+                  <AccordionSummary>
+                    <Typography>
+                      {item.date + ' - ' + item.user_name}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails
+                    style={{ display: 'flex', flexDirection: 'column' }}
+                  >
+                    {item.items.map((it, k) => (
+                      <Typography key={k}>
+                        {it.time_start + ' - ' + it.time_end}{' '}
+                        {it.app_name == '' ? '' : ' - ' + it.app_name}{' '}
+                      </Typography>
+                    ))}
+                  </AccordionDetails>
+                </Accordion>
+              ))}
+            </DialogContent>
+            <DialogActions
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Button
+                style={{ backgroundColor: 'green', color: '#fff' }}
+                onClick={() => {
+                  this.setState({ isOpenModalHMini: false });
+                }}
+              >
+                Закрыть
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
+
         {!this.state.userInfo || this.state.isOpenModalM === false ? null : (
           <Dialog
             open={this.state.isOpenModalM}
@@ -2527,7 +2628,7 @@ class WorkSchedule_ extends React.Component {
                     changeLVDir={this.changeLVDir.bind(this)}
                     changeDopBonus={this.changeDopBonus.bind(this)}
                     openM={this.openM.bind(this)}
-                    openH={this.openH.bind(this)}
+                    openH={this.openHMini.bind(this)}
                     openZP={this.openZP.bind(this)}
                     mix={this.mix.bind(this)}
                     pricePerHour={this.pricePerHour.bind(this)}
@@ -2571,7 +2672,7 @@ class WorkSchedule_ extends React.Component {
                     changeLVDir={this.changeLVDir.bind(this)}
                     changeDopBonus={this.changeDopBonus.bind(this)}
                     openM={this.openM.bind(this)}
-                    openH={this.openH.bind(this)}
+                    openH={this.openHMini.bind(this)}
                     openZP={this.openZP.bind(this)}
                     mix={this.mix.bind(this)}
                     pricePerHour={this.pricePerHour.bind(this)}
