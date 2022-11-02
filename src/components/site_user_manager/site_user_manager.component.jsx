@@ -239,7 +239,7 @@ class SiteUserManager_ extends React.Component {
     async getUsers() {
 
         // todo
-        let app_id = this.state.app_id != null ? this.state.app_id.id : null;
+        //let app_id = this.state.app_id != null ? this.state.app_id.id : null;
 
         let data = {
             point_id: this.state.point_id,
@@ -425,7 +425,7 @@ class SiteUserManager_ extends React.Component {
                     delModal: false,
                     graphModal: false,
                     modalUserEdit: false,
-                    editUser: null
+                    editUser: null,
                 })
 
                 this.isInit = false;
@@ -457,6 +457,11 @@ class SiteUserManager_ extends React.Component {
 
                 this.getUsers();
             } else {
+                this.setState({
+                    is_load: true,
+                    graphModal: false,
+                })
+
                 this.myDropzone.processQueue();
             }
         }
@@ -633,7 +638,7 @@ class SiteUserManager_ extends React.Component {
                         </Grid>
                     </DialogContent>
                     <DialogActions style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Button variant="contained" onClick={this.saveEditUser.bind(this)}>Уволить</Button>
+                        <Button variant="contained" onClick={this.saveEditUser.bind(this, 0)}>Уволить</Button>
                         <Button onClick={() => { this.setState({ delModal: false, textDel: '' }) }}>Отмена</Button>
                     </DialogActions>
                 </Dialog>
@@ -790,7 +795,7 @@ class SiteUserManager_ extends React.Component {
 
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.saveEditUser.bind(this)} color="primary">Сохранить</Button>
+                        <Button onClick={this.saveEditUser.bind(this, 0)} color="primary">Сохранить</Button>
                     </DialogActions>
                 </Dialog>
 
