@@ -31,8 +31,10 @@ class Auth_ extends React.Component {
         };
     }
 
-    async componentDidMount() {
-
+    componentDidMount() {
+        if((window.location.protocol == 'http:' || window.location.protocol == 'http') && window.location.hostname != 'localhost'){
+            window.location.href = 'https://jacosoft-dop.ru'+window.location.pathname;
+        }
     }
 
     getData = (method, data = {}) => {

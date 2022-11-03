@@ -239,7 +239,7 @@ class SiteUserManager_ extends React.Component {
     async getUsers() {
 
         // todo
-        let app_id = this.state.app_id != null ? this.state.app_id.id : null;
+        //let app_id = this.state.app_id != null ? this.state.app_id.id : null;
 
         let data = {
             point_id: this.state.point_id,
@@ -351,7 +351,11 @@ class SiteUserManager_ extends React.Component {
         })
     }
 
-    async saveEditUser() {
+    async saveEditUser(graphType) {
+
+        this.setState({
+            graphType: graphType
+        })
 
         let is_graph = false;
         var editUser_user = this.state.editUser;
@@ -360,7 +364,7 @@ class SiteUserManager_ extends React.Component {
 
         this.state.app_list.map((item, key) => {
             if (parseInt(editUser_user.user.app_id) == parseInt(item.id)) {
-                if (parseInt(item.is_graph) == 1 && parseInt(this.state.graphType) == 0) {
+                if (parseInt(item.is_graph) == 1 && parseInt(graphType) == 0) {
                     is_graph = true;
                 }
             }
@@ -421,7 +425,7 @@ class SiteUserManager_ extends React.Component {
                     delModal: false,
                     graphModal: false,
                     modalUserEdit: false,
-                    editUser: null
+                    editUser: null,
                 })
 
                 this.isInit = false;
@@ -432,7 +436,7 @@ class SiteUserManager_ extends React.Component {
         let data = {
             user: editUser_user,
             textDel: this.state.textDel,
-            graphType: this.state.graphType
+            graphType: graphType
         };
 
         let res = await this.getData('saveEditUser', data);
@@ -453,6 +457,11 @@ class SiteUserManager_ extends React.Component {
 
                 this.getUsers();
             } else {
+                this.setState({
+                    is_load: true,
+                    graphModal: false,
+                })
+
                 this.myDropzone.processQueue();
             }
         }
@@ -473,9 +482,9 @@ class SiteUserManager_ extends React.Component {
                     is_graph_ = true;
                 }
 
-                if (parseInt(item.is_graph) == 1 && parseInt(this.state.graphType) == 0) {
+                /*if (parseInt(item.is_graph) == 1 && parseInt(graphType) == 0) {
                     is_graph = true;
-                }
+                }*/
             }
         })
 
@@ -629,7 +638,7 @@ class SiteUserManager_ extends React.Component {
                         </Grid>
                     </DialogContent>
                     <DialogActions style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Button variant="contained" onClick={this.saveEditUser.bind(this)}>Уволить</Button>
+                        <Button variant="contained" onClick={this.saveEditUser.bind(this, 0)}>Уволить</Button>
                         <Button onClick={() => { this.setState({ delModal: false, textDel: '' }) }}>Отмена</Button>
                     </DialogActions>
                 </Dialog>
@@ -640,14 +649,14 @@ class SiteUserManager_ extends React.Component {
                         <Grid container spacing={3} style={{ paddingBottom: 10, paddingTop: 20 }}>
 
                             <Grid item xs={12} sm={6}>
-                                <Button variant="contained" onClick={() => { this.setState({ graphType: 1 }); this.saveEditUser() }} style={{ width: '100%' }}>С текущего периода</Button>
+                                <Button variant="contained" onClick={ this.saveEditUser.bind(this, 1) } style={{ width: '100%' }}>С текущего периода</Button>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <Button variant="contained" onClick={() => { this.setState({ graphType: 2 }); this.saveEditUser() }} style={{ width: '100%' }}>Со следующего периода</Button>
+                                <Button variant="contained" onClick={ this.saveEditUser.bind(this, 2) } style={{ width: '100%' }}>Со следующего периода</Button>
                             </Grid>
 
                             <Grid item xs={12} sm={6}>
-                                <Button variant="contained" onClick={() => { this.setState({ graphType: -1 }); this.saveEditUser() }} style={{ width: '100%' }}>Без изменений</Button>
+                                <Button variant="contained" onClick={ this.saveEditUser.bind(this, 3) } style={{ width: '100%' }}>Без изменений</Button>
                             </Grid>
 
                         </Grid>
@@ -786,7 +795,7 @@ class SiteUserManager_ extends React.Component {
 
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.saveEditUser.bind(this)} color="primary">Сохранить</Button>
+                        <Button onClick={this.saveEditUser.bind(this, 0)} color="primary">Сохранить</Button>
                     </DialogActions>
                 </Dialog>
 
