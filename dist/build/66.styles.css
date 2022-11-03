@@ -1,4 +1,4 @@
-tbody td:first-child,thead tr:first-child,td:first-child{position:-webkit-sticky;position:sticky;left:0;z-index:2}.td_color{background-color:#fff !important}.tdprice{border-right:1px solid #e5e5e5;width:20%}.tdcity{width:80%}
+tbody td:first-child,thead tr:first-child,td:first-child{position:-webkit-sticky;position:sticky;left:0;z-index:2}.td_color{background-color:#fff !important}.tdprice{border-right:1px solid #e5e5e5;width:20%;white-space:'nowrap';text-align:'center'}.tdcity{width:80%}
 
 
 /*# sourceMappingURL=66.styles.css.map*/
