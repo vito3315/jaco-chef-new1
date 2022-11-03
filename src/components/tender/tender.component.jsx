@@ -157,8 +157,6 @@ class Tender_ extends React.Component {
       return el;
     });
 
-   console.log(vendors_items);
-
     this.setState({
       cats: res.items,
       vendors: vendors_items,
@@ -166,31 +164,141 @@ class Tender_ extends React.Component {
     });
   }
 
-  changeSelect(id, event) {
-
-    // console.log(event.target.value, id)
+  changeSelect(vendor_id, cat_id, price_vendor, event) {
+    // console.log(vendor_id, cat_id, price_vendor, event.target.value)
 
     const vendors = this.state.vendors;
-
     const newCities = this.state.newCities;
+    const cats = this.state.cats;
+
+    cats.forEach(cat => {
+      cat.cats.forEach(it => {
+        it.items.forEach(item => {
+
+            if(item.id === cat_id && event.target.value === '') {
+
+              if(vendor_id === item.vendor_all) {
+                item.city_all = null;
+                item.price_all = null;
+                item.vendor_all = null;
+              }
+
+              if(vendor_id === item.vendor_tlt) {
+                item.city_tlt = null;
+                item.price_tlt = null;
+                item.vendor_tlt = null;
+              }
+
+              if(vendor_id === item.vendor_smr) {
+                item.city_smr = null;
+                item.price_smr = null;
+                item.vendor_smr = null;
+              }
+            }
+     
+            if(item.id === cat_id && event.target.value === -1) {
+              item.city_tlt = null;
+              item.price_tlt = null;
+              item.vendor_tlt = null;
+
+              item.city_smr = null;
+              item.price_smr - null;
+              item.vendor_smr = null;
+
+              item.city_all = newCities.find(city => city.id === event.target.value)
+              item.price_all = price_vendor;
+              item.vendor_all = vendor_id;
+            } 
+
+            if(item.id === cat_id && event.target.value === '1') {
+              item.city_all = null;
+              item.price_all = null;
+              item.vendor_all = null;
+
+              if(!!item.city_tlt && !!item.city_smr && item.vendor_smr === vendor_id) {
+                item.city_smr = null;
+                item.price_smr = null;
+                item.vendor_smr = null;
+              }
+
+              item.city_tlt = newCities.find(city => city.id === event.target.value)
+              item.price_tlt = price_vendor;
+              item.vendor_tlt = vendor_id;
+            } 
+
+            if(item.id === cat_id && event.target.value === '2') {
+              item.city_all = null;
+              item.price_all = null;
+              item.vendor_all = null;
+
+              if(!!item.city_tlt && !!item.city_smr && item.vendor_tlt === vendor_id) {
+                item.city_tlt = null;
+                item.price_tlt = null;
+                item.vendor_tlt = null;
+              }
+
+              item.city_smr = newCities.find(city => city.id === event.target.value)
+              item.price_smr = price_vendor;
+              item.vendor_smr = vendor_id;
+            } 
+          
+        })
+      })
+    })
+
 
     vendors.forEach(vendor => {
+      vendor.price.forEach(price => {
 
-      if(vendor.id === id && vendor.city_list.length === 0) {
-        vendor.city_list.push(newCities.find(city => city.id === event.target.value))
-      }
+        if(price.item_id === cat_id && price.vendor_id === vendor_id) {
 
-      if(vendor.id === id && vendor.city_list.length !== 0) {
-        const vendorFilter = vendor.city_list.filter(city => city.id !== event.target.value)
-        vendorFilter.unshift(newCities.find(city => city.id === event.target.value))
-        vendor.city_list = vendorFilter
-      }
+          price.city = newCities.find(city => city.id === event.target.value)
+
+        } 
+
+        if (price.item_id === cat_id && price.vendor_id !== vendor_id) {
+
+          if(price.city) {
+
+            if(price.city.id === event.target.value || event.target.value === - 1) {
+
+              price.city = null
+
+            } else if (price.city.id === -1 && event.target.value !== - 1) {
+
+              price.city = null
+
+            }
+          } 
+        }
+        
+      })
 
     })
 
+    // console.log(vendors)
+
     this.setState({
-      vendors
+      vendors,
+      cats,
     });
+
+  }
+
+  async saveData () {
+    const data = {
+      city_id: this.state.city,
+      vendors: this.state.vendors,
+      vendor: this.state.vendor,
+      cat: this.state.newCat,
+      cats: this.state.cats,
+    };
+
+    console.log(data);
+
+    const res = await this.getData('save', data);
+
+    console.log(res)
   }
 
   render() {
@@ -210,6 +318,7 @@ class Tender_ extends React.Component {
         </Grid>
 
         <Grid container spacing={3} justifyContent="center" mb={5}>
+
           <Grid item xs={12} sm={3}>
             <MySelect
               data={this.state.cities}
@@ -228,6 +337,7 @@ class Tender_ extends React.Component {
               func={this.changeVendor.bind(this)}
             />
           </Grid>
+
           <Grid item xs={12} sm={6}>
             <MyAutocomplite
               label="Категория"
@@ -238,7 +348,9 @@ class Tender_ extends React.Component {
             />
           </Grid>
 
-          <Grid item xs={12} sm={3}>
+          <Grid container spacing={3} item sm={3}>
+
+          <Grid item xs={12} sm={6}>
             <Button
               variant="contained"
               style={{ whiteSpace: 'nowrap' }}
@@ -247,6 +359,18 @@ class Tender_ extends React.Component {
               Обновить данные
             </Button>
           </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <Button
+              style={{ whiteSpace: 'nowrap', backgroundColor: '#00a550', color: 'white' }}
+              onClick={this.saveData.bind(this)}
+            >
+              Сохранить изменения
+            </Button>
+          </Grid>
+
+          </Grid>
+
         </Grid>
 
         {!this.state.cats.length ? null : (
@@ -304,9 +428,7 @@ class Tender_ extends React.Component {
                                 </TableCell>
                               ) : (
                                 <React.Fragment key={key_cat}>
-                                  <TableCell></TableCell>
-                                  <TableCell></TableCell>
-                                  <TableCell></TableCell>
+                                  <TableCell colSpan={3}></TableCell>
                                 </React.Fragment>
                               )}
                               {this.state.vendors.map((vendor, key) => (
@@ -322,36 +444,32 @@ class Tender_ extends React.Component {
                                   {item.name}
                                 </TableCell>
                                 <TableCell></TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
+                                <TableCell>{item.city_all ? item.price_all : '' }</TableCell>
+                                <TableCell>{item.city_tlt ? item.price_tlt : ''}</TableCell>
+                                <TableCell>{item.city_smr ? item.price_smr : '' }</TableCell>
                                 {this.state.vendors.map((vendor, key) => (
                                  <React.Fragment key={key}>
                                  {vendor.price.find(
                                    (it) => it.item_id === item.id
                                  ) ? (
                                    <>
-                                     <TableCell>
+                                     <TableCell className='tdcity'>
                                        <MySelect
                                          data={this.state.newCities}
-                                         value={vendor.city_list.length ? vendor.city_list[0].id : ''}
-                                         func={this.changeSelect.bind(this, vendor.id)}
+                                         value={vendor.price.find((it) => it.item_id === item.id).city ? vendor.price.find((it) => it.item_id === item.id).city.id : ''}
+                                         func={this.changeSelect.bind(this, vendor.id, item.id, vendor.price.find((it) => it.item_id === item.id).price)}
                                          label=""
                                        />
                                      </TableCell>
                                      <TableCell
-                                       style={{
-                                         whiteSpace: 'nowrap',
-                                         textAlign: 'center',
-                                       }}
+                                       className='tdprice'
                                      >
                                        {vendor.price.find((it) => it.item_id === item.id).price}
                                      </TableCell>
                                    </>
                                  ) : (
                                    <>
-                                     <TableCell></TableCell>
-                                     <TableCell></TableCell>
+                                     <TableCell colSpan={2}></TableCell>
                                    </>
                                  )}
                                </React.Fragment>
