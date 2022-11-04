@@ -554,9 +554,9 @@ class CountUsers_TablePanel extends React.Component {
     return (
       <>
         <TabPanel value={this.props.value} style={{ padding: '0' }}>
-          <Grid container spacing={3}>
+          
             {this.state.item.map((item, key) => (
-              <React.Fragment key={key}>
+              <Grid container spacing={3} key={key} style={{ borderBottom: '1px solid #e5e5e5', paddingBottom: 20, marginBottom: 20 }}>
                 <Grid item xs={8} sm={3}>
                   <div
                     style={{
@@ -579,10 +579,7 @@ class CountUsers_TablePanel extends React.Component {
                     />
                   </div>
                 </Grid>
-                <Grid
-                  item
-                  xs={4}
-                  sm={0}
+                <Grid item xs={4} sm={0}
                   sx={{
                     display: { xs: 'flex', sm: 'none' },
                     justifyContent: 'center',
@@ -642,9 +639,9 @@ class CountUsers_TablePanel extends React.Component {
                     style={{ cursor: 'pointer' }}
                   />
                 </Grid>
-              </React.Fragment>
+              </Grid>
             ))}
-          </Grid>
+          
         </TabPanel>
 
         <Grid item sm={12} className="button">
@@ -973,12 +970,15 @@ class CountUsers_ extends React.Component {
 
       const data = {
         point_id,
+        dow: dow,
         data: item,
       };
   
       console.log(data);
   
-      // await this.getData('update', data);
+      let res = await this.getData('update', data);
+
+      console.log( res )
 
       setTimeout(() => {
         this.update();
@@ -995,7 +995,9 @@ class CountUsers_ extends React.Component {
   
       console.log(data);
   
-      // await this.getData('save_new_day', data);
+      let res = await this.getData('save_new_day', data);
+
+      console.log( res )
 
       setTimeout(() => {
         this.update();
@@ -1013,7 +1015,9 @@ class CountUsers_ extends React.Component {
   
       console.log(data);
   
-      // await this.getData('save_edit_day', data);
+      let res = await this.getData('save_edit_day', data);
+
+      console.log( res )
 
       setTimeout(() => {
         this.update();
@@ -1032,7 +1036,7 @@ class CountUsers_ extends React.Component {
     
     console.log(data)
 
-    // await this.getData('del_day', data);
+    await this.getData('del_day', data);
 
     setTimeout(() => {
       this.update();
