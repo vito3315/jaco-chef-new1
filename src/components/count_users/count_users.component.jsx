@@ -61,7 +61,7 @@ class CountUsers_Modal extends React.Component {
 
     this.state = {
       item: [],
-      date_start: formatDate(new Date()),
+      date_start: '',
       fullScreen: false,
     };
   }
@@ -75,7 +75,8 @@ class CountUsers_Modal extends React.Component {
 
     if (this.props.event !== prevProps.event) {
       this.setState({
-        item: this.props.event,
+        item: JSON.parse(JSON.stringify(this.props.event)),
+        date_start: JSON.parse(JSON.stringify(this.props.event[0].date)),
       });
     }
   }
@@ -98,12 +99,11 @@ class CountUsers_Modal extends React.Component {
   }
 
   changeTimeStart(item, event) {
-    // console.log(item)
 
     const eventItem = this.state.item;
 
     const editEvent = eventItem.map((el) => {
-      if (el.id_table === item.id_table) {
+      if (el.id === item.id) {
         el.time_start = event.target.value;
       }
       return el;
@@ -114,14 +114,14 @@ class CountUsers_Modal extends React.Component {
     });
   }
 
-  changeTimeEnd(el, event) {
+  changeTimeEnd(item, event) {
     const eventItem = this.state.item;
 
-    const editEvent = eventItem.map((element) => {
-      if (element.id_table === el.id_table) {
-        element.time_end = event.target.value;
+    const editEvent = eventItem.map((el) => {
+      if (el.id === item.id) {
+        el.time_end = event.target.value;
       }
-      return element;
+      return el;
     });
 
     this.setState({
@@ -133,10 +133,10 @@ class CountUsers_Modal extends React.Component {
     const eventItem = this.state.item;
 
     const editEvent = eventItem.map((ev) => {
-      if (ev.id_table === item.id_table) {
-        ev.data.map((obj) => {
-          if (obj.post === el.post) {
-            obj.quantity = Number(event.target.value);
+      if (ev.id === item.id) {
+        ev.apps.map((obj) => {
+          if (obj.app_id === el.app_id) {
+            obj.count = Number(event.target.value);
           }
           return obj;
         });
@@ -149,18 +149,24 @@ class CountUsers_Modal extends React.Component {
     });
   }
 
-  changeDateRange(data, val) {
+  changeDateRange(val) {
+
+    const item = this.state.item;
+
+    item.forEach((el) => (el.date = formatDate(val)));
+
     this.setState({
-      [data]: formatDate(val),
+      item,
     });
   }
 
   save() {
-    this.props.save(this, this.state.item, this.state.date_start);
+    const item = this.state.item;
+
+    this.props.save(item, this.props.method, this.state.date_start);
 
     this.setState({
       item: this.props.event ? this.props.event : [],
-      date_start: formatDate(new Date()),
     });
 
     this.props.onClose();
@@ -171,27 +177,29 @@ class CountUsers_Modal extends React.Component {
 
     if (item.length) {
       const newItem = {
-        id: item[0].id,
-        day: item[0].day,
-        id_table: item.length + 1,
+        id: item.length + 1,
         time_start: '',
         time_end: '',
-        data: [
+        apps: [
           {
-            post: 'Кассир',
-            quantity: 0,
+            app_id: '6',
+            count: '0',
+            app_name: 'Кассир',
           },
           {
-            post: 'Повар',
-            quantity: 0,
+            app_id: '5',
+            count: '0',
+            app_name: 'Повар',
           },
           {
-            post: 'Кухонный работник',
-            quantity: 0,
+            app_id: '21',
+            count: '0',
+            app_name: 'Кухонный работник',
           },
           {
-            post: 'Курьер',
-            quantity: 0,
+            app_id: '8',
+            count: '0',
+            app_name: 'Курьер',
           },
         ],
       };
@@ -199,35 +207,35 @@ class CountUsers_Modal extends React.Component {
       item.push(newItem);
     } else {
       const newItem = {
-        id: this.props.event[0].id,
-        day: this.props.value,
-        id_table: 1,
+        id: 1,
         time_start: '',
         time_end: '',
-        data: [
+        apps: [
           {
-            post: 'Кассир',
-            quantity: 0,
+            app_id: '6',
+            count: '0',
+            app_name: 'Кассир',
           },
           {
-            post: 'Повар',
-            quantity: 0,
+            app_id: '5',
+            count: '0',
+            app_name: 'Повар',
           },
           {
-            post: 'Кухонный работник',
-            quantity: 0,
+            app_id: '21',
+            count: '0',
+            app_name: 'Кухонный работник',
           },
           {
-            post: 'Курьер',
-            quantity: 0,
+            app_id: '8',
+            count: '0',
+            app_name: 'Курьер',
           },
         ],
       };
 
       item.push(newItem);
     }
-
-    // console.log(item)
 
     this.setState({
       item,
@@ -237,7 +245,7 @@ class CountUsers_Modal extends React.Component {
   deleteItem(id) {
     const data = this.state.item;
 
-    const item = data.filter((el) => el.id_table !== id);
+    const item = data.filter((el) => el.id !== id);
 
     this.setState({
       item,
@@ -247,7 +255,6 @@ class CountUsers_Modal extends React.Component {
   onClose() {
     this.setState({
       item: this.props.event ? this.props.event : [],
-      date_start: formatDate(new Date()),
     });
 
     this.props.onClose();
@@ -283,8 +290,8 @@ class CountUsers_Modal extends React.Component {
             <Grid item sm={6}>
               <MyDatePickerNew
                 label="Дата"
-                value={this.state.date_start}
-                func={this.changeDateRange.bind(this, 'date_start')}
+                value={ this.state.item[0] ? this.state.item[0].date : '' }
+                func={this.changeDateRange.bind(this)}
               />
             </Grid>
           </Grid>
@@ -326,12 +333,12 @@ class CountUsers_Modal extends React.Component {
                         </Grid>
                       </TableCell>
                     </TableRow>
-                    {item.data.map((el, i) => (
+                    {item.apps.map((el, i) => (
                       <TableRow key={i + 1000}>
-                        <TableCell>{el.post}</TableCell>
+                        <TableCell>{el.app_name}</TableCell>
                         <TableCell>
                           <MyTextInput
-                            value={el.quantity}
+                            value={el.count}
                             type="number"
                             func={this.changeItem.bind(this, el, item)}
                           />
@@ -342,7 +349,7 @@ class CountUsers_Modal extends React.Component {
                               fontSize="large"
                               onClick={this.deleteItem.bind(
                                 this,
-                                item.id_table
+                                item.id
                               )}
                               style={{ cursor: 'pointer' }}
                             />
@@ -391,24 +398,22 @@ class CountUsers_TablePanel extends React.Component {
 
     if (this.props.event !== prevProps.event) {
       this.setState({
-        item: this.props.event,
+        item: JSON.parse(JSON.stringify(this.props.event)),
       });
     }
   }
 
   componentDidMount() {
     this.setState({
-      item: this.props.event,
+      item: JSON.parse(JSON.stringify(this.props.event))
     });
   }
 
   changeTimeStart(item, event) {
-    // console.log(item)
-
     const eventItem = this.state.item;
 
     const editEvent = eventItem.map((el) => {
-      if (el.id_table === item.id_table) {
+      if (el.id === item.id) {
         el.time_start = event.target.value;
       }
       return el;
@@ -419,14 +424,14 @@ class CountUsers_TablePanel extends React.Component {
     });
   }
 
-  changeTimeEnd(el, event) {
+  changeTimeEnd(item, event) {
     const eventItem = this.state.item;
 
-    const editEvent = eventItem.map((element) => {
-      if (element.id_table === el.id_table) {
-        element.time_end = event.target.value;
+    const editEvent = eventItem.map((el) => {
+      if (el.id === item.id) {
+        el.time_end = event.target.value;
       }
-      return element;
+      return el;
     });
 
     this.setState({
@@ -438,10 +443,10 @@ class CountUsers_TablePanel extends React.Component {
     const eventItem = this.state.item;
 
     const editEvent = eventItem.map((ev) => {
-      if (ev.id_table === item.id_table) {
-        ev.data.map((obj) => {
-          if (obj.post === el.post) {
-            obj.quantity = Number(event.target.value);
+      if (ev.id === item.id) {
+        ev.apps.map((obj) => {
+          if (obj.app_id === el.app_id) {
+            obj.count = Number(event.target.value);
           }
           return obj;
         });
@@ -459,27 +464,29 @@ class CountUsers_TablePanel extends React.Component {
 
     if (item.length) {
       const newItem = {
-        id: item[0].id,
-        day: item[0].day,
-        id_table: item.length + 1,
+        id: item.length + 1,
         time_start: '',
         time_end: '',
-        data: [
+        apps: [
           {
-            post: 'Кассир',
-            quantity: 0,
+            app_id: '6',
+            count: '0',
+            app_name: 'Кассир',
           },
           {
-            post: 'Повар',
-            quantity: 0,
+            app_id: '5',
+            count: '0',
+            app_name: 'Повар',
           },
           {
-            post: 'Кухонный работник',
-            quantity: 0,
+            app_id: '21',
+            count: '0',
+            app_name: 'Кухонный работник',
           },
           {
-            post: 'Курьер',
-            quantity: 0,
+            app_id: '8',
+            count: '0',
+            app_name: 'Курьер',
           },
         ],
       };
@@ -487,35 +494,35 @@ class CountUsers_TablePanel extends React.Component {
       item.push(newItem);
     } else {
       const newItem = {
-        id: this.props.event[0].id,
-        day: this.props.value,
-        id_table: 1,
+        id: 1,
         time_start: '',
         time_end: '',
-        data: [
+        apps: [
           {
-            post: 'Кассир',
-            quantity: 0,
+            app_id: '6',
+            count: '0',
+            app_name: 'Кассир',
           },
           {
-            post: 'Повар',
-            quantity: 0,
+            app_id: '5',
+            count: '0',
+            app_name: 'Повар',
           },
           {
-            post: 'Кухонный работник',
-            quantity: 0,
+            app_id: '21',
+            count: '0',
+            app_name: 'Кухонный работник',
           },
           {
-            post: 'Курьер',
-            quantity: 0,
+            app_id: '8',
+            count: '0',
+            app_name: 'Курьер',
           },
         ],
       };
 
       item.push(newItem);
     }
-
-    // console.log(item)
 
     this.setState({
       item,
@@ -525,11 +532,22 @@ class CountUsers_TablePanel extends React.Component {
   deleteItem(id) {
     const data = this.state.item;
 
-    const item = data.filter((el) => el.id_table !== id);
+    const item = data.filter((el) => el.id !== id);
 
     this.setState({
       item,
     });
+  }
+
+  save() {
+    const item = this.state.item;
+
+    this.props.save(item, 'Изменение данных таблицы');
+
+    this.setState({
+      item: JSON.parse(JSON.stringify(this.props.event)),
+    });
+
   }
 
   render() {
@@ -587,7 +605,7 @@ class CountUsers_TablePanel extends React.Component {
                       height: '100%',
                     }}
                   >
-                    {item.data.map((el, i) => (
+                    {item.apps.map((el, i) => (
                       <div
                         key={i + 10}
                         style={{
@@ -597,9 +615,9 @@ class CountUsers_TablePanel extends React.Component {
                           marginBottom: 10,
                         }}
                       >
-                        <span style={{ minWidth: 200 }}>{el.post}</span>
+                        <span style={{ minWidth: 200 }}>{el.app_name}</span>
                         <MyTextInput
-                          value={el.quantity}
+                          value={el.count}
                           type="number"
                           func={this.changeItem.bind(this, el, item)}
                         />
@@ -620,7 +638,7 @@ class CountUsers_TablePanel extends React.Component {
                 >
                   <CloseIcon
                     fontSize="large"
-                    onClick={this.deleteItem.bind(this, item.id_table)}
+                    onClick={this.deleteItem.bind(this, item.id)}
                     style={{ cursor: 'pointer' }}
                   />
                 </Grid>
@@ -644,7 +662,7 @@ class CountUsers_TablePanel extends React.Component {
             <Grid item xs={6} sm={6}>
               <Button
                 variant="contained"
-                onClick={this.props.save.bind(this, this.state.item)}
+                onClick={this.save.bind(this)}
                 style={{ backgroundColor: '#00a550', whiteSpace: 'nowrap' }}
               >
                 Сохранить
@@ -666,236 +684,80 @@ class CountUsers_ extends React.Component {
       module_name: '',
       is_load: false,
 
-      points: [
-        {
-          id: -1,
-          name: 'Выберите точку',
-        },
-        {
-          base: 'jaco_rolls_1',
-          name: 'Тольятти, Ленинградская 47',
-          id: '1',
-          city_id: '1',
-        },
-        {
-          base: 'jaco_rolls_2',
-          name: 'Тольятти, Ворошилова 12а',
-          id: '2',
-          city_id: '1',
-        },
-        {
-          base: 'jaco_rolls_3',
-          name: 'Тольятти, Матросова 32',
-          id: '3',
-          city_id: '1',
-        },
-        {
-          base: 'jaco_rolls_6',
-          name: 'Тольятти, Цветной 1',
-          id: '6',
-          city_id: '1',
-        },
-        {
-          base: 'jaco_rolls_4',
-          name: 'Самара, Куйбышева 113',
-          id: '4',
-          city_id: '2',
-        },
-        {
-          base: 'jaco_rolls_5',
-          name: 'Самара, Победы 10',
-          id: '5',
-          city_id: '2',
-        },
-        {
-          base: 'jaco_rolls_7',
-          name: 'Самара, Молодёжная 2',
-          id: '7',
-          city_id: '2',
-        },
-      ],
-
-      point: -1,
+      points: [],
+      point: '',
 
       ItemTab: '1',
 
       item: [],
 
-      event: [
-        {
-          id: '1',
-          day: '1',
-          id_table: 1,
-          time_start: '',
-          time_end: '',
-          data: [
-            {
-              post: 'Кассир',
-              quantity: 1,
-            },
-            {
-              post: 'Повар',
-              quantity: 1,
-            },
-            {
-              post: 'Кухонный работник',
-              quantity: 1,
-            },
-            {
-              post: 'Курьер',
-              quantity: 1,
-            },
-          ],
-        },
-        {
-          id: '1',
-          day: '2',
-          id_table: 1,
-          time_start: '',
-          time_end: '',
-          data: [
-            {
-              post: 'Кассир',
-              quantity: 2,
-            },
-            {
-              post: 'Повар',
-              quantity: 2,
-            },
-            {
-              post: 'Кухонный работник',
-              quantity: 2,
-            },
-            {
-              post: 'Курьер',
-              quantity: 2,
-            },
-          ],
-        },
-        {
-          id: '1',
-          day: '3',
-          id_table: 1,
-          time_start: '',
-          time_end: '',
-          data: [
-            {
-              post: 'Кассир',
-              quantity: 3,
-            },
-            {
-              post: 'Повар',
-              quantity: 3,
-            },
-            {
-              post: 'Кухонный работник',
-              quantity: 3,
-            },
-            {
-              post: 'Курьер',
-              quantity: 3,
-            },
-          ],
-        },
-      ],
-
       data: [
         {
-          id: '1',
-          data_table: '2022-10-05',
-          time_start: '19:30',
-          time_end: '20:30',
-          data: [
+          id: 1,
+          date: '',
+          time_start: '',
+          time_end: '',
+          apps: [
             {
-              post: 'Кассир',
-              quantity: 1,
+              app_id: '6',
+              count: '0',
+              app_name: 'Кассир',
             },
             {
-              post: 'Повар',
-              quantity: 1,
+              app_id: '5',
+              count: '0',
+              app_name: 'Повар',
             },
             {
-              post: 'Кухонный работник',
-              quantity: 1,
+              app_id: '21',
+              count: '0',
+              app_name: 'Кухонный работник',
             },
             {
-              post: 'Курьер',
-              quantity: 1,
-            },
-          ],
-        },
-        {
-          id: '1',
-          data_table: '2022-10-06',
-          time_start: '20:30',
-          time_end: '21:30',
-          data: [
-            {
-              post: 'Кассир',
-              quantity: 2,
-            },
-            {
-              post: 'Повар',
-              quantity: 2,
-            },
-            {
-              post: 'Кухонный работник',
-              quantity: 2,
-            },
-            {
-              post: 'Курьер',
-              quantity: 2,
-            },
-          ],
-        },
-        {
-          id: '1',
-          data_table: '2022-10-07',
-          time_start: '22:30',
-          time_end: '23:30',
-          data: [
-            {
-              post: 'Кассир',
-              quantity: 3,
-            },
-            {
-              post: 'Повар',
-              quantity: 3,
-            },
-            {
-              post: 'Кухонный работник',
-              quantity: 3,
-            },
-            {
-              post: 'Курьер',
-              quantity: 3,
+              app_id: '8',
+              count: '0',
+              app_name: 'Курьер',
             },
           ],
         },
       ],
 
-      dataPoint: [],
+      other_days: [],
 
       modalDialog: false,
+
+      dows: [],
+      dow: [],
     };
   }
 
   async componentDidMount() {
-    let data = await this.getData('get_all');
+    const ItemTab = this.state.ItemTab;
 
-    // console.log(data);
+    const data = await this.getData('get_all');
+
+    const dataTable = this.state.data;
+
+    const point = {
+      point_id: data.point_list[0].id,
+    };
+
+    const res = await this.getData('get_info', point);
+
+    const dow = res.dows.find((el) => el.dow === Number(ItemTab));
+
+    dow.times.map((el, i) => (el.id = i + 1));
 
     this.setState({
-      // points: data.points,
-      // point: data.points[0].id,
+      points: data.point_list,
+      point: data.point_list[0].id,
       module_name: data.module_info.name,
+      dows: res.dows,
+      dow: dow.times.length ? dow.times : dataTable,
+      other_days: res.other_days,
     });
 
-    // document.title = data.module_info.name;
-
-    // setTimeout( () => {
-    //   this.updateData();
-    // }, 50 )
+    document.title = data.module_info.name;
   }
 
   getData = (method, data = {}) => {
@@ -942,130 +804,75 @@ class CountUsers_ extends React.Component {
   };
 
   async changePoint(event) {
-    const data = event.target.value;
+    const ItemTab = this.state.ItemTab;
 
-    // let data = await this.getData('get_all', data);
+    const dataTable = this.state.data;
 
-    const eventFilter = this.state.event;
+    const data = {
+      point_id: event.target.value,
+    };
 
-    const dataFilter = this.state.data;
+    const res = await this.getData('get_info', data);
 
-    // console.log(dataFilter);
+    const dow = res.dows.find((el) => el.dow === Number(ItemTab));
 
-    const item = eventFilter.filter(
-      (el) => event.target.value === el.id && this.state.ItemTab === el.day
-    );
-
-    const dataPoint = dataFilter.filter((el) => event.target.value === el.id);
-
-    if (!item.length) {
-      const newItem = {
-        id: data,
-        day: '1',
-        id_table: 1,
-        time_start: '',
-        time_end: '',
-        data: [
-          {
-            post: 'Кассир',
-            quantity: 0,
-          },
-          {
-            post: 'Повар',
-            quantity: 0,
-          },
-          {
-            post: 'Кухонный работник',
-            quantity: 0,
-          },
-          {
-            post: 'Курьер',
-            quantity: 0,
-          },
-        ],
-      };
-
-      item.push(newItem);
-    }
+    dow.times.map((el, i) => (el.id = i + 1));
 
     this.setState({
-      point: data,
-      dataPoint,
-      item,
+      point: event.target.value,
+      dows: res.dows,
+      dow: dow.times.length ? dow.times : dataTable,
+      other_days: res.other_days,
     });
   }
 
   changeTab(event, value) {
-    const item = this.state.event.filter(
-      (el) => value === el.day && this.state.point === el.id
-    );
+    const dows = this.state.dows;
 
-    if (!item.length) {
-      const newItem = {
-        id: this.state.point,
-        day: value,
-        id_table: 1,
-        time_start: '',
-        time_end: '',
-        data: [
-          {
-            post: 'Кассир',
-            quantity: 0,
-          },
-          {
-            post: 'Повар',
-            quantity: 0,
-          },
-          {
-            post: 'Кухонный работник',
-            quantity: 0,
-          },
-          {
-            post: 'Курьер',
-            quantity: 0,
-          },
-        ],
-      };
+    const dataTable = this.state.data;
 
-      item.push(newItem);
-    }
+    const dow = dows.find((el) => el.dow === Number(value));
+
+    dow.times.map((el, i) => (el.id = i + 1));
 
     this.setState({
       ItemTab: value,
-      item,
+      dow: dow.times.length ? dow.times : dataTable,
     });
   }
 
-  openModal(method, item, event) {
+  async openModal(method, item, event) {
     if (method === 'Особый день') {
-      const item = [];
-
-      const newItem = {
-        id: this.state.point,
-        data_table: '',
-        time_start: '',
-        time_end: '',
-        data: [
-          {
-            post: 'Кассир',
-            quantity: 0,
-          },
-          {
-            post: 'Повар',
-            quantity: 0,
-          },
-          {
-            post: 'Кухонный работник',
-            quantity: 0,
-          },
-          {
-            post: 'Курьер',
-            quantity: 0,
-          },
-        ],
-      };
-
-      item.push(newItem);
+      const item = [
+        {
+          id: 1,
+          date: '',
+          time_start: '',
+          time_end: '',
+          apps: [
+            {
+              app_id: '6',
+              count: '0',
+              app_name: 'Кассир',
+            },
+            {
+              app_id: '5',
+              count: '0',
+              app_name: 'Повар',
+            },
+            {
+              app_id: '21',
+              count: '0',
+              app_name: 'Кухонный работник',
+            },
+            {
+              app_id: '8',
+              count: '0',
+              app_name: 'Курьер',
+            },
+          ],
+        },
+      ];
 
       this.setState({
         modalDialog: true,
@@ -1077,28 +884,184 @@ class CountUsers_ extends React.Component {
     if (method === 'Редактировать особый день') {
       event.stopPropagation();
 
-      // console.log(item)
+      const point_id = this.state.point;
+
+      const data = {
+        date: item.date,
+        point_id,
+      };
+
+      const res = await this.getData('get_day', data);
+
+      res.forEach((el) => {
+        el.id = 1;
+
+        (el.apps = []),
+          el.apps.push(
+            {
+              app_id: '6',
+              count: el.count_kassir,
+              app_name: 'Кассир',
+            },
+            {
+              app_id: '5',
+              count: el.count_povar,
+              app_name: 'Повар',
+            },
+            {
+              app_id: '21',
+              count: el.count_kux,
+              app_name: 'Кухонный работник',
+            },
+            {
+              app_id: '8',
+              count: el.count_driver,
+              app_name: 'Курьер',
+            }
+          );
+
+        delete el.count_kassir;
+        delete el.count_povar;
+        delete el.count_kux;
+        delete el.count_driver;
+      });
+
       this.setState({
         modalDialog: true,
         method,
-        item: [item],
+        item: res,
       });
     }
   }
 
-  async saveItem(item, data) {
-    // console.log(item);
-    // console.log(data);
+  async save(item, method, old_day) {
 
-    // await this.getData('save_edit', data);
+    // console.log(item)
+
+    const dow = this.state.ItemTab;
+
+    const point_id = this.state.point;
+
+    const date = item[0].date;
+
+    item.forEach((el) => {
+      (el.dow = Number(dow)), delete el.id;
+
+      el.apps.forEach((it) => {
+        if (it.app_name === 'Кассир') {
+          el.count_kassir = it.count;
+        }
+        if (it.app_name === 'Повар') {
+          el.count_povar = it.count;
+        }
+        if (it.app_name === 'Кухонный работник') {
+          el.count_kux = it.count;
+        }
+        if (it.app_name === 'Курьер') {
+          el.count_driver = it.count;
+        }
+      });
+
+      delete el.apps;
+
+      if(el.date) {
+        delete el.date;
+      }
+    });
+
+    if(method === 'Изменение данных таблицы') {
+
+      const data = {
+        point_id,
+        data: item,
+      };
+  
+      console.log(data);
+  
+      // await this.getData('update', data);
+
+      setTimeout(() => {
+        this.update();
+      }, 300);
+    }
+
+    if(method === 'Особый день') {
+
+      const data = {
+        point_id,
+        date,
+        data: item,
+      };
+  
+      console.log(data);
+  
+      // await this.getData('save_new_day', data);
+
+      setTimeout(() => {
+        this.update();
+      }, 300);
+    }
+
+    if(method === 'Редактировать особый день') {
+
+      const data = {
+        point_id,
+        date,
+        old_day,
+        data: item,
+      };
+  
+      console.log(data);
+  
+      // await this.getData('save_edit_day', data);
+
+      setTimeout(() => {
+        this.update();
+      }, 300);
+    }
 
   }
 
   async deleteItem(item, event) {
     event.stopPropagation();
-    // console.log(item)
 
-    // await this.getData('delete_item', data);
+    const data = {
+      point_id: item.point_id,
+      date: item.date,
+    };
+    
+    console.log(data)
+
+    // await this.getData('del_day', data);
+
+    setTimeout(() => {
+      this.update();
+    }, 300);
+    
+  }
+
+  async update() {
+    const ItemTab = this.state.ItemTab;
+
+    const point_id = this.state.point;
+
+    const dataTable = this.state.data;
+
+    const data = {
+      point_id
+    };
+
+    const res = await this.getData('get_info', data);
+
+    const dow = res.dows.find((el) => el.dow === Number(ItemTab));
+
+    dow.times.map((el, i) => (el.id = i + 1));
+
+    this.setState({
+      dows: res.dows,
+      dow: dow.times.length ? dow.times : dataTable,
+      other_days: res.other_days,
+    });
   }
 
   render() {
@@ -1116,7 +1079,7 @@ class CountUsers_ extends React.Component {
           }}
           method={this.state.method}
           event={this.state.item}
-          save={this.saveItem.bind(this)}
+          save={this.save.bind(this)}
         />
 
         <Grid container spacing={3}>
@@ -1125,7 +1088,6 @@ class CountUsers_ extends React.Component {
           </Grid>
 
           {/* выбор и кнопка */}
-
           <Grid item xs={12} sm={6}>
             <MySelect
               data={this.state.points}
@@ -1137,8 +1099,7 @@ class CountUsers_ extends React.Component {
 
           <Grid item xs={12} sm={6}>
             <Button
-              disabled={this.state.point < 1 ? true : false}
-              variant={this.state.point < 1 ? 'outlined' : 'contained'}
+              variant="contained"
               style={{ whiteSpace: 'nowrap' }}
               onClick={this.openModal.bind(this, 'Особый день')}
             >
@@ -1147,7 +1108,6 @@ class CountUsers_ extends React.Component {
           </Grid>
 
           {/* таблица */}
-
           {this.state.point < 1 ? null : (
             <Grid item xs={12} sm={8}>
               <TabContext value={this.state.ItemTab}>
@@ -1160,7 +1120,6 @@ class CountUsers_ extends React.Component {
                 >
                   <TabList
                     onChange={this.changeTab.bind(this)}
-                    //variant="fullWidth"
                     variant="scrollable"
                     scrollButtons
                     allowScrollButtonsMobile
@@ -1174,19 +1133,17 @@ class CountUsers_ extends React.Component {
                     <Tab label="Воскресенье" value="7" />
                   </TabList>
                 </Box>
-
                 <CountUsers_TablePanel
                   value={this.state.ItemTab}
-                  event={this.state.item}
-                  save={this.saveItem.bind(this)}
+                  event={this.state.dow}
+                  save={this.save.bind(this)}
                 />
               </TabContext>
             </Grid>
-
           )}
 
-            {/* аккордион */}
-            {this.state.point < 1 || !this.state.dataPoint.length ? null : (
+          {/* аккордион */}
+          {!this.state.other_days.length ? null : (
             <Grid item xs={12} sm={4}>
               <Accordion>
                 <AccordionSummary
@@ -1196,7 +1153,7 @@ class CountUsers_ extends React.Component {
                   <Typography>Даты</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  {this.state.dataPoint.map((item, i) => (
+                  {this.state.other_days.map((item, i) => (
                     <Accordion key={i}>
                       <AccordionSummary
                         expandIcon={
@@ -1212,7 +1169,7 @@ class CountUsers_ extends React.Component {
                             item
                           )}
                         >
-                          {item.data_table}
+                          {item.date}
                         </Typography>
                       </AccordionSummary>
                     </Accordion>

@@ -66,6 +66,7 @@ class ListFakeUsers_ extends React.Component {
       count_orders: 0,
       max_summ: 0,
       is_show_claim: 0,
+      is_show_claim_last: 0,
       is_show_marketing: 0,
     };
   }
@@ -139,6 +140,7 @@ class ListFakeUsers_ extends React.Component {
       max_summ: this.state.max_summ,
       items: this.state.item,
       is_show_claim: this.state.is_show_claim,
+      is_show_claim_last: this.state.is_show_claim_last,
       is_show_marketing: this.state.is_show_marketing,
     };
 
@@ -270,7 +272,7 @@ class ListFakeUsers_ extends React.Component {
 
           <Grid item xs={12} sm={3}>
             <MyCheckBox
-              label="Жалоба"
+              label="Была оформлена ошибка на заказ"
               value={parseInt(this.state.is_show_claim) == 1 ? true : false}
               func={this.changeItemChecked.bind(this, 'is_show_claim')}
             />
@@ -298,9 +300,9 @@ class ListFakeUsers_ extends React.Component {
 
           <Grid item xs={12} sm={3}>
             <MyCheckBox
-              label="Реклама"
-              value={parseInt(this.state.is_show_marketing) == 1 ? true : false}
-              func={this.changeItemChecked.bind(this, 'is_show_marketing')}
+              label="Была оформлена ошибка на последний заказ"
+              value={parseInt(this.state.is_show_claim_last) == 1 ? true : false}
+              func={this.changeItemChecked.bind(this, 'is_show_claim_last')}
             />
           </Grid>
           </Grid>
@@ -327,7 +329,14 @@ class ListFakeUsers_ extends React.Component {
             />
           </Grid>
 
-          <Grid item xs={12} sm={3}></Grid>
+          <Grid item xs={12} sm={3}>
+            <MyCheckBox
+              label="Подписка на рекламную рассылку"
+              value={parseInt(this.state.is_show_marketing) == 1 ? true : false}
+              func={this.changeItemChecked.bind(this, 'is_show_marketing')}
+            />
+          </Grid>
+          
         </Grid>
 
         {!this.state.users.length ? null : (
