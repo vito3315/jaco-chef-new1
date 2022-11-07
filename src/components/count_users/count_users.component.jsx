@@ -24,6 +24,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import CloseIcon from '@mui/icons-material/Close';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import Divider from '@mui/material/Divider';
 
 import {
   MySelect,
@@ -92,7 +93,6 @@ class CountUsers_Modal extends React.Component {
   }
 
   changeTimeStart(item, event) {
-
     const eventItem = this.state.item;
 
     const editEvent = eventItem.map((el) => {
@@ -143,7 +143,6 @@ class CountUsers_Modal extends React.Component {
   }
 
   changeDateRange(val) {
-
     const item = this.state.item;
 
     item.forEach((el) => (el.date = formatDate(val)));
@@ -278,18 +277,19 @@ class CountUsers_Modal extends React.Component {
           ) : null}
         </DialogTitle>
 
-        <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+        <DialogContent style={{ paddingTop: 10, paddingBottom: 10 }}>
           <Grid container spacing={3} mb={3}>
             <Grid item xs={12} sm={6}>
               <MyDatePickerNew
                 label="Дата"
-                value={ this.state.item[0] ? this.state.item[0].date : '' }
+                value={this.state.item[0] ? this.state.item[0].date : ''}
                 func={this.changeDateRange.bind(this)}
               />
             </Grid>
           </Grid>
           {this.state.item.map((item, key) => (
-              <Grid container spacing={3} key={key} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <React.Fragment key={key}>
+              <Grid container spacing={3}>
                 <Grid item xs={8} sm={3} mt={2}>
                   <div
                     style={{
@@ -312,7 +312,10 @@ class CountUsers_Modal extends React.Component {
                     />
                   </div>
                 </Grid>
-                <Grid item xs={4} sm={0}
+                <Grid
+                  item
+                  xs={4}
+                  sm={0}
                   sx={{
                     display: { xs: 'flex', sm: 'none' },
                     justifyContent: 'center',
@@ -343,7 +346,7 @@ class CountUsers_Modal extends React.Component {
                           flexDirection: 'row',
                           alignItems: 'center',
                           marginBottom: 20,
-                          marginTop: i === 0 ? 20 : 0
+                          marginTop: i === 0 ? 20 : 0,
                         }}
                       >
                         <span style={{ minWidth: 200 }}>{el.app_name}</span>
@@ -374,7 +377,9 @@ class CountUsers_Modal extends React.Component {
                   />
                 </Grid>
               </Grid>
-            ))}
+              <Divider />
+            </React.Fragment>
+          ))}
         </DialogContent>
 
         <DialogActions className="button">
@@ -418,7 +423,7 @@ class CountUsers_TablePanel extends React.Component {
 
   componentDidMount() {
     this.setState({
-      item: JSON.parse(JSON.stringify(this.props.event))
+      item: JSON.parse(JSON.stringify(this.props.event)),
     });
   }
 
@@ -560,16 +565,22 @@ class CountUsers_TablePanel extends React.Component {
     this.setState({
       item: JSON.parse(JSON.stringify(this.props.event)),
     });
-
   }
 
   render() {
     return (
       <>
-        <TabPanel value={this.props.value} >
-          
+        <TabPanel value={this.props.value}>
+          <Grid container justifyContent="center">
             {this.state.item.map((item, key) => (
-              <Grid container spacing={3} key={key} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Grid
+                container
+                spacing={3}
+                key={key}
+                sx={{ borderBottom: 1, borderColor: 'divider' }}
+                item
+                sm={8}
+              >
                 <Grid item xs={8} sm={3} mt={2}>
                   <div
                     style={{
@@ -592,7 +603,10 @@ class CountUsers_TablePanel extends React.Component {
                     />
                   </div>
                 </Grid>
-                <Grid item xs={4} sm={0}
+                <Grid
+                  item
+                  xs={4}
+                  sm={0}
                   sx={{
                     display: { xs: 'flex', sm: 'none' },
                     justifyContent: 'center',
@@ -606,7 +620,7 @@ class CountUsers_TablePanel extends React.Component {
                   />
                 </Grid>
 
-                <Grid item sm={8}>
+                <Grid item sm={6}>
                   <div
                     style={{
                       display: 'flex',
@@ -623,7 +637,7 @@ class CountUsers_TablePanel extends React.Component {
                           flexDirection: 'row',
                           alignItems: 'center',
                           marginBottom: 20,
-                          marginTop: i === 0 ? 20 : 0
+                          marginTop: i === 0 ? 20 : 0,
                         }}
                       >
                         <span style={{ minWidth: 200 }}>{el.app_name}</span>
@@ -640,7 +654,7 @@ class CountUsers_TablePanel extends React.Component {
                 <Grid
                   item
                   xs={4}
-                  sm={1}
+                  sm={3}
                   sx={{
                     display: { xs: 'none', sm: 'flex' },
                     justifyContent: 'center',
@@ -655,32 +669,36 @@ class CountUsers_TablePanel extends React.Component {
                 </Grid>
               </Grid>
             ))}
-          
-        </TabPanel>
 
-        <Grid item sm={12} className="button">
-          <Grid container spacing={3}>
-            <Grid item xs={6} sm={6}>
-              <Button
-                variant="contained"
-                style={{ whiteSpace: 'nowrap' }}
-                onClick={this.addItem.bind(this)}
-              >
-                Добавить
-              </Button>
-            </Grid>
+            <Grid
+              item
+              sm={8}
+              container
+              spacing={3}
+              sx={{ marginBottom: { xs: 0, sm: 3 }, marginTop: 1 }}
+            >
+              <Grid item xs={6} sm={9}>
+                <Button
+                  variant="contained"
+                  style={{ whiteSpace: 'nowrap' }}
+                  onClick={this.addItem.bind(this)}
+                >
+                  Добавить
+                </Button>
+              </Grid>
 
-            <Grid item xs={6} sm={6}>
-              <Button
-                variant="contained"
-                onClick={this.save.bind(this)}
-                style={{ backgroundColor: '#00a550', whiteSpace: 'nowrap' }}
-              >
-                Сохранить
-              </Button>
+              <Grid item xs={6} sm={3}>
+                <Button
+                  variant="contained"
+                  onClick={this.save.bind(this)}
+                  style={{ backgroundColor: '#00a550', whiteSpace: 'nowrap' }}
+                >
+                  Сохранить
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
+        </TabPanel>
       </>
     );
   }
@@ -946,7 +964,6 @@ class CountUsers_ extends React.Component {
   }
 
   async save(item, method, old_day) {
-
     // console.log(item)
 
     const dow = this.state.ItemTab;
@@ -975,21 +992,20 @@ class CountUsers_ extends React.Component {
 
       delete el.apps;
 
-      if(el.date) {
+      if (el.date) {
         delete el.date;
       }
     });
 
-    if(method === 'Изменение данных таблицы') {
-
+    if (method === 'Изменение данных таблицы') {
       const data = {
         point_id,
         dow: dow,
         data: item,
       };
-  
+
       // console.log(data);
-  
+
       let res = await this.getData('update', data);
 
       // console.log( res )
@@ -999,16 +1015,15 @@ class CountUsers_ extends React.Component {
       }, 300);
     }
 
-    if(method === 'Особый день') {
-
+    if (method === 'Особый день') {
       const data = {
         point_id,
         date,
         data: item,
       };
-  
+
       // console.log(data);
-  
+
       let res = await this.getData('save_new_day', data);
 
       // console.log( res )
@@ -1018,17 +1033,16 @@ class CountUsers_ extends React.Component {
       }, 300);
     }
 
-    if(method === 'Редактировать особый день') {
-
+    if (method === 'Редактировать особый день') {
       const data = {
         point_id,
         date,
         old_day,
         data: item,
       };
-  
+
       // console.log(data);
-  
+
       let res = await this.getData('save_edit_day', data);
 
       // console.log( res )
@@ -1037,7 +1051,6 @@ class CountUsers_ extends React.Component {
         this.update();
       }, 300);
     }
-
   }
 
   async deleteItem(item, event) {
@@ -1047,7 +1060,7 @@ class CountUsers_ extends React.Component {
       point_id: item.point_id,
       date: item.date,
     };
-    
+
     // console.log(data)
 
     await this.getData('del_day', data);
@@ -1055,7 +1068,6 @@ class CountUsers_ extends React.Component {
     setTimeout(() => {
       this.update();
     }, 300);
-    
   }
 
   async update() {
@@ -1066,7 +1078,7 @@ class CountUsers_ extends React.Component {
     const dataTable = this.state.data;
 
     const data = {
-      point_id
+      point_id,
     };
 
     const res = await this.getData('get_info', data);
@@ -1161,7 +1173,7 @@ class CountUsers_ extends React.Component {
 
           {/* аккордион */}
           {!this.state.other_days.length ? null : (
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={4} mb={3}>
               <Accordion>
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
@@ -1171,7 +1183,11 @@ class CountUsers_ extends React.Component {
                 </AccordionSummary>
                 <AccordionDetails>
                   {this.state.other_days.map((item, i) => (
-                    <Accordion key={i} expanded={true} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <Accordion
+                      key={i}
+                      expanded={true}
+                      sx={{ borderBottom: 1, borderColor: 'divider' }}
+                    >
                       <AccordionSummary
                         expandIcon={
                           <CloseIcon
