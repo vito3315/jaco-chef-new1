@@ -6,13 +6,6 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TableContainer from '@mui/material/TableContainer';
-
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -287,7 +280,7 @@ class CountUsers_Modal extends React.Component {
 
         <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
           <Grid container spacing={3} mb={3}>
-            <Grid item sm={6}>
+            <Grid item xs={12} sm={6}>
               <MyDatePickerNew
                 label="Дата"
                 value={ this.state.item[0] ? this.state.item[0].date : '' }
@@ -295,73 +288,93 @@ class CountUsers_Modal extends React.Component {
               />
             </Grid>
           </Grid>
-          <TableContainer>
-            <Table size="small" style={{ whiteSpace: 'nowrap' }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell style={{ width: '30%' }}>Время</TableCell>
-                  <TableCell style={{ width: '30%' }}>Должность</TableCell>
-                  <TableCell style={{ width: '20%' }}>Кол-во</TableCell>
-                  <TableCell style={{ width: '20%' }}></TableCell>
-                </TableRow>
-              </TableHead>
-              {this.state.item.map((item, key) => (
-                <React.Fragment key={key}>
-                  <TableBody
-                    key={key + 100}
-                    sx={{
-                      '& td': { border: 0 },
-                      borderBottom: 1,
-                      borderColor: 'divider',
+          {this.state.item.map((item, key) => (
+              <Grid container spacing={3} key={key} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Grid item xs={8} sm={3} mt={2}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-around',
+                      height: '100%',
+                      minHeight: 120,
                     }}
                   >
-                    <TableRow>
-                      <TableCell rowSpan="5">
-                        <Grid item xs={6} sm={12} mb={2}>
-                          <MyTimePicker
-                            value={item.time_start}
-                            func={this.changeTimeStart.bind(this, item)}
-                            label="Время начала"
-                          />
-                        </Grid>
-                        <Grid item xs={6} sm={12}>
-                          <MyTimePicker
-                            value={item.time_end}
-                            func={this.changeTimeEnd.bind(this, item)}
-                            label="Время окончания"
-                          />
-                        </Grid>
-                      </TableCell>
-                    </TableRow>
+                    <MyTimePicker
+                      value={item.time_start}
+                      func={this.changeTimeStart.bind(this, item)}
+                      label="Время начала"
+                    />
+                    <MyTimePicker
+                      value={item.time_end}
+                      func={this.changeTimeEnd.bind(this, item)}
+                      label="Время окончания"
+                    />
+                  </div>
+                </Grid>
+                <Grid item xs={4} sm={0}
+                  sx={{
+                    display: { xs: 'flex', sm: 'none' },
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <CloseIcon
+                    fontSize="large"
+                    onClick={this.deleteItem.bind(this, item.id)}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </Grid>
+
+                <Grid item sm={8}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      height: '100%',
+                    }}
+                  >
                     {item.apps.map((el, i) => (
-                      <TableRow key={i + 1000}>
-                        <TableCell>{el.app_name}</TableCell>
-                        <TableCell>
-                          <MyTextInput
-                            value={el.count}
-                            type="number"
-                            func={this.changeItem.bind(this, el, item)}
-                          />
-                        </TableCell>
-                        {i !== 1 ? null : (
-                          <TableCell colSpan="5" align="center">
-                            <CloseIcon
-                              fontSize="large"
-                              onClick={this.deleteItem.bind(
-                                this,
-                                item.id
-                              )}
-                              style={{ cursor: 'pointer' }}
-                            />
-                          </TableCell>
-                        )}
-                      </TableRow>
+                      <div
+                        key={i + 10}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          marginBottom: 20,
+                          marginTop: i === 0 ? 20 : 0
+                        }}
+                      >
+                        <span style={{ minWidth: 200 }}>{el.app_name}</span>
+                        <MyTextInput
+                          value={el.count}
+                          type="number"
+                          func={this.changeItem.bind(this, el, item)}
+                        />
+                      </div>
                     ))}
-                  </TableBody>
-                </React.Fragment>
-              ))}
-            </Table>
-          </TableContainer>
+                  </div>
+                </Grid>
+
+                <Grid
+                  item
+                  xs={4}
+                  sm={1}
+                  sx={{
+                    display: { xs: 'none', sm: 'flex' },
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <CloseIcon
+                    fontSize="large"
+                    onClick={this.deleteItem.bind(this, item.id)}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </Grid>
+              </Grid>
+            ))}
         </DialogContent>
 
         <DialogActions className="button">
@@ -553,11 +566,11 @@ class CountUsers_TablePanel extends React.Component {
   render() {
     return (
       <>
-        <TabPanel value={this.props.value} style={{ padding: '0' }}>
+        <TabPanel value={this.props.value} >
           
             {this.state.item.map((item, key) => (
-              <Grid container spacing={3} key={key} style={{ borderBottom: '1px solid #e5e5e5', paddingBottom: 20, marginBottom: 20 }}>
-                <Grid item xs={8} sm={3}>
+              <Grid container spacing={3} key={key} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Grid item xs={8} sm={3} mt={2}>
                   <div
                     style={{
                       display: 'flex',
@@ -588,7 +601,7 @@ class CountUsers_TablePanel extends React.Component {
                 >
                   <CloseIcon
                     fontSize="large"
-                    onClick={this.deleteItem.bind(this, item.id_table)}
+                    onClick={this.deleteItem.bind(this, item.id)}
                     style={{ cursor: 'pointer' }}
                   />
                 </Grid>
@@ -609,7 +622,8 @@ class CountUsers_TablePanel extends React.Component {
                           display: 'flex',
                           flexDirection: 'row',
                           alignItems: 'center',
-                          marginBottom: 10,
+                          marginBottom: 20,
+                          marginTop: i === 0 ? 20 : 0
                         }}
                       >
                         <span style={{ minWidth: 200 }}>{el.app_name}</span>
@@ -974,11 +988,11 @@ class CountUsers_ extends React.Component {
         data: item,
       };
   
-      console.log(data);
+      // console.log(data);
   
       let res = await this.getData('update', data);
 
-      console.log( res )
+      // console.log( res )
 
       setTimeout(() => {
         this.update();
@@ -993,11 +1007,11 @@ class CountUsers_ extends React.Component {
         data: item,
       };
   
-      console.log(data);
+      // console.log(data);
   
       let res = await this.getData('save_new_day', data);
 
-      console.log( res )
+      // console.log( res )
 
       setTimeout(() => {
         this.update();
@@ -1013,11 +1027,11 @@ class CountUsers_ extends React.Component {
         data: item,
       };
   
-      console.log(data);
+      // console.log(data);
   
       let res = await this.getData('save_edit_day', data);
 
-      console.log( res )
+      // console.log( res )
 
       setTimeout(() => {
         this.update();
@@ -1034,7 +1048,7 @@ class CountUsers_ extends React.Component {
       date: item.date,
     };
     
-    console.log(data)
+    // console.log(data)
 
     await this.getData('del_day', data);
 
@@ -1119,7 +1133,6 @@ class CountUsers_ extends React.Component {
                   sx={{
                     borderBottom: 1,
                     borderColor: 'divider',
-                    marginBottom: 3,
                   }}
                 >
                   <TabList
@@ -1158,7 +1171,7 @@ class CountUsers_ extends React.Component {
                 </AccordionSummary>
                 <AccordionDetails>
                   {this.state.other_days.map((item, i) => (
-                    <Accordion key={i}>
+                    <Accordion key={i} expanded={true} sx={{ borderBottom: 1, borderColor: 'divider' }}>
                       <AccordionSummary
                         expandIcon={
                           <CloseIcon
