@@ -32,6 +32,8 @@ class Tender_ extends React.Component {
 
       newCities: [],
 
+      allVendors: [],
+
       vendors: [],
       vendor: [],
 
@@ -52,7 +54,8 @@ class Tender_ extends React.Component {
       module_name: data.module_info.name,
       cities: data.cities,
       city: data.cities[0].id,
-      vendors: data.vendors,
+      //vendors: data.vendors,
+      allVendors: data.vendors,
       newCats: data.cats,
     });
 
@@ -160,7 +163,7 @@ class Tender_ extends React.Component {
     this.setState({
       cats: res.items,
       vendors: vendors_items,
-      newCities: res.cities,
+      //newCities: res.cities,
     });
   }
 
@@ -286,12 +289,25 @@ class Tender_ extends React.Component {
   }
 
   async saveData () {
+    const cats = this.state.cats;
+
+    let items = [];
+
+    cats.forEach(cat => {
+      cat.cats.forEach(it => {
+        it.items.forEach(item => {
+          items.push(item)
+        })
+      })
+    })
+
     const data = {
       city_id: this.state.city,
-      vendors: this.state.vendors,
-      vendor: this.state.vendor,
-      cat: this.state.newCat,
-      cats: this.state.cats,
+      items: items
+      //vendors: this.state.vendors,
+      //vendor: this.state.vendor,
+      //cat: this.state.newCat,
+      //cats: this.state.cats,
     };
 
     console.log(data);
@@ -332,7 +348,7 @@ class Tender_ extends React.Component {
             <MyAutocomplite
               label="Поставщик"
               multiple={true}
-              data={this.state.vendors}
+              data={this.state.allVendors}
               value={this.state.vendor}
               func={this.changeVendor.bind(this)}
             />
@@ -382,18 +398,15 @@ class Tender_ extends React.Component {
                     <TableRow>
                       <TableCell>Категория</TableCell>
                       <TableCell>Параметры</TableCell>
-                      <TableCell>Все</TableCell>
-                      <TableCell>Тольятти</TableCell>
-                      <TableCell>Самара</TableCell>
+                      <TableCell>Выбранный</TableCell>
                       {this.state.vendors.map((vendor, key) => (
                         <TableCell
                           key={key}
                           style={{
-                            whiteSpace: 'nowrap',
-                            minWidth: 300,
+                            maxWidth: 100,
                             textAlign: 'center'
                           }}
-                          colSpan={2}
+                          
                         >
                           {vendor.name}
                         </TableCell>
@@ -423,17 +436,17 @@ class Tender_ extends React.Component {
                               <TableCell>{category.name}</TableCell>
                               <TableCell></TableCell>
                               {key_cat === 0 ? (
-                                <TableCell colSpan={3}>
-                                  Зафиксированные цены
+                                <TableCell >
+                                  цена
                                 </TableCell>
                               ) : (
                                 <React.Fragment key={key_cat}>
-                                  <TableCell colSpan={3}></TableCell>
+                                  <TableCell></TableCell>
                                 </React.Fragment>
                               )}
                               {this.state.vendors.map((vendor, key) => (
                                 <React.Fragment key={key}>
-                                  <TableCell colSpan={2}></TableCell>
+                                  <TableCell></TableCell>
                                 </React.Fragment>
                               ))}
                             </TableRow>
@@ -445,32 +458,23 @@ class Tender_ extends React.Component {
                                 </TableCell>
                                 <TableCell></TableCell>
                                 <TableCell>{item.city_all ? item.price_all : '' }</TableCell>
-                                <TableCell>{item.city_tlt ? item.price_tlt : ''}</TableCell>
-                                <TableCell>{item.city_smr ? item.price_smr : '' }</TableCell>
                                 {this.state.vendors.map((vendor, key) => (
                                  <React.Fragment key={key}>
                                  {vendor.price.find(
                                    (it) => it.item_id === item.id
                                  ) ? (
-                                   <>
-                                     <TableCell className='tdcity'>
-                                       <MySelect
-                                         data={this.state.newCities}
-                                         value={vendor.price.find((it) => it.item_id === item.id).city ? vendor.price.find((it) => it.item_id === item.id).city.id : ''}
-                                         func={this.changeSelect.bind(this, vendor.id, item.id, vendor.price.find((it) => it.item_id === item.id).price)}
-                                         label=""
-                                       />
-                                     </TableCell>
-                                     <TableCell
-                                       className='tdprice'
-                                     >
-                                       {vendor.price.find((it) => it.item_id === item.id).price}
-                                     </TableCell>
-                                   </>
+                                   
+                                     
+                                  <TableCell
+                                    className='tdprice'
+                                  >
+                                    {vendor.price.find((it) => it.item_id === item.id).price}
+                                  </TableCell>
+                                   
                                  ) : (
-                                   <>
-                                     <TableCell colSpan={2}></TableCell>
-                                   </>
+                                  
+                                  <TableCell></TableCell>
+                                   
                                  )}
                                </React.Fragment>
                                 ))}
