@@ -2499,7 +2499,6 @@ class SiteSale2_StatList_ extends React.Component {
       
       date_start: formatDate(new Date()),
       date_end: formatDate(new Date()),
-      rangeDate: [formatDate(new Date()), formatDate(new Date())],
 
       promo_list: []
     };
@@ -2595,14 +2594,9 @@ class SiteSale2_StatList_ extends React.Component {
     })
   }
   
-  changeDateRange(data){
-    let dateStart = data[0] ? formatDate(data[0]) : '';
-    let dateEnd = data[1] ? formatDate(data[1]) : '';
-    
+  changeDateRange(data, event){
     this.setState({
-      rangeDate: [dateStart, dateEnd],
-      date_start: dateStart,
-      date_end: dateEnd,
+      [data]: formatDate(event)
     })
   }
 
@@ -2622,8 +2616,11 @@ class SiteSale2_StatList_ extends React.Component {
           
           <Grid container direction="row" style={{ paddingTop: 20 }} spacing={3}>
             
-            <Grid item xs={12} sm={6} className="MyDaterange">
-              <MyDaterange startText="Дата от" endText="Дата до" value={this.state.rangeDate} func={ this.changeDateRange.bind(this) } />
+            <Grid item xs={12} sm={3}>
+              <MyDatePickerNew label="Дата от" value={ this.state.date_start } func={ this.changeDateRange.bind(this, 'date_start') } />
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <MyDatePickerNew label="Дата до" value={ this.state.date_end } func={ this.changeDateRange.bind(this, 'date_end') } />
             </Grid>
             
             <Grid item xs={12} sm={3}>
@@ -2680,7 +2677,6 @@ class SiteSale2_AnaliticList_ extends React.Component {
       
       date_start: formatDate(new Date()),
       date_end: formatDate(new Date()),
-      rangeDate: [formatDate(new Date()), formatDate(new Date())],
 
       promo_list: []
     };
@@ -2775,15 +2771,10 @@ class SiteSale2_AnaliticList_ extends React.Component {
       promo_list: res.promo_list
     })
   }
-  
-  changeDateRange(data){
-    let dateStart = data[0] ? formatDate(data[0]) : '';
-    let dateEnd = data[1] ? formatDate(data[1]) : '';
-    
+
+  changeDateRange(data, event){
     this.setState({
-      rangeDate: [dateStart, dateEnd],
-      date_start: dateStart,
-      date_end: dateEnd,
+      [data]: formatDate(event)
     })
   }
 
@@ -2802,9 +2793,12 @@ class SiteSale2_AnaliticList_ extends React.Component {
           
           
           <Grid container direction="row" style={{ paddingTop: 20 }} spacing={3}>
-            
-            <Grid item xs={12} sm={6} className="MyDaterange">
-              <MyDaterange startText="Дата от" endText="Дата до" value={this.state.rangeDate} func={ this.changeDateRange.bind(this) } />
+
+            <Grid item xs={12} sm={3}>
+              <MyDatePickerNew label="Дата от" value={ this.state.date_start } func={ this.changeDateRange.bind(this, 'date_start') } />
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <MyDatePickerNew label="Дата до" value={ this.state.date_end } func={ this.changeDateRange.bind(this, 'date_end') } />
             </Grid>
             
             <Grid item xs={12} sm={3}>

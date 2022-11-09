@@ -2,6 +2,14 @@ import React from 'react';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -10,8 +18,23 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableContainer from '@mui/material/TableContainer';
 
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+
+import PersonIcon from '@mui/icons-material/Person';
+import HowToRegIcon from '@mui/icons-material/HowToReg';
+import EventIcon from '@mui/icons-material/Event';
+import HandshakeIcon from '@mui/icons-material/Handshake';
+import MoneyIcon from '@mui/icons-material/Money';
+import HistoryIcon from '@mui/icons-material/History';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import TransferWithinAStationIcon from '@mui/icons-material/TransferWithinAStation';
+import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -41,6 +64,657 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
+class ListFakeUsers_Modal extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleResize = this.handleResize.bind(this);
+
+    this.state = {
+      item: {},
+      fullScreen: false,
+    };
+  }
+
+  componentDidUpdate(prevProps) {
+    // console.log(this.props.event);
+
+    if (!this.props.event) {
+      return;
+    }
+
+    if (this.props.event !== prevProps.event) {
+      this.props.event.date_reg = this.props.event.date_reg.slice(0, 10);
+
+      this.setState({
+        item: this.props.event,
+      });
+    }
+  }
+
+  componentDidMount() {
+    this.handleResize();
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  handleResize() {
+    if (window.innerWidth < 601) {
+      this.setState({
+        fullScreen: true,
+      });
+    } else {
+      this.setState({
+        fullScreen: false,
+      });
+    }
+  }
+
+  onClose() {
+    this.setState({
+      item: this.props.event ? this.props.event : [],
+    });
+
+    this.props.onClose();
+  }
+
+  render() {
+    return (
+      <Dialog
+        open={this.props.open}
+        onClose={this.onClose.bind(this)}
+        fullScreen={this.state.fullScreen}
+        fullWidth={true}
+        maxWidth={'lg'}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle className="button">
+          <Typography style={{ fontWeight: 'bold' }}>
+            Информация о клиенте
+          </Typography>
+          {this.state.fullScreen ? (
+            <IconButton
+              onClick={this.onClose.bind(this)}
+              style={{ cursor: 'pointer' }}
+            >
+              <CloseIcon />
+            </IconButton>
+          ) : null}
+        </DialogTitle>
+
+        <DialogContent style={{ paddingTop: 10, paddingBottom: 10 }}>
+          <Grid container spacing={3} justifyContent="center" mb={3}>
+            <Grid
+              item
+              xs={12}
+              sm={3}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
+              <PersonIcon
+                fontSize="large"
+                color="info"
+                sx={{ marginBottom: 1 }}
+              ></PersonIcon>
+
+              <Grid display="flex" flexDirection="row" alignItems="center">
+                <Typography
+                  sx={{
+                    borderRadius: '15px 0 0 15px',
+                    padding: 1,
+                    fontWeight: 'normal',
+                    whiteSpace: 'nowrap',
+                    color: 'white',
+                    backgroundColor: '#87CEEB',
+                  }}
+                >
+                  Имя
+                </Typography>
+                <Typography
+                  sx={{
+                    padding: 1,
+                    borderTop: 1,
+                    borderBottom: 1,
+                    borderRight: 1,
+                    borderColor: '#87CEEB',
+                    borderRadius: '0 15px 15px 0',
+                    fontWeight: 'bold',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {this.state.item ? this.state.item.name : 'нет'}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              sm={3}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
+              <HowToRegIcon
+                fontSize="large"
+                color="info"
+                sx={{ marginBottom: 1 }}
+              ></HowToRegIcon>
+
+              <Grid display="flex" flexDirection="row" alignItems="center">
+                <Typography
+                  sx={{
+                    borderRadius: '15px 0 0 15px',
+                    padding: 1,
+                    fontWeight: 'normal',
+                    whiteSpace: 'nowrap',
+                    color: 'white',
+                    backgroundColor: '#87CEEB',
+                  }}
+                >
+                  Дата регистрации
+                </Typography>
+                <Typography
+                  sx={{
+                    padding: 1,
+                    borderTop: 1,
+                    borderBottom: 1,
+                    borderRight: 1,
+                    borderColor: '#87CEEB',
+                    borderRadius: '0 15px 15px 0',
+                    fontWeight: 'bold',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {this.state.item ? this.state.item.date_reg : 'нет'}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              sm={3}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
+              <EventIcon
+                fontSize="large"
+                color="info"
+                sx={{ marginBottom: 1 }}
+              ></EventIcon>
+
+              <Grid display="flex" flexDirection="row" alignItems="center">
+                <Typography
+                  sx={{
+                    borderRadius: '15px 0 0 15px',
+                    padding: 1,
+                    fontWeight: 'normal',
+                    whiteSpace: 'nowrap',
+                    color: 'white',
+                    backgroundColor: '#87CEEB',
+                  }}
+                >
+                  День рождения
+                </Typography>
+                <Typography
+                  sx={{
+                    padding: 1,
+                    borderTop: 1,
+                    borderBottom: 1,
+                    borderRight: 1,
+                    borderColor: '#87CEEB',
+                    borderRadius: '0 15px 15px 0',
+                    fontWeight: 'bold',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {this.state.item ? this.state.item.date_bir : 'нет'}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              sm={3}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
+              <HandshakeIcon
+                fontSize="large"
+                color="info"
+                sx={{ marginBottom: 1 }}
+              ></HandshakeIcon>
+
+              <Grid display="flex" flexDirection="row" alignItems="center">
+                <Typography
+                  sx={{
+                    borderRadius: '15px 0 0 15px',
+                    padding: 1,
+                    fontWeight: 'normal',
+                    whiteSpace: 'nowrap',
+                    color: 'white',
+                    backgroundColor: '#87CEEB',
+                  }}
+                >
+                  Согласие на рассылку
+                </Typography>
+                <Typography
+                  sx={{
+                    padding: 1,
+                    borderTop: 1,
+                    borderBottom: 1,
+                    borderRight: 1,
+                    borderColor: '#87CEEB',
+                    borderRadius: '0 15px 15px 0',
+                    fontWeight: 'bold',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {this.state.item
+                    ? this.state.item.spam === '0'
+                      ? 'нет'
+                      : 'есть'
+                    : 'нет'}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              sm={4}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
+              <MoneyIcon
+                fontSize="large"
+                color="info"
+                sx={{ marginBottom: 1 }}
+              ></MoneyIcon>
+
+              <Grid display="flex" flexDirection="row" alignItems="center">
+                <Typography
+                  sx={{
+                    borderRadius: '15px 0 0 15px',
+                    padding: 1,
+                    fontWeight: 'normal',
+                    whiteSpace: 'nowrap',
+                    color: 'white',
+                    backgroundColor: '#87CEEB',
+                  }}
+                >
+                  Общее количество заказов
+                </Typography>
+                <Typography
+                  sx={{
+                    padding: 1,
+                    borderTop: 1,
+                    borderBottom: 1,
+                    borderRight: 1,
+                    borderColor: '#87CEEB',
+                    borderRadius: '0 15px 15px 0',
+                    fontWeight: 'bold',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {this.state.item ? this.state.item.all_count_order : '0'}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              sm={4}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
+              <HistoryIcon
+                fontSize="large"
+                color="info"
+                sx={{ marginBottom: 1 }}
+              ></HistoryIcon>
+
+              <Grid display="flex" flexDirection="row" alignItems="center">
+                <Typography
+                  sx={{
+                    borderRadius: '15px 0 0 15px',
+                    padding: 1,
+                    fontWeight: 'normal',
+                    whiteSpace: 'nowrap',
+                    color: 'white',
+                    backgroundColor: '#87CEEB',
+                  }}
+                >
+                  Переодичность заказов
+                </Typography>
+                <Typography
+                  sx={{
+                    padding: 1,
+                    borderTop: 1,
+                    borderBottom: 1,
+                    borderRight: 1,
+                    borderColor: '#87CEEB',
+                    borderRadius: '0 15px 15px 0',
+                    fontWeight: 'bold',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {this.state.item ? this.state.item.order_per_day : '0'}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              sm={4}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
+              <DirectionsCarIcon
+                fontSize="large"
+                color="info"
+                sx={{ marginBottom: 1 }}
+              ></DirectionsCarIcon>
+
+              <Grid display="flex" flexDirection="row" alignItems="center">
+                <Typography
+                  sx={{
+                    borderRadius: '15px 0 0 15px',
+                    padding: 1,
+                    fontWeight: 'normal',
+                    whiteSpace: 'nowrap',
+                    color: 'white',
+                    backgroundColor: '#87CEEB',
+                  }}
+                >
+                  Количество заказов на доставку
+                </Typography>
+                <Typography
+                  sx={{
+                    padding: 1,
+                    borderTop: 1,
+                    borderBottom: 1,
+                    borderRight: 1,
+                    borderColor: '#87CEEB',
+                    borderRadius: '0 15px 15px 0',
+                    fontWeight: 'bold',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {this.state.item ? this.state.item.count_dev : '0'}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              sm={4}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
+              <TransferWithinAStationIcon
+                fontSize="large"
+                color="info"
+                sx={{ marginBottom: 1 }}
+              ></TransferWithinAStationIcon>
+
+              <Grid display="flex" flexDirection="row" alignItems="center">
+                <Typography
+                  sx={{
+                    borderRadius: '15px 0 0 15px',
+                    padding: 1,
+                    fontWeight: 'normal',
+                    whiteSpace: 'nowrap',
+                    color: 'white',
+                    backgroundColor: '#87CEEB',
+                  }}
+                >
+                  Количество заказов на самовывоз
+                </Typography>
+                <Typography
+                  sx={{
+                    padding: 1,
+                    borderTop: 1,
+                    borderBottom: 1,
+                    borderRight: 1,
+                    borderColor: '#87CEEB',
+                    borderRadius: '0 15px 15px 0',
+                    fontWeight: 'bold',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {this.state.item ? this.state.item.count_pic : '0'}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              sm={4}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
+              <LocalAtmIcon
+                fontSize="large"
+                color="info"
+                sx={{ marginBottom: 1 }}
+              ></LocalAtmIcon>
+
+              <Grid display="flex" flexDirection="row" alignItems="center">
+                <Typography
+                  sx={{
+                    borderRadius: '15px 0 0 15px',
+                    padding: 1,
+                    fontWeight: 'normal',
+                    whiteSpace: 'nowrap',
+                    color: 'white',
+                    backgroundColor: '#87CEEB',
+                  }}
+                >
+                  Первый промик после регистрации
+                </Typography>
+                <Typography
+                  sx={{
+                    padding: 1,
+                    borderTop: 1,
+                    borderBottom: 1,
+                    borderRight: 1,
+                    borderColor: '#87CEEB',
+                    borderRadius: '0 15px 15px 0',
+                    fontWeight: 'bold',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {this.state.item
+                    ? this.state.item.promo_name !== ''
+                      ? this.state.item.promo_name
+                      : 'не было'
+                    : 'не было'}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          {/* аккордион */}
+          {!this.state.item.orders ? null : (
+            <Grid item xs={12} sm={4} mb={3}>
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                >
+                  <Typography style={{ fontWeight: 'bold' }}>Заказы</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  {this.state.fullScreen ? null : (
+                    <Accordion expanded={true}>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon sx={{ opacity: 0 }} />}
+                        aria-controls="panel1a-content"
+                      >
+                        <Grid item xs display="flex" flexDirection="row">
+                          <Typography style={{ width: '15%' }} noWrap>
+                            Номер
+                          </Typography>
+                          <Typography style={{ width: '25%' }} noWrap>
+                            Дата/время
+                          </Typography>
+                          <Typography style={{ width: '15%' }} noWrap>
+                            Точка
+                          </Typography>
+                          <Typography style={{ width: '15%' }} noWrap>
+                            Сумма
+                          </Typography>
+                          <Typography style={{ width: '15%' }} noWrap>
+                            Промик
+                          </Typography>
+                          <Typography style={{ width: '15%' }} noWrap>
+                            Тип
+                          </Typography>
+                        </Grid>
+                      </AccordionSummary>
+                    </Accordion>
+                  )}
+                  {this.state.item.orders.map((item, i) => (
+                    <Accordion key={i}>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1a-content"
+                      >
+                        <Grid
+                          item
+                          xs
+                          display="flex"
+                          sx={{ flexDirection: { sm: 'row', xs: 'column' } }}
+                        >
+                          <Typography
+                            style={{ width: '15%' }}
+                            sx={{
+                              noWrap: { sm: true, xs: false },
+                              whiteSpace: { xs: 'nowrap' },
+                            }}
+                          >
+                            {this.state.fullScreen
+                              ? `Номер: ${item.order_id}`
+                              : item.order_id}
+                          </Typography>
+                          <Typography
+                            style={{ width: '25%' }}
+                            sx={{
+                              noWrap: { sm: true, xs: false },
+                              whiteSpace: { xs: 'nowrap' },
+                            }}
+                          >
+                            {this.state.fullScreen
+                              ? `Дата: ${item.date}/${item.time}`
+                              : `${item.date}/${item.time}`}
+                          </Typography>
+                          <Typography
+                            style={{ width: '15%' }}
+                            sx={{
+                              noWrap: { sm: true, xs: false },
+                              whiteSpace: { xs: 'nowrap' },
+                            }}
+                          >
+                            {this.state.fullScreen
+                              ? `Точка: ${item.addr}`
+                              : item.addr}
+                          </Typography>
+                          <Typography
+                            style={{ width: '15%' }}
+                            sx={{
+                              noWrap: { sm: true, xs: false },
+                              whiteSpace: { xs: 'nowrap' },
+                            }}
+                          >
+                            {this.state.fullScreen
+                              ? `Сумма: ${item.summ}`
+                              : item.summ}
+                          </Typography>
+                          <Typography
+                            style={{ width: '15%' }}
+                            sx={{
+                              noWrap: { sm: true, xs: false },
+                              whiteSpace: { xs: 'nowrap' },
+                            }}
+                          >
+                            {this.state.fullScreen
+                              ? `Промик: ${item.promo_name ?? 'Нет'}`
+                              : item.promo_name ?? 'Нет'}
+                          </Typography>
+                          <Typography
+                            style={{ width: '15%' }}
+                            sx={{
+                              noWrap: { sm: true, xs: false },
+                              whiteSpace: { xs: 'nowrap' },
+                            }}
+                          >
+                            {this.state.fullScreen
+                              ? `Тип: ${
+                                  item.xy === '' ? 'Самовывоз' : 'Доставка'
+                                }`
+                              : item.xy === ''
+                              ? 'Самовывоз'
+                              : 'Доставка'}
+                          </Typography>
+                        </Grid>
+                      </AccordionSummary>
+                      <AccordionDetails
+                        style={{ width: '100%', overflow: 'scroll' }}
+                      >
+                        <Table>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Наименование</TableCell>
+                              <TableCell>Количество</TableCell>
+                            </TableRow>
+                          </TableHead>
+
+                          <TableBody>
+                            {!item.items ? null : (item.items.map((it, key) => (
+                              <TableRow key={key}>
+                                <TableCell>{it.name}</TableCell>
+                                <TableCell>{it.count}</TableCell>
+                              </TableRow>
+                            )))}
+                          </TableBody>
+                        </Table>
+                      </AccordionDetails>
+                    </Accordion>
+                  ))}
+                </AccordionDetails>
+              </Accordion>
+            </Grid>
+          )}
+        </DialogContent>
+
+        <DialogActions>
+          <Button
+            style={{ color: '#DC143C' }}
+            onClick={this.onClose.bind(this)}
+          >
+            Закрыть
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+}
+
 class ListFakeUsers_ extends React.Component {
   constructor(props) {
     super(props);
@@ -68,6 +742,9 @@ class ListFakeUsers_ extends React.Component {
       is_show_claim: 0,
       is_show_claim_last: 0,
       is_show_marketing: 0,
+
+      modalDialog: false,
+      user: null,
     };
   }
 
@@ -129,7 +806,6 @@ class ListFakeUsers_ extends React.Component {
   };
 
   async getUsers() {
-
     const data = {
       point: this.state.point,
       date_start_true: this.state.date_start_true,
@@ -148,21 +824,16 @@ class ListFakeUsers_ extends React.Component {
 
     // console.log(res);
 
-    if(res.st) {
-
+    if (res.st) {
       this.setState({
         users: res.users,
       });
-
     } else {
-
       this.setState({
         error: res.text,
         snackbar: true,
       });
-      
     }
-
   }
 
   changeNumber(data, event) {
@@ -172,14 +843,12 @@ class ListFakeUsers_ extends React.Component {
   }
 
   changeItem(data, event, value) {
-
     this.setState({
       [data]: value,
     });
   }
 
   changeDateRange(data, event) {
-
     this.setState({
       [data]: event ? formatDate(event) : '',
     });
@@ -193,6 +862,32 @@ class ListFakeUsers_ extends React.Component {
     });
   }
 
+  async openModal(item) {
+    const date_start_true = this.state.date_start_true;
+
+    const date_end_true = this.state.date_end_true;
+
+    const point = this.state.point;
+
+    const data = {
+      client_id: item.client_id,
+      date_start_true,
+      date_end_true,
+      point,
+    };
+
+    // console.log(data)
+
+    const res = await this.getData('get_one', data);
+
+    // console.log(res);
+
+    this.setState({
+      modalDialog: true,
+      user: res.user,
+    });
+  }
+
   render() {
     return (
       <>
@@ -200,33 +895,49 @@ class ListFakeUsers_ extends React.Component {
           <CircularProgress color="inherit" />
         </Backdrop>
 
-        <Snackbar 
-          open={this.state.snackbar} 
+        <Snackbar
+          open={this.state.snackbar}
           autoHideDuration={30000}
-          anchorOrigin={{  
+          anchorOrigin={{
             vertical: 'top',
-            horizontal: 'center', 
+            horizontal: 'center',
           }}
           onClose={() => {
             this.setState({ snackbar: false });
-          }}>
-          <Alert 
+          }}
+        >
+          <Alert
             onClose={() => {
-            this.setState({ snackbar: false });
-            }} 
-            severity={ "error" } 
-            sx={{ width: '100%' }}>
-             {this.state.error}
+              this.setState({ snackbar: false });
+            }}
+            severity={'error'}
+            sx={{ width: '100%' }}
+          >
+            {this.state.error}
           </Alert>
         </Snackbar>
 
-          <Grid item xs={12} mb={3} >
-            <h1>{this.state.module_name}</h1>
-          </Grid>
+        <ListFakeUsers_Modal
+          open={this.state.modalDialog}
+          onClose={() => {
+            this.setState({ modalDialog: false });
+          }}
+          event={this.state.user}
+        />
 
-        <Grid item container spacing={3} justifyContent="center" mb={3} sx={{ flexDirection: {sm: "row", xs: "column-reverse"}}}>
+        <Grid item xs={12} mb={3}>
+          <h1>{this.state.module_name}</h1>
+        </Grid>
 
-          <Grid item xs={12} sm={3} sx={{ order: { sm: 0, xs: 1 }}}>
+        <Grid
+          item
+          container
+          spacing={3}
+          justifyContent="center"
+          mb={3}
+          sx={{ flexDirection: { sm: 'row', xs: 'column-reverse' } }}
+        >
+          <Grid item xs={12} sm={3} sx={{ order: { sm: 0, xs: 1 } }}>
             <MyDatePickerNew
               label="Делал заказ от"
               value={this.state.date_start_true}
@@ -234,7 +945,7 @@ class ListFakeUsers_ extends React.Component {
             />
           </Grid>
 
-          <Grid item xs={12} sm={3} sx={{ order: { sm: 1, xs: 0 }}}>
+          <Grid item xs={12} sm={3} sx={{ order: { sm: 1, xs: 0 } }}>
             <MyDatePickerNew
               label="Делал заказ до"
               value={this.state.date_end_true}
@@ -242,7 +953,7 @@ class ListFakeUsers_ extends React.Component {
             />
           </Grid>
 
-          <Grid item xs={12} sm={3} sx={{ order: { sm: 2, xs: 2 }}}>
+          <Grid item xs={12} sm={3} sx={{ order: { sm: 2, xs: 2 } }}>
             <Button
               variant="contained"
               style={{ whiteSpace: 'nowrap' }}
@@ -277,9 +988,9 @@ class ListFakeUsers_ extends React.Component {
               func={this.changeItemChecked.bind(this, 'is_show_claim')}
             />
           </Grid>
-          </Grid>
+        </Grid>
 
-          <Grid container spacing={3} justifyContent="center" mb={3}>
+        <Grid container spacing={3} justifyContent="center" mb={3}>
           <Grid item xs={12} sm={3}>
             <MyTextInput
               label="Количество заказов"
@@ -301,14 +1012,15 @@ class ListFakeUsers_ extends React.Component {
           <Grid item xs={12} sm={3}>
             <MyCheckBox
               label="Была оформлена ошибка на последний заказ"
-              value={parseInt(this.state.is_show_claim_last) == 1 ? true : false}
+              value={
+                parseInt(this.state.is_show_claim_last) == 1 ? true : false
+              }
               func={this.changeItemChecked.bind(this, 'is_show_claim_last')}
             />
           </Grid>
-          </Grid>
+        </Grid>
 
-          <Grid container spacing={3} justifyContent="center" mb={3}>
-
+        <Grid container spacing={3} justifyContent="center" mb={3}>
           <Grid item xs={12} sm={3}>
             <MyAutocomplite
               label="Точки"
@@ -336,7 +1048,6 @@ class ListFakeUsers_ extends React.Component {
               func={this.changeItemChecked.bind(this, 'is_show_marketing')}
             />
           </Grid>
-          
         </Grid>
 
         {!this.state.users.length ? null : (
@@ -354,7 +1065,11 @@ class ListFakeUsers_ extends React.Component {
 
                   <TableBody>
                     {this.state.users.map((item, i) => (
-                      <TableRow key={i}>
+                      <TableRow
+                        key={i}
+                        onClick={this.openModal.bind(this, item)}
+                        style={{ cursor: 'pointer' }}
+                      >
                         <TableCell>{i + 1}</TableCell>
                         <TableCell>{item.name}</TableCell>
                         <TableCell>{item.login}</TableCell>
