@@ -17,6 +17,34 @@ import { MyAutocomplite, MySelect } from '../../stores/elements';
 
 const queryString = require('query-string');
 
+class TenderCell extends React.Component {
+  render(){
+    const { vendor, price, item } = this.props;
+
+    let className = 'tdprice ';
+
+    if( price.checkTender == '1' ){
+      className += 'chooseCell ';
+    }
+
+    if( price.price == price.min_price ){
+      className += 'minPriceCell ';
+    }
+
+    if( price.price == price.max_price ){
+      className += 'maxPriceCell ';
+    }
+
+    return (
+      <TableCell
+        className={className}
+        onClick={this.props.changePrice.bind(this, vendor.id, item.id, price.price)}
+      >
+        {price.price}
+      </TableCell>
+    )
+  }
+}
 
 class Tender_ extends React.Component {
   constructor(props) {
@@ -144,7 +172,7 @@ class Tender_ extends React.Component {
 
     const res = await this.getData('get_data', data);
 
-    // console.log(res)
+    console.log(res)
 
     this.getDataTableCell(res);
 
@@ -229,9 +257,9 @@ class Tender_ extends React.Component {
 
     console.log(data);
 
-    // const res = await this.getData('save', data);
+    const res = await this.getData('save', data);
 
-    // console.log(res)
+    console.log(res)
   }
 
   render() {
@@ -314,6 +342,7 @@ class Tender_ extends React.Component {
                       <TableCell>Категория</TableCell>
                       <TableCell>Параметры</TableCell>
                       <TableCell>Выбранный</TableCell>
+                      <TableCell>Расход</TableCell>
                       {this.state.vendors.map((vendor, key) => (
                         <TableCell
                           key={key}
@@ -350,6 +379,7 @@ class Tender_ extends React.Component {
                             >
                               <TableCell>{category.name}</TableCell>
                               <TableCell></TableCell>
+                              
                               {key_cat === 0 ? (
                                 <TableCell >
                                   Цена
@@ -359,6 +389,7 @@ class Tender_ extends React.Component {
                                   <TableCell></TableCell>
                                 </React.Fragment>
                               )}
+                              <TableCell></TableCell>
                               {this.state.vendors.map((vendor, key) => (
                                 <React.Fragment key={key}>
                                   <TableCell></TableCell>
@@ -372,21 +403,19 @@ class Tender_ extends React.Component {
                                   {item.name}
                                 </TableCell>
                                 <TableCell></TableCell>
+                                
                                 <TableCell>{item.price}</TableCell>
+                                <TableCell>{item.ras}</TableCell>
                                 {this.state.vendors.map((vendor, key) => (
                                  <React.Fragment key={key}>
                                  {vendor.price.find((it) => it.item_id === item.id) ? (
-                                   <TableCell
-                                   className='tdprice'
-                                   style={{ 
-                                     backgroundColor: vendor.price.find((it) => it.item_id === item.id).checkTender === '1' ? '#FF0000' : null,
-                                     color: vendor.price.find((it) => it.item_id === item.id).checkTender === '1' ? '#FFFFFF' : null,
-                                    }}
-                                    onClick={this.changePrice.bind(this, vendor.id, item.id, vendor.price.find((it) => it.item_id === item.id).price)}
-                                    >
-                                    {vendor.price.find((it) => it.item_id === item.id).price}
-                                  </TableCell>
-                                 ) : (
+                                  <TenderCell 
+                                    vendor={ vendor }
+                                    item={ item }
+                                    price={ vendor.price.find((it) => it.item_id === item.id) }
+                                    changePrice={ this.changePrice.bind(this) }
+                                   />
+                                  ) : (
                                   <TableCell></TableCell>
                                  )}
                                </React.Fragment>
