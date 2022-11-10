@@ -30,8 +30,6 @@ class Tender_ extends React.Component {
       cities: [],
       city: '',
 
-      newCities: [],
-
       allVendors: [],
 
       vendors: [],
@@ -48,13 +46,12 @@ class Tender_ extends React.Component {
   async componentDidMount() {
     let data = await this.getData('get_all');
 
-    console.log(data);
+    // console.log(data);
 
     this.setState({
       module_name: data.module_info.name,
       cities: data.cities,
       city: data.cities[0].id,
-      //vendors: data.vendors,
       allVendors: data.vendors,
       newCats: data.cats,
     });
@@ -108,9 +105,19 @@ class Tender_ extends React.Component {
       });
   };
 
-  changeCity(event) {
+  async changeCity(event) {
+
+    const data = {
+      city_id: event.target.value,
+    };
+
+    const res = await this.getData('get_vendors', data);
+
+    // console.log(res)
+
     this.setState({
       city: event.target.value,
+      allVendors: res,
     });
   }
 
@@ -137,7 +144,7 @@ class Tender_ extends React.Component {
 
     const res = await this.getData('get_data', data);
 
-    console.log(res)
+    // console.log(res)
 
     this.getDataTableCell(res);
 
@@ -163,129 +170,43 @@ class Tender_ extends React.Component {
     this.setState({
       cats: res.items,
       vendors: vendors_items,
-      //newCities: res.cities,
     });
   }
 
-  changeSelect(vendor_id, cat_id, price_vendor, event) {
-    // console.log(vendor_id, cat_id, price_vendor, event.target.value)
+  changePrice(vendor_id, cat_id, price) {
+    // console.log(vendor_id, cat_id, price)
 
     const vendors = this.state.vendors;
-    const newCities = this.state.newCities;
     const cats = this.state.cats;
+
+    // console.log(cats);
 
     cats.forEach(cat => {
       cat.cats.forEach(it => {
         it.items.forEach(item => {
-
-            if(item.id === cat_id && event.target.value === '') {
-
-              if(vendor_id === item.vendor_all) {
-                item.city_all = null;
-                item.price_all = null;
-                item.vendor_all = null;
-              }
-
-              if(vendor_id === item.vendor_tlt) {
-                item.city_tlt = null;
-                item.price_tlt = null;
-                item.vendor_tlt = null;
-              }
-
-              if(vendor_id === item.vendor_smr) {
-                item.city_smr = null;
-                item.price_smr = null;
-                item.vendor_smr = null;
-              }
+            if(item.id === cat_id) {
+              item.price = price;
+              item.vendor_id = vendor_id;
             }
-     
-            if(item.id === cat_id && event.target.value === -1) {
-              item.city_tlt = null;
-              item.price_tlt = null;
-              item.vendor_tlt = null;
-
-              item.city_smr = null;
-              item.price_smr - null;
-              item.vendor_smr = null;
-
-              item.city_all = newCities.find(city => city.id === event.target.value)
-              item.price_all = price_vendor;
-              item.vendor_all = vendor_id;
-            } 
-
-            if(item.id === cat_id && event.target.value === '1') {
-              item.city_all = null;
-              item.price_all = null;
-              item.vendor_all = null;
-
-              if(!!item.city_tlt && !!item.city_smr && item.vendor_smr === vendor_id) {
-                item.city_smr = null;
-                item.price_smr = null;
-                item.vendor_smr = null;
-              }
-
-              item.city_tlt = newCities.find(city => city.id === event.target.value)
-              item.price_tlt = price_vendor;
-              item.vendor_tlt = vendor_id;
-            } 
-
-            if(item.id === cat_id && event.target.value === '2') {
-              item.city_all = null;
-              item.price_all = null;
-              item.vendor_all = null;
-
-              if(!!item.city_tlt && !!item.city_smr && item.vendor_tlt === vendor_id) {
-                item.city_tlt = null;
-                item.price_tlt = null;
-                item.vendor_tlt = null;
-              }
-
-              item.city_smr = newCities.find(city => city.id === event.target.value)
-              item.price_smr = price_vendor;
-              item.vendor_smr = vendor_id;
-            } 
-          
         })
       })
     })
 
-
     vendors.forEach(vendor => {
       vendor.price.forEach(price => {
-
         if(price.item_id === cat_id && price.vendor_id === vendor_id) {
-
-          price.city = newCities.find(city => city.id === event.target.value)
-
+          price.checkTender = '1';
         } 
-
         if (price.item_id === cat_id && price.vendor_id !== vendor_id) {
-
-          if(price.city) {
-
-            if(price.city.id === event.target.value || event.target.value === - 1) {
-
-              price.city = null
-
-            } else if (price.city.id === -1 && event.target.value !== - 1) {
-
-              price.city = null
-
-            }
-          } 
+          price.checkTender = '0';
         }
-        
       })
-
     })
-
-    // console.log(vendors)
 
     this.setState({
       vendors,
       cats,
     });
-
   }
 
   async saveData () {
@@ -304,22 +225,16 @@ class Tender_ extends React.Component {
     const data = {
       city_id: this.state.city,
       items: items
-      //vendors: this.state.vendors,
-      //vendor: this.state.vendor,
-      //cat: this.state.newCat,
-      //cats: this.state.cats,
     };
 
     console.log(data);
 
-    const res = await this.getData('save', data);
+    // const res = await this.getData('save', data);
 
-    console.log(res)
+    // console.log(res)
   }
 
   render() {
-
-    console.log('render')
 
     return (
       <>
@@ -419,7 +334,7 @@ class Tender_ extends React.Component {
                       <React.Fragment key={key}>
                         <TableRow>
                           <TableCell
-                            colSpan={`${5 + this.state.vendors.length * 2}`}
+                            colSpan={`${3 + this.state.vendors.length * 2}`}
                             sx={{
                               backgroundColor: '#ADD8E6',
                             }}
@@ -437,7 +352,7 @@ class Tender_ extends React.Component {
                               <TableCell></TableCell>
                               {key_cat === 0 ? (
                                 <TableCell >
-                                  цена
+                                  Цена
                                 </TableCell>
                               ) : (
                                 <React.Fragment key={key_cat}>
@@ -457,24 +372,22 @@ class Tender_ extends React.Component {
                                   {item.name}
                                 </TableCell>
                                 <TableCell></TableCell>
-                                <TableCell>{item.city_all ? item.price_all : '' }</TableCell>
+                                <TableCell>{item.price}</TableCell>
                                 {this.state.vendors.map((vendor, key) => (
                                  <React.Fragment key={key}>
-                                 {vendor.price.find(
-                                   (it) => it.item_id === item.id
-                                 ) ? (
-                                   
-                                     
-                                  <TableCell
-                                    className='tdprice'
-                                  >
+                                 {vendor.price.find((it) => it.item_id === item.id) ? (
+                                   <TableCell
+                                   className='tdprice'
+                                   style={{ 
+                                     backgroundColor: vendor.price.find((it) => it.item_id === item.id).checkTender === '1' ? '#FF0000' : null,
+                                     color: vendor.price.find((it) => it.item_id === item.id).checkTender === '1' ? '#FFFFFF' : null,
+                                    }}
+                                    onClick={this.changePrice.bind(this, vendor.id, item.id, vendor.price.find((it) => it.item_id === item.id).price)}
+                                    >
                                     {vendor.price.find((it) => it.item_id === item.id).price}
                                   </TableCell>
-                                   
                                  ) : (
-                                  
                                   <TableCell></TableCell>
-                                   
                                  )}
                                </React.Fragment>
                                 ))}

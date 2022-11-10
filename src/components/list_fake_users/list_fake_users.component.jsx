@@ -26,16 +26,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import PersonIcon from '@mui/icons-material/Person';
-import HowToRegIcon from '@mui/icons-material/HowToReg';
-import EventIcon from '@mui/icons-material/Event';
-import HandshakeIcon from '@mui/icons-material/Handshake';
-import MoneyIcon from '@mui/icons-material/Money';
-import HistoryIcon from '@mui/icons-material/History';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import TransferWithinAStationIcon from '@mui/icons-material/TransferWithinAStation';
-import LocalAtmIcon from '@mui/icons-material/LocalAtm';
-
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 
@@ -84,8 +74,6 @@ class ListFakeUsers_Modal extends React.Component {
     }
 
     if (this.props.event !== prevProps.event) {
-      this.props.event.date_reg = this.props.event.date_reg.slice(0, 10);
-
       this.setState({
         item: this.props.event,
       });
@@ -152,40 +140,22 @@ class ListFakeUsers_Modal extends React.Component {
               flexDirection="column"
               alignItems="center"
             >
-              <PersonIcon
-                fontSize="large"
-                color="info"
-                sx={{ marginBottom: 1 }}
-              ></PersonIcon>
-
-              <Grid display="flex" flexDirection="row" alignItems="center">
-                <Typography
-                  sx={{
-                    borderRadius: '15px 0 0 15px',
-                    padding: 1,
-                    fontWeight: 'normal',
-                    whiteSpace: 'nowrap',
-                    color: 'white',
-                    backgroundColor: '#87CEEB',
-                  }}
-                >
-                  Имя
-                </Typography>
-                <Typography
-                  sx={{
-                    padding: 1,
-                    borderTop: 1,
-                    borderBottom: 1,
-                    borderRight: 1,
-                    borderColor: '#87CEEB',
-                    borderRadius: '0 15px 15px 0',
-                    fontWeight: 'bold',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {this.state.item ? this.state.item.name : 'нет'}
-                </Typography>
-              </Grid>
+              <Typography
+                sx={{
+                  fontWeight: 'bold',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Имя
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: 'normal',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {this.state.item ? this.state.item.name !== '0' ? this.state.item.name : 'не указано' : 'не указано'}
+              </Typography>
             </Grid>
 
             <Grid
@@ -196,40 +166,22 @@ class ListFakeUsers_Modal extends React.Component {
               flexDirection="column"
               alignItems="center"
             >
-              <HowToRegIcon
-                fontSize="large"
-                color="info"
-                sx={{ marginBottom: 1 }}
-              ></HowToRegIcon>
-
-              <Grid display="flex" flexDirection="row" alignItems="center">
-                <Typography
-                  sx={{
-                    borderRadius: '15px 0 0 15px',
-                    padding: 1,
-                    fontWeight: 'normal',
-                    whiteSpace: 'nowrap',
-                    color: 'white',
-                    backgroundColor: '#87CEEB',
-                  }}
-                >
-                  Дата регистрации
-                </Typography>
-                <Typography
-                  sx={{
-                    padding: 1,
-                    borderTop: 1,
-                    borderBottom: 1,
-                    borderRight: 1,
-                    borderColor: '#87CEEB',
-                    borderRadius: '0 15px 15px 0',
-                    fontWeight: 'bold',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {this.state.item ? this.state.item.date_reg : 'нет'}
-                </Typography>
-              </Grid>
+              <Typography
+                sx={{
+                  whiteSpace: 'nowrap',
+                  fontWeight: 'bold',
+                }}
+              >
+                Регистрация
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: 'normal',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {this.state.item ? this.state.item.date_reg ? this.state.item.date_reg : 'не указано' : 'не указано'}
+              </Typography>
             </Grid>
 
             <Grid
@@ -240,40 +192,22 @@ class ListFakeUsers_Modal extends React.Component {
               flexDirection="column"
               alignItems="center"
             >
-              <EventIcon
-                fontSize="large"
-                color="info"
-                sx={{ marginBottom: 1 }}
-              ></EventIcon>
-
-              <Grid display="flex" flexDirection="row" alignItems="center">
-                <Typography
-                  sx={{
-                    borderRadius: '15px 0 0 15px',
-                    padding: 1,
-                    fontWeight: 'normal',
-                    whiteSpace: 'nowrap',
-                    color: 'white',
-                    backgroundColor: '#87CEEB',
-                  }}
-                >
-                  День рождения
-                </Typography>
-                <Typography
-                  sx={{
-                    padding: 1,
-                    borderTop: 1,
-                    borderBottom: 1,
-                    borderRight: 1,
-                    borderColor: '#87CEEB',
-                    borderRadius: '0 15px 15px 0',
-                    fontWeight: 'bold',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {this.state.item ? this.state.item.date_bir : 'нет'}
-                </Typography>
-              </Grid>
+              <Typography
+                sx={{
+                  fontWeight: 'bold',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                День рождения
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: 'normal',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {this.state.item ? this.state.item.date_bir ? this.state.item.date_bir : 'не указано' : 'не указано'}
+              </Typography>
             </Grid>
 
             <Grid
@@ -284,44 +218,26 @@ class ListFakeUsers_Modal extends React.Component {
               flexDirection="column"
               alignItems="center"
             >
-              <HandshakeIcon
-                fontSize="large"
-                color="info"
-                sx={{ marginBottom: 1 }}
-              ></HandshakeIcon>
-
-              <Grid display="flex" flexDirection="row" alignItems="center">
-                <Typography
-                  sx={{
-                    borderRadius: '15px 0 0 15px',
-                    padding: 1,
-                    fontWeight: 'normal',
-                    whiteSpace: 'nowrap',
-                    color: 'white',
-                    backgroundColor: '#87CEEB',
-                  }}
-                >
-                  Согласие на рассылку
-                </Typography>
-                <Typography
-                  sx={{
-                    padding: 1,
-                    borderTop: 1,
-                    borderBottom: 1,
-                    borderRight: 1,
-                    borderColor: '#87CEEB',
-                    borderRadius: '0 15px 15px 0',
-                    fontWeight: 'bold',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {this.state.item
-                    ? this.state.item.spam === '0'
-                      ? 'нет'
-                      : 'есть'
-                    : 'нет'}
-                </Typography>
-              </Grid>
+              <Typography
+                sx={{
+                  whiteSpace: 'nowrap',
+                  fontWeight: 'bold',
+                }}
+              >
+                Согласие на рассылку
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: 'normal',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {this.state.item
+                  ? this.state.item.spam === '0'
+                    ? 'нет'
+                    : 'есть'
+                  : 'нет'}
+              </Typography>
             </Grid>
 
             <Grid
@@ -332,40 +248,22 @@ class ListFakeUsers_Modal extends React.Component {
               flexDirection="column"
               alignItems="center"
             >
-              <MoneyIcon
-                fontSize="large"
-                color="info"
-                sx={{ marginBottom: 1 }}
-              ></MoneyIcon>
-
-              <Grid display="flex" flexDirection="row" alignItems="center">
-                <Typography
-                  sx={{
-                    borderRadius: '15px 0 0 15px',
-                    padding: 1,
-                    fontWeight: 'normal',
-                    whiteSpace: 'nowrap',
-                    color: 'white',
-                    backgroundColor: '#87CEEB',
-                  }}
-                >
-                  Общее количество заказов
-                </Typography>
-                <Typography
-                  sx={{
-                    padding: 1,
-                    borderTop: 1,
-                    borderBottom: 1,
-                    borderRight: 1,
-                    borderColor: '#87CEEB',
-                    borderRadius: '0 15px 15px 0',
-                    fontWeight: 'bold',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {this.state.item ? this.state.item.all_count_order : '0'}
-                </Typography>
-              </Grid>
+              <Typography
+                sx={{
+                  fontWeight: 'bold',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Общее количество заказов
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: 'normal',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {this.state.item ? this.state.item.all_count_order : '0'}
+              </Typography>
             </Grid>
 
             <Grid
@@ -376,40 +274,22 @@ class ListFakeUsers_Modal extends React.Component {
               flexDirection="column"
               alignItems="center"
             >
-              <HistoryIcon
-                fontSize="large"
-                color="info"
-                sx={{ marginBottom: 1 }}
-              ></HistoryIcon>
-
-              <Grid display="flex" flexDirection="row" alignItems="center">
-                <Typography
-                  sx={{
-                    borderRadius: '15px 0 0 15px',
-                    padding: 1,
-                    fontWeight: 'normal',
-                    whiteSpace: 'nowrap',
-                    color: 'white',
-                    backgroundColor: '#87CEEB',
-                  }}
-                >
-                  Переодичность заказов
-                </Typography>
-                <Typography
-                  sx={{
-                    padding: 1,
-                    borderTop: 1,
-                    borderBottom: 1,
-                    borderRight: 1,
-                    borderColor: '#87CEEB',
-                    borderRadius: '0 15px 15px 0',
-                    fontWeight: 'bold',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {this.state.item ? this.state.item.order_per_day : '0'}
-                </Typography>
-              </Grid>
+              <Typography
+                sx={{
+                  fontWeight: 'bold',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Количество заказов на доставку
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: 'normal',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {this.state.item ? this.state.item.count_dev : '0'}
+              </Typography>
             </Grid>
 
             <Grid
@@ -420,40 +300,22 @@ class ListFakeUsers_Modal extends React.Component {
               flexDirection="column"
               alignItems="center"
             >
-              <DirectionsCarIcon
-                fontSize="large"
-                color="info"
-                sx={{ marginBottom: 1 }}
-              ></DirectionsCarIcon>
-
-              <Grid display="flex" flexDirection="row" alignItems="center">
-                <Typography
-                  sx={{
-                    borderRadius: '15px 0 0 15px',
-                    padding: 1,
-                    fontWeight: 'normal',
-                    whiteSpace: 'nowrap',
-                    color: 'white',
-                    backgroundColor: '#87CEEB',
-                  }}
-                >
-                  Количество заказов на доставку
-                </Typography>
-                <Typography
-                  sx={{
-                    padding: 1,
-                    borderTop: 1,
-                    borderBottom: 1,
-                    borderRight: 1,
-                    borderColor: '#87CEEB',
-                    borderRadius: '0 15px 15px 0',
-                    fontWeight: 'bold',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {this.state.item ? this.state.item.count_dev : '0'}
-                </Typography>
-              </Grid>
+              <Typography
+                sx={{
+                  fontWeight: 'bold',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Количество заказов на самовывоз
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: 'normal',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {this.state.item ? this.state.item.count_pic : '0'}
+              </Typography>
             </Grid>
 
             <Grid
@@ -464,40 +326,22 @@ class ListFakeUsers_Modal extends React.Component {
               flexDirection="column"
               alignItems="center"
             >
-              <TransferWithinAStationIcon
-                fontSize="large"
-                color="info"
-                sx={{ marginBottom: 1 }}
-              ></TransferWithinAStationIcon>
-
-              <Grid display="flex" flexDirection="row" alignItems="center">
-                <Typography
-                  sx={{
-                    borderRadius: '15px 0 0 15px',
-                    padding: 1,
-                    fontWeight: 'normal',
-                    whiteSpace: 'nowrap',
-                    color: 'white',
-                    backgroundColor: '#87CEEB',
-                  }}
-                >
-                  Количество заказов на самовывоз
-                </Typography>
-                <Typography
-                  sx={{
-                    padding: 1,
-                    borderTop: 1,
-                    borderBottom: 1,
-                    borderRight: 1,
-                    borderColor: '#87CEEB',
-                    borderRadius: '0 15px 15px 0',
-                    fontWeight: 'bold',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {this.state.item ? this.state.item.count_pic : '0'}
-                </Typography>
-              </Grid>
+              <Typography
+                sx={{
+                  fontWeight: 'bold',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Переодичность заказов
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: 'normal',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {this.state.item ? this.state.item.order_per_day : '0'}
+              </Typography>
             </Grid>
 
             <Grid
@@ -508,44 +352,26 @@ class ListFakeUsers_Modal extends React.Component {
               flexDirection="column"
               alignItems="center"
             >
-              <LocalAtmIcon
-                fontSize="large"
-                color="info"
-                sx={{ marginBottom: 1 }}
-              ></LocalAtmIcon>
-
-              <Grid display="flex" flexDirection="row" alignItems="center">
-                <Typography
-                  sx={{
-                    borderRadius: '15px 0 0 15px',
-                    padding: 1,
-                    fontWeight: 'normal',
-                    whiteSpace: 'nowrap',
-                    color: 'white',
-                    backgroundColor: '#87CEEB',
-                  }}
-                >
-                  Первый промик после регистрации
-                </Typography>
-                <Typography
-                  sx={{
-                    padding: 1,
-                    borderTop: 1,
-                    borderBottom: 1,
-                    borderRight: 1,
-                    borderColor: '#87CEEB',
-                    borderRadius: '0 15px 15px 0',
-                    fontWeight: 'bold',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {this.state.item
-                    ? this.state.item.promo_name !== ''
-                      ? this.state.item.promo_name
-                      : 'не было'
-                    : 'не было'}
-                </Typography>
-              </Grid>
+              <Typography
+                sx={{
+                  fontWeight: 'bold',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Первый промик после регистрации
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: 'normal',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {this.state.item
+                  ? this.state.item.promo_name !== ''
+                    ? this.state.item.promo_name
+                    : 'не было'
+                  : 'не было'}
+              </Typography>
             </Grid>
           </Grid>
 
@@ -685,12 +511,14 @@ class ListFakeUsers_Modal extends React.Component {
                           </TableHead>
 
                           <TableBody>
-                            {!item.items ? null : (item.items.map((it, key) => (
-                              <TableRow key={key}>
-                                <TableCell>{it.name}</TableCell>
-                                <TableCell>{it.count}</TableCell>
-                              </TableRow>
-                            )))}
+                            {!item.items
+                              ? null
+                              : item.items.map((it, key) => (
+                                  <TableRow key={key}>
+                                    <TableCell>{it.name}</TableCell>
+                                    <TableCell>{it.count}</TableCell>
+                                  </TableRow>
+                                ))}
                           </TableBody>
                         </Table>
                       </AccordionDetails>
@@ -882,10 +710,18 @@ class ListFakeUsers_ extends React.Component {
 
     // console.log(res);
 
-    this.setState({
-      modalDialog: true,
-      user: res.user,
-    });
+    if (res.st) {
+      this.setState({
+        modalDialog: true,
+        user: res.user,
+      });
+    } else {
+      this.setState({
+        error: res.text,
+        snackbar: true,
+      });
+    }
+
   }
 
   render() {
