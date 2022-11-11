@@ -18,6 +18,17 @@ import { MyAutocomplite, MySelect } from '../../stores/elements';
 const queryString = require('query-string');
 
 class TenderCell extends React.Component {
+
+  // shouldComponentUpdate(nextProps){
+
+  //   let array1 = Object.values(nextProps.price);
+  //   let array2 = Object.values(this.props.price);
+
+  //   let is_same = array1.length === array2.length && array1.every(function (element, index) { return element === array2[index] });
+
+  //   return is_same;
+  // }
+
   render(){
     const { vendor, price, item } = this.props;
 
@@ -34,6 +45,8 @@ class TenderCell extends React.Component {
     if( price.price == price.max_price ){
       className += 'maxPriceCell ';
     }
+
+    console.log('render')
 
     return (
       <TableCell
@@ -67,6 +80,8 @@ class Tender_ extends React.Component {
 
       newCats: [],
       newCat: '',
+
+      all_price: '',
 
     };
   }
@@ -198,6 +213,7 @@ class Tender_ extends React.Component {
     this.setState({
       cats: res.items,
       vendors: vendors_items,
+      all_price: res.all_price
     });
   }
 
@@ -255,11 +271,13 @@ class Tender_ extends React.Component {
       items: items
     };
 
-    console.log(data);
+    // console.log(data);
 
-    const res = await this.getData('save', data);
+    await this.getData('save', data);
 
-    console.log(res)
+    this.getDataTable();
+
+    // console.log(res)
   }
 
   render() {
@@ -336,10 +354,20 @@ class Tender_ extends React.Component {
           <Grid container spacing={3}>
             <Grid item xs={12} sm={12}>
               <TableContainer sx={{ maxHeight: { xs: 'none', sm: 650 } }}>
-                <Table stickyHeader aria-label="sticky table">
+                <Table stickyHeader aria-label="sticky table" >
+
                   <TableHead>
-                    <TableRow>
-                      <TableCell>Категория</TableCell>
+
+                  <TableRow sx={{ zIndex: 6 }}>
+                      <TableCell 
+                      sx={{ zIndex: 7 }} 
+                      >Средний закуп</TableCell>
+                      <TableCell sx={{ borderRight: 0, textAlign: 'center', fontWeight: 'bold' }}>{this.state.all_price}</TableCell>
+                      <TableCell colSpan={`${2 + this.state.vendors.length * 2}`}></TableCell>
+                    </TableRow>
+
+                    <TableRow sx={{ zIndex: 1 }} >
+                      <TableCell sx={{ zIndex: 3 }}>Категория</TableCell>
                       <TableCell>Параметры</TableCell>
                       <TableCell>Выбранный</TableCell>
                       <TableCell>Расход</TableCell>
@@ -363,25 +391,27 @@ class Tender_ extends React.Component {
                       <React.Fragment key={key}>
                         <TableRow>
                           <TableCell
-                            colSpan={`${3 + this.state.vendors.length * 2}`}
-                            sx={{
-                              backgroundColor: '#ADD8E6',
-                            }}
+                            style={{ position: 'sticky', display: 'flex', backgroundColor: '#ADD8E6' }}
                           >
                             {item.name}
+                          </TableCell>
+                          <TableCell
+                          style={{ backgroundColor: '#ADD8E6' }}
+                          colSpan={`${3 + this.state.vendors.length * 2}`}
+                          >
                           </TableCell>
                         </TableRow>
 
                         {item.cats.map((category, key_cat) => (
                           <React.Fragment key={key_cat}>
                             <TableRow
-                              sx={{ '& td': { backgroundColor: '#ADD8E6' } }}
+                              sx={{ '& td': { backgroundColor: '#ADD8E6', borderRight: 'none' } }}
                             >
                               <TableCell>{category.name}</TableCell>
                               <TableCell></TableCell>
                               
                               {key_cat === 0 ? (
-                                <TableCell >
+                                <TableCell sx={{ textAlign: 'center' }}>
                                   Цена
                                 </TableCell>
                               ) : (
