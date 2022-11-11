@@ -199,7 +199,6 @@ class SiteItems_ extends React.Component {
     addRemoveLinks: true,
     url: "https://jacochef.ru/src/img/site_img/upload_img_new.php",
   };
-  myDropzoneOld = null;
   myDropzoneNew = null;
 
   constructor(props) {
@@ -280,7 +279,6 @@ class SiteItems_ extends React.Component {
 
       item_items: [],
 
-      myDropzoneOld: null,
       myDropzoneNew: null,
 
       is_snack: false,
@@ -456,7 +454,6 @@ class SiteItems_ extends React.Component {
     })
 
     setTimeout( () => {
-      this.myDropzoneOld = new Dropzone("#for_img_edit_old", this.dropzoneOptions);
       this.myDropzoneNew = new Dropzone("#for_img_edit_new", this.dropzoneOptions);
     }, 300 )
   }
@@ -489,7 +486,6 @@ class SiteItems_ extends React.Component {
     })
 
     setTimeout( () => {
-      this.myDropzoneOld = new Dropzone("#for_img_edit_old", this.dropzoneOptions);
       this.myDropzoneNew = new Dropzone("#for_img_edit_new", this.dropzoneOptions);
     }, 300 )
   }
@@ -790,52 +786,6 @@ class SiteItems_ extends React.Component {
   }
 
   async saveEditItem(){
-    if( this.myDropzoneOld['files'].length > 0 ){
-      
-      let name = this.state.editItem.name,
-        id = this.state.editItem.id,
-        type = 'old';
-
-      this.myDropzoneOld.on("sending", (file, xhr, data) => {
-        let file_type = (file.name).split('.');
-        file_type = file_type[file_type.length - 1];
-        file_type = file_type.toLowerCase();
-        
-        data.append("typeFile", type);
-        data.append("name", name);
-        data.append("id", id);
-      });
-  
-      this.myDropzoneOld.on("queuecomplete", (data) => {
-  
-        var check_img = false;
-  
-        var myDropzoneNew = this.myDropzoneNew;
-
-        this.myDropzoneOld['files'].map((item, key) => {
-          if( item['status'] == "error" ){
-            check_img = true;
-          }
-
-          if( item['status'] == "success" ){
-            if( myDropzoneNew['files'][0] && myDropzoneNew['files'][0]["status"] == 'success' ){
-              this.setState({ 
-                modalEdit: false, 
-                editItem: null, 
-                ItemTab: '1'
-              })
-
-              this.getItems();
-            }
-          }
-        })
-        
-        if( check_img ){
-          alert('Ошибка при загрузке фотографии '+type)
-        }
-      })
-    }
-
     if( this.myDropzoneNew['files'].length > 0 ){
       let name = this.state.editItem.name,
         id = this.state.editItem.id,
@@ -854,23 +804,19 @@ class SiteItems_ extends React.Component {
       this.myDropzoneNew.on("queuecomplete", (data) => {
         var check_img = false;
   
-        var myDropzoneOld = this.myDropzoneOld;
-
         this.myDropzoneNew['files'].map((item, key) => {  
           if( item['status'] == "error" ){
             check_img = true;
           }
 
           if( item['status'] == "success" ){
-            if( myDropzoneOld['files'][0] && myDropzoneOld['files'][0]["status"] == 'success' ){
-              this.setState({ 
-                modalEdit: false, 
-                editItem: null, 
-                ItemTab: '1'
-              })
+            this.setState({ 
+              modalEdit: false, 
+              editItem: null, 
+              ItemTab: '1'
+            })
 
-              this.getItems();
-            }
+            this.getItems();
           }
         })
         
@@ -928,8 +874,6 @@ class SiteItems_ extends React.Component {
     
     console.log( data );
 
-    //return;
-
     let res = await this.getData('saveEditItem', data);
 
     if( res.st === false ){
@@ -937,67 +881,21 @@ class SiteItems_ extends React.Component {
     }else{
       this.openSnack('Данные обновлены');
 
-      if( this.myDropzoneOld['files'].length > 0 ){
-        this.myDropzoneOld.processQueue();
-      }
-
       if( this.myDropzoneNew['files'].length > 0 ){
         this.myDropzoneNew.processQueue();
+      }else{
+        this.setState({ 
+          modalEdit: false, 
+          editItem: null, 
+          ItemTab: '1'
+        })
+
+        this.getItems();
       }
     }
   }
 
   async saveEditItemHist(){
-    if( this.myDropzoneOld['files'].length > 0 ){
-      
-      let name = this.state.editItem.name,
-        id = this.state.editItem.id,
-        date_update = this.state.date_update,
-        hist_id = this.state.editItem.hist_id,
-        type = 'old';
-
-      this.myDropzoneOld.on("sending", (file, xhr, data) => {
-        let file_type = (file.name).split('.');
-        file_type = file_type[file_type.length - 1];
-        file_type = file_type.toLowerCase();
-        
-        data.append("typeFile", type);
-        data.append("name", name);
-        data.append("id", id);
-        data.append("hist_id", hist_id);
-        data.append("date_update", date_update);
-      });
-  
-      this.myDropzoneOld.on("queuecomplete", (data) => {
-  
-        var check_img = false;
-  
-        var myDropzoneNew = this.myDropzoneNew;
-
-        this.myDropzoneOld['files'].map((item, key) => {
-          if( item['status'] == "error" ){
-            check_img = true;
-          }
-
-          if( item['status'] == "success" ){
-            if( (myDropzoneNew['files'][0] && myDropzoneNew['files'][0]["status"] == 'success') || myDropzoneNew['files'].length == 0 ){
-              this.setState({ 
-                modalEdit: false, 
-                editItem: null, 
-                ItemTab1: '0'
-              })
-
-              this.getItems();
-            }
-          }
-        })
-        
-        if( check_img ){
-          alert('Ошибка при загрузке фотографии '+type)
-        }
-      })
-    }
-
     if( this.myDropzoneNew['files'].length > 0 ){
       let name = this.state.editItem.name,
         id = this.state.editItem.id,
@@ -1020,24 +918,20 @@ class SiteItems_ extends React.Component {
       this.myDropzoneNew.on("queuecomplete", (data) => {
         var check_img = false;
   
-        var myDropzoneOld = this.myDropzoneOld;
-
         this.myDropzoneNew['files'].map((item, key) => {  
           if( item['status'] == "error" ){
             check_img = true;
           }
 
           if( item['status'] == "success" ){
-            if( (myDropzoneOld['files'][0] && myDropzoneOld['files'][0]["status"] == 'success') || myDropzoneOld['files'].length == 0 ){
-              this.setState({ 
-                modalEdit: false, 
-                editItem: null, 
-                ItemTab1: '0',
-                ItemTab: '1'
-              })
+            this.setState({ 
+              modalEdit: false, 
+              editItem: null, 
+              ItemTab1: '0',
+              ItemTab: '1'
+            })
 
-              this.getItems();
-            }
+            this.getItems();
           }
         })
         
@@ -1099,15 +993,9 @@ class SiteItems_ extends React.Component {
     }else{
       this.openSnack('Данные обновлены');
 
-      if( this.myDropzoneOld['files'].length > 0 ){
-        this.myDropzoneOld.processQueue();
-      }
-
       if( this.myDropzoneNew['files'].length > 0 ){
         this.myDropzoneNew.processQueue();
-      }
-
-      if( this.myDropzoneOld['files'].length == 0 && this.myDropzoneNew['files'].length == 0 ){
+      }else{
         this.setState({ 
           modalEdit: false, 
           editItem: null, 
@@ -1142,57 +1030,6 @@ class SiteItems_ extends React.Component {
     }else{
       this.openSnack('Данные обновлены');
 
-      if( this.myDropzoneOld['files'].length > 0 ){
-      
-        let name = this.state.editItem.name,
-          id = this.state.editItem.id,
-          date_update = this.state.date_update,
-          hist_id = res.hist_id,
-          type = 'old';
-  
-        this.myDropzoneOld.on("sending", (file, xhr, data) => {
-          let file_type = (file.name).split('.');
-          file_type = file_type[file_type.length - 1];
-          file_type = file_type.toLowerCase();
-          
-          data.append("typeFile", type);
-          data.append("name", name);
-          data.append("id", id);
-          data.append("hist_id", hist_id);
-          data.append("date_update", date_update);
-        });
-    
-        this.myDropzoneOld.on("queuecomplete", (data) => {
-    
-          var check_img = false;
-    
-          var myDropzoneNew = this.myDropzoneNew;
-  
-          this.myDropzoneOld['files'].map((item, key) => {
-            if( item['status'] == "error" ){
-              check_img = true;
-            }
-  
-            if( item['status'] == "success" ){
-              if( (myDropzoneNew['files'][0] && myDropzoneNew['files'][0]["status"] == 'success') || myDropzoneNew['files'].length == 0 ){
-                this.setState({ 
-                  modalEdit: false, 
-                  editItem: null, 
-                  ItemTab1: '0',
-                  ItemTab: '1'
-                })
-  
-                this.getItems();
-              }
-            }
-          })
-          
-          if( check_img ){
-            alert('Ошибка при загрузке фотографии '+type)
-          }
-        })
-      }
-  
       if( this.myDropzoneNew['files'].length > 0 ){
         let name = this.state.editItem.name,
           id = this.state.editItem.id,
@@ -1215,24 +1052,20 @@ class SiteItems_ extends React.Component {
         this.myDropzoneNew.on("queuecomplete", (data) => {
           var check_img = false;
     
-          var myDropzoneOld = this.myDropzoneOld;
-  
           this.myDropzoneNew['files'].map((item, key) => {  
             if( item['status'] == "error" ){
               check_img = true;
             }
   
             if( item['status'] == "success" ){
-              if( (myDropzoneOld['files'][0] && myDropzoneOld['files'][0]["status"] == 'success') || myDropzoneOld['files'].length == 0 ){
-                this.setState({ 
-                  modalEdit: false, 
-                  editItem: null, 
-                  ItemTab: '1',
-                  ItemTab1: '0'
-                })
-  
-                this.getItems();
-              }
+              this.setState({ 
+                modalNew: false, 
+                editItem: null, 
+                ItemTab: '1',
+                ItemTab1: '0'
+              })
+
+              this.getItems();
             }
           })
           
@@ -1242,20 +1075,14 @@ class SiteItems_ extends React.Component {
         })
       }
 
-      if( this.myDropzoneOld['files'].length > 0 ){
-        this.myDropzoneOld.processQueue();
-      }
-
       if( this.myDropzoneNew['files'].length > 0 ){
         this.myDropzoneNew.processQueue();
-      }
-
-      if( this.myDropzoneOld['files'].length == 0 && this.myDropzoneNew['files'].length == 0 ){
+      }else{
         this.setState({ 
-          modalEdit: false, 
+          modalNew: false, 
           editItem: null, 
-          ItemTab1: '0',
-          ItemTab: '1'
+          ItemTab: '1',
+          ItemTab1: '0'
         })
 
         this.getItems();
@@ -1286,52 +1113,6 @@ class SiteItems_ extends React.Component {
     }else{
       this.openSnack('Данные обновлены');
 
-      if( this.myDropzoneOld['files'].length > 0 ){
-      
-        let name = this.state.editItem.name,
-          id = res.id,
-          type = 'old';
-  
-        this.myDropzoneOld.on("sending", (file, xhr, data) => {
-          let file_type = (file.name).split('.');
-          file_type = file_type[file_type.length - 1];
-          file_type = file_type.toLowerCase();
-          
-          data.append("typeFile", type);
-          data.append("name", name);
-          data.append("id", id);
-        });
-    
-        this.myDropzoneOld.on("queuecomplete", (data) => {
-    
-          var check_img = false;
-    
-          var myDropzoneNew = this.myDropzoneNew;
-  
-          this.myDropzoneOld['files'].map((item, key) => {
-            if( item['status'] == "error" ){
-              check_img = true;
-            }
-  
-            if( item['status'] == "success" ){
-              if( myDropzoneNew['files'][0] && myDropzoneNew['files'][0]["status"] == 'success' ){
-                this.setState({ 
-                  modalNew: false, 
-                  editItem: null, 
-                  ItemTab: '1'
-                })
-  
-                this.getItems();
-              }
-            }
-          })
-          
-          if( check_img ){
-            alert('Ошибка при загрузке фотографии '+type)
-          }
-        })
-      }
-  
       if( this.myDropzoneNew['files'].length > 0 ){
         let name = this.state.editItem.name,
           id = res.id,
@@ -1350,23 +1131,19 @@ class SiteItems_ extends React.Component {
         this.myDropzoneNew.on("queuecomplete", (data) => {
           var check_img = false;
     
-          var myDropzoneOld = this.myDropzoneOld;
-  
           this.myDropzoneNew['files'].map((item, key) => {  
             if( item['status'] == "error" ){
               check_img = true;
             }
   
             if( item['status'] == "success" ){
-              if( myDropzoneOld['files'][0] && myDropzoneOld['files'][0]["status"] == 'success' ){
-                this.setState({ 
-                  modalNew: false, 
-                  editItem: null, 
-                  ItemTab: '1'
-                })
-  
-                this.getItems();
-              }
+              this.setState({ 
+                modalNew: false, 
+                editItem: null, 
+                ItemTab: '1'
+              })
+
+              this.getItems();
             }
           })
           
@@ -1376,12 +1153,16 @@ class SiteItems_ extends React.Component {
         })
       }
 
-      if( this.myDropzoneOld['files'].length > 0 ){
-        this.myDropzoneOld.processQueue();
-      }
-
       if( this.myDropzoneNew['files'].length > 0 ){
         this.myDropzoneNew.processQueue();
+      }else{
+        this.setState({ 
+          modalNew: false, 
+          editItem: null, 
+          ItemTab: '1'
+        })
+
+        this.getItems();
       }
     }
   }
@@ -1420,7 +1201,6 @@ class SiteItems_ extends React.Component {
   changeTab(event, value){
 
     this.setState({
-      myDropzoneOld: this.myDropzoneOld['files'],
       myDropzoneNew: this.myDropzoneNew['files'],
     })
 
@@ -1430,23 +1210,7 @@ class SiteItems_ extends React.Component {
 
     if( parseInt(value) == 1 ){
       setTimeout( () => {
-        this.myDropzoneOld = new Dropzone("#for_img_edit_old", this.dropzoneOptions);
         this.myDropzoneNew = new Dropzone("#for_img_edit_new", this.dropzoneOptions);
-
-        if( this.state.myDropzoneOld[0] ){
-          var mockFileOld = { 
-            name: this.state.myDropzoneOld[0].name,
-            size: this.state.myDropzoneOld[0].size, 
-            type: this.state.myDropzoneOld[0].type, 
-            status: this.state.myDropzoneOld[0].status,
-            url: this.state.myDropzoneOld[0].dataURL,
-            dataURL: this.state.myDropzoneOld[0].dataURL
-          };
-
-          this.myDropzoneOld.emit("addedfile", mockFileOld);
-          this.myDropzoneOld.emit("thumbnail", mockFileOld, this.state.myDropzoneOld[0].dataURL);
-          this.myDropzoneOld.files.push(this.state.myDropzoneOld[0]);
-        }
 
         if( this.state.myDropzoneNew[0] ){
           var mockFileNew = { 
@@ -1822,26 +1586,6 @@ class SiteItems_ extends React.Component {
                               <Grid item xs={12}>
                                 <Grid container spacing={3}>
                                   <Grid item xs={12}>
-                                    <Typography>Картинка соотношением сторон (3:2) (пример: 600х400) только JPG</Typography>
-                                  </Grid>
-                                
-
-                                  <Grid item xs={12} sm={6}>
-                                    { this.state.editItem.img_new.length > 0 ?
-                                      <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_new+'600х400.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
-                                        :
-                                      <div style={{maxWidth: 300, maxHeight: 300}}/>
-                                    }
-                                  </Grid>
-                                  <Grid item xs={12} sm={6}>
-                                    <div className="dropzone" id="for_img_edit_old" style={{ width: '100%', minHeight: 150 }} />
-                                  </Grid>
-                                </Grid>
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                <Grid container spacing={3}>
-                                  <Grid item xs={12}>
                                     <Typography>Картинка соотношением сторон (1:1) (пример: 2000х2000) только JPG</Typography>
                                   </Grid>
                                 
@@ -2190,26 +1934,6 @@ class SiteItems_ extends React.Component {
                                     :
                                   null
                                 }
-
-                                <Grid item xs={12}>
-                                  <Grid container spacing={3}>
-                                    <Grid item xs={12}>
-                                      <Typography>Картинка соотношением сторон (3:2) (пример: 600х400) только JPG</Typography>
-                                    </Grid>
-                                  
-
-                                    <Grid item xs={12} sm={6}>
-                                      { this.state.editItem.img_new.length > 0 ?
-                                        <img src={'https://storage.yandexcloud.net/site-img/'+this.state.editItem.img_new+'600х400.jpg?'+this.state.editItem.img_new_update} style={{maxWidth: 300, maxHeight: 300}} />
-                                          :
-                                        <div style={{maxWidth: 300, maxHeight: 300}}/>
-                                      }
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                      <div className="dropzone" id="for_img_edit_old" style={{ width: '100%', minHeight: 150 }} />
-                                    </Grid>
-                                  </Grid>
-                                </Grid>
 
                                 <Grid item xs={12}>
                                   <Grid container spacing={3}>
