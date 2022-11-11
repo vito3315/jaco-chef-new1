@@ -50,6 +50,8 @@ const queryString = require('query-string');
 
 class TableStages extends React.Component{
   render (){
+    console.log( this.props.data )
+
     return (
       <Table size='small' style={{ marginBottom: 50 }}>
         <TableHead>
@@ -272,10 +274,6 @@ class SiteItems_ extends React.Component {
       openMenuType: null,
       openMenuitem: null,
 
-      rec_stage_1: [],
-      rec_stage_2: [],
-      rec_stage_3: [],
-
       pf_stage_1: [],
       pf_stage_2: [],
       pf_stage_3: [],
@@ -381,32 +379,13 @@ class SiteItems_ extends React.Component {
 
     let res = await this.getData('get_one', data);
 
+    console.log( 'get_one', res )
 
     var items_pf_stages_1 = [],
 			items_pf_stages_2 = [],
 			items_pf_stages_3 = [],
 			
-			items_rec_stages_1 = [],
-			items_rec_stages_2 = [],
-			items_rec_stages_3 = [],
-
-      items_items = [];
-
-    if(res.item_rec.stage_1){
-      res.item_rec.stage_1.map(function(item){
-        items_rec_stages_1.push({item_id: item['rec_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name']});
-      })
-    }
-    if(res.item_rec.stage_2){
-      res.item_rec.stage_2.map(function(item){
-        items_rec_stages_2.push({item_id: item['rec_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name']});
-      })
-    }
-    if(res.item_rec.stage_3){
-      res.item_rec.stage_3.map(function(item){
-        items_rec_stages_3.push({item_id: item['rec_id'], name: item['name'], count: item['count'], sort: item['sort'], ei_name: item['ei_name']});
-      })
-    }
+			items_items = [];
 
     // todo
     if(res.item_pf.stage_1){
@@ -462,10 +441,6 @@ class SiteItems_ extends React.Component {
       item_items_all: res.item_items.all_items,
       item_items_render: res.item_items.all_items,
 
-      rec_stage_1: items_rec_stages_1,
-      rec_stage_2: items_rec_stages_2,
-      rec_stage_3: items_rec_stages_3,
-
       pf_stage_1: items_pf_stages_1,
       pf_stage_2: items_pf_stages_2,
       pf_stage_3: items_pf_stages_3,
@@ -494,11 +469,7 @@ class SiteItems_ extends React.Component {
 			items_pf_stages_2 = [],
 			items_pf_stages_3 = [],
 			
-			items_rec_stages_1 = [],
-			items_rec_stages_2 = [],
-			items_rec_stages_3 = [],
-
-      items_items = [];
+			items_items = [];
 
     this.setState({
       editItem: res.item,
@@ -507,10 +478,6 @@ class SiteItems_ extends React.Component {
       item_pf_render: res.item_pf.all,
       item_items_all: res.item_items.all_items,
       item_items_render: res.item_items.all_items,
-
-      rec_stage_1: items_rec_stages_1,
-      rec_stage_2: items_rec_stages_2,
-      rec_stage_3: items_rec_stages_3,
 
       pf_stage_1: items_pf_stages_1,
       pf_stage_2: items_pf_stages_2,
@@ -591,83 +558,8 @@ class SiteItems_ extends React.Component {
 
     // todo
   chooseStage(stage){
-           
-    // определаем заготовка или рецепт
     let type = this.state.openMenuitem.storage_id ? 'pf' : 'rec';
    
-    console.log('type=', this.state.openMenuitem.type);
-    console.log('test=');
-
-    // todo
-   if( this.state.openMenuitem.type == 'rec' ){
-   // if( type == 'rec' ){
-      let check = false;
-
-      // почему то код не работает !!
-     // let rec = stage == 1 ? this.state.rec_stage_1 : stage == 2 ? this.state.rec_stage_2 : stage == 3 ? this.state.rec_stage_3 : [];
-     let rec = [];
-     if(stage == 1){
-        rec =  this.state.rec_stage_1 ;
-      } else if(stage == 2 ){
-        rec = this.state.rec_stage_2 ;
-      } else if(stage == 3 ){
-        rec = this.state.rec_stage_3 ;
-      }
-
-      //rec = rec ? rec : [];	
-      console.log('rec_add=', rec);
-      console.log('pf_stage_1=',  this.state.pf_stage_1)
-   
-      rec.map((this_item) => {
-        if(parseInt(this.state.openMenuitem.id) == parseInt(this_item.item_id)) {
-          console.log('check ok=', this_item.item_id);
-          check = true;
-        }
-      })
-
-      console.log('check='+ check);
-
-      if( !check ){
-
-        console.log( this.state.openMenuitem )
-
-        rec.push({
-          item_id: this.state.openMenuitem.id, 
-          name: this.state.openMenuitem.name,
-          count: 0,
-          sort: 0,
-          ei_name: this.state.openMenuitem.ei_name,
-          type : 'rec'
-        });
-        
-        console.log('stage='+ stage);
-  
-        if( stage == 1 ){
-          // todo
-          console.log('add to stage3', rec);
-          let pf = this.state.pf_stage_1;
-          pf.push({item_id: this.state.openMenuitem.id, name: this.state.openMenuitem.name, count: 0, sort: 0, ei_name: this.state.openMenuitem.ei_name});
-          console.log('pf_stage_1', pf);
-          this.setState({
-						rec_stage_1: rec,
-            pf_stage_1: pf  
-					});
-				}
-       
-				if( stage == 2 ){
-					this.setState({
-						rec_stage_2: rec
-					});
-				}
-				
-				if( stage == 3 ){
-					this.setState({
-						rec_stage_3: rec
-					});
-				}
-      }
-    }
-
     if( this.state.openMenuitem.type == 'pf' ){
     //if( type == 'pf' ){
       let check = false;
@@ -716,49 +608,9 @@ class SiteItems_ extends React.Component {
 
   chooseStage_old(stage){
   
-    // определаем заготовка или рецепт
     let type = this.state.openMenuitem.storage_id ? 'pf' : 'rec';
    
-    // todo
-   // if( this.state.openMenuType == 'rec' ){
-    if( type == 'rec' ){
-      let check = false;
-
-      let rec = stage == 1 ? this.state.rec_stage_1 : stage == 2 ? this.state.rec_stage_2 : stage == 3 ? this.state.rec_stage_3 : [];
-
-      rec = rec ? rec : [];	
-      
-      rec.map((this_item) => {
-        if(parseInt(this.state.openMenuitem.id) == parseInt(this_item.item_id)) {
-          console.log('check ok=', this_item.item_id);
-          check = true;
-        }
-      })
-
-      if( !check ){
-
-        rec.push({item_id: this.state.openMenuitem.id, name: this.state.openMenuitem.name, count: 0, sort: 0, ei_name: this.state.openMenuitem.ei_name});
-         //todo
-				console.log('rec=', rec);
-        if( stage == 1 ){
-					this.setState({
-						rec_stage_1: rec
-					});
-				}
-       
-				if( stage == 2 ){
-					this.setState({
-						rec_stage_2: rec
-					});
-				}
-				
-				if( stage == 3 ){
-					this.setState({
-						rec_stage_3: rec
-					});
-				}
-      }
-    }
+    
 
    // if( this.state.openMenuType == 'pf' ){
     if( type == 'pf' ){
@@ -826,30 +678,6 @@ class SiteItems_ extends React.Component {
 
   // todo rec pf
   changeData(type, arr, data, key, event){
-    if( type == 'rec' ){
-      let rec = arr == 'rec_stage_1' ? this.state.rec_stage_1 : arr == 'rec_stage_2' ? this.state.rec_stage_2 : arr == 'rec_stage_3' ? this.state.rec_stage_3 : [];
-
-      rec[ key ][ data ] = event.target.value;
-
-      if( arr == 'rec_stage_1' ){
-        this.setState({
-          rec_stage_1: rec
-        });
-      }
-      
-      if( arr == 'rec_stage_2' ){
-        this.setState({
-          rec_stage_2: rec
-        });
-      }
-      
-      if( arr == 'rec_stage_3' ){
-        this.setState({
-          rec_stage_3: rec
-        });
-      }
-    }
-
     if( type == 'pf' ){
       let rec = arr == 'pf_stage_1' ? this.state.pf_stage_1 : arr == 'pf_stage_2' ? this.state.pf_stage_2 : arr == 'pf_stage_3' ? this.state.pf_stage_3 : [];
 
@@ -891,31 +719,6 @@ class SiteItems_ extends React.Component {
   
   // todo rec pf
   delItem(type, arr, key){
-    if( type == 'rec' ){
-      let rec = arr == 'rec_stage_1' ? this.state.rec_stage_1 : arr == 'rec_stage_2' ? this.state.rec_stage_2 : arr == 'rec_stage_3' ? this.state.rec_stage_3 : [];
-
-      rec.splice(key, 1);
-
-      rec = rec ? rec : [];
-
-      if( arr == 'rec_stage_1' ){
-        this.setState({
-          rec_stage_1: rec
-        });
-      }
-      
-      if( arr == 'rec_stage_2' ){
-        this.setState({
-          rec_stage_2: rec
-        });
-      }
-      
-      if( arr == 'rec_stage_3' ){
-        this.setState({
-          rec_stage_3: rec
-        });
-      }
-    }
 
     if( type == 'pf' ){
       let rec = arr == 'pf_stage_1' ? this.state.pf_stage_1 : arr == 'pf_stage_2' ? this.state.pf_stage_2 : arr == 'pf_stage_3' ? this.state.pf_stage_3 : [];
@@ -928,6 +731,8 @@ class SiteItems_ extends React.Component {
         this.setState({
           pf_stage_1: rec
         });
+
+        console.log( rec )
       }
       
       if( arr == 'pf_stage_2' ){
@@ -1077,7 +882,8 @@ class SiteItems_ extends React.Component {
 
     // запихиваем рецепы в другой массив
     let rec_1 = [], pf_1 = [], item_1 = [];
-    item_1 = this.state.pf_stage_1.length > 0 ? this.state.pf_stage_1 : this.state.rec_stage_1;
+    item_1 = this.state.pf_stage_1;
+
     item_1.map((this_item) => {
         if(this_item.type == 'pf'){
           pf_1.push(this_item);
@@ -1088,7 +894,7 @@ class SiteItems_ extends React.Component {
     })
 
     let rec_2 = [], pf_2 = [], item_2 = [];      
-    item_2 = this.state.pf_stage_2.length > 0 ? this.state.pf_stage_2 : this.state.rec_stage_2;
+    item_2 = this.state.pf_stage_2;
     item_2.map((this_item) => {
         if(this_item.type == 'pf'){
           pf_2.push(this_item);
@@ -1098,7 +904,7 @@ class SiteItems_ extends React.Component {
     })
 
     let rec_3 = [], pf_3 = [], item_3 = [];       
-    item_3 = this.state.pf_stage_3.length > 0 ? this.state.pf_stage_3 : this.state.rec_stage_3;
+    item_3 = this.state.pf_stage_3;
     item_3.map((this_item) => {
         if(this_item.type == 'pf'){
           pf_3.push(this_item);
@@ -1243,7 +1049,7 @@ class SiteItems_ extends React.Component {
 
     // запихиваем рецепы в другой массив
     let rec_1 = [], pf_1 = [], item_1 = [];
-    item_1 = this.state.pf_stage_1.length > 0 ? this.state.pf_stage_1 : this.state.rec_stage_1;
+    item_1 = this.state.pf_stage_1;
     item_1.map((this_item) => {
         if(this_item.type == 'pf'){
           pf_1.push(this_item);
@@ -1253,7 +1059,7 @@ class SiteItems_ extends React.Component {
     })
 
     let rec_2 = [], pf_2 = [], item_2 = [];      
-    item_2 = this.state.pf_stage_2.length > 0 ? this.state.pf_stage_2 : this.state.rec_stage_2;
+    item_2 = this.state.pf_stage_2;
     item_2.map((this_item) => {
         if(this_item.type == 'pf'){
           pf_2.push(this_item);
@@ -1263,7 +1069,7 @@ class SiteItems_ extends React.Component {
     })
 
     let rec_3 = [], pf_3 = [], item_3 = [];       
-    item_3 = this.state.pf_stage_3.length > 0 ? this.state.pf_stage_3 : this.state.rec_stage_3;
+    item_3 = this.state.pf_stage_3;
     item_3.map((this_item) => {
         if(this_item.type == 'pf'){
           pf_3.push(this_item);
@@ -2477,44 +2283,6 @@ class SiteItems_ extends React.Component {
                                   </Grid>
                                 </Grid>
 
-                              </Grid>
-
-                            </TabPanel>
-                            <TabPanel value="2">
-
-                              <Grid container spacing={3}>
-
-                                { !this.state.item_rec ? null :
-                                  <Grid item xs={12} sm={4}>
-                                    <Table size='small'>
-                                      <TableHead>
-                                        <TableRow>
-                                          <TableCell>Название</TableCell>
-                                          <TableCell></TableCell>
-                                        </TableRow>
-                                      </TableHead>
-                                      <TableBody>
-                                        { this.state.item_rec.all.map( (item, key) =>
-                                          <TableRow key={key}>
-                                            <TableCell>{item.name}</TableCell>
-                                            <TableCell>
-                                              <DehazeIcon onClick={this.openMenu.bind(this, 'rec', item)} />
-                                            </TableCell>
-                                          </TableRow>
-                                        ) }
-                                      </TableBody>
-                                    </Table>
-                                  </Grid>
-                                }
-
-                                { !this.state.item_rec ? null :
-                                  <Grid item xs={12} sm={8}>
-                                    <TableStages title={'1 этап'} type={'rec'} arr={'rec_stage_1'} data={this.state.rec_stage_1} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
-                                    <TableStages title={'2 этап'} type={'rec'} arr={'rec_stage_2'} data={this.state.rec_stage_2} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
-                                    <TableStages title={'3 этап'} type={'rec'} arr={'rec_stage_3'} data={this.state.rec_stage_3} changeData={this.changeData.bind(this)} delItem={this.delItem.bind(this)} />
-                                  </Grid>
-                                }
-                                
                               </Grid>
 
                             </TabPanel>
