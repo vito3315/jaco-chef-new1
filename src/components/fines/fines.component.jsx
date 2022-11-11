@@ -45,14 +45,14 @@ class Fines_Table_Сameras extends React.Component {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell style={{ width: '50%' }}>Наименование</TableCell>
-              <TableCell style={{ width: '15%' }}>
+              <TableCell style={{ width: '35%' }}>Наименование</TableCell>
+              <TableCell style={{ width: '20%' }}>
                 Размер штрафа за первый раз
               </TableCell>
-              <TableCell style={{ width: '15%' }}>
+              <TableCell style={{ width: '20%' }}>
                 Размер штрафа за второй раз
               </TableCell>
-              <TableCell style={{ width: '15%' }}>
+              <TableCell style={{ width: '20%' }}>
                 Размер штрафа за третий и последующие
               </TableCell>
               <TableCell style={{ width: '5%' }}></TableCell>
@@ -67,16 +67,16 @@ class Fines_Table_Сameras extends React.Component {
                   onClick={this.props.openModal.bind(
                     this,
                     'Штраф по камерам',
-                    item
+                    item.id
                   )}
                 >
                   {item.name}
                 </TableCell>
-                <TableCell>{`${item.first} руб`}</TableCell>
-                <TableCell>{`${item.second} руб`}</TableCell>
-                <TableCell>{`${item.third} руб`}</TableCell>
+                <TableCell>{`${item.price_one} руб`}</TableCell>
+                <TableCell>{`${item.price_two} руб`}</TableCell>
+                <TableCell>{`${item.price_tree} руб`}</TableCell>
                 <TableCell>
-                  {parseInt(item.is_show) == 1 ? (
+                  {parseInt(item.is_active) == 1 ? (
                     <VisibilityIcon />
                   ) : (
                     <VisibilityOffIcon />
@@ -108,18 +108,18 @@ class Fines_Table_Reviews extends React.Component {
   render() {
     return (
       <>
-        <Grid mb={3}>Ошибки по камерам</Grid>
+        <Grid mb={3}>Ошибки по отзывам</Grid>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell style={{ width: '50%' }}>Наименование</TableCell>
-              <TableCell style={{ width: '15%' }}>
+              <TableCell style={{ width: '35%' }}>Наименование</TableCell>
+              <TableCell style={{ width: '20%' }}>
                 Процент за первый раз
               </TableCell>
-              <TableCell style={{ width: '15%' }}>
+              <TableCell style={{ width: '20%' }}>
                 Процент за второй раз
               </TableCell>
-              <TableCell style={{ width: '15%' }}>
+              <TableCell style={{ width: '20%' }}>
                 Процент за третий и последующие
               </TableCell>
               <TableCell style={{ width: '5%' }}></TableCell>
@@ -136,16 +136,16 @@ class Fines_Table_Reviews extends React.Component {
                     onClick={this.props.openModal.bind(
                       this,
                       'Штраф по отзывам',
-                      item
+                      item.id
                     )}
                   >
                     {item.name}
                   </TableCell>
-                  <TableCell>{`${item.first_percent} %`}</TableCell>
-                  <TableCell>{`${item.second_percent} %`}</TableCell>
-                  <TableCell>{`${item.third_percent} %`}</TableCell>
+                  <TableCell>{`${item.percent_one} %`}</TableCell>
+                  <TableCell>{`${item.percent_two} %`}</TableCell>
+                  <TableCell>{`${item.percent_tree} %`}</TableCell>
                   <TableCell rowSpan="2">
-                    {parseInt(item.is_show) == 1 ? (
+                    {parseInt(item.is_active) == 1 ? (
                       <VisibilityIcon />
                     ) : (
                       <VisibilityOffIcon />
@@ -153,9 +153,9 @@ class Fines_Table_Reviews extends React.Component {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>{`${item.first} руб`}</TableCell>
-                  <TableCell>{`${item.second} руб`}</TableCell>
-                  <TableCell>{`${item.third} руб`}</TableCell>
+                  <TableCell>{`${item.price_one} руб`}</TableCell>
+                  <TableCell>{`${item.price_two} руб`}</TableCell>
+                  <TableCell>{`${item.price_tree} руб`}</TableCell>
                 </TableRow>
               </React.Fragment>
             ))}
@@ -171,7 +171,7 @@ class Fines_Modal extends React.Component {
     super(props);
 
     this.state = {
-      item: null,
+      item: null
     };
   }
 
@@ -206,7 +206,7 @@ class Fines_Modal extends React.Component {
 
   onClose() {
     this.setState({
-      item: null,
+      item: null
     });
 
     this.props.onClose();
@@ -244,22 +244,22 @@ class Fines_Modal extends React.Component {
                   <Grid item xs={12} sm={4} mb={2}>
                     <MyTextInput
                       label="Процент за первый раз"
-                      value={this.state.item.first_percent}
-                      func={this.changeItem.bind(this, 'first_percent')}
+                      value={this.state.item.percent_one}
+                      func={this.changeItem.bind(this, 'percent_one')}
                     />
                   </Grid>
                   <Grid item xs={12} sm={4} mb={2}>
                     <MyTextInput
                       label="Процент за второй раз"
-                      value={this.state.item.second_percent}
-                      func={this.changeItem.bind(this, 'second_percent')}
+                      value={this.state.item.percent_two}
+                      func={this.changeItem.bind(this, 'percent_two')}
                     />
                   </Grid>
                   <Grid item xs={12} sm={4} mb={2}>
                     <MyTextInput
                       label="Процент за третий и последующие"
-                      value={this.state.item.third_percent}
-                      func={this.changeItem.bind(this, 'third_percent')}
+                      value={this.state.item.percent_tree}
+                      func={this.changeItem.bind(this, 'percent_tree')}
                     />
                   </Grid>
                 </Grid>
@@ -269,22 +269,22 @@ class Fines_Modal extends React.Component {
                 <Grid item xs={12} sm={4} mb={2}>
                   <MyTextInput
                     label="Размер штрафа за первый раз"
-                    value={this.state.item.first}
-                    func={this.changeItem.bind(this, 'first')}
+                    value={this.state.item.price_one}
+                    func={this.changeItem.bind(this, 'price_one')}
                   />
                 </Grid>
                 <Grid item xs={12} sm={4} mb={2}>
                   <MyTextInput
                     label="Размер штрафа за второй раз"
-                    value={this.state.item.second}
-                    func={this.changeItem.bind(this, 'second')}
+                    value={this.state.item.price_two}
+                    func={this.changeItem.bind(this, 'price_two')}
                   />
                 </Grid>
                 <Grid item xs={12} sm={4} mb={2}>
                   <MyTextInput
                     label="Размер штрафа за третий и последующие"
-                    value={this.state.item.third}
-                    func={this.changeItem.bind(this, 'third')}
+                    value={this.state.item.price_tree}
+                    func={this.changeItem.bind(this, 'price_tree')}
                   />
                 </Grid>
               </Grid>
@@ -297,9 +297,9 @@ class Fines_Modal extends React.Component {
                     <MyCheckBox
                       label="Картинка"
                       value={
-                        parseInt(this.state.item.is_show) == 1 ? true : false
+                        parseInt(this.state.item.img) == 1 ? true : false
                       }
-                      func={this.changeItemChecked.bind(this, 'is_show')}
+                      func={this.changeItemChecked.bind(this, 'img')}
                     />
                   </Grid>
           
@@ -311,8 +311,8 @@ class Fines_Modal extends React.Component {
                   <Grid item xs={12} sm={3}>
                     <MyCheckBox
                       label="Активность"
-                      value={parseInt(this.state.item.is) == 1 ? true : false}
-                      func={this.changeItemChecked.bind(this, 'is')}
+                      value={parseInt(this.state.item.is_active) == 1 ? true : false}
+                      func={this.changeItemChecked.bind(this, 'is_active')}
                     />
                   </Grid>
 
@@ -350,129 +350,21 @@ class Fines_ extends React.Component {
       modalDialog: false,
       itemName: '',
 
-      cameras: [
-        {
-          id: '1',
-          name: 'Немытые руки',
-          first: '50',
-          second: '100',
-          third: '200',
-          is_show: 1,
-          is: 1,
-        },
-        {
-          id: '2',
-          name: 'Внешний вид',
-          first: '50',
-          second: '100',
-          third: '200',
-          is_show: 1,
-          is: 1,
-        },
-        {
-          id: '3',
-          name: 'Употребление продуктов компании',
-          first: '50',
-          second: '100',
-          third: '200',
-          is_show: 1,
-          is: 0,
-        },
-        {
-          id: '4',
-          name: 'Хищение продуктов',
-          first: '50',
-          second: '100',
-          third: '200',
-          is_show: 0,
-          is: 0,
-        },
-        {
-          id: '5',
-          name: 'Ингредиенты разложены или порезаны не по стандартам',
-          first: '50',
-          second: '100',
-          third: '200',
-          is_show: 1,
-          is: 1,
-        },
-      ],
-
-      reviews: [
-        {
-          id: '1',
-          name: 'Ошибка не выявлена',
-          first_percent: 0,
-          second_percent: 0,
-          third_percent: 0,
-          first: '50',
-          second: '100',
-          third: '200',
-          is_show: 1,
-          is: 0,
-        },
-        {
-          id: '2',
-          name: 'Извинение',
-          first_percent: 100,
-          second_percent: 100,
-          third_percent: 100,
-          first: '50',
-          second: '100',
-          third: '200',
-          is_show: 1,
-          is: 1,
-        },
-        {
-          id: '3',
-          name: 'Скидка 10%',
-          first_percent: 0,
-          second_percent: 0,
-          third_percent: 0,
-          first: '50',
-          second: '100',
-          third: '200',
-          is_show: 1,
-          is: 1,
-        },
-        {
-          id: '4',
-          name: 'Скидка 20%',
-          first_percent: 10,
-          second_percent: 10,
-          third_percent: 10,
-          first: '50',
-          second: '100',
-          third: '200',
-          is_show: 1,
-          is: 1,
-        },
-        {
-          id: '5',
-          name: 'Замена товара на аналогичный',
-          first_percent: 50,
-          second_percent: 50,
-          third_percent: 50,
-          first: '50',
-          second: '100',
-          third: '200',
-          is_show: 1,
-          is: 0,
-        },
-      ],
-
+      cameras: [],
+      reviews: [],
+      
       event: {},
 
       newFine: {
-        id: '',
         name: '',
-        first_percent: '',
-        second_percent: '',
-        third_percent: '',
-        first: '',
-        second: '',
-        third: '',
-        is_show: 0,
+        percent_one: '',
+        percent_two: '',
+        percent_tree: '',
+        price_one: '',
+        price_two: '',
+        price_tree: '',
+        is_active: 0,
+        img: 0,
       },
     };
   }
@@ -483,20 +375,12 @@ class Fines_ extends React.Component {
     // console.log(data);
 
     this.setState({
-      //points: data.points,
-      ///point: data.points[0].id,
-      module_name: data.module_info.name,
-      mounths: data.mounth,
-      //mounth: data.this_m,
-      // years: data.years,
-      // year: data.this_y,
+      cameras: data.items,
+      reviews: data.items_1,
+      module_name: data.module_info.name
     });
 
     document.title = data.module_info.name;
-
-    // setTimeout( () => {
-    //   this.updateData();
-    // }, 50 )
   }
 
   getData = (method, data = {}) => {
@@ -542,8 +426,7 @@ class Fines_ extends React.Component {
       });
   };
 
-  openModal(method, event) {
-    // console.log(method)
+  async openModal(method, id) {
 
     if (method === 'Новый штраф по камерам') {
       this.setState({
@@ -562,42 +445,75 @@ class Fines_ extends React.Component {
     }
 
     if (method === 'Штраф по камерам') {
-      // const data = this.state.cameras;
 
-      // const event = data.find(el => el.id === id)
+      const data = {
+        id,
+      }
+
+      const item = await this.getData('get_one_cam', data);
 
       this.setState({
         modalDialog: true,
         method,
-        event,
-        itemName: event.name,
+        event: item.item,
+        itemName: item.item.name,
       });
     }
 
     if (method === 'Штраф по отзывам') {
-      // const data = this.state.reviews;
 
-      // const event = data.find(el => el.id === id)
+      const data = {
+        id,
+      }
+
+      const item = await this.getData('get_one_orders', data);
 
       this.setState({
         modalDialog: true,
         method,
-        event,
-        itemName: event.name,
+        event: item.item,
+        itemName: item.item.name,
       });
     }
   }
 
-  async saveItem(method, item) {
-    console.log(method);
-    console.log(item);
-
-    // await this.getData('save_edit', data);
+  async saveItem(method, data) {
 
     this.setState({
       modalDialog: false,
-      // item
+      itemName: ''
     });
+
+    if (method === 'Новый штраф по камерам') {
+      await this.getData('save_new_cam', data); 
+    }
+
+    if (method === 'Новый штраф по отзывам') {
+      await this.getData('save_new_orders', data); 
+    }
+
+    if (method === 'Штраф по камерам') {
+      await this.getData('save_edit', data); 
+    }
+
+    if (method === 'Штраф по отзывам') {
+      await this.getData('save_edit_orders', data); 
+    }
+
+    this.update();
+  }
+
+  async update() {
+
+    let data = await this.getData('get_all');
+
+    // console.log(data);
+
+    this.setState({
+      cameras: data.items,
+      reviews: data.items_1,
+    });
+
   }
 
   render() {
@@ -648,7 +564,7 @@ class Fines_ extends React.Component {
         <Fines_Modal
           open={this.state.modalDialog}
           onClose={() => {
-            this.setState({ modalDialog: false });
+            this.setState({ modalDialog: false, itemName: '' });
           }}
           method={this.state.method}
           event={this.state.event}

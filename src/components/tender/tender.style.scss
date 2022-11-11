@@ -1,10 +1,14 @@
-tbody td:first-child,
-thead tr:first-child,
+th:first-child,
+tr:first-child,
 td:first-child {
   position: -webkit-sticky;
   position: sticky;
   left: 0;
-  z-index: 2;
+  border-right: none;
+}
+
+td, th {
+  border-right: solid 1px #e5e5e5;
 }
 
 .td_color {
@@ -12,7 +16,6 @@ td:first-child {
 }
 
 .tdprice{
-  border-right: 1px solid #e5e5e5;
   white-space: nowrap;
   text-align: center!important;
 }
@@ -20,7 +23,6 @@ td:first-child {
 .tdcity{
   width: 80%;
 }
-
 
 .minPriceCell{
   background-color: green;
