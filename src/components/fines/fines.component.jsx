@@ -8,6 +8,7 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import TableContainer from '@mui/material/TableContainer';
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -40,8 +41,10 @@ class Fines_Table_Сameras extends React.Component {
 
   render() {
     return (
-      <>
-        <Grid>Ошибки по камерам</Grid>
+      <TableContainer>
+
+
+        <Grid sx={{fontWeight: 'bold' }} mt={3} mb={3}>Ошибки по камерам</Grid>
         <Table>
           <TableHead>
             <TableRow>
@@ -86,7 +89,8 @@ class Fines_Table_Сameras extends React.Component {
             ))}
           </TableBody>
         </Table>
-      </>
+      </TableContainer>
+      
     );
   }
 }
@@ -107,8 +111,8 @@ class Fines_Table_Reviews extends React.Component {
 
   render() {
     return (
-      <>
-        <Grid mb={3}>Ошибки по отзывам</Grid>
+      <TableContainer>
+        <Grid sx={{ fontWeight: 'bold' }} mt={3} mb={3}>Ошибки по отзывам</Grid>
         <Table>
           <TableHead>
             <TableRow>
@@ -161,7 +165,7 @@ class Fines_Table_Reviews extends React.Component {
             ))}
           </TableBody>
         </Table>
-      </>
+      </TableContainer>
     );
   }
 }
@@ -552,6 +556,7 @@ class Fines_ extends React.Component {
               openModal={this.openModal.bind(this)}
             />
           </Grid>
+
 
           <Grid item xs={12} sm={6}>
             <Fines_Table_Reviews
