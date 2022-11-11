@@ -75,9 +75,9 @@ class Fines_Table_Сameras extends React.Component {
                 >
                   {item.name}
                 </TableCell>
-                <TableCell>{`${item.price_one} руб`}</TableCell>
-                <TableCell>{`${item.price_two} руб`}</TableCell>
-                <TableCell>{`${item.price_tree} руб`}</TableCell>
+                <TableCell>{item.price_one} руб</TableCell>
+                <TableCell>{item.price_two} руб</TableCell>
+                <TableCell>{item.price_tree} руб</TableCell>
                 <TableCell>
                   {parseInt(item.is_active) == 1 ? (
                     <VisibilityIcon />
@@ -145,9 +145,9 @@ class Fines_Table_Reviews extends React.Component {
                   >
                     {item.name}
                   </TableCell>
-                  <TableCell>{`${item.percent_one} %`}</TableCell>
-                  <TableCell>{`${item.percent_two} %`}</TableCell>
-                  <TableCell>{`${item.percent_tree} %`}</TableCell>
+                  <TableCell>{item.percent_one} %</TableCell>
+                  <TableCell>{item.percent_two} %</TableCell>
+                  <TableCell>{item.percent_tree} %</TableCell>
                   <TableCell rowSpan="2">
                     {parseInt(item.is_active) == 1 ? (
                       <VisibilityIcon />
@@ -157,9 +157,9 @@ class Fines_Table_Reviews extends React.Component {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>{`${item.price_one} руб`}</TableCell>
-                  <TableCell>{`${item.price_two} руб`}</TableCell>
-                  <TableCell>{`${item.price_tree} руб`}</TableCell>
+                  <TableCell>{item.price_one} руб</TableCell>
+                  <TableCell>{item.price_two} руб</TableCell>
+                  <TableCell>{item.price_tree} руб</TableCell>
                 </TableRow>
               </React.Fragment>
             ))}
@@ -223,8 +223,6 @@ class Fines_Modal extends React.Component {
         onClose={this.onClose.bind(this)}
         fullWidth={true}
         maxWidth={'lg'}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
           {this.props.method}
@@ -358,6 +356,7 @@ class Fines_ extends React.Component {
       reviews: [],
       
       event: {},
+      method: '',
 
       newFine: {
         name: '',
@@ -497,7 +496,7 @@ class Fines_ extends React.Component {
     }
 
     if (method === 'Штраф по камерам') {
-      await this.getData('save_edit', data); 
+      await this.getData('save_edit_cam', data); 
     }
 
     if (method === 'Штраф по отзывам') {
