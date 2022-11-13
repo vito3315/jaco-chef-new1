@@ -833,7 +833,6 @@ class SiteItems_ extends React.Component {
         if(this_item.type == 'pf'){
           pf_1.push(this_item);
         } else{
-          console.log('this_item=',this_item)
           rec_1.push(this_item); 
         }
     })
@@ -1008,16 +1007,49 @@ class SiteItems_ extends React.Component {
   }
 
   async saveNewItemHist(){
+
+     //  правка от 13.12.22 запихиваем рецепы в другой массив
+     let rec_1 = [], pf_1 = [], item_1 = [];
+     item_1 = this.state.pf_stage_1;
+ 
+     item_1.map((this_item) => {
+         if(this_item.type == 'pf'){
+           pf_1.push(this_item);
+         } else{
+           rec_1.push(this_item); 
+         }
+     })
+ 
+     let rec_2 = [], pf_2 = [], item_2 = [];      
+     item_2 = this.state.pf_stage_2;
+     item_2.map((this_item) => {
+         if(this_item.type == 'pf'){
+           pf_2.push(this_item);
+         } else{
+           rec_2.push(this_item); 
+         }
+     })
+ 
+     let rec_3 = [], pf_3 = [], item_3 = [];       
+     item_3 = this.state.pf_stage_3;
+     item_3.map((this_item) => {
+         if(this_item.type == 'pf'){
+           pf_3.push(this_item);
+         } else{
+           rec_3.push(this_item); 
+         }
+     })
+
     let data = {
       dateUpdate: this.state.date_update,
-      item: this.state.editItem,
-      rec_stage_1: this.state.rec_stage_1,
-      rec_stage_2: this.state.rec_stage_2,
-      rec_stage_3: this.state.rec_stage_3,
+      item      : this.state.editItem,
+      rec_stage_1: rec_1,
+      rec_stage_2: rec_2,
+      rec_stage_3: rec_3,
 
-      pf_stage_1: this.state.pf_stage_1,
-      pf_stage_2: this.state.pf_stage_2,
-      pf_stage_3: this.state.pf_stage_3,
+      pf_stage_1: pf_1,
+      pf_stage_2: pf_2,
+      pf_stage_3: pf_3,
 
       item_items: this.state.item_items,
     };
@@ -1090,15 +1122,55 @@ class SiteItems_ extends React.Component {
   }
 
   async saveNewItem(){
+
+     // правка от 13.11.22 запихиваем рецепы в другой массив
+     let rec_1 = [], pf_1 = [], item_1 = [];
+     item_1 = this.state.pf_stage_1;
+ 
+     item_1.map((this_item) => {
+         if(this_item.type == 'pf'){
+           pf_1.push(this_item);
+         } else{
+           rec_1.push(this_item); 
+         }
+     })
+ 
+     let rec_2 = [], pf_2 = [], item_2 = [];      
+     item_2 = this.state.pf_stage_2;
+     item_2.map((this_item) => {
+         if(this_item.type == 'pf'){
+           pf_2.push(this_item);
+         } else{
+           rec_2.push(this_item); 
+         }
+     })
+ 
+     let rec_3 = [], pf_3 = [], item_3 = [];       
+     item_3 = this.state.pf_stage_3;
+     item_3.map((this_item) => {
+         if(this_item.type == 'pf'){
+           pf_3.push(this_item);
+         } else{
+           rec_3.push(this_item); 
+         }
+     })
+
+    console.log('pf_1', pf_1);
+    console.log('pf_2', pf_2);
+    console.log('pf_3', pf_3);
+    console.log('rec_1', rec_1);
+    console.log('rec_2', rec_2);
+    console.log('rec_3', rec_3);
+
     let data = {
       item: this.state.editItem,
-      rec_stage_1: this.state.rec_stage_1,
-      rec_stage_2: this.state.rec_stage_2,
-      rec_stage_3: this.state.rec_stage_3,
+      rec_stage_1: rec_1,
+      rec_stage_2: rec_2,
+      rec_stage_3: rec_3,
 
-      pf_stage_1: this.state.pf_stage_1,
-      pf_stage_2: this.state.pf_stage_2,
-      pf_stage_3: this.state.pf_stage_3,
+      pf_stage_1: pf_1,
+      pf_stage_2: pf_2,
+      pf_stage_3: pf_3,
 
       item_items: this.state.item_items,
     };
