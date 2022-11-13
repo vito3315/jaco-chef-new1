@@ -1,5 +1,13 @@
 node_modules
 package-lock.json
 yarn.lock
+<<<<<<< HEAD
 .temporary_cache
 .gitignore
+||||||| 5fc4a5d
+.temporary_cache
+.gitignore
+dist
+=======
+.temporary_cache
+>>>>>>> 5a655b7f732ce6fd3c3a333d606a02333d49908a

@@ -555,17 +555,16 @@ class SiteItems_ extends React.Component {
     // todo
   chooseStage(stage){
     let type = this.state.openMenuitem.storage_id ? 'pf' : 'rec';
-   
-    if( this.state.openMenuitem.type == 'pf' ){
+    console.log('chooseStage='+stage); 
+
+    // правка от 13.11.22, убрал if this.state.openMenuitem.type == 'pf'
+    //if( this.state.openMenuitem.type == 'pf' ){
     //if( type == 'pf' ){
       let check = false;
 
       let rec = stage == 1 ? this.state.pf_stage_1 : stage == 2 ? this.state.pf_stage_2 : stage == 3 ? this.state.pf_stage_3 : [];
 
       rec = rec ? rec : [];	
-
-      console.log('item=', this.state.openMenuitem); 
-
       // проверка на добавленнный
       rec.map((this_item) => {
         if(parseInt(this.state.openMenuitem.id) == parseInt(this_item.item_id)){
@@ -597,7 +596,7 @@ class SiteItems_ extends React.Component {
 					});
 				}
       }
-    }
+   // }
 
     this.closeMenu();
   }
