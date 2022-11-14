@@ -358,12 +358,53 @@ class Tender_ extends React.Component {
 
                   <TableHead>
 
-                  <TableRow sx={{ zIndex: 6 }}>
+                    <TableRow sx={{ zIndex: 6 }}>
                       <TableCell 
                       sx={{ zIndex: 7 }} 
                       >Средний закуп</TableCell>
                       <TableCell sx={{ borderRight: 0, textAlign: 'center', fontWeight: 'bold' }}>{this.state.all_price}</TableCell>
                       <TableCell colSpan={`${2 + this.state.vendors.length * 2}`}></TableCell>
+                    </TableRow>
+
+                    <TableRow sx={{ zIndex: 1 }} >
+                      <TableCell sx={{ zIndex: 3 }}></TableCell>
+                      <TableCell></TableCell>
+                      <TableCell></TableCell>
+                      <TableCell></TableCell>
+                      {this.state.vendors.map((vendor, key) => (
+                        <TableCell
+                          key={key}
+                          style={{
+                            maxWidth: 150,
+                            textAlign: 'center',
+                          }}
+                          
+                        >
+                          {vendor.price2}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                    <TableRow sx={{ zIndex: 1 }} >
+                      <TableCell sx={{ zIndex: 3 }}></TableCell>
+                      <TableCell></TableCell>
+                      <TableCell></TableCell>
+                      <TableCell></TableCell>
+                      {this.state.vendors.map((vendor, key) => (
+                        <TableCell
+                          key={key}
+                          style={{
+                            maxWidth: 150,
+                            textAlign: 'center',
+
+                            backgroundColor: vendor.type == 'white' ? '#fff' : vendor.type == 'red' ? 'red' : 'green', 
+                            color: vendor.type == 'white' ? '#000' : vendor.type == 'red' ? '#fff' : '#fff', 
+                            fontWeight: 700
+                          }}
+                          
+                        >
+                          {vendor.price3}
+                        </TableCell>
+                      ))}
                     </TableRow>
 
                     <TableRow sx={{ zIndex: 1 }} >
@@ -375,7 +416,7 @@ class Tender_ extends React.Component {
                         <TableCell
                           key={key}
                           style={{
-                            maxWidth: 100,
+                            maxWidth: 150,
                             textAlign: 'center'
                           }}
                           
@@ -383,8 +424,11 @@ class Tender_ extends React.Component {
                           {vendor.name}
                         </TableCell>
                       ))}
+                      
                     </TableRow>
+
                   </TableHead>
+
 
                   <TableBody>
                     {this.state.cats.map((item, key) => (
@@ -429,10 +473,8 @@ class Tender_ extends React.Component {
 
                             {category.items.map((item, k) => (
                               <TableRow key={k} hover>
-                                <TableCell className="td_color">
-                                  {item.name}
-                                </TableCell>
-                                <TableCell></TableCell>
+                                <TableCell className="td_color">{item.name}</TableCell>
+                                <TableCell>{item.name_for_vendor}</TableCell>
                                 
                                 <TableCell>{item.price}</TableCell>
                                 <TableCell>{item.ras}</TableCell>
