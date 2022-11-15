@@ -532,16 +532,18 @@ class OrderPostRec_ extends React.Component {
   };
 
   async changePoint(event) {
-    let point = event.target.value;
-
-    let data = await this.getData('get_all', point);
+    let data = {
+      point_id: event.target.value
+    }
+    
+    let res = await this.getData('get_all', data);
 
     this.setState({
-      point,
-      items: data.items,
-      cats: data.cats,
-      freeItems: data.items_free,
-      hist: data.hist,
+      point: event.target.value,
+      items: res.items,
+      cats: res.cats,
+      freeItems: res.items_free,
+      hist: res.hist,
     });
   }
 
@@ -613,7 +615,7 @@ class OrderPostRec_ extends React.Component {
   }
 
   async save(points) {
-    // console.log(points);
+    console.log(points);
 
     let data = {
       items: this.state.cats,
@@ -621,7 +623,7 @@ class OrderPostRec_ extends React.Component {
       points
     };
 
-    // console.log(data);
+    console.log(data);
 
     let res = await this.getData('save_edit', data);
 
@@ -650,19 +652,19 @@ class OrderPostRec_ extends React.Component {
   }
 
   async update() {
-    let point = this.state.point;
-
-    // console.log(point)
-
-    let data = await this.getData('get_all', point);
+    let data = {
+      point_id: this.state.point
+    }
+    
+    let res = await this.getData('get_all', data);
 
     // console.log(data);
 
     this.setState({
-      items: data.items,
-      cats: data.cats,
-      freeItems: data.items_free,
-      hist: data.hist,
+      items: res.items,
+      cats: res.cats,
+      freeItems: res.items_free,
+      hist: res.hist,
     });
   }
 
