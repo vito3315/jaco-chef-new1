@@ -84,6 +84,7 @@ const UserSmena = React.lazy(() => import("../user_smena"));
 
 const CountUsers = React.lazy(() => import("../count_users"));
 const Fines = React.lazy(() => import("../fines"));
+const FinesErr = React.lazy(() => import("../fines_err"));
 const EventTime1 = React.lazy(() => import("../event_time_1"));
 const ReceptModule = React.lazy(() => import("../recept_module"));
 const OrderPostRec = React.lazy(() => import("../order_post_rec"));
@@ -389,6 +390,8 @@ export function App () {
                   <Route path={'/count_users'} exact={ true } element={ <CountUsers /> } />
 
                   <Route path={'/fines'} exact={ true } element={ <Fines /> } />
+                  <Route path={'/fines_err'} exact={ true } element={ <FinesErr /> } />
+
                   <Route path={'/event_time_1'} exact={ true } element={ <EventTime1 /> } />
                   <Route path={'/recept_module'} exact={ true } element={ <ReceptModule /> } />
                   <Route path={'/order_post_rec'} exact={ true } element={ <OrderPostRec /> } />
