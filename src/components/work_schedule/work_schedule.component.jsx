@@ -1183,6 +1183,8 @@ class WorkSchedule_ extends React.Component {
       hours: this.state.userInfo.hours,
       new_app: this.state.userInfo.new_app,
       mentor_id: this.state.userInfo.mentor_id,
+
+      point_id: this.state.point
     };
 
     let res = await this.getData('save_user_day', data);
