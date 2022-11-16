@@ -510,6 +510,8 @@ class Fines_err_Modal_NewItem extends React.Component {
 
     setTimeout(() => {
       this.myDropzone = new Dropzone('#for_img_new', this.dropzoneOptions);
+
+      this.click = false;
     }, 300);
   }
 
@@ -532,6 +534,10 @@ class Fines_err_Modal_NewItem extends React.Component {
   }
 
   save() {
+
+    if( !this.click ) {
+      this.click = true;  
+
     const point_id = this.state.point;
     const fine = this.state.fine;
     const date = this.state.date;
@@ -546,6 +552,10 @@ class Fines_err_Modal_NewItem extends React.Component {
         error: text,
         snackbar: true,
       });
+
+      setTimeout(() => {
+        this.click = false;
+      }, 300);
 
       return;
     }
@@ -610,6 +620,11 @@ class Fines_err_Modal_NewItem extends React.Component {
     this.props.save(data);
 
     this.onClose();
+
+    setTimeout( () => {
+      this.click = false;    
+    }, 300 )
+  }
   }
 
   onClose() {
