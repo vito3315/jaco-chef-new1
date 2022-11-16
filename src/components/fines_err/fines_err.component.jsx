@@ -21,6 +21,13 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 import Dropzone from 'dropzone';
 
 import {
@@ -59,7 +66,7 @@ class Fines_err_Modal_item extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    console.log(this.props.item);
+    // console.log(this.props.item);
 
     if (!this.props.item) {
       return;
@@ -366,8 +373,6 @@ class Fines_err_Modal_NewItem extends React.Component {
 
     this.handleResize = this.handleResize.bind(this);
 
-    // Dropzone.autoDiscover = false;
-
     this.state = {
       points: [],
       point: '',
@@ -388,6 +393,9 @@ class Fines_err_Modal_NewItem extends React.Component {
 
       fullScreen: false,
       selected: '',
+
+      snackbar: false,
+      error: '',
     };
   }
 
@@ -403,21 +411,12 @@ class Fines_err_Modal_NewItem extends React.Component {
         points: this.props.points,
         point: this.props.points[0].id,
       });
-
-    //   setTimeout(() => {
-    //     this.myDropzone = new Dropzone("div#for_img_new", this.dropzoneOptions);
-    // }, 300)
-
     }
   }
 
   componentDidMount() {
     this.handleResize();
     window.addEventListener('resize', this.handleResize);
-
-  //   setTimeout(() => {
-  //     this.myDropzone = new Dropzone("#for_img_new", this.dropzoneOptions);
-  // }, 300)
   }
 
   handleResize() {
@@ -433,8 +432,6 @@ class Fines_err_Modal_NewItem extends React.Component {
   }
 
   changeAutocomplite(data, event, value) {
-    console.log(value);
-
     if (data === 'user') {
       this.setState({
         [data]: value,
@@ -466,7 +463,7 @@ class Fines_err_Modal_NewItem extends React.Component {
 
     if (event.target.value !== '' && date !== '') {
       this.setState({
-        user: [],
+        user: '',
       });
 
       const point_id = event.target.value;
@@ -505,9 +502,15 @@ class Fines_err_Modal_NewItem extends React.Component {
 
     this.setState({
       fines: res.fines,
+      fine: res.fines[0],
       apps: res.apps,
       users: res.users,
+      user: res.users[0],
     });
+
+    setTimeout(() => {
+      this.myDropzone = new Dropzone('#for_img_new', this.dropzoneOptions);
+    }, 300);
   }
 
   changeClass(user, event) {
@@ -529,25 +532,84 @@ class Fines_err_Modal_NewItem extends React.Component {
   }
 
   save() {
-    const point = this.state.point;
+    const point_id = this.state.point;
     const fine = this.state.fine;
     const date = this.state.date;
     const user = this.state.user;
     const time = this.state.time;
 
-       setTimeout(() => {
-        this.myDropzone = new Dropzone("#for_img_new", this.dropzoneOptions);
-    }, 300)
+    if(!point_id || !fine || !date || !user || !time || time === '00:00' || !user.id || !fine.id) {
 
-    // console.log(this.myDropzone);
+      const text = "Для сохранения новой Ошибки, необходимо выбрать: Точку, Дату, Ошибку, Сотрудника и указать Время ошибки"
 
-    // this.props.save(item, this.props.method, this.state.date_start);
+      this.setState({
+        error: text,
+        snackbar: true,
+      });
 
-    // this.setState({
-    //   item: this.props.event ? this.props.event : [],
-    // });
+      return;
+    }
 
-    // this.props.onClose();
+    let img = 0;
+
+    if (this.myDropzone['files'].length > 0 && this.isInit === false) {
+
+      img = 1;
+
+      this.isInit = true;
+
+      this.myDropzone.on("sending", (file, xhr, data) => {
+
+          i++;
+          let file_type = (file.name).split('.');
+          file_type = file_type[file_type.length - 1];
+          file_type = file_type.toLowerCase();
+
+          // "file_1_point_id_1_id_2226.jpg"
+
+          data.append("filetype", 'file_' + i + '_point_id_' + point + '_id_' + fines_err.global_new_id + '.' + file_type);
+
+          this.getOrientation(file, function (orientation) {
+              data.append("orientation", orientation);
+          })
+      });
+
+      this.myDropzone.on("queuecomplete", (data) => {
+
+          var check_img = false;
+
+          this.myDropzone['files'].map(function (item, key) {
+              if (item['status'] == "error") {
+                  check_img = true;
+              }
+          })
+
+          if (check_img) {
+
+            this.setState({
+              error: 'Ошибка при загрузке фотографии',
+              snackbar: true,
+            });
+    
+            return;
+          }
+
+          this.isInit = false;
+      })
+    }
+
+    const data = {
+      fine: fine.id,
+      user: user.id,
+      point_id,
+      date,
+      time,
+      img,
+    };
+
+    this.props.save(data);
+
+    this.onClose();
   }
 
   onClose() {
@@ -577,151 +639,175 @@ class Fines_err_Modal_NewItem extends React.Component {
 
   render() {
     return (
-      <Dialog
-        open={this.props.open}
-        onClose={this.onClose.bind(this)}
-        fullScreen={this.state.fullScreen}
-        fullWidth={true}
-        maxWidth={'lg'}
-      >
-        <DialogTitle className="button">
-          {this.props.text}
-          {this.state.fullScreen ? (
-            <IconButton
-              onClick={this.onClose.bind(this)}
-              style={{ cursor: 'pointer' }}
-            >
-              <CloseIcon />
-            </IconButton>
-          ) : null}
-        </DialogTitle>
-        <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <MySelect
-                data={this.state.points}
-                value={this.state.point}
-                func={this.changePoint.bind(this, 'point')}
-                label="Точка"
-              />
-            </Grid>
+      <>
+        <Snackbar
+          open={this.state.snackbar}
+          autoHideDuration={30000}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+          onClose={() => {
+            this.setState({ snackbar: false });
+          }}
+        >
+          <Alert
+            onClose={() => {
+              this.setState({ snackbar: false });
+            }}
+            severity={'error'}
+            sx={{ width: '100%' }}
+          >
+            {this.state.error}
+          </Alert>
+        </Snackbar>
 
-            <Grid item xs={12} sm={6}>
-              <MyDatePickerNew
-                label="Дата"
-                value={this.state.date}
-                func={this.changeDateRange.bind(this, 'date')}
-              />
-            </Grid>
+        <Dialog
+          open={this.props.open}
+          onClose={this.onClose.bind(this)}
+          fullScreen={this.state.fullScreen}
+          fullWidth={true}
+          maxWidth={'lg'}
+        >
+          <DialogTitle className="button">
+            {this.props.text}
+            {this.state.fullScreen ? (
+              <IconButton
+                onClick={this.onClose.bind(this)}
+                style={{ cursor: 'pointer' }}
+              >
+                <CloseIcon />
+              </IconButton>
+            ) : null}
+          </DialogTitle>
+          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6}>
+                <MySelect
+                  data={this.state.points}
+                  value={this.state.point}
+                  func={this.changePoint.bind(this, 'point')}
+                  label="Точка"
+                />
+              </Grid>
 
-            {!this.state.fines.length ? null : (
-              <>
-                <Grid item xs={12} sm={3}>
-                  <MyAutocomplite
-                    label="Ошибка"
-                    multiple={false}
-                    data={this.state.fines}
-                    value={this.state.fine}
-                    func={this.changeAutocomplite.bind(this, 'fine')}
-                  />
-                </Grid>
+              <Grid item xs={12} sm={6}>
+                <MyDatePickerNew
+                  label="Дата"
+                  value={this.state.date}
+                  func={this.changeDateRange.bind(this, 'date')}
+                />
+              </Grid>
 
-                <Grid item xs={12} sm={3}>
-                  <MySelect
-                    data={this.state.apps}
-                    value={this.state.app}
-                    func={this.changeItem.bind(this, 'app')}
-                    label="Должность"
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={3}>
-                  <MyTimePicker
-                    value={this.state.time}
-                    func={this.changeItem.bind(this, 'time')}
-                    label="Время ошибки"
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={3}>
-                  <MyCheckBox
-                    label="Не могу определиться с виновником"
-                    value={this.state.is_active == 1 ? true : false}
-                    func={this.changeItemChecked.bind(this, 'is_active')}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <MyTextInput
-                    label="Комментарии"
-                    multiline={true}
-                    maxRows={5}
-                    value={this.state.comment}
-                    func={this.changeItem.bind(this, 'comment')}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <MyAutocomplite
-                    label="Сотрудник"
-                    multiple={false}
-                    data={this.state.users}
-                    value={this.state.user}
-                    func={this.changeAutocomplite.bind(this, 'user')}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={12}>
-                  
-                    <div 
-                    className="dropzone" 
-                    id="for_img_new" 
-                    style={{ width: '100%', minHeight: 150 }} 
+              {!this.state.fines.length ? null : (
+                <>
+                  <Grid item xs={12} sm={3}>
+                    <MyAutocomplite
+                      label="Ошибка"
+                      multiple={false}
+                      data={this.state.fines}
+                      value={this.state.fine}
+                      func={this.changeAutocomplite.bind(this, 'fine')}
                     />
-                
-                </Grid>
+                  </Grid>
 
-                <Grid item xs={12} sm={12}>
-                  {this.state.users.map((user, key) => (
-                    <React.Fragment key={key}>
-                      {!user.img ? null : (
-                        <img
-                          src={
-                            'https://storage.yandexcloud.net/user-img/max-img/' +
-                            user.img
-                          }
-                          style={{ maxWidth: 300, maxHeight: 300 }}
-                          onClick={this.changeClass.bind(this, user)}
-                          className={
-                            this.state.selected === user.id ? 'choose_user' : ''
-                          }
-                        />
-                      )}
-                    </React.Fragment>
-                  ))}
-                </Grid>
-              </>
-            )}
-          </Grid>
-        </DialogContent>
+                  <Grid item xs={12} sm={3}>
+                    <MySelect
+                      data={this.state.apps}
+                      value={this.state.app}
+                      func={this.changeItem.bind(this, 'app')}
+                      label="Должность"
+                    />
+                  </Grid>
 
-        <DialogActions className="button">
-          <Button
-            variant="contained"
-            style={{ backgroundColor: '#00a550', whiteSpace: 'nowrap' }}
-            onClick={this.save.bind(this)}
-          >
-            Сохранить
-          </Button>
-          <Button
-            variant="contained"
-            style={{ whiteSpace: 'nowrap' }}
-            onClick={this.onClose.bind(this)}
-          >
-            Отмена
-          </Button>
-        </DialogActions>
-      </Dialog>
+                  <Grid item xs={12} sm={3}>
+                    <MyTimePicker
+                      value={this.state.time}
+                      func={this.changeItem.bind(this, 'time')}
+                      label="Время ошибки"
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={3}>
+                    <MyCheckBox
+                      label="Не могу определиться с виновником"
+                      value={this.state.is_active == 1 ? true : false}
+                      func={this.changeItemChecked.bind(this, 'is_active')}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <MyTextInput
+                      label="Комментарии"
+                      multiline={true}
+                      maxRows={5}
+                      value={this.state.comment}
+                      func={this.changeItem.bind(this, 'comment')}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <MyAutocomplite
+                      label="Сотрудник"
+                      multiple={false}
+                      data={this.state.users}
+                      value={this.state.user}
+                      func={this.changeAutocomplite.bind(this, 'user')}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={12}>
+                    <div
+                      className="dropzone"
+                      id="for_img_new"
+                      style={{ width: '100%', minHeight: 150 }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={12}>
+                    {this.state.users.map((user, key) => (
+                      <React.Fragment key={key}>
+                        {!user.img ? null : (
+                          <img
+                            src={
+                              'https://storage.yandexcloud.net/user-img/max-img/' +
+                              user.img
+                            }
+                            style={{ maxWidth: 300, maxHeight: 300 }}
+                            onClick={this.changeClass.bind(this, user)}
+                            className={
+                              this.state.selected === user.id
+                                ? 'choose_user'
+                                : ''
+                            }
+                          />
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </Grid>
+                </>
+              )}
+            </Grid>
+          </DialogContent>
+
+          <DialogActions className="button">
+            <Button
+              variant="contained"
+              style={{ backgroundColor: '#00a550', whiteSpace: 'nowrap' }}
+              onClick={this.save.bind(this)}
+            >
+              Сохранить
+            </Button>
+            <Button
+              variant="contained"
+              style={{ whiteSpace: 'nowrap' }}
+              onClick={this.onClose.bind(this)}
+            >
+              Отмена
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </>
     );
   }
 }
@@ -951,8 +1037,11 @@ class Fines_err_ extends React.Component {
     });
   }
 
-  async saveNewItem(item) {
-    console.log(item);
+  async saveNewItem(data) {
+    console.log(data);
+
+    // await this.getData('save_new', data);
+
   }
 
   render() {
