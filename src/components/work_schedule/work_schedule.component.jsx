@@ -289,6 +289,8 @@ class WorkSchedule_Table extends React.Component {
   }
 
   render() {
+    let check_period = this.props.test.find( item => item.row !== 'header' && parseInt(item.data.check_period) == 0 );
+
     return (
       <TableContainer component={Paper}>
         <Table
@@ -299,6 +301,13 @@ class WorkSchedule_Table extends React.Component {
           }
         >
           <TableBody>
+
+            { !check_period ? null :
+              <TableRow>
+                <TableCell colSpan={25} style={{ textAlign: 'center', color: 'red', fontSize: '3rem' }}>Чтобы увидеть зарплату, надо закрыть все ошибки в модуле "Регистрация ошибок кухни"</TableCell>
+              </TableRow>
+            }
+
             {this.props.test.map((item, key) =>
               item.row == 'header' ? (
                 <HeaderItem
@@ -341,11 +350,7 @@ class WorkSchedule_Table extends React.Component {
 
                   {item.data.dates.map((date, date_k) => (
                     <TableCell
-                      onClick={this.props.openH.bind(
-                        this,
-                        item.data,
-                        date.date
-                      )}
+                      onClick={this.props.openH.bind(this, item.data,date.date)}
                       className="min_block"
                       style={{
                         backgroundColor: date.info ? date.info.color : '#fff',
@@ -369,21 +374,21 @@ class WorkSchedule_Table extends React.Component {
                     onClick={ this.props.kind == 'manager' ? () => {} : this.props.pricePerHour.bind(this, item.data) }
                   >{item.data.price_p_h}</TableCell>
 
-                  <TableCell style={{ textAlign: 'center' }}>{item.data.dop_bonus}</TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>{item.data.h_price}</TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>{item.data.err_price}</TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>{item.data.my_bonus}</TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.dop_bonus : ' - '}</TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.h_price : ' - '}</TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.err_price : ' - '}</TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.my_bonus : ' - '}</TableCell>
                     
 
                   {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                     <TableCell style={{ textAlign: 'center' }}>
-                      {parseInt(item.data.dop_bonus) +
+                      { parseInt(item.data.check_period) == 1 ? (parseInt(item.data.dop_bonus) +
                         parseInt(item.data.dir_price) +
                         parseInt(item.data.dir_price_dop) +
                         parseInt(item.data.h_price) +
                         parseInt(item.data.my_bonus) -
                         parseInt(item.data.err_price) +
-                        ''}
+                        '') : ' - '}
                     </TableCell>
                   ) : null}
 
@@ -663,20 +668,20 @@ class WorkSchedule_Table_without_functions extends React.Component {
                         {item.data.price_p_h}
                       </TableCell>
 
-                      <TableCell style={{ textAlign: 'center' }}>{item.data.dop_bonus}</TableCell>
-                      <TableCell style={{ textAlign: 'center' }}>{item.data.h_price}</TableCell>
-                      <TableCell style={{ textAlign: 'center' }}>{item.data.err_price}</TableCell>
-                      <TableCell style={{ textAlign: 'center' }}>{item.data.my_bonus}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.dop_bonus : ' - '}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.h_price : ' - '}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.err_price : ' - '}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.my_bonus : ' - '}</TableCell>
                         
                       {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                         <TableCell style={{ textAlign: 'center' }}>
-                          {parseInt(item.data.dop_bonus) +
+                          { parseInt(item.data.check_period) == 1 ? (parseInt(item.data.dop_bonus) +
                             parseInt(item.data.dir_price) +
                             parseInt(item.data.dir_price_dop) +
                             parseInt(item.data.h_price) +
                             parseInt(item.data.my_bonus) -
                             parseInt(item.data.err_price) +
-                            ''}
+                            '') : ' - ' }
                         </TableCell>
                       ) : null}
 
