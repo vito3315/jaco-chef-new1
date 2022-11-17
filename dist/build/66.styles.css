@@ -1,4 +1,4 @@
-th:first-child,tr:first-child,td:first-child{position:-webkit-sticky;position:sticky;left:0;border-right:none}td,th{border-right:solid 1px #e5e5e5}.td_color{background-color:#fff !important}.tdprice{white-space:nowrap;text-align:center !important}.tdcity{width:80%}.minPriceCell{background-color:green;color:#fff;font-weight:700 !important}.maxPriceCell{background-color:red;color:#fff;font-weight:700 !important}.chooseCell{background-color:#fc0 !important;color:#333 !important;font-weight:700 !important}
+th:first-child,tr:first-child,td:first-child{position:-webkit-sticky;position:sticky;left:0;border-right:none}td,th{border-right:solid 1px #e5e5e5}tbody tr:nth-child(odd){background-color:rgba(229,229,229,0.5)}tbody tr:nth-child(even){background-color:#e5e5e5}.tdprice{white-space:nowrap;text-align:center !important}.tdcity{width:80%}.minPriceCell{background-color:green;color:#fff;font-weight:700 !important}.maxPriceCell{background-color:red;color:#fff;font-weight:700 !important}.chooseCell{background-color:#fc0 !important;color:#333 !important;font-weight:700 !important}
 
 
 /*# sourceMappingURL=66.styles.css.map*/
