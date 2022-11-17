@@ -502,10 +502,8 @@ class Fines_err_Modal_NewItem extends React.Component {
 
     this.setState({
       fines: res.fines,
-      fine: res.fines[0],
       apps: res.apps,
       users: res.users,
-      user: res.users[0],
     });
 
     setTimeout(() => {
