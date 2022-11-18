@@ -291,7 +291,7 @@ class Tender_ extends React.Component {
         <Grid container spacing={3} mb={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
-          </Grid>
+          </Grid> 
         </Grid>
 
         <Grid container spacing={3} justifyContent="center" mb={5}>
@@ -353,7 +353,7 @@ class Tender_ extends React.Component {
         {!this.state.cats.length ? null : (
           <Grid container spacing={3}>
             <Grid item xs={12} sm={12}>
-              <TableContainer sx={{ maxHeight: { xs: 'none', sm: 650 } }}>
+              <TableContainer sx={{ maxHeight: { xs: 'none', sm: 1000 } }}>
                 <Table stickyHeader aria-label="sticky table" size="small">
                   <TableHead style={{ position: 'sticky', top: 0, zIndex: 7 }}>
                     <TableRow>
@@ -505,12 +505,8 @@ class Tender_ extends React.Component {
                                       <TenderCell
                                         vendor={vendor}
                                         item={item}
-                                        price={vendor.price.find(
-                                          (it) => it.item_id === item.id
-                                        )}
-                                        changePrice={this.changePrice.bind(
-                                          this
-                                        )}
+                                        price={vendor.price.find((it) => it.item_id === item.id)}
+                                        changePrice={this.changePrice.bind(this)}
                                       />
                                     ) : (
                                       <TableCell></TableCell>

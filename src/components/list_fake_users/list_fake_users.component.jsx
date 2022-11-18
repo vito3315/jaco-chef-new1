@@ -658,6 +658,7 @@ class ListFakeUsers_ extends React.Component {
       });
     } else {
       this.setState({
+        users:  [],
         error: res.text,
         snackbar: true,
       });
@@ -684,7 +685,19 @@ class ListFakeUsers_ extends React.Component {
 
   changeItemChecked(data, event) {
     const value = event.target.checked === true ? 1 : 0;
+   
+    // делаем переключатель для галочек ошибка на заказ и на последний заказ
+    if(data == 'is_show_claim_last' ){
+      this.setState({
+        'is_show_claim' : 0,
+      });
+    } else if(data == 'is_show_claim'){
+      this.setState({
+        'is_show_claim_last' : 0,
+      });
+    }
 
+    // changeItemChecked
     this.setState({
       [data]: value,
     });
