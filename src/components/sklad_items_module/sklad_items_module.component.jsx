@@ -108,17 +108,16 @@ class SkladItemsModule_Modal_Edit extends React.Component {
   render() {
     return (
       <Dialog
-      open={this.props.open}
-      onClose={this.onClose.bind(this)}
-      fullWidth={true}
-      maxWidth={'sm'}
-    >
-      <DialogTitle>
-      Изменить цену и/или статус Ревизии в Товаре: <br/>
-      {this.props.itemName}
-      </DialogTitle>
+        open={this.props.open}
+        onClose={this.onClose.bind(this)}
+        fullWidth={true}
+        maxWidth={'sm'}
+      >
+        <DialogTitle>
+          Изменить цену и/или статус Ревизии в Товаре: {this.props.itemName}
+        </DialogTitle>
 
-      <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+        <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
           <TableContainer>
             <Table>
               <TableHead>
@@ -137,26 +136,24 @@ class SkladItemsModule_Modal_Edit extends React.Component {
                       />
                   </TableCell>
                   <TableCell>
-                  <MyTextInput
-                      label=""
-                      value={this.state.handle_price}
-                      func={this.changeItem.bind(this)}
-                  />
+                    <MyTextInput
+                        label=""
+                        value={this.state.handle_price}
+                        func={this.changeItem.bind(this)}
+                    />
                   </TableCell>
-                  </TableRow>
-                  </TableBody>
+                </TableRow>
+              </TableBody>
             </Table>
-            </TableContainer>
-      </DialogContent>
+          </TableContainer>
+        </DialogContent>
 
-      <DialogActions>
-        <Button 
-          onClick={this.save.bind(this)}
-        >
-          Сохранить
-        </Button>
-      </DialogActions>
-    </Dialog>
+        <DialogActions>
+          <Button onClick={this.save.bind(this)}>
+            Сохранить
+          </Button>
+        </DialogActions>
+      </Dialog>
     );
   }
 }
@@ -866,10 +863,10 @@ class SkladItemsModule_ extends React.Component {
                               <TableCell style={{ width: '2%' }}></TableCell>
                               <TableCell style={{ width: '3%' }}>Ревизия</TableCell>
                               <TableCell style={{ width: '15%' }}>Товар</TableCell>
-                              <TableCell style={{ width: '10%' }}> % потерь</TableCell>
-                              <TableCell style={{ width: '10%' }}>  % заявки</TableCell>
-                              <TableCell style={{ width: '15%' }}>     Заготовка</TableCell>
-                              <TableCell style={{ width: '5%' }}> Ед. измер</TableCell>
+                              <TableCell style={{ width: '10%' }}>% потерь</TableCell>
+                              <TableCell style={{ width: '10%' }}>% заявки</TableCell>
+                              <TableCell style={{ width: '15%' }}>Заготовка</TableCell>
+                              <TableCell style={{ width: '5%' }}>Ед. измер</TableCell>
                               <TableCell style={{ width: '9%' }}>Место хранения</TableCell>
                               <TableCell style={{ width: '9%', minWidth: 150 }}>Моя цена</TableCell>
                             </TableRow>
