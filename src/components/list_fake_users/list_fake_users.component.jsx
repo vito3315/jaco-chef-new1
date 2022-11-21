@@ -29,6 +29,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 
+import DownloadIcon from '@mui/icons-material/Download';
+
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -372,6 +374,27 @@ class ListFakeUsers_Modal extends React.Component {
                     : 'не было'
                   : 'не было'}
               </Typography>
+              
+              <Typography
+                sx={{
+                  fontWeight: 'bold',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Описание ошибки
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: 'normal',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {this.state.item
+                  ? this.state.item.promo_name !== ''
+                    ? this.state.item.promo_name
+                    : 'не было'
+                  : 'не было'}
+              </Typography>
             </Grid>
           </Grid>
 
@@ -560,6 +583,7 @@ class ListFakeUsers_ extends React.Component {
 
       snackbar: false,
       error: '',
+      url: '',
 
       date_start_true: '',
       date_end_true: '',
@@ -572,6 +596,7 @@ class ListFakeUsers_ extends React.Component {
       is_show_marketing: 0,
 
       modalDialog: false,
+      modalDialogDwn: false,
       user: null,
     };
   }
@@ -663,6 +688,38 @@ class ListFakeUsers_ extends React.Component {
         snackbar: true,
       });
     }
+  }
+
+  async getUsersDownload(){
+
+    const data = {
+      point: this.state.point,
+      date_start_true: this.state.date_start_true,
+      date_end_true: this.state.date_end_true,
+      date_start_false: this.state.date_start_false,
+      date_end_false: this.state.date_end_false,
+      count_orders: this.state.count_orders,
+      max_summ: this.state.max_summ,
+      items: this.state.item,
+      is_show_claim: this.state.is_show_claim,
+      is_show_claim_last: this.state.is_show_claim_last,
+      is_show_marketing: this.state.is_show_marketing,
+    };
+    const res = await this.getData('get_users_download', data);
+    
+    if (res.st) {
+      console.log('show'); 
+      this.setState({
+        modalDialogDwn: true,
+        url: res.url 
+      });
+    } else{
+      this.setState({
+        error: res.text,
+        snackbar: true,
+      });
+    }
+
   }
 
   changeNumber(data, event) {
@@ -774,6 +831,15 @@ class ListFakeUsers_ extends React.Component {
           event={this.state.user}
         />
 
+        <ListFakeUsers_Modal_Download
+          open={this.state.modalDialogDwn}
+          url={this.state.url}
+          onClose={() => {
+            this.setState({ modalDialogDwn: false });
+          }}
+         
+        />
+
         <Grid item xs={12} mb={3}>
           <h1>{this.state.module_name}</h1>
         </Grid>
@@ -810,6 +876,10 @@ class ListFakeUsers_ extends React.Component {
             >
               Получить список клиентов
             </Button>
+            <Button 
+                variant="contained"
+                style={{ marginLeft: 10, backgroundColor: '#ffcc00' }}
+                onClick={this.getUsersDownload.bind(this)}> <DownloadIcon /> </Button>
           </Grid>
         </Grid>
 
@@ -867,6 +937,7 @@ class ListFakeUsers_ extends React.Component {
               func={this.changeItemChecked.bind(this, 'is_show_claim_last')}
             />
           </Grid>
+         
         </Grid>
 
         <Grid container spacing={3} justifyContent="center" mb={3}>
@@ -897,7 +968,9 @@ class ListFakeUsers_ extends React.Component {
               func={this.changeItemChecked.bind(this, 'is_show_marketing')}
             />
           </Grid>
+         
         </Grid>
+       
 
         {!this.state.users.length ? null : (
           <Grid container justifyContent="center">
@@ -932,6 +1005,55 @@ class ListFakeUsers_ extends React.Component {
         )}
       </>
     );
+  }
+}
+
+class ListFakeUsers_Modal_Download extends React.Component {
+ /*
+  constructor(props) {
+    super(props);
+
+    //this.handleResize = this.handleResize.bind(this);
+ } 
+  */
+
+  onClose() {
+    this.setState({
+      item: this.props.event ? this.props.event : [],
+    });
+
+    this.props.onClose();
+  }
+
+
+  render() {
+    return (
+      <Dialog
+        open={this.props.open}
+        onClose={this.onClose.bind(this)}
+        fullWidth={true}
+        maxWidth={'lg'}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle className="button">
+          <Typography style={{ fontWeight: 'bold' }}>
+            Скачать список пользователей
+          </Typography>
+        </DialogTitle>
+        <DialogContent style={{ paddingTop: 10, paddingBottom: 10 }}>
+            <a target="_blank" href={this.props.url}>Скачать</a>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            style={{ color: '#DC143C' }}
+            onClick={this.onClose.bind(this)}
+          >
+            Закрыть
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )
   }
 }
 
