@@ -30,7 +30,19 @@ import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
 
-import { MySelect, MyAutocomplite, MyTimePicker, MyDatePickerNew } from '../../stores/elements';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+import {
+  MySelect,
+  MyAutocomplite2,
+  MyTimePicker,
+  MyDatePickerNew,
+} from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -53,8 +65,11 @@ class EventTime1_Modal extends React.Component {
     this.handleResize = this.handleResize.bind(this);
 
     this.state = {
-      item: {},
+      item: null,
       fullScreen: false,
+      data: [],
+      snackbar: false,
+      error: '',
     };
   }
 
@@ -66,8 +81,15 @@ class EventTime1_Modal extends React.Component {
     }
 
     if (this.props.event !== prevProps.event) {
+      const data = [];
+
+      for (let i = 5; i <= 300; i += 5) {
+        data.push({ id: `${i}`, name: `${i}` });
+      }
+
       this.setState({
         item: this.props.event,
+        data,
       });
     }
   }
@@ -89,54 +111,78 @@ class EventTime1_Modal extends React.Component {
     }
   }
 
-  changeTimeStart(data, event) {
-    // console.log(item)
-
+  changeItem(data, event, value) {
     const item = this.state.item;
 
-    item[data] = event.target.value;
+    item[data] = value;
 
     this.setState({
-      item
+      item,
     });
   }
 
-  changeTimeEnd(data, event) {
-    // console.log(item)
-
+  changeTime(data, event) {
     const item = this.state.item;
 
     item[data] = event.target.value;
 
     this.setState({
-      item
+      item,
     });
   }
 
   changeDateRange(data, value) {
-   
     const item = this.state.item;
 
-    item[data] = formatDate(value);
+    item[data] = value ? formatDate(value) : '';
 
     this.setState({
-      item
+      item,
     });
   }
 
   save() {
-    this.props.save(this, this.state.item);
+    const message = 'Необходимо заполнить все данные!';
 
-    this.setState({
-      item: this.props.event ? this.props.event : {},
-    });
+    if (
+      this.props.mark === 'newDay' &&
+      (!this.state.item.date ||
+        !this.state.item.time_start ||
+        !this.state.item.time_end ||
+        !this.state.item.time_dev)
+    ) {
+      this.setState({
+        error: message,
+        snackbar: true,
+      });
 
-    this.props.onClose();
+      return;
+    }
+
+    if (
+      (this.props.mark === 'newEvent' || this.props.mark === 'editEvent') && 
+      (!this.state.item.time_start ||
+      !this.state.item.time_end ||
+      !this.state.item.time_dev)
+    ) {
+      this.setState({
+        error: message,
+        snackbar: true,
+      });
+
+      return;
+    }
+
+    this.props.save(this.state.item, this.props.mark);
+
+    this.onClose();
   }
 
   onClose() {
     this.setState({
-      item: this.props.event ? this.props.event : {},
+      item: this.props.event ? this.props.event : null,
+      data: [],
+      error: '',
     });
 
     this.props.onClose();
@@ -144,79 +190,93 @@ class EventTime1_Modal extends React.Component {
 
   render() {
     return (
-      <Dialog
-        open={this.props.open}
-        onClose={this.onClose.bind(this)}
-        fullScreen={this.state.fullScreen}
-        fullWidth={true}
-        maxWidth={this.props.method !== "Особый день" ? 'md' : 'lg'}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle className="button">
-          <Typography style={{ fontWeight: 'normal' }}>{this.props.method}</Typography>
-          {this.state.fullScreen ? (
-            <IconButton
-              onClick={this.onClose.bind(this)}
-              style={{ cursor: 'pointer' }}
-            >
-              <CloseIcon />
-            </IconButton>
-          ) : null}
-        </DialogTitle>
+      <>
+        <Snackbar
+          open={this.state.snackbar}
+          autoHideDuration={30000}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+          onClose={() => {
+            this.setState({ snackbar: false });
+          }}
+        >
+          <Alert
+            onClose={() => {
+              this.setState({ snackbar: false });
+            }}
+            severity={'error'}
+            sx={{ width: '100%' }}
+          >
+            {this.state.error}
+          </Alert>
+        </Snackbar>
 
-        <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-          <Grid container spacing={3} mb={3} item xs={12}>
-          {this.props.method !== "Особый день" ? null :
+        <Dialog
+          open={this.props.open}
+          onClose={this.onClose.bind(this)}
+          fullScreen={this.state.fullScreen}
+          fullWidth={true}
+          maxWidth={this.props.mark !== 'newDay' ? 'md' : 'lg'}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle className="button">
+            <Typography style={{ fontWeight: 'normal' }}>{this.props.method}</Typography>
+            {this.state.fullScreen ? (
+              <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
+                <CloseIcon />
+              </IconButton>
+            ) : null}
+          </DialogTitle>
 
-            <Grid item sm={3} xs={12}>
-              <MyDatePickerNew
-                label="Дата"
-                value={this.state.item.data}
-                func={this.changeDateRange.bind(this, 'data')}
-              />
+          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+            <Grid container spacing={3} mb={3} item xs={12}>
+              {this.props.mark !== 'newDay' ? null : (
+                <Grid item sm={3} xs={12}>
+                  <MyDatePickerNew
+                    label="Дата"
+                    value={this.state.item ? this.state.item.date : ''}
+                    func={this.changeDateRange.bind(this, 'date')}
+                  />
+                </Grid>
+              )}
+
+              <Grid item sm={this.props.mark !== 'newDay' ? 4 : 3} xs={6}>
+                <MyTimePicker
+                  value={this.state.item ? this.state.item.time_start : ''}
+                  func={this.changeTime.bind(this, 'time_start')}
+                  label="Время начала"
+                />
+              </Grid>
+
+              <Grid item sm={this.props.mark !== 'newDay' ? 4 : 3} xs={6}>
+                <MyTimePicker
+                  value={this.state.item ? this.state.item.time_end : ''}
+                  func={this.changeTime.bind(this, 'time_end')}
+                  label="Время окончания"
+                />
+              </Grid>
+
+              <Grid item sm={this.props.mark !== 'newDay' ? 4 : 3} xs={12}>
+                <MyAutocomplite2
+                  label="Время на доставку"
+                  multiple={false}
+                  freeSolo={true}
+                  func={this.changeItem.bind(this, 'time_dev')}
+                  data={this.state.data}
+                  value={this.state.item ? this.state.item.time_dev : ''}
+                />
+              </Grid>
             </Grid>
-          }
-        
-          <Grid item sm={this.props.method !== "Особый день" ? 4 : 3} xs={6}>
-            <MyTimePicker
-              value={this.state.item.time_start}
-              func={this.changeTimeStart.bind(this, 'time_start')}
-              label="Время начала"
-            />
-          </Grid>
-          
-          <Grid item sm={this.props.method !== "Особый день" ? 4 : 3} xs={6}>
-            <MyTimePicker
-              value={this.state.item.time_end}
-              func={this.changeTimeEnd.bind(this, 'time_end')}
-              label="Время окончания"
-              />
-          </Grid>
-         
-          <Grid item sm={this.props.method !== "Особый день" ? 4 : 3} xs={12}>
-            <MyAutocomplite
-              label="Количество"
-              multiple={false}
-              freeSolo={true}
-              func={(event, value) => {
-                const item = this.state.item
-                item.quantity = value
-                this.setState({ item })}}
-              data={this.state.item.array}
-              value={this.state.item.quantity}
-            />
-          </Grid>
-          </Grid>
-        
-        </DialogContent>
+          </DialogContent>
 
-        <DialogActions>
-          <Button onClick={this.save.bind(this)}>
-            Сохранить
-          </Button>
-        </DialogActions>
-      </Dialog>
+          <DialogActions>
+            <Button onClick={this.save.bind(this)}>Сохранить</Button>
+          </DialogActions>
+        </Dialog>
+      </>
     );
   }
 }
@@ -232,194 +292,93 @@ class EventTime1_ extends React.Component {
 
       points: [],
       point: '0',
+
       modalDialog: false,
       method: '',
+      mark: '',
 
-      item: [
-        {
-          id: '1',
-          id_row: '1',
-          data: '2022-10-05',
-          time_start: '19:30',
-          time_end: '20:30',
-          quantity: 10,
-        },
-        {
-          id: '1',
-          id_row: '2',
-          data: '2022-10-06',
-          time_start: '19:30',
-          time_end: '20:30',
-          quantity: 20,
-        },
-      ],
+      item: [],
+      itemData: [],
 
       itemNew: {
-        id: '',
-        id_row: '',
-        data: '',
+        date: '',
+        dow: '',
+        zone_id: '',
         time_start: '',
         time_end: '',
-        quantity: 0,
-        array: [{name: '5'}, {name: '10'}, {name: '15'}, {name: '20'}]
+        time_dev: '',
       },
 
-      event: {},
+      event: null,
 
       cardData: [
         {
-          id: '1',
           day_id: '1',
           day_week: 'Понедельник',
-          data: [
-            {
-              id_row: '1',
-              time_start: '19:30',
-              time_end: '20:30',
-              quantity: 20,
-            },
-            {
-              id_row: '2',
-              time_start: '20:30',
-              time_end: '21:30',
-              quantity: 30,
-            },
-          ],
+          data: [],
         },
         {
-          id: '1',
           day_id: '2',
           day_week: 'Вторник',
-          data: [
-            {
-              id_row: '1',
-              time_start: '19:30',
-              time_end: '20:30',
-              quantity: 20,
-            },
-            {
-              id_row: '2',
-              time_start: '20:30',
-              time_end: '21:30',
-              quantity: 30,
-            },
-          ],
+          data: [],
         },
         {
-          id: '1',
           day_id: '3',
           day_week: 'Среда',
-          data: [
-            {
-              id_row: '1',
-              time_start: '19:30',
-              time_end: '20:30',
-              quantity: 20,
-            },
-            {
-              id_row: '2',
-              time_start: '20:30',
-              time_end: '21:30',
-              quantity: 30,
-            },
-          ],
+          data: [],
         },
         {
-          id: '1',
           day_id: '4',
           day_week: 'Четверг',
-          data: [
-            {
-              id_row: '1',
-              time_start: '19:30',
-              time_end: '20:30',
-              quantity: 20,
-            },
-            {
-              id_row: '2',
-              time_start: '20:30',
-              time_end: '21:30',
-              quantity: 30,
-            },
-          ],
+          data: [],
         },
         {
-          id: '1',
           day_id: '5',
           day_week: 'Пятница',
-          data: [
-            {
-              id_row: '1',
-              time_start: '19:30',
-              time_end: '20:30',
-              quantity: 20,
-            },
-            {
-              id_row: '2',
-              time_start: '20:30',
-              time_end: '21:30',
-              quantity: 30,
-            },
-          ],
+          data: [],
         },
         {
-          id: '1',
           day_id: '6',
           day_week: 'Суббота',
-          data: [
-            {
-              id_row: '1',
-              time_start: '19:30',
-              time_end: '20:30',
-              quantity: 20,
-            },
-            {
-              id_row: '2',
-              time_start: '20:30',
-              time_end: '21:30',
-              quantity: 30,
-            },
-          ],
+          data: [],
         },
         {
-          id: '1',
           day_id: '7',
           day_week: 'Воскресенье',
-          data: [
-            {
-              id_row: '1',
-              time_start: '19:30',
-              time_end: '20:30',
-              quantity: 20,
-            },
-            {
-              id_row: '2',
-              time_start: '20:30',
-              time_end: '21:30',
-              quantity: 30,
-            },
-          ],
+          data: [],
         },
       ],
     };
   }
 
   async componentDidMount() {
-    let data = await this.getData('get_all');
+    const itemData = JSON.parse(JSON.stringify(this.state.cardData));
 
-    // console.log( data )
+    const data = await this.getData('get_all');
+
+    const zone = {
+      zone_id: data.points[0].id,
+    };
+
+    const res = await this.getData('get_data', zone);
+
+    res.dows.forEach((item) => {
+      itemData.forEach((el) => {
+        if (item.dow === el.day_id) {
+          el.data.push(item);
+        }
+      });
+    });
 
     this.setState({
       points: data.points,
       point: data.points[0].id,
       module_name: data.module_info.name,
+      itemData,
+      item: res.other_days,
     });
 
-    // document.title = data.module_info.name;
-
-    // setTimeout( () => {
-    //   this.updateData();
-    // }, 50 )
+    document.title = data.module_info.name;
   }
 
   getData = (method, data = {}) => {
@@ -466,51 +425,151 @@ class EventTime1_ extends React.Component {
   };
 
   async changePoint(event) {
-    let point = event.target.value;
 
-    // let data = await this.getData('get_all', point);
+    const zone_id = event.target.value;
 
-    this.setState({
-      point
-    });
+    if(event.target.value) {
 
-    // setTimeout( () => {
-    //   this.updateData();
-    // }, 50 )
+      const itemData = JSON.parse(JSON.stringify(this.state.cardData));
+  
+      const zone = {
+        zone_id,
+      };
+  
+      const res = await this.getData('get_data', zone);
+  
+      res.dows.forEach((item) => {
+        itemData.forEach((el) => {
+          if (item.dow === el.day_id) {
+            el.data.push(item);
+          }
+        });
+      });
+  
+      this.setState({
+        point: zone_id,
+        item: res.other_days,
+        itemData,
+      });
+
+    } else {
+
+      this.setState({
+        point: zone_id,
+        item: [],
+        itemData: [],
+      });
+
+    }
+
   }
 
-  openModal(method, item, event) {
+  openModal(method, mark, item) {
 
-    const itemNew = this.state.itemNew;
+    if (mark === 'newDay') {
 
-    itemNew.id = this.state.point;
-    
+      const itemNew = JSON.parse(JSON.stringify(this.state.itemNew));
+
+      itemNew.zone_id = this.state.point;
+
       this.setState({
         modalDialog: true,
         method,
-        event: itemNew
+        mark,
+        event: itemNew,
       });
-  
+    }
+
+    if (mark === 'newEvent') {
+
+      const itemNew = JSON.parse(JSON.stringify(this.state.itemNew));
+
+      itemNew.zone_id = this.state.point;
+
+      itemNew.dow = item.day_id;
+
+      method = `${item.day_week} ${method}`;
+
+      this.setState({
+        modalDialog: true,
+        method,
+        mark,
+        event: itemNew,
+      });
+    }
+
+    if (mark === 'editEvent') {
+
+      this.setState({
+        modalDialog: true,
+        method,
+        mark,
+        event: item,
+      });
+    }
   }
 
-  async saveItem(event, item) {
-    console.log(item);
-    // console.log(data);
+  async saveItem(item, mark) {
 
-    // await this.getData('save_edit', data);
+    item.time = `${item.time_start}-${item.time_end}`
+
+    if (mark === 'newDay') {
+      await this.getData('save_new_cur_other', item);
+    }
+
+    if (mark === 'newEvent') {
+      await this.getData('save_new_cur', item);
+    }
+
+    if (mark === 'editEvent') {
+      await this.getData('save_edit_cur_time', item);
+    }
+
+    this.update();
+
   }
 
-  async deleteItemAccordion(id) {
-    // console.log(id)
+  async deleteItem(time_id, mark, event) {
+    event.stopPropagation();
 
-    // await this.getData('delete_item_acc', data);
+    const data = {
+      time_id,
+    };
+
+    if (mark === 'time') {
+      await this.getData('del_time', data);
+    }
+
+    if (mark === 'time_other') {
+      await this.getData('del_time_other', data);
+    }
+
+    this.update();
   }
 
-  async deleteItemCard(id) {
-    // console.log(id)
+  async update() {
+    const zone_id = this.state.point;
 
-    // await this.getData('delete_item_card', data);
+    const itemData = JSON.parse(JSON.stringify(this.state.cardData));
 
+    const zone = {
+      zone_id,
+    };
+
+    const res = await this.getData('get_data', zone);
+
+    res.dows.forEach((item) => {
+      itemData.forEach((el) => {
+        if (item.dow === el.day_id) {
+          el.data.push(item);
+        }
+      });
+    });
+
+    this.setState({
+      item: res.other_days,
+      itemData,
+    });
   }
 
   render() {
@@ -527,7 +586,7 @@ class EventTime1_ extends React.Component {
         </Grid>
 
         {/* модалка */}
-        <EventTime1_Modal 
+        <EventTime1_Modal
           open={this.state.modalDialog}
           onClose={() => {
             this.setState({ modalDialog: false });
@@ -535,162 +594,102 @@ class EventTime1_ extends React.Component {
           method={this.state.method}
           event={this.state.event}
           save={this.saveItem.bind(this)}
+          mark={this.state.mark}
         />
 
         {/* выбор и кнопка */}
-        <Grid container spacing={3} justifyContent="center" direction="column">
-          <Grid
-            container
-            spacing={3}
-            justifyContent="center"
-            item
-            xs={12}
-          >
-            <Grid item xs={12} sm={4}>
-              <MySelect
-                data={this.state.points}
-                value={this.state.point}
-                func={this.changePoint.bind(this)}
-                label="Точка"
-              />
-            </Grid>
-            <Grid item xs={12} sm={2}>
-              <Button
-                disabled={this.state.point < 1 ? true : false}
-                variant={this.state.point < 1 ? 'outlined' : 'contained'}
-                style={{ whiteSpace: 'nowrap' }}
-                onClick={this.openModal.bind(this, 'Особый день')}
-              >
-                Добавить особый день
-              </Button>
-            </Grid>
+        <Grid container spacing={3} justifyContent="center">
+          <Grid item xs={12} sm={3}></Grid>
+          <Grid item xs={12} sm={4}>
+            <MySelect
+              data={this.state.points}
+              value={this.state.point}
+              func={this.changePoint.bind(this)}
+              label="Точка"
+            />
+          </Grid>
+          <Grid item xs={12} sm={5}>
+            <Button
+              variant="contained"
+              style={{ whiteSpace: 'nowrap' }}
+              onClick={this.openModal.bind(this, 'Особый день', 'newDay')}
+            >
+              Добавить особый день
+            </Button>
           </Grid>
 
           {/* аккардион */}
-          {this.state.point < 1 ? null : (
-            <Grid container justifyContent="center" spacing={3} p={3}>
-              <Grid item sm={5} xs={12}>
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel1a-content"
-                  >
-                    <Typography style={{ whiteSpace: 'nowrap' }}>
-                      Особые дни
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Accordion>
+          {!this.state.item.length ? null : (
+            <Grid item sm={5} xs={12} mb={3}>
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content">
+                  <Typography style={{ whiteSpace: 'nowrap' }}> Особые дни </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Accordion>
                     <TableContainer>
-
                       <Table size="small" style={{ whiteSpace: 'nowrap' }}>
                         <TableHead>
                           <TableRow>
-                            <TableCell style={{ width: '30%' }}  >
-                              Дата
-                            </TableCell>
-                            <TableCell style={{ width: '30%' }}  >
-                              Время
-                            </TableCell>
-                            <TableCell style={{ width: '30%' }}  >
-                              Доставка
-                            </TableCell>
-                            <TableCell style={{ width: '10%' }}  ></TableCell>
+                            <TableCell style={{ width: '30%' }}>Дата</TableCell>
+                            <TableCell style={{ width: '30%' }}>Время</TableCell>
+                            <TableCell style={{ width: '30%' }}>Доставка</TableCell>
+                            <TableCell style={{ width: '10%' }}></TableCell>
                           </TableRow>
                         </TableHead>
+                        <TableBody sx={{ '& td': { border: 0 }, borderBottom: 1, borderColor: 'divider' }}
+                        >
                         {this.state.item.map((item, key) => (
-                          <TableBody
-                            key={key + 100}
-                            sx={{
-                              '& td': { border: 0 },
-                              borderBottom: 1,
-                              borderColor: 'divider',
-                            }}
-                          >
-                            <TableRow>
-                              <TableCell  >{item.data}</TableCell>
-                              <TableCell  >
-                                {item.time_start} - {item.time_end}
-                              </TableCell>
-                              <TableCell  >{item.quantity}</TableCell>
-                              <TableCell  >
-                                <CloseIcon
-                                  onClick={this.deleteItemAccordion.bind(
-                                    this,
-                                    item.id_row
-                                  )}
-                                  style={{ cursor: 'pointer' }}
-                                />
-                              </TableCell>
+                            <TableRow  key={key + 100}>
+                              <TableCell>{item.date}</TableCell>
+                              <TableCell>{item.time_start} - {item.time_end}</TableCell>
+                              <TableCell>{item.time_dev}</TableCell>
+                              <TableCell><CloseIcon onClick={this.deleteItem.bind(this, item.id, 'time_other')} style={{ cursor: 'pointer' }}/></TableCell>
                             </TableRow>
-                          </TableBody>
                         ))}
+                        </TableBody>
                       </Table>
                     </TableContainer>
-                
-                    </Accordion>
-                  </AccordionDetails>
-                </Accordion>
-              </Grid>
+                  </Accordion>
+                </AccordionDetails>
+              </Accordion>
             </Grid>
           )}
         </Grid>
 
         {/* карточки/таблица */}
-        {this.state.point < 1 && this.state.cardData.length ? null : (
-          <Grid container item xs={12} spacing={3} direction="row">
-            {this.state.cardData.map((item, key) => (
-              <Grid item sm={3}  key={key}>
-                <Card
-                  variant="outlined"
-                  sx={{
-                    border: 1,
-                    boxShadow: 1,
-                    borderRadius: 2,
-                    p: 2,
-                  }}
-                >
+        {!this.state.itemData.length ? null : (
+          <Grid container item xs={12} spacing={3}>
+            {this.state.itemData.map((item, key) => (
+              <Grid item sm={3} xs={12} key={key}>
+                <Card variant="outlined" sx={{ border: 1, boxShadow: 1, borderRadius: 2, p: 2, marginBottom: key === 6 ? 10 : '' }}>
                   <Grid align="center">{item.day_week}</Grid>
                   <Divider />
                   <Table size="small" style={{ whiteSpace: 'nowrap' }}>
                     <TableHead>
                       <TableRow>
                         <TableCell style={{ maxWidth: '40%' }}>Время</TableCell>
-                        <TableCell style={{ maxWidth: '40%' }}>
-                          {' '}
-                          Доставка
-                        </TableCell>
+                        <TableCell style={{ maxWidth: '40%' }}>Доставка</TableCell>
                         <TableCell style={{ maxWidth: '20%' }}></TableCell>
                       </TableRow>
                     </TableHead>
+                    <TableBody sx={{ '& td': { border: 0 }, borderBottom: 1, borderColor: 'divider' }}>
                     {item.data.map((item, key) => (
-                      <TableBody
-                        key={key + 100}
-                        sx={{
-                          '& td': { border: 0 },
-                          borderBottom: 1,
-                          borderColor: 'divider',
-                        }}
-                      >
-                        <TableRow>
-                          <TableCell>
-                            {item.time_start} - {item.time_end}
-                          </TableCell>
-                          <TableCell>{item.quantity}</TableCell>
-                          <TableCell>
-                            <CloseIcon
-                              onClick={this.deleteItemCard.bind(
-                                this,
-                                item.id_row
-                              )}
-                              style={{ cursor: 'pointer' }}
-                            />
+                        <TableRow key={key + 100} style={{ cursor: 'pointer' }} onClick={this.openModal.bind(this, 'Редактирование времени', 'editEvent', item)}>
+                          <TableCell>{item.time_start} - {item.time_end}</TableCell>
+                          <TableCell>{item.time_dev}</TableCell>
+                          <TableCell style={{ padding: 0 }}>
+                            <CloseIcon onClick={this.deleteItem.bind(this, item.id, 'time')} />
                           </TableCell>
                         </TableRow>
-                      </TableBody>
                     ))}
+                    </TableBody>
                   </Table>
-                  <Button size="sm" fullWidth={true} onClick={this.openModal.bind(this, 'Добавить в текущие заказы')}>
+                  <Button
+                    size="sm"
+                    fullWidth={true}
+                    onClick={this.openModal.bind(this, '- текущие заказы', 'newEvent', item)}
+                  >
                     Добавить
                   </Button>
                 </Card>

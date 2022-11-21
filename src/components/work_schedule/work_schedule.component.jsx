@@ -289,6 +289,8 @@ class WorkSchedule_Table extends React.Component {
   }
 
   render() {
+    let check_period = this.props.test.find( item => item.row !== 'header' && parseInt(item.data.check_period) == 0 );
+
     return (
       <TableContainer component={Paper}>
         <Table
@@ -299,6 +301,13 @@ class WorkSchedule_Table extends React.Component {
           }
         >
           <TableBody>
+
+            { !check_period ? null :
+              <TableRow>
+                <TableCell colSpan={25} style={{ textAlign: 'center', color: 'red', fontSize: '3rem' }}>Чтобы увидеть зарплату, надо закрыть все ошибки в модуле "Регистрация ошибок кухни"</TableCell>
+              </TableRow>
+            }
+
             {this.props.test.map((item, key) =>
               item.row == 'header' ? (
                 <HeaderItem
@@ -341,11 +350,7 @@ class WorkSchedule_Table extends React.Component {
 
                   {item.data.dates.map((date, date_k) => (
                     <TableCell
-                      onClick={this.props.openH.bind(
-                        this,
-                        item.data,
-                        date.date
-                      )}
+                      onClick={this.props.openH.bind(this, item.data,date.date)}
                       className="min_block"
                       style={{
                         backgroundColor: date.info ? date.info.color : '#fff',
@@ -369,21 +374,21 @@ class WorkSchedule_Table extends React.Component {
                     onClick={ this.props.kind == 'manager' ? () => {} : this.props.pricePerHour.bind(this, item.data) }
                   >{item.data.price_p_h}</TableCell>
 
-                  <TableCell style={{ textAlign: 'center' }}>{item.data.dop_bonus}</TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>{item.data.h_price}</TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>{item.data.err_price}</TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>{item.data.my_bonus}</TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.dop_bonus : ' - '}</TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.h_price : ' - '}</TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.err_price : ' - '}</TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.my_bonus : ' - '}</TableCell>
                     
 
                   {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                     <TableCell style={{ textAlign: 'center' }}>
-                      {parseInt(item.data.dop_bonus) +
+                      { parseInt(item.data.check_period) == 1 ? (parseInt(item.data.dop_bonus) +
                         parseInt(item.data.dir_price) +
                         parseInt(item.data.dir_price_dop) +
                         parseInt(item.data.h_price) +
                         parseInt(item.data.my_bonus) -
                         parseInt(item.data.err_price) +
-                        ''}
+                        '') : ' - '}
                     </TableCell>
                   ) : null}
 
@@ -663,20 +668,20 @@ class WorkSchedule_Table_without_functions extends React.Component {
                         {item.data.price_p_h}
                       </TableCell>
 
-                      <TableCell style={{ textAlign: 'center' }}>{item.data.dop_bonus}</TableCell>
-                      <TableCell style={{ textAlign: 'center' }}>{item.data.h_price}</TableCell>
-                      <TableCell style={{ textAlign: 'center' }}>{item.data.err_price}</TableCell>
-                      <TableCell style={{ textAlign: 'center' }}>{item.data.my_bonus}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.dop_bonus : ' - '}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.h_price : ' - '}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.err_price : ' - '}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.my_bonus : ' - '}</TableCell>
                         
                       {this.props.show_zp == 1 || this.props.show_zp == 0 ? (
                         <TableCell style={{ textAlign: 'center' }}>
-                          {parseInt(item.data.dop_bonus) +
+                          { parseInt(item.data.check_period) == 1 ? (parseInt(item.data.dop_bonus) +
                             parseInt(item.data.dir_price) +
                             parseInt(item.data.dir_price_dop) +
                             parseInt(item.data.h_price) +
                             parseInt(item.data.my_bonus) -
                             parseInt(item.data.err_price) +
-                            ''}
+                            '') : ' - ' }
                         </TableCell>
                       ) : null}
 
@@ -2063,12 +2068,7 @@ class WorkSchedule_ extends React.Component {
                   ' / Средняя нагрузка: ' +
                   this.state.userInfo.user.all_load_h}
               </Typography>
-              {this.state.show_bonus === false ? null : (
-                <Typography style={{ marginBottom: 20 }}>
-                  {'Бонус: ' + this.state.userInfo.user.bonus}
-                </Typography>
-              )}
-
+              
               {this.state.otherAppList.length == 0 ? null : (
                 <MySelect
                   data={this.state.otherAppList}
@@ -2312,9 +2312,7 @@ class WorkSchedule_ extends React.Component {
             id={'OpenModalM'}
           >
             <DialogTitle>
-              {this.state.userInfo.user.app_name +
-                ' ' +
-                this.state.userInfo.user.user_name}
+              {this.state.userInfo.user.app_name + ' ' + this.state.userInfo.user.user_name}
             </DialogTitle>
             <DialogContent>
               <Grid container spacing={3}>
@@ -2504,6 +2502,11 @@ class WorkSchedule_ extends React.Component {
                 <Grid item xs={12} sm={6} className="cellErr">
                   <b>Дата время ошибки</b>
                   <span>{this.state.showErrCam.date_time_fine}</span>
+                </Grid>
+
+                <Grid item xs={12} className="cellErr">
+                  <b>Комментарий</b>
+                  <span>{this.state.showErrCam.comment}</span>
                 </Grid>
 
                 <Grid item xs={12}>
