@@ -2068,12 +2068,7 @@ class WorkSchedule_ extends React.Component {
                   ' / Средняя нагрузка: ' +
                   this.state.userInfo.user.all_load_h}
               </Typography>
-              {this.state.show_bonus === false ? null : (
-                <Typography style={{ marginBottom: 20 }}>
-                  {'Бонус: ' + this.state.userInfo.user.bonus}
-                </Typography>
-              )}
-
+              
               {this.state.otherAppList.length == 0 ? null : (
                 <MySelect
                   data={this.state.otherAppList}
@@ -2317,9 +2312,7 @@ class WorkSchedule_ extends React.Component {
             id={'OpenModalM'}
           >
             <DialogTitle>
-              {this.state.userInfo.user.app_name +
-                ' ' +
-                this.state.userInfo.user.user_name}
+              {this.state.userInfo.user.app_name + ' ' + this.state.userInfo.user.user_name}
             </DialogTitle>
             <DialogContent>
               <Grid container spacing={3}>
@@ -2509,6 +2502,11 @@ class WorkSchedule_ extends React.Component {
                 <Grid item xs={12} sm={6} className="cellErr">
                   <b>Дата время ошибки</b>
                   <span>{this.state.showErrCam.date_time_fine}</span>
+                </Grid>
+
+                <Grid item xs={12} className="cellErr">
+                  <b>Комментарий</b>
+                  <span>{this.state.showErrCam.comment}</span>
                 </Grid>
 
                 <Grid item xs={12}>
