@@ -180,7 +180,7 @@ class EventTime1_Modal extends React.Component {
 
   onClose() {
     this.setState({
-      item: null,
+      item: this.props.event ? this.props.event : null,
       data: [],
       error: '',
     });
@@ -223,14 +223,9 @@ class EventTime1_Modal extends React.Component {
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle className="button">
-            <Typography style={{ fontWeight: 'normal' }}>
-              {this.props.method}
-            </Typography>
+            <Typography style={{ fontWeight: 'normal' }}>{this.props.method}</Typography>
             {this.state.fullScreen ? (
-              <IconButton
-                onClick={this.onClose.bind(this)}
-                style={{ cursor: 'pointer' }}
-              >
+              <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
                 <CloseIcon />
               </IconButton>
             ) : null}
@@ -430,33 +425,49 @@ class EventTime1_ extends React.Component {
   };
 
   async changePoint(event) {
+
     const zone_id = event.target.value;
 
-    const itemData = JSON.parse(JSON.stringify(this.state.cardData));
+    if(event.target.value) {
 
-    const zone = {
-      zone_id,
-    };
-
-    const res = await this.getData('get_data', zone);
-
-    res.dows.forEach((item) => {
-      itemData.forEach((el) => {
-        if (item.dow === el.day_id) {
-          el.data.push(item);
-        }
+      const itemData = JSON.parse(JSON.stringify(this.state.cardData));
+  
+      const zone = {
+        zone_id,
+      };
+  
+      const res = await this.getData('get_data', zone);
+  
+      res.dows.forEach((item) => {
+        itemData.forEach((el) => {
+          if (item.dow === el.day_id) {
+            el.data.push(item);
+          }
+        });
       });
-    });
+  
+      this.setState({
+        point: zone_id,
+        item: res.other_days,
+        itemData,
+      });
 
-    this.setState({
-      point: zone_id,
-      item: res.other_days,
-      itemData,
-    });
+    } else {
+
+      this.setState({
+        point: zone_id,
+        item: [],
+        itemData: [],
+      });
+
+    }
+
   }
 
   openModal(method, mark, item) {
+
     if (mark === 'newDay') {
+
       const itemNew = JSON.parse(JSON.stringify(this.state.itemNew));
 
       itemNew.zone_id = this.state.point;
@@ -470,6 +481,7 @@ class EventTime1_ extends React.Component {
     }
 
     if (mark === 'newEvent') {
+
       const itemNew = JSON.parse(JSON.stringify(this.state.itemNew));
 
       itemNew.zone_id = this.state.point;
@@ -487,6 +499,7 @@ class EventTime1_ extends React.Component {
     }
 
     if (mark === 'editEvent') {
+
       this.setState({
         modalDialog: true,
         method,
@@ -501,32 +514,34 @@ class EventTime1_ extends React.Component {
     item.time = `${item.time_start}-${item.time_end}`
 
     if (mark === 'newDay') {
-      // await this.getData('save_new_cur_other', item);
+      await this.getData('save_new_cur_other', item);
     }
 
     if (mark === 'newEvent') {
-      // await this.getData('save_new_cur', item);
+      await this.getData('save_new_cur', item);
     }
 
     if (mark === 'editEvent') {
-      // await this.getData('save_edit_cur_time', item);
+      await this.getData('save_edit_cur_time', item);
     }
 
     this.update();
 
   }
 
-  async deleteItem(time_id, mark) {
+  async deleteItem(time_id, mark, event) {
+    event.stopPropagation();
+
     const data = {
       time_id,
     };
 
     if (mark === 'time') {
-      // await this.getData('del_time', data);
+      await this.getData('del_time', data);
     }
 
     if (mark === 'time_other') {
-      // await this.getData('del_time_other', data);
+      await this.getData('del_time_other', data);
     }
 
     this.update();
@@ -607,13 +622,8 @@ class EventTime1_ extends React.Component {
           {!this.state.item.length ? null : (
             <Grid item sm={5} xs={12} mb={3}>
               <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                >
-                  <Typography style={{ whiteSpace: 'nowrap' }}>
-                    Особые дни
-                  </Typography>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content">
+                  <Typography style={{ whiteSpace: 'nowrap' }}> Особые дни </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Accordion>
@@ -622,43 +632,22 @@ class EventTime1_ extends React.Component {
                         <TableHead>
                           <TableRow>
                             <TableCell style={{ width: '30%' }}>Дата</TableCell>
-                            <TableCell style={{ width: '30%' }}>
-                              Время
-                            </TableCell>
-                            <TableCell style={{ width: '30%' }}>
-                              Доставка
-                            </TableCell>
+                            <TableCell style={{ width: '30%' }}>Время</TableCell>
+                            <TableCell style={{ width: '30%' }}>Доставка</TableCell>
                             <TableCell style={{ width: '10%' }}></TableCell>
                           </TableRow>
                         </TableHead>
+                        <TableBody sx={{ '& td': { border: 0 }, borderBottom: 1, borderColor: 'divider' }}
+                        >
                         {this.state.item.map((item, key) => (
-                          <TableBody
-                            key={key + 100}
-                            sx={{
-                              '& td': { border: 0 },
-                              borderBottom: 1,
-                              borderColor: 'divider',
-                            }}
-                          >
-                            <TableRow>
+                            <TableRow  key={key + 100}>
                               <TableCell>{item.date}</TableCell>
-                              <TableCell>
-                                {item.time_start} - {item.time_end}
-                              </TableCell>
+                              <TableCell>{item.time_start} - {item.time_end}</TableCell>
                               <TableCell>{item.time_dev}</TableCell>
-                              <TableCell>
-                                <CloseIcon
-                                  onClick={this.deleteItem.bind(
-                                    this,
-                                    item.id,
-                                    'time_other'
-                                  )}
-                                  style={{ cursor: 'pointer' }}
-                                />
-                              </TableCell>
+                              <TableCell><CloseIcon onClick={this.deleteItem.bind(this, item.id, 'time_other')} style={{ cursor: 'pointer' }}/></TableCell>
                             </TableRow>
-                          </TableBody>
                         ))}
+                        </TableBody>
                       </Table>
                     </TableContainer>
                   </Accordion>
@@ -673,71 +662,33 @@ class EventTime1_ extends React.Component {
           <Grid container item xs={12} spacing={3}>
             {this.state.itemData.map((item, key) => (
               <Grid item sm={3} xs={12} key={key}>
-                <Card
-                  variant="outlined"
-                  sx={{
-                    border: 1,
-                    boxShadow: 1,
-                    borderRadius: 2,
-                    p: 2,
-                  }}
-                >
+                <Card variant="outlined" sx={{ border: 1, boxShadow: 1, borderRadius: 2, p: 2, marginBottom: key === 6 ? 10 : '' }}>
                   <Grid align="center">{item.day_week}</Grid>
                   <Divider />
                   <Table size="small" style={{ whiteSpace: 'nowrap' }}>
                     <TableHead>
                       <TableRow>
                         <TableCell style={{ maxWidth: '40%' }}>Время</TableCell>
-                        <TableCell style={{ maxWidth: '40%' }}>
-                          Доставка
-                        </TableCell>
+                        <TableCell style={{ maxWidth: '40%' }}>Доставка</TableCell>
                         <TableCell style={{ maxWidth: '20%' }}></TableCell>
                       </TableRow>
                     </TableHead>
+                    <TableBody sx={{ '& td': { border: 0 }, borderBottom: 1, borderColor: 'divider' }}>
                     {item.data.map((item, key) => (
-                      <TableBody
-                        key={key + 100}
-                        sx={{
-                          '& td': { border: 0 },
-                          borderBottom: 1,
-                          borderColor: 'divider',
-                        }}
-                      >
-                        <TableRow
-                          onClick={this.openModal.bind(
-                            this,
-                            'Редактирование времени',
-                            'editEvent',
-                            item
-                          )}
-                        >
-                          <TableCell>
-                            {item.time_start} - {item.time_end}
-                          </TableCell>
+                        <TableRow key={key + 100} style={{ cursor: 'pointer' }} onClick={this.openModal.bind(this, 'Редактирование времени', 'editEvent', item)}>
+                          <TableCell>{item.time_start} - {item.time_end}</TableCell>
                           <TableCell>{item.time_dev}</TableCell>
                           <TableCell style={{ padding: 0 }}>
-                            <CloseIcon
-                              onClick={this.deleteItem.bind(
-                                this,
-                                item.id,
-                                'time'
-                              )}
-                              style={{ cursor: 'pointer' }}
-                            />
+                            <CloseIcon onClick={this.deleteItem.bind(this, item.id, 'time')} />
                           </TableCell>
                         </TableRow>
-                      </TableBody>
                     ))}
+                    </TableBody>
                   </Table>
                   <Button
                     size="sm"
                     fullWidth={true}
-                    onClick={this.openModal.bind(
-                      this,
-                      '- текущие заказы',
-                      'newEvent',
-                      item
-                    )}
+                    onClick={this.openModal.bind(this, '- текущие заказы', 'newEvent', item)}
                   >
                     Добавить
                   </Button>
