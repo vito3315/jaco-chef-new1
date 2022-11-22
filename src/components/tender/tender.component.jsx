@@ -166,6 +166,7 @@ class Tender_ extends React.Component {
       city: event.target.value,
       allVendors: res.vendors,
       allTenders: res.tenders,
+      tender: res.tenders[0],
       allCats: res.cats,
     });
   }
