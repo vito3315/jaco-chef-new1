@@ -76,14 +76,17 @@ class Tender_ extends React.Component {
       city: '',
 
       allVendors: [],
+      allTenders: [],
+
+      tender: "",
 
       vendors: [],
       vendor: [],
 
       cats: [],
 
-      newCats: [],
-      newCat: '',
+      allCats: [],
+      newCat: [],
 
       all_price: '',
     };
@@ -92,14 +95,9 @@ class Tender_ extends React.Component {
   async componentDidMount() {
     let data = await this.getData('get_all');
 
-    // console.log(data);
-
     this.setState({
       module_name: data.module_info.name,
       cities: data.cities,
-      city: data.cities[0].id,
-      allVendors: data.vendors,
-      newCats: data.cats,
     });
 
     document.title = data.module_info.name;
@@ -151,6 +149,12 @@ class Tender_ extends React.Component {
       });
   };
 
+  changeTender(event, data){
+    this.setState({
+      tender: data
+    });
+  }
+
   async changeCity(event) {
     const data = {
       city_id: event.target.value,
@@ -158,11 +162,11 @@ class Tender_ extends React.Component {
 
     const res = await this.getData('get_vendors', data);
 
-    // console.log(res)
-
     this.setState({
       city: event.target.value,
-      allVendors: res,
+      allVendors: res.vendors,
+      allTenders: res.tenders,
+      allCats: res.cats,
     });
   }
 
@@ -185,6 +189,7 @@ class Tender_ extends React.Component {
       city_id: this.state.city,
       vendors: this.state.vendor,
       cat: this.state.newCat,
+      date: this.state.tender.name
     };
 
     const res = await this.getData('get_data', data);
@@ -303,8 +308,19 @@ class Tender_ extends React.Component {
               label="Город"
             />
           </Grid>
+          <Grid item xs={12} sm={3}>
+            <MyAutocomplite
+              label="Тендер"
+              multiple={false}
+              data={this.state.allTenders}
+              value={this.state.tender}
+              func={this.changeTender.bind(this)}
+            />
+          </Grid>
+        </Grid>
 
-          <Grid item xs={12} sm={6}>
+        <Grid container spacing={3} justifyContent="center">
+          <Grid item xs={8}>
             <MyAutocomplite
               label="Поставщик"
               multiple={true}
@@ -313,39 +329,42 @@ class Tender_ extends React.Component {
               func={this.changeVendor.bind(this)}
             />
           </Grid>
+         
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={8}>
             <MyAutocomplite
               label="Категория"
               multiple={false}
-              data={this.state.newCats}
+              data={this.state.allCats}
               value={this.state.newCat}
               func={this.changeCat.bind(this)}
             />
           </Grid>
 
-          <Grid container spacing={3} item sm={3}>
-            <Grid item xs={12} sm={6}>
-              <Button
-                variant="contained"
-                style={{ whiteSpace: 'nowrap' }}
-                onClick={this.getDataTable.bind(this)}
-              >
-                Обновить данные
-              </Button>
-            </Grid>
+          <Grid item sm={6}>
+            <Grid container spacing={3} justifyContent="center">
+              <Grid item xs={12} sm={6}>
+                <Button
+                  variant="contained"
+                  style={{ whiteSpace: 'nowrap' }}
+                  onClick={this.getDataTable.bind(this)}
+                >
+                  Обновить данные
+                </Button>
+              </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <Button
-                style={{
-                  whiteSpace: 'nowrap',
-                  backgroundColor: '#00a550',
-                  color: 'white',
-                }}
-                onClick={this.saveData.bind(this)}
-              >
-                Сохранить изменения
-              </Button>
+              <Grid item xs={12} sm={6}>
+                <Button
+                  style={{
+                    whiteSpace: 'nowrap',
+                    backgroundColor: '#00a550',
+                    color: 'white',
+                  }}
+                  onClick={this.saveData.bind(this)}
+                >
+                  Сохранить изменения
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
