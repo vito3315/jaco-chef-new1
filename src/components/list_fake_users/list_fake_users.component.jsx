@@ -318,6 +318,8 @@ class ListFakeUsers_Modal extends React.Component {
               >
                 {this.state.item ? this.state.item.count_pic : '0'}
               </Typography>
+
+              
             </Grid>
 
             <Grid
@@ -374,14 +376,23 @@ class ListFakeUsers_Modal extends React.Component {
                     : 'не было'
                   : 'не было'}
               </Typography>
-              
-              <Typography
+           
+            </Grid> 
+            <Grid
+              item
+              xs={12}
+              sm={4}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >    
+                 <Typography
                 sx={{
                   fontWeight: 'bold',
                   whiteSpace: 'nowrap',
                 }}
               >
-                Описание ошибки
+                Есть ошибки в заказах
               </Typography>
               <Typography
                 sx={{
@@ -390,12 +401,14 @@ class ListFakeUsers_Modal extends React.Component {
                 }}
               >
                 {this.state.item
-                  ? this.state.item.promo_name !== ''
-                    ? this.state.item.promo_name
-                    : 'не было'
-                  : 'не было'}
-              </Typography>
+                  ? this.state.item.error_exsist !== ''
+                    ? 'Да'
+                    : 'Нет'
+                  : ''}
+              </Typography> 
             </Grid>
+
+                        
           </Grid>
 
           {/* аккордион */}
@@ -433,6 +446,9 @@ class ListFakeUsers_Modal extends React.Component {
                           </Typography>
                           <Typography style={{ width: '15%' }} noWrap>
                             Тип
+                          </Typography>
+                          <Typography style={{ width: '15%' }} noWrap>
+                           Ошибка заказа
                           </Typography>
                         </Grid>
                       </AccordionSummary>
@@ -519,6 +535,16 @@ class ListFakeUsers_Modal extends React.Component {
                               : item.xy === ''
                               ? 'Самовывоз'
                               : 'Доставка'}
+                          </Typography>
+
+                          <Typography
+                            style={{ width: '15%', overflow: 'hidden' }}
+                            sx={{
+                              noWrap: { sm: true, xs: false },
+                              whiteSpace: { xs: 'nowrap' },
+                            }}
+                          >
+                             {item.order_desc != '' ? item.order_desc : ''} 
                           </Typography>
                         </Grid>
                       </AccordionSummary>
