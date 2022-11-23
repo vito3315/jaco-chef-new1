@@ -126,14 +126,7 @@ class Fines_err_Modal_item extends React.Component {
         </DialogTitle>
         <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
           <Grid container spacing={3} justifyContent="center" mb={3}>
-            <Grid
-              item
-              xs={12}
-              sm={4}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
+            <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
               <Typography
                 sx={{
                   fontWeight: 'bold',
@@ -148,20 +141,11 @@ class Fines_err_Modal_item extends React.Component {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {this.state.item
-                  ? this.state.item.point_info.name
-                  : 'не указана'}
+                {this.state.item ? this.state.item.point_info.name : 'не указана'}
               </Typography>
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={4}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
+            <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
               <Typography
                 sx={{
                   whiteSpace: 'nowrap',
@@ -180,14 +164,7 @@ class Fines_err_Modal_item extends React.Component {
               </Typography>
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={4}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
+            <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
               <Typography
                 sx={{
                   fontWeight: 'bold',
@@ -206,14 +183,7 @@ class Fines_err_Modal_item extends React.Component {
               </Typography>
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
+            <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
               <Typography
                 sx={{
                   whiteSpace: 'nowrap',
@@ -232,14 +202,7 @@ class Fines_err_Modal_item extends React.Component {
               </Typography>
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
+            <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
               <Typography
                 sx={{
                   fontWeight: 'bold',
@@ -258,14 +221,7 @@ class Fines_err_Modal_item extends React.Component {
               </Typography>
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
+            <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
               <Typography
                 sx={{
                   fontWeight: 'bold',
@@ -284,13 +240,7 @@ class Fines_err_Modal_item extends React.Component {
                   !this.state.item.imgs.length ? (
                     'Фото отсутствует'
                   ) : (
-                    <img
-                      src={
-                        'https://jacochef.ru/src/img/fine_err/uploads/' +
-                        this.state.item.imgs[0]
-                      }
-                      style={{ maxWidth: 300, maxHeight: 400 }}
-                    />
+                    <img src={ 'https://jacochef.ru/src/img/fine_err/uploads/' + this.state.item.imgs[0] } style={{ maxWidth: 300, maxHeight: 400 }} />
                   )
                 ) : (
                   'Фото отсутствует'
@@ -298,14 +248,7 @@ class Fines_err_Modal_item extends React.Component {
               </Grid>
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
+            <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center" >
               <Typography
                 sx={{
                   fontWeight: 'bold',
@@ -320,9 +263,7 @@ class Fines_err_Modal_item extends React.Component {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {this.state.item
-                  ? this.state.item.user.name ?? 'ФИО не указано'
-                  : 'ФИО не указано'}
+                {this.state.item ? this.state.item.user.name ?? 'ФИО не указано' : 'ФИО не указано'}
               </Typography>
               <Grid
                 sx={{
@@ -332,13 +273,7 @@ class Fines_err_Modal_item extends React.Component {
               >
                 {this.state.item ? (
                   this.state.item.user.img ? (
-                    <img
-                      src={
-                        'https://storage.yandexcloud.net/user-img/max-img/' +
-                        this.state.item.user.img
-                      }
-                      style={{ maxWidth: 300, maxHeight: 300 }}
-                    />
+                    <img src={ 'https://storage.yandexcloud.net/user-img/max-img/' + this.state.item.user.img } style={{ maxWidth: 300, maxHeight: 300 }} />
                   ) : (
                     'Фото отсутствует'
                   )
@@ -497,8 +432,6 @@ class Fines_err_Modal_NewItem extends React.Component {
     };
 
     const res = await this.props.getData('get_users', data);
-
-    // console.log(res);
 
     this.setState({
       fines: res.fines,
@@ -660,14 +593,10 @@ class Fines_err_Modal_NewItem extends React.Component {
             vertical: 'top',
             horizontal: 'center',
           }}
-          onClose={() => {
-            this.setState({ snackbar: false });
-          }}
+          onClose={() => { this.setState({ snackbar: false }); }}
         >
           <Alert
-            onClose={() => {
-              this.setState({ snackbar: false });
-            }}
+            onClose={() => { this.setState({ snackbar: false }); }}
             severity={'error'}
             sx={{ width: '100%' }}
           >
@@ -826,7 +755,7 @@ class Fines_err_Modal_NewItem extends React.Component {
 }
 
 class Fines_err_Table extends React.Component {
-  shouldComponentUpdate(nextProps) {
+  /*shouldComponentUpdate(nextProps) {
     var array1 = nextProps.list;
     var array2 = this.props.list;
 
@@ -837,7 +766,7 @@ class Fines_err_Table extends React.Component {
       });
 
     return !is_same;
-  }
+  }*/
 
   render() {
     return (
@@ -855,34 +784,38 @@ class Fines_err_Table extends React.Component {
           </TableHead>
 
           <TableBody>
-            {this.props.list.map((item, i) => (
+            {this.props.ret_list.map((item, i) => (
               <TableRow
                 key={i}
                 style={{ cursor: 'pointer' }}
-                onClick={this.props.openModal.bind(
-                  this,
-                  'item',
-                  'Ошибка сотрудника',
-                  item.id
-                )}
+                onClick={this.props.openModal.bind(this, 'item', 'Ошибка сотрудника', item.id)}
               >
                 <TableCell>{item.find_user_name}</TableCell>
                 <TableCell>{item.user_name}</TableCell>
-                <TableCell>
-                  {item.date} {item.time}
-                </TableCell>
+                <TableCell>{item.date} {item.time}</TableCell>
                 <TableCell>{item.date_close}</TableCell>
                 <TableCell>{item.fine_name}</TableCell>
                 <TableCell>
-                  {' '}
-                  {!item.imgs.length ? null : (
-                    <img
-                      src={
-                        'https://jacochef.ru/src/img/fine_err/uploads/' +
-                        item.imgs[0]
-                      }
-                      style={{ maxWidth: 150, maxHeight: 150 }}
-                    />
+                  {item.imgs.length == 0 ? null : (
+                    <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + item.imgs[0]} style={{ maxWidth: 150, maxHeight: 150 }} />
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+            {this.props.all_list.map((item, i) => (
+              <TableRow
+                key={i}
+                style={{ cursor: 'pointer', backgroundColor: item.user_name == null ? '#926eae' : '#6ab04c', color: '#fff', fontWeight: 300 }}
+                onClick={this.props.openModal.bind(this, 'item', 'Ошибка сотрудника', item.id)}
+              >
+                <TableCell>{item.find_user_name}</TableCell>
+                <TableCell>{item.user_name}</TableCell>
+                <TableCell>{item.date} {item.time}</TableCell>
+                <TableCell>{item.date_close}</TableCell>
+                <TableCell>{item.fine_name}</TableCell>
+                <TableCell>
+                  {item.imgs.length == 0 ? null : (
+                    <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + item.imgs[0]} style={{ maxWidth: 150, maxHeight: 150 }} />
                   )}
                 </TableCell>
               </TableRow>
@@ -925,8 +858,6 @@ class Fines_err_ extends React.Component {
 
   async componentDidMount() {
     let data = await this.getData('get_all');
-
-    // console.log(data);
 
     this.setState({
       points: data.points,
@@ -997,8 +928,6 @@ class Fines_err_ extends React.Component {
     if (method === 'newItem') {
       const res = await this.getData('get_all_for_new');
 
-      // console.log(res);
-
       this.setState({
         pointsDialog: res.points,
         modalDialogNew: true,
@@ -1014,8 +943,6 @@ class Fines_err_ extends React.Component {
 
       const res = await this.getData('get_one', data);
 
-      // console.log(res);
-
       this.setState({
         item: res,
         modalDialog: true,
@@ -1026,27 +953,17 @@ class Fines_err_ extends React.Component {
   }
 
   async getItems() {
-    const point_id = this.state.point;
-
-    const date_start = this.state.date_start;
-
-    const date_end = this.state.date_end;
-
     const data = {
-      point_id,
-      date_start,
-      date_end,
+      point_id: this.state.point,
+      date_start: this.state.date_start,
+      date_end: this.state.date_end,
     };
-
-    // console.log(data);
 
     const res = await this.getData('get_data', data);
 
-    // console.log(res);
-
     this.setState({
       all_list: res.all_list,
-      ret_list: res.ret_list,
+      ret_list: res.ret_list
     });
   }
 
@@ -1066,9 +983,7 @@ class Fines_err_ extends React.Component {
 
         <Fines_err_Modal_NewItem
           open={this.state.modalDialogNew}
-          onClose={() => {
-            this.setState({ modalDialogNew: false });
-          }}
+          onClose={() => { this.setState({ modalDialogNew: false }); }}
           method={this.state.method}
           points={this.state.pointsDialog}
           text={this.state.text}
@@ -1078,9 +993,7 @@ class Fines_err_ extends React.Component {
 
         <Fines_err_Modal_item
           open={this.state.modalDialog}
-          onClose={() => {
-            this.setState({ modalDialog: false });
-          }}
+          onClose={() => { this.setState({ modalDialog: false }); }}
           method={this.state.method}
           text={this.state.text}
           item={this.state.item}
@@ -1131,14 +1044,15 @@ class Fines_err_ extends React.Component {
             </Button>
           </Grid>
 
-          {!this.state.all_list.length ? null : (
-            <Grid item xs={12} sm={12}>
-              <Fines_err_Table
-                list={this.state.all_list}
-                openModal={this.openModal.bind(this)}
-              />
-            </Grid>
-          )}
+         
+          <Grid item xs={12} sm={12}>
+            <Fines_err_Table
+              all_list={this.state.all_list}
+              ret_list={this.state.ret_list}
+              openModal={this.openModal.bind(this)}
+            />
+          </Grid>
+    
         </Grid>
       </>
     );
