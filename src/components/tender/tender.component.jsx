@@ -287,6 +287,25 @@ class Tender_ extends React.Component {
     // console.log(res)
   }
 
+  async downLoadVendor(vendor_id){
+    const data = {
+      city_id: this.state.city,
+      vendor_id: vendor_id,
+      date: this.state.tender['name']
+    };
+
+    await this.getData('downLoadVendor', data);
+  }
+
+  async downLoadAll(){
+    const data = {
+      city_id: this.state.city,
+      date: this.state.tender['name']
+    };
+
+    await this.getData('downLoadAll', data);
+  }
+
   render() {
     return (
       <>
@@ -344,7 +363,7 @@ class Tender_ extends React.Component {
 
           <Grid item sm={6}>
             <Grid container spacing={3} justifyContent="center">
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={4}>
                 <Button
                   variant="contained"
                   style={{ whiteSpace: 'nowrap' }}
@@ -354,7 +373,7 @@ class Tender_ extends React.Component {
                 </Button>
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={4}>
                 <Button
                   style={{
                     whiteSpace: 'nowrap',
@@ -366,6 +385,20 @@ class Tender_ extends React.Component {
                   Сохранить изменения
                 </Button>
               </Grid>
+
+              <Grid item xs={12} sm={4}>
+                <Button
+                  style={{
+                    whiteSpace: 'nowrap',
+                    backgroundColor: '#00a550',
+                    color: 'white',
+                  }}
+                  onClick={this.downLoadAll.bind(this)}
+                >
+                  скачать
+                </Button>
+              </Grid>
+
             </Grid>
           </Grid>
         </Grid>
@@ -407,6 +440,24 @@ class Tender_ extends React.Component {
                           }}
                         >
                           {vendor.name}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+
+                    <TableRow>
+                      <TableCell style={{ zIndex: 3 }}></TableCell>
+                      <TableCell></TableCell>
+                      <TableCell></TableCell>
+                      {this.state.vendors.map((vendor, key) => (
+                        <TableCell
+                          key={key}
+                          style={{
+                            maxWidth: 150,
+                            textAlign: 'center',
+                          }}
+                          onClick={this.downLoadVendor.bind(this, vendor.id)}
+                        >
+                          скачать
                         </TableCell>
                       ))}
                     </TableRow>
