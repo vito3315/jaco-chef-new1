@@ -59,6 +59,7 @@ import {
   MyTimePicker,
   MyDatePickerGraph,
   formatDate,
+  MyAutocomplite
 } from '../../stores/elements';
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 
@@ -263,8 +264,9 @@ class HeaderItem extends React.Component {
 
         <TableRow style={{ backgroundColor: '#e5e5e5' }}>
           <TableCell
-            style={{ textAlign: 'center' }}
+            style={{ textAlign: 'center', cursor: 'pointer' }}
             colSpan={this.props.days.length + 3 + 7}
+            onClick={ this.props.kind == 'manager' ? () => {} : this.props.editSmena ? this.props.editSmena.bind(this, this.props.item.smena_id) : () => { console.log('no_edit_smena') } }
           >
             {this.props.item.data}
           </TableCell>
@@ -324,9 +326,10 @@ class WorkSchedule_Table extends React.Component {
                     dataKey={key}
                     days={this.props.number.days}
                     item={item}
+                    editSmena={this.props.editSmena.bind(this)}
                   />
 
-                  { parseInt(key) == 0 ? 
+                  { parseInt(key) == 0 && this.props.kind !== 'manager' && this.props.kind !== 'other' ? 
                     <TableRow>
                       <TableCell colSpan={25} style={{ textAlign: 'left', fontSize: '3rem', cursor: 'pointer' }} onClick={this.props.addSmena.bind(this)}>Добавить смену</TableCell>
                     </TableRow>
@@ -957,6 +960,9 @@ class WorkSchedule_ extends React.Component {
       errOrdersTwoCam: [],
 
       newSmena: false,
+      editSmena: false,
+      allUsers: [],
+      smena: null,
       newSmenaName: '',
     };
   }
@@ -1716,11 +1722,136 @@ class WorkSchedule_ extends React.Component {
     })
   }
 
-  addSmena(){
+  async addSmena(){
+    let data = {
+      point_id: this.state.point,
+    };
+
+    let res = await this.getData('getAllForNewSmena', data);
+
+    console.log( res )
+
     this.setState({ 
       newSmena: true, 
-      newSmenaName: '' 
+      newSmenaName: '',
+      allUsers: res.free_users
     });
+  }
+
+  async editSmena(id){
+    let data = {
+      id: id,
+      point_id: this.state.point,
+    };
+
+    let res = await this.getData('getOneSmena', data);
+
+    console.log( res )
+
+    this.setState({ 
+      editSmena: true, 
+      smena: res.smena,
+      newSmenaName: res.smena.name,
+      allUsers: res.free_users,
+    });
+  }
+
+  async saveNewSmena(){
+    let data = {
+      name: this.state.newSmenaName,
+      point_id: this.state.point,
+      users: this.state.allUsers
+    };
+
+    let res = await this.getData('saveNewSmena', data);
+
+    console.log( res )
+
+    if (res['st'] == true) {
+      this.setState({
+        newSmenaName: '',
+        newSmena: false,
+        allUsers: [],
+      });
+
+      setTimeout(() => {
+        this.updateData();
+      }, 300);
+    } else {
+      alert(res['text']);
+    }
+  }
+
+  async saveEditSmena(){
+    let data = {
+      id: this.state.smena.id,
+      name: this.state.newSmenaName,
+      point_id: this.state.point,
+      users: this.state.allUsers
+    };
+
+    let res = await this.getData('saveEditSmena', data);
+
+    console.log( res )
+
+    if (res['st'] == true) {
+      this.setState({
+        newSmenaName: '',
+        editSmena: false,
+        smena: null,
+        allUsers: [],
+      });
+
+      setTimeout(() => {
+        this.updateData();
+      }, 300);
+    } else {
+      alert(res['text']);
+    }
+  }
+
+  async deleteSmena(){
+    if (confirm("Удалить смену ?")) {
+      let data = {
+        id: this.state.smena.id,
+        point_id: this.state.point,
+        users: this.state.allUsers
+      };
+  
+      let res = await this.getData('deleteSmena', data);
+  
+      console.log( res )
+  
+      if (res['st'] == true) {
+        this.setState({
+          newSmenaName: '',
+          editSmena: false,
+          smena: null,
+          allUsers: [],
+        });
+  
+        setTimeout(() => {
+          this.updateData();
+        }, 300);
+      } else {
+        alert(res['text']);
+      }
+    } 
+  }
+
+  changeNewSmenaUsers(user_id){
+
+    const userList = this.state.allUsers;
+
+    userList.map( (item, key) => {
+      if( parseInt(item.id) == parseInt(user_id) ){ 
+        userList[ key ]['is_my'] = parseInt(item.is_my) == 1 ? 0 : 1;
+      }
+    })
+
+    this.setState({ 
+      allUsers: userList
+    })
   }
 
   render() {
@@ -2597,13 +2728,127 @@ class WorkSchedule_ extends React.Component {
         >
           <DialogTitle>Новая смена</DialogTitle>
           <DialogContent>
-            <MyTextInput
-              label="Название смены"
-              value={this.state.newSmenaName}
-              func={(event) => this.setState({ newSmenaName: event.target.value }) }
-            />
-          </DialogContent>
 
+            <Grid container spacing={3} style={{ marginTop: 10 }}>
+              <Grid item xs={12} sm={12}>
+                <MyTextInput
+                  label="Название смены"
+                  value={this.state.newSmenaName}
+                  func={(event) => this.setState({ newSmenaName: event.target.value }) }
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={12}>
+                <List className='userSmenalist'>
+                  { this.state.allUsers.map( (item, key) =>
+                    <ListItemButton
+                      key={item.id}
+                      disableRipple={false}
+                      selected={ parseInt(item.is_my) === 1 }
+                      onClick={this.changeNewSmenaUsers.bind(this, item.id)}
+                    >
+                      <ListItemText primary={item.name} />
+                    </ListItemButton>
+                  ) }
+                
+                </List>
+              </Grid>
+            </Grid>
+
+          </DialogContent>
+          <DialogActions
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Button
+              style={{ backgroundColor: 'green', color: '#fff' }}
+              onClick={this.saveNewSmena.bind(this)}
+            >
+              Сохранить
+            </Button>
+            <Button
+              style={{ backgroundColor: 'red', color: '#fff' }}
+              onClick={() => {
+                this.setState({ newSmena: false });
+              }}
+            >
+              Отмена
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          onClose={() => { this.setState({ editSmena: false, newSmenaName: '' }); }}
+          open={this.state.editSmena}
+          fullWidth={true}
+        >
+          <DialogTitle>Редактирование смены</DialogTitle>
+          <DialogContent>
+            
+            <Grid container spacing={3} >
+              <Grid item xs={12} sm={12}>
+                <span style={{ color: 'red', fontWeight: 'bold' }}>Все изменения применяются сразу</span>
+              </Grid>
+
+              <Grid item xs={12} sm={12}>
+                <MyTextInput
+                  label="Название смены"
+                  value={this.state.newSmenaName}
+                  func={(event) => this.setState({ newSmenaName: event.target.value }) }
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={12}>
+                <List className='userSmenalist'>
+                  { this.state.allUsers.map( (item, key) =>
+                    <ListItemButton
+                      key={item.id}
+                      disableRipple={false}
+                      selected={ parseInt(item.is_my) === 1 }
+                      onClick={this.changeNewSmenaUsers.bind(this, item.id)}
+                    >
+                      <ListItemText primary={item.name} />
+                    </ListItemButton>
+                  ) }
+                
+                  <ListItemButton
+                    disableRipple={false}
+                    selected={ true }
+                    onClick={this.deleteSmena.bind(this)}
+                    className='SmenaDelete'
+                  >
+                    <ListItemText primary="Удалить смену" />
+                  </ListItemButton>
+                </List>
+              </Grid>
+            </Grid>
+
+          </DialogContent>
+          <DialogActions
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Button
+              style={{ backgroundColor: 'green', color: '#fff' }}
+              onClick={this.saveEditSmena.bind(this)}
+            >
+              Сохранить
+            </Button>
+            <Button
+              style={{ backgroundColor: 'red', color: '#fff' }}
+              onClick={() => {
+                this.setState({ editSmena: false });
+              }}
+            >
+              Отмена
+            </Button>
+          </DialogActions>
         </Dialog>
 
         <Grid container spacing={3}>
@@ -2696,6 +2941,7 @@ class WorkSchedule_ extends React.Component {
                     mix={this.mix.bind(this)}
                     pricePerHour={this.pricePerHour.bind(this)}
                     addSmena={this.addSmena.bind(this)}
+                    editSmena={this.editSmena.bind(this)}
                   />
                 )}
               </TabPanel>
@@ -2741,6 +2987,7 @@ class WorkSchedule_ extends React.Component {
                     mix={this.mix.bind(this)}
                     pricePerHour={this.pricePerHour.bind(this)}
                     addSmena={this.addSmena.bind(this)}
+                    editSmena={this.editSmena.bind(this)}
                   />
                 )}
               </TabPanel>
