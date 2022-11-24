@@ -136,7 +136,15 @@ class OrderPostRec_TableItem extends React.Component {
 
     if( item.length > 0 ){
       vendors = item[0].vendors;
+    }else{
+      vendors = it.items[0].vendors;
     }
+
+    /*if( parseInt(it.id) == 200 ){
+      console.log( it )
+      console.log( item )
+      console.log( vendors )
+    }*/
 
     let pq = vendors.find(el => el.id === it.vendor_id_rec);
 
@@ -161,12 +169,7 @@ class OrderPostRec_TableItem extends React.Component {
             <MySelect
               data={it.items}
               value={it.item_id_rec}
-              func={this.props.changeSelect.bind(
-                this,
-                it.id,
-                'item_id_rec',
-                this.props.type
-              )}
+              func={this.props.changeSelect.bind(this, it.id, 'item_id_rec', this.props.type)}
             />
           )}
         </TableCell>
@@ -180,13 +183,8 @@ class OrderPostRec_TableItem extends React.Component {
             is_none={false}
             data={vendors}
             value={it.vendor_id_rec}
-            func={this.props.changeSelect.bind(
-                  this,
-                  it.id,
-                  'vendor_id_rec',
-                  this.props.type
-                )}
-              />
+            func={this.props.changeSelect.bind(this, it.id, 'vendor_id_rec', this.props.type)}
+          />
         </TableCell>
       </TableRow>
     )
