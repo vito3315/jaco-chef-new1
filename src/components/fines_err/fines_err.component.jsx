@@ -62,6 +62,13 @@ class Fines_err_Modal_item extends React.Component {
     this.state = {
       item: null,
       fullScreen: false,
+
+      users: [],
+      user: '',
+      selected: '',
+
+      snackbar: false,
+      error: '',
     };
   }
 
@@ -75,6 +82,7 @@ class Fines_err_Modal_item extends React.Component {
     if (this.props.item !== prevProps.item) {
       this.setState({
         item: this.props.item,
+        users: this.props.item.users,
       });
     }
   }
@@ -96,9 +104,69 @@ class Fines_err_Modal_item extends React.Component {
     }
   }
 
+  changeAutocomplite(data, event, value) {
+    if (data === 'user') {
+      this.setState({
+        [data]: value,
+        selected: value.id,
+      });
+    } else {
+      this.setState({
+        [data]: value,
+      });
+    }
+  }
+
+  changeClass(user, event) {
+    if (event.target.classList.contains('choose_user')) {
+      this.setState({
+        user: '',
+      });
+    } else {
+      this.setState({
+        user,
+      });
+    }
+
+    event.target.classList.toggle('choose_user');
+
+    this.setState({
+      selected: user.id,
+    });
+  }
+
+  save() {
+
+    const user = this.state.user;
+
+    if(!user) {
+      this.setState({
+        error: 'Укажите сотрудника!',
+        snackbar: true,
+      });
+
+      return;
+    }
+
+    const item = this.state.item;
+
+    const data = {
+      id: item.err.id,
+      user: user.id,
+    }
+
+    this.props.save(data);
+
+    this.onClose();
+  }
+
   onClose() {
     this.setState({
       item: null,
+      users: [],
+      user: '',
+      selected: '',
+      error: '',
     });
 
     this.props.onClose();
@@ -106,6 +174,23 @@ class Fines_err_Modal_item extends React.Component {
 
   render() {
     return (
+    <>
+      <Snackbar
+          open={this.state.snackbar}
+          autoHideDuration={30000}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          onClose={() => this.setState({ snackbar: false })}
+        >
+          <Alert
+            onClose={() => this.setState({ snackbar: false })}
+            severity={'error'}
+            sx={{ width: '100%' }}
+          >
+            {this.state.error}
+          </Alert>
+        </Snackbar>
+    
+    
       <Dialog
         open={this.props.open}
         onClose={this.onClose.bind(this)}
@@ -116,175 +201,109 @@ class Fines_err_Modal_item extends React.Component {
         <DialogTitle className="button">
           {this.props.text}
           {this.state.fullScreen ? (
-            <IconButton
-              onClick={this.onClose.bind(this)}
-              style={{ cursor: 'pointer' }}
-            >
+            <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
               <CloseIcon />
             </IconButton>
           ) : null}
         </DialogTitle>
         <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
           <Grid container spacing={3} justifyContent="center" mb={3}>
+
             <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
-              <Typography
-                sx={{
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                Точка
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Точка</Typography>
+              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap'}}>
                 {this.state.item ? this.state.item.point_info.name : 'не указана'}
               </Typography>
             </Grid>
 
             <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
-              <Typography
-                sx={{
-                  whiteSpace: 'nowrap',
-                  fontWeight: 'bold',
-                }}
-              >
-                Дата ошибки
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+              <Typography sx={{ whiteSpace: 'nowrap', fontWeight: 'bold' }}>Дата ошибки</Typography>
+              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap'}}>
                 {this.state.item ? this.state.item.err.date : 'не указана'}
               </Typography>
             </Grid>
 
             <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
-              <Typography
-                sx={{
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                Время совершения ошибки
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Время совершения ошибки</Typography>
+              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
                 {this.state.item ? this.state.item.err.time : 'не указано'}
               </Typography>
             </Grid>
 
             <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
-              <Typography
-                sx={{
-                  whiteSpace: 'nowrap',
-                  fontWeight: 'bold',
-                }}
-              >
-                Комментарии
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  textAlign: 'center',
-                }}
-              >
+              <Typography sx={{ whiteSpace: 'nowrap', fontWeight: 'bold' }}>Комментарии</Typography>
+              <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>
                 {this.state.item ? this.state.item.err.comment : 'не указаны'}
               </Typography>
             </Grid>
 
             <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
-              <Typography
-                sx={{
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                Ошибка
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  textAlign: 'center',
-                }}
-              >
+              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Ошибка</Typography>
+              <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>
                 {this.state.item ? this.state.item.err.fine_name : 'не указана'}
               </Typography>
             </Grid>
 
             <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
-              <Typography
-                sx={{
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                Фото ошибки
-              </Typography>
-              <Grid
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {this.state.item ? (
-                  !this.state.item.imgs.length ? (
-                    'Фото отсутствует'
-                  ) : (
-                    <img src={ 'https://jacochef.ru/src/img/fine_err/uploads/' + this.state.item.imgs[0] } style={{ maxWidth: 300, maxHeight: 400 }} />
-                  )
-                ) : (
-                  'Фото отсутствует'
-                )}
+              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Фото ошибки</Typography>
+              <Grid sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
+                {this.state.item ? !this.state.item.imgs.length ? 'Фото отсутствует' : (
+                    <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + this.state.item.imgs[0]} style={{ maxWidth: 300, maxHeight: 400 }}/>
+                  ) : 'Фото отсутствует'}
               </Grid>
             </Grid>
 
-            <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center" >
-              <Typography
-                sx={{
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                Сотрудник
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {this.state.item ? this.state.item.user.name ?? 'ФИО не указано' : 'ФИО не указано'}
-              </Typography>
-              <Grid
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {this.state.item ? (
-                  this.state.item.user.img ? (
-                    <img src={ 'https://storage.yandexcloud.net/user-img/max-img/' + this.state.item.user.img } style={{ maxWidth: 300, maxHeight: 300 }} />
-                  ) : (
-                    'Фото отсутствует'
-                  )
-                ) : (
-                  'Фото отсутствует'
-                )}
-              </Grid>
-            </Grid>
+            {this.state.item ? this.state.item.user.name ? (
+                <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
+                  <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Сотрудник</Typography>
+                  <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
+                    {this.state.item.user.name}
+                  </Typography>
+                  <Grid sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
+                    {this.state.item ? this.state.item.user.img ? (
+                        <img src={'https://storage.yandexcloud.net/user-img/max-img/' + this.state.item.user.img} style={{ maxWidth: 300, maxHeight: 300 }}/>
+                      ) : 'Фото отсутствует' : 'Фото отсутствует'}
+                  </Grid>
+                </Grid>
+              ) : (
+                <Grid container spacing={3} justifyContent="center" mt={1}>
+
+                  <Grid item xs={12} sm={12} sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} align="center">Указать сотрудника</Grid>
+
+                  <Grid item xs={12} sm={6} sx={{ marginLeft: { xs: '24px'} }}>
+                    <MyAutocomplite
+                      label="Сотрудник"
+                      multiple={false}
+                      data={this.state.users}
+                      value={this.state.user}
+                      func={this.changeAutocomplite.bind(this, 'user')}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={12} display="flex" flexWrap="wrap" justifyContent="center">
+                    {this.state.users.map((user, key) => (
+                      <React.Fragment key={key}>
+                        {!user.img ? null : (
+                          <img src={'https://storage.yandexcloud.net/user-img/max-img/' + user.img}
+                            style={{ maxWidth: 300, maxHeight: 300 }}
+                            onClick={this.changeClass.bind(this, user)}
+                            className={this.state.selected === user.id ? 'choose_user' : ''}
+                          />
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </Grid>
+                </Grid>
+            ) : 'ФИО и Фото отсутствует'}
           </Grid>
         </DialogContent>
+        {this.state.item ? !this.state.item.user.name ? (
+        <DialogActions>
+            <Button color="primary" style={{ whiteSpace: 'nowrap' }} onClick={this.save.bind(this)}>Coxpанить</Button>
+          </DialogActions>
+        ) : null : null}
       </Dialog>
+    </>
     );
   }
 }
@@ -465,97 +484,101 @@ class Fines_err_Modal_NewItem extends React.Component {
   }
 
   save() {
+    if (!this.click) {
+      this.click = true;
 
-    if( !this.click ) {
-      this.click = true;  
+      const point_id = this.state.point;
+      const fine = this.state.fine;
+      const date = this.state.date;
+      const user = this.state.user;
+      const time = this.state.time;
 
-    const point_id = this.state.point;
-    const fine = this.state.fine;
-    const date = this.state.date;
-    const user = this.state.user;
-    const time = this.state.time;
+      if (!point_id || !fine || !date || !user || !time || time === '00:00' || !user.id || !fine.id) {
+        const text = 'Для сохранения новой Ошибки, необходимо выбрать: Точку, Дату, Ошибку, Сотрудника и указать Время ошибки';
 
-    if(!point_id || !fine || !date || !user || !time || time === '00:00' || !user.id || !fine.id) {
+        this.setState({
+          error: text,
+          snackbar: true,
+        });
 
-      const text = "Для сохранения новой Ошибки, необходимо выбрать: Точку, Дату, Ошибку, Сотрудника и указать Время ошибки"
+        setTimeout(() => {
+          this.click = false;
+        }, 300);
 
-      this.setState({
-        error: text,
-        snackbar: true,
-      });
+        return;
+      }
 
-      setTimeout(() => {
-        this.click = false;
-      }, 300);
+      let img = 0;
 
-      return;
-    }
+      if (this.myDropzone['files'].length > 0 && this.isInit === false) {
+        img = 1;
 
-    let img = 0;
+        this.isInit = true;
 
-    if (this.myDropzone['files'].length > 0 && this.isInit === false) {
-
-      img = 1;
-
-      this.isInit = true;
-
-      this.myDropzone.on("sending", (file, xhr, data) => {
-
+        this.myDropzone.on('sending', (file, xhr, data) => {
           i++;
-          let file_type = (file.name).split('.');
+          let file_type = file.name.split('.');
           file_type = file_type[file_type.length - 1];
           file_type = file_type.toLowerCase();
 
           // "file_1_point_id_1_id_2226.jpg"
 
-          data.append("filetype", 'file_' + i + '_point_id_' + point + '_id_' + fines_err.global_new_id + '.' + file_type);
+          data.append(
+            'filetype',
+            'file_' +
+              i +
+              '_point_id_' +
+              point +
+              '_id_' +
+              fines_err.global_new_id +
+              '.' +
+              file_type
+          );
 
           this.getOrientation(file, function (orientation) {
-              data.append("orientation", orientation);
-          })
-      });
+            data.append('orientation', orientation);
+          });
+        });
 
-      this.myDropzone.on("queuecomplete", (data) => {
-
+        this.myDropzone.on('queuecomplete', (data) => {
           var check_img = false;
 
           this.myDropzone['files'].map(function (item, key) {
-              if (item['status'] == "error") {
-                  check_img = true;
-              }
-          })
+            if (item['status'] == 'error') {
+              check_img = true;
+            }
+          });
 
           if (check_img) {
-
             this.setState({
               error: 'Ошибка при загрузке фотографии',
               snackbar: true,
             });
-    
+
             return;
           }
 
           this.isInit = false;
-      })
+        });
+      }
+
+      const data = {
+        fine: fine.id,
+        user: user.id,
+        point_id,
+        date,
+        time,
+        img,
+      };
+
+      this.props.save(data);
+
+      this.onClose();
+
+      setTimeout(() => {
+        this.click = false;
+      }, 300);
     }
-
-    const data = {
-      fine: fine.id,
-      user: user.id,
-      point_id,
-      date,
-      time,
-      img,
-    };
-
-    this.props.save(data);
-
-    this.onClose();
-
-    setTimeout( () => {
-      this.click = false;    
-    }, 300 )
-  }
   }
 
   onClose() {
@@ -589,14 +612,11 @@ class Fines_err_Modal_NewItem extends React.Component {
         <Snackbar
           open={this.state.snackbar}
           autoHideDuration={30000}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
-          }}
-          onClose={() => { this.setState({ snackbar: false }); }}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          onClose={() => this.setState({ snackbar: false })}
         >
           <Alert
-            onClose={() => { this.setState({ snackbar: false }); }}
+            onClose={() => this.setState({ snackbar: false })}
             severity={'error'}
             sx={{ width: '100%' }}
           >
@@ -614,16 +634,14 @@ class Fines_err_Modal_NewItem extends React.Component {
           <DialogTitle className="button">
             {this.props.text}
             {this.state.fullScreen ? (
-              <IconButton
-                onClick={this.onClose.bind(this)}
-                style={{ cursor: 'pointer' }}
-              >
+              <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
                 <CloseIcon />
               </IconButton>
             ) : null}
           </DialogTitle>
           <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             <Grid container spacing={3}>
+
               <Grid item xs={12} sm={6}>
                 <MySelect
                   data={this.state.points}
@@ -710,18 +728,10 @@ class Fines_err_Modal_NewItem extends React.Component {
                     {this.state.users.map((user, key) => (
                       <React.Fragment key={key}>
                         {!user.img ? null : (
-                          <img
-                            src={
-                              'https://storage.yandexcloud.net/user-img/max-img/' +
-                              user.img
-                            }
+                          <img src={'https://storage.yandexcloud.net/user-img/max-img/' + user.img}
                             style={{ maxWidth: 300, maxHeight: 300 }}
                             onClick={this.changeClass.bind(this, user)}
-                            className={
-                              this.state.selected === user.id
-                                ? 'choose_user'
-                                : ''
-                            }
+                            className={this.state.selected === user.id ? 'choose_user' : ''}
                           />
                         )}
                       </React.Fragment>
@@ -755,19 +765,6 @@ class Fines_err_Modal_NewItem extends React.Component {
 }
 
 class Fines_err_Table extends React.Component {
-  /*shouldComponentUpdate(nextProps) {
-    var array1 = nextProps.list;
-    var array2 = this.props.list;
-
-    var is_same =
-      array1.length == array2.length &&
-      array1.every(function (element, index) {
-        return element === array2[index];
-      });
-
-    return !is_same;
-  }*/
-
   render() {
     return (
       <TableContainer>
@@ -785,9 +782,7 @@ class Fines_err_Table extends React.Component {
 
           <TableBody>
             {this.props.ret_list.map((item, i) => (
-              <TableRow
-                key={i}
-                style={{ cursor: 'pointer' }}
+              <TableRow key={i} style={{ cursor: 'pointer' }}
                 onClick={this.props.openModal.bind(this, 'item', 'Ошибка сотрудника', item.id)}
               >
                 <TableCell>{item.find_user_name}</TableCell>
@@ -797,14 +792,15 @@ class Fines_err_Table extends React.Component {
                 <TableCell>{item.fine_name}</TableCell>
                 <TableCell>
                   {item.imgs.length == 0 ? null : (
-                    <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + item.imgs[0]} style={{ maxWidth: 150, maxHeight: 150 }} />
+                    <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + item.imgs[0]}
+                      style={{ maxWidth: 150, maxHeight: 150 }}
+                    />
                   )}
                 </TableCell>
               </TableRow>
             ))}
             {this.props.all_list.map((item, i) => (
-              <TableRow
-                key={i}
+              <TableRow key={i}
                 style={{ cursor: 'pointer', backgroundColor: item.user_name == null ? '#926eae' : '#6ab04c', color: '#fff', fontWeight: 300 }}
                 onClick={this.props.openModal.bind(this, 'item', 'Ошибка сотрудника', item.id)}
               >
@@ -815,7 +811,9 @@ class Fines_err_Table extends React.Component {
                 <TableCell>{item.fine_name}</TableCell>
                 <TableCell>
                   {item.imgs.length == 0 ? null : (
-                    <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + item.imgs[0]} style={{ maxWidth: 150, maxHeight: 150 }} />
+                    <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + item.imgs[0]}
+                      style={{ maxWidth: 150, maxHeight: 150 }}
+                    />
                   )}
                 </TableCell>
               </TableRow>
@@ -917,10 +915,19 @@ class Fines_err_ extends React.Component {
     });
   }
 
-  changePoint(event) {
+  async changePoint(event) {
+    const data = {
+      point_id: event.target.value,
+      date_start: this.state.date_start,
+      date_end: this.state.date_end,
+    };
+
+    const res = await this.getData('get_data', data);
+
     this.setState({
       point: event.target.value,
-      all_list: [],
+      all_list: res.all_list,
+      ret_list: res.ret_list,
     });
   }
 
@@ -963,8 +970,16 @@ class Fines_err_ extends React.Component {
 
     this.setState({
       all_list: res.all_list,
-      ret_list: res.ret_list
+      ret_list: res.ret_list,
     });
+  }
+
+  async saveEditItem(data) {
+    console.log(data);
+
+    // await this.getData('update', data);
+
+    // this.getItems();
   }
 
   async saveNewItem(data) {
@@ -972,6 +987,7 @@ class Fines_err_ extends React.Component {
 
     // await this.getData('save_new', data);
 
+    // this.getItems();
   }
 
   render() {
@@ -983,7 +999,9 @@ class Fines_err_ extends React.Component {
 
         <Fines_err_Modal_NewItem
           open={this.state.modalDialogNew}
-          onClose={() => { this.setState({ modalDialogNew: false }); }}
+          onClose={() => {
+            this.setState({ modalDialogNew: false });
+          }}
           method={this.state.method}
           points={this.state.pointsDialog}
           text={this.state.text}
@@ -993,10 +1011,13 @@ class Fines_err_ extends React.Component {
 
         <Fines_err_Modal_item
           open={this.state.modalDialog}
-          onClose={() => { this.setState({ modalDialog: false }); }}
+          onClose={() => {
+            this.setState({ modalDialog: false });
+          }}
           method={this.state.method}
           text={this.state.text}
           item={this.state.item}
+          save={this.saveEditItem.bind(this)}
         />
 
         <Grid container spacing={3}>
@@ -1044,7 +1065,6 @@ class Fines_err_ extends React.Component {
             </Button>
           </Grid>
 
-         
           <Grid item xs={12} sm={12}>
             <Fines_err_Table
               all_list={this.state.all_list}
@@ -1052,7 +1072,6 @@ class Fines_err_ extends React.Component {
               openModal={this.openModal.bind(this)}
             />
           </Grid>
-    
         </Grid>
       </>
     );
