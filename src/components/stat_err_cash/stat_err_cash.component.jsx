@@ -302,10 +302,10 @@ class StatErrCash_Modal extends React.Component {
 
               <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
                 <Grid mb={5}>
-                  <Button variant="contained" onClick={this.openConfirm.bind(this, '50')}>Снять 50%</Button>
+                  <Button variant="contained" onClick={this.openConfirm.bind(this, '50')} style={{ minWidth: '130px' }}>Снять 50%</Button>
                 </Grid>
                 <Grid>
-                  <Button variant="contained" onClick={this.openConfirm.bind(this, '100')}>Снять 100%</Button>
+                  <Button variant="contained" onClick={this.openConfirm.bind(this, '100')} style={{ minWidth: '130px' }}>Снять 100%</Button>
                 </Grid>
               </Grid>
             </Grid>
@@ -560,9 +560,9 @@ class StatErrCash_ extends React.Component {
 
         {/* аккордионы */}
         {!this.state.svod.length && !this.state.svod_new.length ? null : (
-          <Grid container spacing={3}>
+          <Grid container spacing={3} sx={{ marginBottom: 3 }}>
             {!this.state.svod.length ? null : (
-              <Grid item xs={12} sm={6} mb={1}>
+              <Grid item xs={12} sm={6}>
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content">
                     <Typography style={{ fontWeight: 'bold' }}>Общие данные (заказы)</Typography>
@@ -595,7 +595,7 @@ class StatErrCash_ extends React.Component {
             )}
 
             {!this.state.svod_new.length ? null : (
-              <Grid item xs={12} sm={6} mb={1}>
+              <Grid item xs={12} sm={6}>
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content">
                     <Typography style={{ fontWeight: 'bold' }}>Общие данные (камеры)</Typography>
@@ -632,8 +632,50 @@ class StatErrCash_ extends React.Component {
         {/* таблицы */}
         {!this.state.all_data.length && !this.state.all_data_new.length ? null : (
           <Grid container mt={3} spacing={3}>
+          {!this.state.all_data_new.length ? null : (
+          <Grid item xs={12} sm={12} sx={{ marginBottom: 5 }}>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell colSpan={6} sx={{ fontWeight: 'bold' }}>Все данные (камеры)</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell style={{ width: '10%' }} align="center">Сотрудник</TableCell>
+                    <TableCell style={{ width: '15%' }} align="center">Дата внесения ошибки</TableCell>
+                    <TableCell style={{ width: '20%' }} align="center">Дата и время совершения ошибки</TableCell>
+                    <TableCell style={{ width: '30%' }} align="center">Ошибка</TableCell>
+                    <TableCell style={{ width: '15%' }} align="center">Сумма ошибки</TableCell>
+                    <TableCell style={{ width: '10%' }} align="center">Фото</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={6} sx={{ fontWeight: 'bold' }}>Кол-во не обработанных ошибок: {this.state.all_data_new_stat}</TableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {this.state.all_data_new.map((item, key) => (
+                    <TableRow key={key} hover style={{ cursor: 'pointer' }} onClick={this.openModal.bind(this, 'errCam', 'Ошибка', item)}>
+                      <TableCell align="center">{item.user_name}</TableCell>
+                      <TableCell align="center">{item.date_close}</TableCell>
+                      <TableCell align="center">{item.date} {item.time}</TableCell>
+                      <TableCell align="center">{item.fine_name}</TableCell>
+                      <TableCell align="center">{item.price}</TableCell>
+                      <TableCell align="center">
+                        {!item.imgs.length ? null : (
+                          <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + item.imgs[0]} style={{ maxWidth: 100, maxHeight: 100 }}/>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+          )}
+
             {!this.state.all_data.length ? null : (
-              <Grid item xs={12} sm={6} sx={{ marginBottom: { sm: 10, xs: 5 } }}>
+              <Grid item xs={12} sm={12} sx={{ marginBottom: 5 }}>
                 <TableContainer>
                   <Table>
                     <TableHead>
@@ -641,13 +683,13 @@ class StatErrCash_ extends React.Component {
                         <TableCell colSpan={8} sx={{ fontWeight: 'bold' }}>Все данные (заказы)</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell style={{ width: '20%' }} align="center">Сотрудник</TableCell>
-                        <TableCell style={{ width: '5%' }} align="center">Номер заказа</TableCell>
-                        <TableCell style={{ width: '30%' }} align="center">Дата заказа</TableCell>
-                        <TableCell style={{ width: '10%' }} align="center">Позиция</TableCell>
+                        <TableCell style={{ width: '10%' }} align="center">Сотрудник</TableCell>
+                        <TableCell style={{ width: '10%' }} align="center">Номер заказа</TableCell>
+                        <TableCell style={{ width: '10%' }} align="center">Дата заказа</TableCell>
+                        <TableCell style={{ width: '20%' }} align="center">Позиция</TableCell>
                         <TableCell style={{ width: '20%' }} align="center">Ошибка</TableCell>
-                        <TableCell style={{ width: '2%' }} align="center">Довоз</TableCell>
-                        <TableCell style={{ width: '3%' }} align="center">Сумма ошибки</TableCell>
+                        <TableCell style={{ width: '5%' }} align="center">Довоз</TableCell>
+                        <TableCell style={{ width: '15%' }} align="center">Сумма ошибки</TableCell>
                         <TableCell style={{ width: '10%' }} align="center">Фото</TableCell>
                       </TableRow>
                     </TableHead>
@@ -675,47 +717,6 @@ class StatErrCash_ extends React.Component {
               </Grid>
             )}
 
-            {!this.state.all_data_new.length ? null : (
-              <Grid item xs={12} sm={6} style={{ marginBottom: 100 }}>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell colSpan={6} sx={{ fontWeight: 'bold' }}>Все данные (камеры)</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell style={{ width: '10%' }} align="center">Сотрудник</TableCell>
-                        <TableCell style={{ width: '20%' }} align="center">Дата внесения ошибки</TableCell>
-                        <TableCell style={{ width: '25%' }} align="center">Дата и время совершения ошибки</TableCell>
-                        <TableCell style={{ width: '30%' }} align="center">Ошибка</TableCell>
-                        <TableCell style={{ width: '5%' }} align="center">Сумма ошибки</TableCell>
-                        <TableCell style={{ width: '10%' }} align="center">Фото</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell colSpan={6} sx={{ fontWeight: 'bold' }}>Кол-во не обработанных ошибок: {this.state.all_data_new_stat}</TableCell>
-                      </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                      {this.state.all_data_new.map((item, key) => (
-                        <TableRow key={key} hover style={{ cursor: 'pointer' }} onClick={this.openModal.bind(this, 'errCam', 'Ошибка', item)}>
-                          <TableCell align="center">{item.user_name}</TableCell>
-                          <TableCell align="center">{item.date_close}</TableCell>
-                          <TableCell align="center">{item.date} {item.time}</TableCell>
-                          <TableCell align="center">{item.fine_name}</TableCell>
-                          <TableCell align="center">{item.price}</TableCell>
-                          <TableCell align="center">
-                            {!item.imgs.length ? null : (
-                              <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + item.imgs[0]} style={{ maxWidth: 100, maxHeight: 100 }}/>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
-            )}
           </Grid>
         )}
       </>
