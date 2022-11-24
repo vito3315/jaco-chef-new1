@@ -310,19 +310,31 @@ class WorkSchedule_Table extends React.Component {
 
             {this.props.test.map((item, key) =>
               item.row == 'header' ? (
-                <HeaderItem
-                  key={key}
-                  bonus_other={this.props.number.bonus_other}
-                  changeLVDir={this.props.changeLVDir.bind(this)}
-                  changeDopBonus={this.props.changeDopBonus.bind(this)}
-                  kind={this.props.kind}
-                  show_zp={this.props.show_zp}
-                  lv_dir={this.props.lv_dir}
-                  lv_cafe={this.props.lv_cafe}
-                  dataKey={key}
-                  days={this.props.number.days}
-                  item={item}
-                />
+                
+                <React.Fragment key={key}>
+                  
+                  <HeaderItem
+                    bonus_other={this.props.number.bonus_other}
+                    changeLVDir={this.props.changeLVDir.bind(this)}
+                    changeDopBonus={this.props.changeDopBonus.bind(this)}
+                    kind={this.props.kind}
+                    show_zp={this.props.show_zp}
+                    lv_dir={this.props.lv_dir}
+                    lv_cafe={this.props.lv_cafe}
+                    dataKey={key}
+                    days={this.props.number.days}
+                    item={item}
+                  />
+
+                  { parseInt(key) == 0 ? 
+                    <TableRow>
+                      <TableCell colSpan={25} style={{ textAlign: 'left', fontSize: '3rem', cursor: 'pointer' }} onClick={this.props.addSmena.bind(this)}>Добавить смену</TableCell>
+                    </TableRow>
+                      : 
+                    null 
+                  }
+
+                </React.Fragment>
               ) : (
                 <TableRow key={key}>
                   <TableCell
@@ -942,7 +954,10 @@ class WorkSchedule_ extends React.Component {
       errOrdersOneOrders: [],
       errOrdersTwoOrders: [],
       errOrdersOneCam: [],
-      errOrdersTwoCam: []
+      errOrdersTwoCam: [],
+
+      newSmena: false,
+      newSmenaName: '',
     };
   }
 
@@ -1699,6 +1714,13 @@ class WorkSchedule_ extends React.Component {
       showErrCam: res,
       isShowErrCam: true
     })
+  }
+
+  addSmena(){
+    this.setState({ 
+      newSmena: true, 
+      newSmenaName: '' 
+    });
   }
 
   render() {
@@ -2569,6 +2591,21 @@ class WorkSchedule_ extends React.Component {
           </Dialog>
         )}
 
+        <Dialog
+          onClose={() => { this.setState({ newSmena: false, newSmenaName: '' }); }}
+          open={this.state.newSmena}
+        >
+          <DialogTitle>Новая смена</DialogTitle>
+          <DialogContent>
+            <MyTextInput
+              label="Название смены"
+              value={this.state.newSmenaName}
+              func={(event) => this.setState({ newSmenaName: event.target.value }) }
+            />
+          </DialogContent>
+
+        </Dialog>
+
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
@@ -2658,6 +2695,7 @@ class WorkSchedule_ extends React.Component {
                     openZP={this.openZP.bind(this)}
                     mix={this.mix.bind(this)}
                     pricePerHour={this.pricePerHour.bind(this)}
+                    addSmena={this.addSmena.bind(this)}
                   />
                 )}
               </TabPanel>
@@ -2702,6 +2740,7 @@ class WorkSchedule_ extends React.Component {
                     openZP={this.openZP.bind(this)}
                     mix={this.mix.bind(this)}
                     pricePerHour={this.pricePerHour.bind(this)}
+                    addSmena={this.addSmena.bind(this)}
                   />
                 )}
               </TabPanel>
