@@ -119,14 +119,9 @@ class ListFakeUsers_Modal extends React.Component {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle className="button">
-          <Typography style={{ fontWeight: 'bold' }}>
-            Информация о клиенте
-          </Typography>
+          <Typography style={{ fontWeight: 'bold' }}>Информация о клиенте</Typography>
           {this.state.fullScreen ? (
-            <IconButton
-              onClick={this.onClose.bind(this)}
-              style={{ cursor: 'pointer' }}
-            >
+            <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
               <CloseIcon />
             </IconButton>
           ) : null}
@@ -134,423 +129,139 @@ class ListFakeUsers_Modal extends React.Component {
 
         <DialogContent style={{ paddingTop: 10, paddingBottom: 10 }}>
           <Grid container spacing={3} justifyContent="center" mb={3}>
-            <Grid
-              item
-              xs={12}
-              sm={3}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
-              <Typography
-                sx={{
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                Имя
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+
+            <Grid item xs={12} sm={3} display="flex" flexDirection="column" alignItems="center">
+              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Имя</Typography>
+              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap'}}>
                 {this.state.item ? this.state.item.name !== '0' ? this.state.item.name : 'не указано' : 'не указано'}
               </Typography>
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={3}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
-              <Typography
-                sx={{
-                  whiteSpace: 'nowrap',
-                  fontWeight: 'bold',
-                }}
-              >
-                Регистрация
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+            <Grid item xs={12} sm={3} display="flex" flexDirection="column" alignItems="center">
+              <Typography sx={{ whiteSpace: 'nowrap', fontWeight: 'bold' }}>Регистрация</Typography>
+              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
                 {this.state.item ? this.state.item.date_reg ? this.state.item.date_reg : 'не указано' : 'не указано'}
               </Typography>
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={3}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
-              <Typography
-                sx={{
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                День рождения
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+            <Grid item xs={12} sm={3} display="flex" flexDirection="column" alignItems="center">
+              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>День рождения</Typography>
+              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
                 {this.state.item ? this.state.item.date_bir ? this.state.item.date_bir : 'не указано' : 'не указано'}
               </Typography>
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={3}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
-              <Typography
-                sx={{
-                  whiteSpace: 'nowrap',
-                  fontWeight: 'bold',
-                }}
-              >
-                Согласие на рассылку
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {this.state.item
-                  ? this.state.item.spam === '0'
-                    ? 'нет'
-                    : 'есть'
-                  : 'нет'}
+            <Grid item xs={12} sm={3} display="flex" flexDirection="column" alignItems="center">
+              <Typography sx={{ whiteSpace: 'nowrap', fontWeight: 'bold' }}>Согласие на рассылку</Typography>
+              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
+                {this.state.item ? this.state.item.spam === '0' ? 'нет' : 'есть' : 'нет'}
               </Typography>
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={4}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
-              <Typography
-                sx={{
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                Общее количество заказов
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+            <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
+              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Общее количество заказов</Typography>
+              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
                 {this.state.item ? this.state.item.all_count_order : '0'}
               </Typography>
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={4}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
-              <Typography
-                sx={{
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                Количество заказов на доставку
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+            <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
+              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Количество заказов на доставку</Typography>
+              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
                 {this.state.item ? this.state.item.count_dev : '0'}
               </Typography>
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={4}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
-              <Typography
-                sx={{
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                Количество заказов на самовывоз
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+            <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
+              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Количество заказов на самовывоз</Typography>
+              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
                 {this.state.item ? this.state.item.count_pic : '0'}
               </Typography>
-
-              
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={4}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
-              <Typography
-                sx={{
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                Переодичность заказов
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+            <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
+              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Переодичность заказов</Typography>
+              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
                 {this.state.item ? this.state.item.order_per_day : '0'}
               </Typography>
             </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={4}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
-              <Typography
-                sx={{
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                Первый промик после регистрации
+            <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
+              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Первый промик после регистрации</Typography>
+              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
+                {this.state.item ? this.state.item.promo_name !== '' ? this.state.item.promo_name : 'не было' : 'не было'}
               </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {this.state.item
-                  ? this.state.item.promo_name !== ''
-                    ? this.state.item.promo_name
-                    : 'не было'
-                  : 'не было'}
-              </Typography>
-           
-            </Grid> 
-            <Grid
-              item
-              xs={12}
-              sm={4}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >    
-                 <Typography
-                sx={{
-                  fontWeight: 'bold',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                Есть ошибки в заказах
-              </Typography>
-              <Typography
-                sx={{
-                  fontWeight: 'normal',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {this.state.item
-                  ? this.state.item.error_exsist !== ''
-                    ? 'Да'
-                    : 'Нет'
-                  : ''}
-              </Typography> 
             </Grid>
 
-                        
+            <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
+              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Есть ошибки в заказах</Typography>
+              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
+                {this.state.item ? this.state.item.error_exsist !== '' ? 'Да' : 'Нет' : ''}
+              </Typography>
+            </Grid>
           </Grid>
 
           {/* аккордион */}
           {!this.state.item.orders ? null : (
             <Grid item xs={12} sm={4} mb={3}>
               <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content">
                   <Typography style={{ fontWeight: 'bold' }}>Заказы</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   {this.state.fullScreen ? null : (
                     <Accordion expanded={true}>
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon sx={{ opacity: 0 }} />}
-                        aria-controls="panel1a-content"
-                      >
+                      <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ opacity: 0 }} />} aria-controls="panel1a-content">
                         <Grid item xs display="flex" flexDirection="row">
-                          <Typography style={{ width: '15%' }} noWrap>
-                            Номер
-                          </Typography>
-                          <Typography style={{ width: '25%' }} noWrap>
-                            Дата/время
-                          </Typography>
-                          <Typography style={{ width: '15%' }} noWrap>
-                            Точка
-                          </Typography>
-                          <Typography style={{ width: '15%' }} noWrap>
-                            Сумма
-                          </Typography>
-                          <Typography style={{ width: '15%' }} noWrap>
-                            Промик
-                          </Typography>
-                          <Typography style={{ width: '15%' }} noWrap>
-                            Тип
-                          </Typography>
-                          <Typography style={{ width: '15%' }} noWrap>
-                           Ошибка заказа
-                          </Typography>
+                          <Typography style={{ width: '15%' }} noWrap>Номер</Typography>
+                          <Typography style={{ width: '25%' }} noWrap>Дата/время</Typography>
+                          <Typography style={{ width: '20%' }} noWrap>Точка</Typography>
+                          <Typography style={{ width: '10%' }} noWrap>Сумма</Typography>
+                          <Typography style={{ width: '15%' }} noWrap>Промик</Typography>
+                          <Typography style={{ width: '15%' }} noWrap>Тип</Typography>
+                          <Typography style={{ width: '15%' }} noWrap>Ошибка заказа</Typography>
                         </Grid>
                       </AccordionSummary>
                     </Accordion>
                   )}
                   {this.state.item.orders.map((item, i) => (
                     <Accordion key={i}>
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel1a-content"
-                      >
-                        <Grid
-                          item
-                          xs
-                          display="flex"
-                          sx={{ flexDirection: { sm: 'row', xs: 'column' } }}
-                        >
-                          <Typography
-                            style={{ width: '15%' }}
-                            sx={{
-                              noWrap: { sm: true, xs: false },
-                              whiteSpace: { xs: 'nowrap' },
-                            }}
-                          >
-                            {this.state.fullScreen
-                              ? `Номер: ${item.order_id}`
-                              : item.order_id}
-                          </Typography>
-                          <Typography
-                            style={{ width: '25%' }}
-                            sx={{
-                              noWrap: { sm: true, xs: false },
-                              whiteSpace: { xs: 'nowrap' },
-                            }}
-                          >
-                            {this.state.fullScreen
-                              ? `Дата: ${item.date}/${item.time}`
-                              : `${item.date}/${item.time}`}
-                          </Typography>
-                          <Typography
-                            style={{ width: '15%' }}
-                            sx={{
-                              noWrap: { sm: true, xs: false },
-                              whiteSpace: { xs: 'nowrap' },
-                            }}
-                          >
-                            {this.state.fullScreen
-                              ? `Точка: ${item.addr}`
-                              : item.addr}
-                          </Typography>
-                          <Typography
-                            style={{ width: '15%' }}
-                            sx={{
-                              noWrap: { sm: true, xs: false },
-                              whiteSpace: { xs: 'nowrap' },
-                            }}
-                          >
-                            {this.state.fullScreen
-                              ? `Сумма: ${item.summ}`
-                              : item.summ}
-                          </Typography>
-                          <Typography
-                            style={{ width: '15%' }}
-                            sx={{
-                              noWrap: { sm: true, xs: false },
-                              whiteSpace: { xs: 'nowrap' },
-                            }}
-                          >
-                            {this.state.fullScreen
-                              ? `Промик: ${item.promo_name ?? 'Нет'}`
-                              : item.promo_name ?? 'Нет'}
-                          </Typography>
-                          <Typography
-                            style={{ width: '15%' }}
-                            sx={{
-                              noWrap: { sm: true, xs: false },
-                              whiteSpace: { xs: 'nowrap' },
-                            }}
-                          >
-                            {this.state.fullScreen
-                              ? `Тип: ${
-                                  item.xy === '' ? 'Самовывоз' : 'Доставка'
-                                }`
-                              : item.xy === ''
-                              ? 'Самовывоз'
-                              : 'Доставка'}
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content">
+
+                        <Grid item xs display="flex" sx={{ flexDirection: { sm: 'row', xs: 'column' } }}>
+
+                          <Typography style={{ width: '15%' }} sx={{ noWrap: { sm: true, xs: false }, whiteSpace: { xs: 'nowrap' } }}>
+                            {this.state.fullScreen ? `Номер: ${item.order_id}` : item.order_id}
                           </Typography>
 
-                          <Typography
-                            style={{ width: '15%', overflow: 'hidden' }}
-                            sx={{
-                              noWrap: { sm: true, xs: false },
-                              whiteSpace: { xs: 'nowrap' },
-                            }}
-                          >
-                             {item.order_desc != '' ? item.order_desc : ''} 
+                          <Typography style={{ width: '25%' }} sx={{ noWrap: { sm: true, xs: false }, whiteSpace: { xs: 'nowrap' } }}>
+                            {this.state.fullScreen ? `Дата: ${item.date}/${item.time}` : `${item.date}/${item.time}`}
                           </Typography>
+
+                          <Typography style={{ width: '20%' }} sx={{ noWrap: { sm: true, xs: false }, whiteSpace: { xs: 'nowrap' } }}>
+                            {this.state.fullScreen ? `Точка: ${item.addr}` : item.addr}
+                          </Typography>
+
+                          <Typography style={{ width: '10%' }} sx={{ noWrap: { sm: true, xs: false }, whiteSpace: { xs: 'nowrap' } }}>
+                            {this.state.fullScreen ? `Сумма: ${item.summ}` : item.summ}
+                          </Typography>
+
+                          <Typography style={{ width: '15%' }} sx={{ noWrap: { sm: true, xs: false }, whiteSpace: { xs: 'nowrap' } }}>
+                            {this.state.fullScreen ? `Промик: ${item.promo_name ?? 'Нет'}` : item.promo_name ?? 'Нет'}
+                          </Typography>
+
+                          <Typography style={{ width: '15%' }} sx={{ noWrap: { sm: true, xs: false }, whiteSpace: { xs: 'nowrap' } }}>
+                            {this.state.fullScreen ? `Тип: ${item.xy === '' ? 'Самовывоз' : 'Доставка'}` : item.xy === '' ? 'Самовывоз' : 'Доставка'}
+                          </Typography>
+
+                          <Typography style={{ width: '15%', overflow: 'hidden' }} sx={{ noWrap: { sm: true, xs: false }, whiteSpace: { xs: 'nowrap' } }}>
+                            {item.order_desc != '' ? item.order_desc : ''}
+                          </Typography>
+
                         </Grid>
+
                       </AccordionSummary>
-                      <AccordionDetails
-                        style={{ width: '100%', overflow: 'scroll' }}
-                      >
+                      <AccordionDetails style={{ width: '100%', overflow: 'scroll' }}>
                         <Table>
                           <TableHead>
                             <TableRow>
@@ -560,14 +271,12 @@ class ListFakeUsers_Modal extends React.Component {
                           </TableHead>
 
                           <TableBody>
-                            {!item.items
-                              ? null
-                              : item.items.map((it, key) => (
-                                  <TableRow key={key}>
-                                    <TableCell>{it.name}</TableCell>
-                                    <TableCell>{it.count}</TableCell>
-                                  </TableRow>
-                                ))}
+                            {!item.items ? null : item.items.map((it, key) => (
+                              <TableRow key={key}>
+                                <TableCell>{it.name}</TableCell>
+                                <TableCell>{it.count}</TableCell>
+                              </TableRow>
+                            ))}
                           </TableBody>
                         </Table>
                       </AccordionDetails>
@@ -580,10 +289,7 @@ class ListFakeUsers_Modal extends React.Component {
         </DialogContent>
 
         <DialogActions>
-          <Button
-            style={{ color: '#DC143C' }}
-            onClick={this.onClose.bind(this)}
-          >
+          <Button style={{ color: '#DC143C' }} onClick={this.onClose.bind(this)}>
             Закрыть
           </Button>
         </DialogActions>
@@ -706,46 +412,15 @@ class ListFakeUsers_ extends React.Component {
     if (res.st) {
       this.setState({
         users: res.users,
+        url: res.url,
       });
     } else {
       this.setState({
-        users:  [],
+        users: [],
         error: res.text,
         snackbar: true,
       });
     }
-  }
-
-  async getUsersDownload(){
-
-    const data = {
-      point: this.state.point,
-      date_start_true: this.state.date_start_true,
-      date_end_true: this.state.date_end_true,
-      date_start_false: this.state.date_start_false,
-      date_end_false: this.state.date_end_false,
-      count_orders: this.state.count_orders,
-      max_summ: this.state.max_summ,
-      items: this.state.item,
-      is_show_claim: this.state.is_show_claim,
-      is_show_claim_last: this.state.is_show_claim_last,
-      is_show_marketing: this.state.is_show_marketing,
-    };
-    const res = await this.getData('get_users_download', data);
-    
-    if (res.st) {
-      console.log('show'); 
-      this.setState({
-        modalDialogDwn: true,
-        url: res.url 
-      });
-    } else{
-      this.setState({
-        error: res.text,
-        snackbar: true,
-      });
-    }
-
   }
 
   changeNumber(data, event) {
@@ -768,15 +443,15 @@ class ListFakeUsers_ extends React.Component {
 
   changeItemChecked(data, event) {
     const value = event.target.checked === true ? 1 : 0;
-   
+
     // делаем переключатель для галочек ошибка на заказ и на последний заказ
-    if(data == 'is_show_claim_last' ){
+    if (data == 'is_show_claim_last') {
       this.setState({
-        'is_show_claim' : 0,
+        is_show_claim: 0,
       });
-    } else if(data == 'is_show_claim'){
+    } else if (data == 'is_show_claim') {
       this.setState({
-        'is_show_claim_last' : 0,
+        is_show_claim_last: 0,
       });
     }
 
@@ -817,7 +492,14 @@ class ListFakeUsers_ extends React.Component {
         snackbar: true,
       });
     }
+  }
 
+  onDownload() {
+    const url = this.state.url;
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.click();
   }
 
   render() {
@@ -830,18 +512,11 @@ class ListFakeUsers_ extends React.Component {
         <Snackbar
           open={this.state.snackbar}
           autoHideDuration={30000}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
-          }}
-          onClose={() => {
-            this.setState({ snackbar: false });
-          }}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          onClose={() => this.setState({ snackbar: false })}
         >
           <Alert
-            onClose={() => {
-              this.setState({ snackbar: false });
-            }}
+            onClose={() => this.setState({ snackbar: false })}
             severity={'error'}
             sx={{ width: '100%' }}
           >
@@ -851,33 +526,16 @@ class ListFakeUsers_ extends React.Component {
 
         <ListFakeUsers_Modal
           open={this.state.modalDialog}
-          onClose={() => {
-            this.setState({ modalDialog: false });
-          }}
+          onClose={() => this.setState({ modalDialog: false })}
           event={this.state.user}
-        />
-
-        <ListFakeUsers_Modal_Download
-          open={this.state.modalDialogDwn}
-          url={this.state.url}
-          onClose={() => {
-            this.setState({ modalDialogDwn: false });
-          }}
-         
         />
 
         <Grid item xs={12} mb={3}>
           <h1>{this.state.module_name}</h1>
         </Grid>
 
-        <Grid
-          item
-          container
-          spacing={3}
-          justifyContent="center"
-          mb={3}
-          sx={{ flexDirection: { sm: 'row', xs: 'column-reverse' } }}
-        >
+        <Grid item container spacing={3} justifyContent="center" mb={3} sx={{ flexDirection: { sm: 'row', xs: 'column-reverse' } }}>
+
           <Grid item xs={12} sm={3} sx={{ order: { sm: 0, xs: 1 } }}>
             <MyDatePickerNew
               label="Делал заказ от"
@@ -894,18 +552,29 @@ class ListFakeUsers_ extends React.Component {
             />
           </Grid>
 
-          <Grid item xs={12} sm={3} sx={{ order: { sm: 2, xs: 2 } }}>
-            <Button
-              variant="contained"
-              style={{ whiteSpace: 'nowrap' }}
-              onClick={this.getUsers.bind(this)}
-            >
-              Получить список клиентов
-            </Button>
-            <Button 
+          <Grid item xs={12} sm={3} sx={{ order: { sm: 2, xs: 2 } }} display="flex" flexDirection="row">
+
+            <Grid>
+              <Button
+                variant="contained"
+                style={{ whiteSpace: 'nowrap' }}
+                onClick={this.getUsers.bind(this)}
+              >
+                Получить список клиентов
+              </Button>
+            </Grid>
+
+            <Grid>
+              <Button
                 variant="contained"
                 style={{ marginLeft: 10, backgroundColor: '#ffcc00' }}
-                onClick={this.getUsersDownload.bind(this)}> <DownloadIcon /> </Button>
+                onClick={this.onDownload.bind(this)}
+                disabled={!this.state.users.length}
+              >
+                <DownloadIcon />
+              </Button>
+            </Grid>
+
           </Grid>
         </Grid>
 
@@ -963,7 +632,6 @@ class ListFakeUsers_ extends React.Component {
               func={this.changeItemChecked.bind(this, 'is_show_claim_last')}
             />
           </Grid>
-         
         </Grid>
 
         <Grid container spacing={3} justifyContent="center" mb={3}>
@@ -994,9 +662,7 @@ class ListFakeUsers_ extends React.Component {
               func={this.changeItemChecked.bind(this, 'is_show_marketing')}
             />
           </Grid>
-         
         </Grid>
-       
 
         {!this.state.users.length ? null : (
           <Grid container justifyContent="center">
@@ -1013,11 +679,7 @@ class ListFakeUsers_ extends React.Component {
 
                   <TableBody>
                     {this.state.users.map((item, i) => (
-                      <TableRow
-                        key={i}
-                        onClick={this.openModal.bind(this, item)}
-                        style={{ cursor: 'pointer' }}
-                      >
+                      <TableRow key={i} onClick={this.openModal.bind(this, item)} style={{ cursor: 'pointer' }}>
                         <TableCell>{i + 1}</TableCell>
                         <TableCell>{item.name}</TableCell>
                         <TableCell>{item.login}</TableCell>
@@ -1031,55 +693,6 @@ class ListFakeUsers_ extends React.Component {
         )}
       </>
     );
-  }
-}
-
-class ListFakeUsers_Modal_Download extends React.Component {
- /*
-  constructor(props) {
-    super(props);
-
-    //this.handleResize = this.handleResize.bind(this);
- } 
-  */
-
-  onClose() {
-    this.setState({
-      item: this.props.event ? this.props.event : [],
-    });
-
-    this.props.onClose();
-  }
-
-
-  render() {
-    return (
-      <Dialog
-        open={this.props.open}
-        onClose={this.onClose.bind(this)}
-        fullWidth={true}
-        maxWidth={'lg'}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle className="button">
-          <Typography style={{ fontWeight: 'bold' }}>
-            Скачать список пользователей
-          </Typography>
-        </DialogTitle>
-        <DialogContent style={{ paddingTop: 10, paddingBottom: 10 }}>
-            <a target="_blank" href={this.props.url}>Скачать</a>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            style={{ color: '#DC143C' }}
-            onClick={this.onClose.bind(this)}
-          >
-            Закрыть
-          </Button>
-        </DialogActions>
-      </Dialog>
-    )
   }
 }
 
