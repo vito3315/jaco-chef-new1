@@ -76,6 +76,7 @@ const SiteUserManager = React.lazy(() => import("../site_user_manager"));
 const PromoItemsStat = React.lazy(() => import("../promo_items_stat"));
 const SiteItems = React.lazy(() => import("../site_items"));
 const StatErrCash = React.lazy(() => import("../stat_err_cash"));
+const CloseBuy = React.lazy(() => import("../close_buy"));
 
 const HotMap = React.lazy(() => import("../hot_map"));
 const ShowCook = React.lazy(() => import("../show_cook"));
@@ -382,6 +383,7 @@ export function App () {
                   <Route path={'/site_sale_min/edit/:promoId'} exact={ true } element={ <SiteSaleMin_Edit /> } />
                   <Route path={'/site_sale_min/stat_list'} exact={ true } element={ <SiteSaleMin_StatList /> } />
                   <Route path={'/stat_err_cash'} exact={ true } element={ <StatErrCash /> } />
+                  <Route path={'/close_buy'} exact={ true } element={ <CloseBuy /> } />
 
                   <Route path={'/show_cook'} exact={ true } element={ <ShowCook /> } />
                   <Route path={'/cafe_upr_edit'} exact={ true } element={ <СafeUprEdit /> } />
