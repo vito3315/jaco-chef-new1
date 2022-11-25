@@ -42,3 +42,29 @@ div.css-19kzrtu {
   display: flex !important;
   flex-direction: column !important;
 }
+
+.userSmenalist{
+  max-height: 300px;
+  overflow: scroll;
+
+  & > div{
+    margin-bottom: 10px;
+  }
+  & .Mui-selected:not(.SmenaDelete){
+    background-color: #F9BC23!important;
+    border-radius: 10px;
+    & span{
+      color: #525252!important;
+      font-weight: 600!important;
+    }
+  }
+  & .Mui-selected.SmenaDelete{
+    background-color: red!important;
+    border-radius: 10px;
+    & span{
+      color: #fff!important;
+      font-weight: 600!important;
+      text-align: center;
+    }
+  }
+}
