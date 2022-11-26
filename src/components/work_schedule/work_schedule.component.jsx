@@ -1342,9 +1342,12 @@ class WorkSchedule_ extends React.Component {
     }
   }
 
-  checkFastPoint(point_id, smena_id) {
+  checkFastPoint(point) {
+
+    console.log( point )
+
     if (confirm('Точно сменить точку с сегоднешнего дня ?')) {
-      this.fastPoint(point_id, smena_id);
+      this.fastPoint(point.point_id, point.smena_id);
     }
   }
 
@@ -2013,7 +2016,7 @@ class WorkSchedule_ extends React.Component {
 
           <List sx={{ pt: 0 }}>
             {this.state.myOtherPoints.map((item, key) => (
-              <ListItem key={key} button>
+              <ListItem key={key} button onClick={this.checkFastPoint.bind(this, item)}>
                 <ListItemAvatar>
                   <Avatar>
                     <HomeWorkIcon />
