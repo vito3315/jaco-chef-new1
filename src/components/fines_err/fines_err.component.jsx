@@ -350,6 +350,8 @@ class Fines_err_Modal_NewItem extends React.Component {
 
       snackbar: false,
       error: '',
+
+      chooseApp: '',
     };
   }
 
@@ -385,17 +387,33 @@ class Fines_err_Modal_NewItem extends React.Component {
     }
   }
 
-  changeAutocomplite(data, event, value) {
-    if (data === 'user') {
+  changeUser(event, value) {
+
+    const apps = this.state.apps;
+    
+    if (value) {
+      
+      const app = apps.find(app => app.id === (value.new_app === '0' ? value.app_id : value.new_app));
+
       this.setState({
-        [data]: value,
+        user: value,
         selected: value.id,
+        app,
+        chooseApp: '',
       });
     } else {
       this.setState({
-        [data]: value,
+        user: value,
+        selected: '',
+        app: apps[0],
       });
     }
+  }
+
+  changeAutocomplite(data, event, value) {
+    this.setState({
+      [data]: value,
+    });
   }
 
   changeItemChecked(data, event) {
@@ -410,6 +428,25 @@ class Fines_err_Modal_NewItem extends React.Component {
     this.setState({
       [data]: event.target.value,
     });
+  }
+
+  changePost(data, event, value) {
+
+    const user = this.state.user;
+
+    if(user && value.id !== -1) {
+      this.setState({
+        [data]: value,
+      });
+    } else {
+      this.setState({
+        [data]: value,
+        chooseApp: value.id,
+        selected: '',
+        user: '',
+      });
+    }
+
   }
 
   changePoint(data, event) {
@@ -427,6 +464,11 @@ class Fines_err_Modal_NewItem extends React.Component {
 
     this.setState({
       [data]: event.target.value,
+      chooseApp: '',
+      fine: '',
+      time: '00:00',
+      is_active: 0,
+      comment: '',
     });
   }
 
@@ -452,10 +494,13 @@ class Fines_err_Modal_NewItem extends React.Component {
 
     const res = await this.props.getData('get_users', data);
 
+    // console.log(res);
+
     this.setState({
       fines: res.fines,
-      apps: res.apps,
       users: res.users,
+      apps: res.apps,
+      app: res.apps[0],
     });
 
     setTimeout(() => {
@@ -466,9 +511,20 @@ class Fines_err_Modal_NewItem extends React.Component {
   }
 
   changeClass(user, event) {
+
+    const apps = this.state.apps;
+
+    const app = apps.find(app => app.id === (user.new_app === '0' ? user.app_id : user.new_app));
+
+    this.setState({
+      chooseApp: '',
+      app,
+    });
+
     if (event.target.classList.contains('choose_user')) {
       this.setState({
         user: '',
+        app: apps[0],
       });
     } else {
       this.setState({
@@ -523,17 +579,7 @@ class Fines_err_Modal_NewItem extends React.Component {
 
           // "file_1_point_id_1_id_2226.jpg"
 
-          data.append(
-            'filetype',
-            'file_' +
-              i +
-              '_point_id_' +
-              point +
-              '_id_' +
-              fines_err.global_new_id +
-              '.' +
-              file_type
-          );
+          data.append('filetype', 'file_' + i + '_point_id_' + point + '_id_' + fines_err.global_new_id + '.' + file_type);
 
           this.getOrientation(file, function (orientation) {
             data.append('orientation', orientation);
@@ -601,6 +647,8 @@ class Fines_err_Modal_NewItem extends React.Component {
       comment: '',
 
       selected: '',
+
+      chooseApp: '',
     });
 
     this.props.onClose();
@@ -661,22 +709,13 @@ class Fines_err_Modal_NewItem extends React.Component {
 
               {!this.state.fines.length ? null : (
                 <>
-                  <Grid item xs={12} sm={3}>
+                  <Grid item xs={12} sm={6}>
                     <MyAutocomplite
                       label="Ошибка"
                       multiple={false}
                       data={this.state.fines}
                       value={this.state.fine}
                       func={this.changeAutocomplite.bind(this, 'fine')}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={3}>
-                    <MySelect
-                      data={this.state.apps}
-                      value={this.state.app}
-                      func={this.changeItem.bind(this, 'app')}
-                      label="Должность"
                     />
                   </Grid>
 
@@ -696,7 +735,7 @@ class Fines_err_Modal_NewItem extends React.Component {
                     />
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} sm={12}>
                     <MyTextInput
                       label="Комментарии"
                       multiline={true}
@@ -706,15 +745,6 @@ class Fines_err_Modal_NewItem extends React.Component {
                     />
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
-                    <MyAutocomplite
-                      label="Сотрудник"
-                      multiple={false}
-                      data={this.state.users}
-                      value={this.state.user}
-                      func={this.changeAutocomplite.bind(this, 'user')}
-                    />
-                  </Grid>
 
                   <Grid item xs={12} sm={12}>
                     <div
@@ -724,12 +754,33 @@ class Fines_err_Modal_NewItem extends React.Component {
                     />
                   </Grid>
 
-                  <Grid item xs={12} sm={12}>
+                  <Grid item xs={12} sm={6}>
+                    <MyAutocomplite
+                      multiple={false}
+                      data={this.state.apps}
+                      value={this.state.app}
+                      func={this.changePost.bind(this, 'app')}
+                      label="Должность"
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <MyAutocomplite
+                      label="Сотрудник"
+                      multiple={false}
+                      data={this.state.users}
+                      value={this.state.user}
+                      func={this.changeUser.bind(this)}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={12} display="flex" flexWrap="wrap" justifyContent="center">
                     {this.state.users.map((user, key) => (
                       <React.Fragment key={key}>
                         {!user.img ? null : (
                           <img src={'https://storage.yandexcloud.net/user-img/max-img/' + user.img}
-                            style={{ maxWidth: 300, maxHeight: 300 }}
+                            style={{ maxWidth: 300, maxHeight: 300, 
+                              border: this.state.chooseApp === (user.new_app === '0' ?  user.app_id : user.new_app) ? '10px #00a550 solid' : null }}
                             onClick={this.changeClass.bind(this, user)}
                             className={this.state.selected === user.id ? 'choose_user' : ''}
                           />
