@@ -20,7 +20,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyTextInput, MyAutocomplite } from '../../stores/elements';
+import { MySelect, MyAlert, MyTextInput, MyAutocomplite } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -34,7 +34,8 @@ class VendorItemPrice_ extends React.Component {
       is_load: false,
       
       modalDialog: false,
-      
+      modalDialogCity: false,
+
       vendors: [],
       vendor: null,
       
@@ -42,8 +43,13 @@ class VendorItemPrice_ extends React.Component {
       
       cities: [],
       city: '',
-      allCity: false,
-      isPrioriti: false
+
+      vendorCities: [],
+      vendorCity: [],
+
+      operAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
   
@@ -123,8 +129,6 @@ class VendorItemPrice_ extends React.Component {
   
   async changeVendor(event, value){
 
-    console.log( event.target.value, value )
-
     let data = {
       city: this.state.city,
       vendor_id: value.id,
@@ -133,8 +137,10 @@ class VendorItemPrice_ extends React.Component {
     let res = await this.getData('get_vendor_items', data);
     
     this.setState({
-      items: res,
+      items: res.items,
       vendor: value,
+      vendorCities: res.vendor_cities,
+      vendorCity: this.state.cities.filter( city => parseInt(city.id) == parseInt(this.state.city) )
     })
   }
   
@@ -159,26 +165,43 @@ class VendorItemPrice_ extends React.Component {
       vendor_id: this.state.vendor.id,
       items: this.state.items,
       city_id: this.state.city,
-      all_city: this.state.allCity === true ? 1 : 0,
-      is_prioriti: this.state.isPrioriti === true ? 1 : 0,
+      vendorCity: this.state.vendorCity
     }
     
-    if( data.all_city == 1 ){
-      if( confirm("Точно сохранить на все города поставщика ?") ){
-        let res = await this.getData('save_price', data);
-      }
+    let res = await this.getData('save_price', data);
+    
+    this.setState({
+      operAlert: true,
+      err_status: res.st,
+      err_text: res.text,
+      modalDialogCity: res.st ? false : this.state.modalDialogCity
+    })
+
+  }
+
+  chooseCity(event, data){
+    this.setState({
+      vendorCity: data
+    })
+  }
+
+  openSave(){
+    if( this.state.vendorCities.length > 1 ){
+      this.setState({ modalDialogCity: true });
     }else{
-      let res = await this.getData('save_price', data);
+      this.save();
     }
   }
-  
+
   render(){
     return (
       <>
-        <Backdrop style={{ zIndex: 999 }} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
         
+        <MyAlert isOpen={this.state.operAlert} onClose={() => { this.setState({ operAlert: false }); }} status={this.state.err_status} text={this.state.err_text} />
+
         <Dialog
           open={this.state.modalDialog}
           onClose={ () => { this.setState({ modalDialog: false }) } }
@@ -196,6 +219,32 @@ class VendorItemPrice_ extends React.Component {
           </DialogActions>
         </Dialog>
         
+        <Dialog
+          open={this.state.modalDialogCity}
+          onClose={() => { this.setState({ modalDialogCity: false }); }}
+          fullWidth={true}
+          maxWidth={'xs'}
+        >
+          <DialogTitle>Где применить</DialogTitle>
+
+          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+            <Grid item xs={12} sm={4}>
+              <MyAutocomplite
+                label="Города"
+                multiple={true}
+                data={this.state.vendorCities}
+                value={this.state.vendorCity}
+                func={this.chooseCity.bind(this)}
+              />
+            </Grid>
+          </DialogContent>
+
+          <DialogActions>
+            <Button onClick={this.save.bind(this)}>
+              Сохранить
+            </Button>
+          </DialogActions>
+        </Dialog>
         
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
@@ -203,20 +252,15 @@ class VendorItemPrice_ extends React.Component {
           </Grid>
           
           <Grid item xs={12} sm={3}>
-            <MySelect data={this.state.cities} value={this.state.city} func={ this.changeCity.bind(this) } label='Город' />
+            <MySelect data={this.state.cities} value={this.state.city} func={ this.changeCity.bind(this) } is_none={false} label='Город' />
           </Grid>
           <Grid item xs={12} sm={3}>
             <MyAutocomplite data={this.state.vendors} value={this.state.vendor} func={ this.changeVendor.bind(this) } multiple={false} label='Поставщик' />
           </Grid>
-          <Grid item xs={12} sm={3}>
-            <MyCheckBox value={this.state.allCity} func={ (event) => { this.setState({ allCity: event.target.checked }) } } label='На все города поставщика' />
-          </Grid>
-          <Grid item xs={12} sm={12}>
-            <MyCheckBox value={this.state.isPrioriti} func={ (event) => { this.setState({ isPrioriti: event.target.checked }) } } label='Приоритетный постащик' />
-          </Grid>
+          
           
           <Grid item xs={12}>
-            <Button onClick={this.save.bind(this)} variant="contained">Сохранить</Button>
+            <Button onClick={ () => { this.setState({ modalDialogCity: true }) } } variant="contained">Сохранить</Button>
           </Grid>
           
           
