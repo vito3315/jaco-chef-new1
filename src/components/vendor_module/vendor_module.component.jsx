@@ -600,7 +600,7 @@ class VendorModule_ extends React.Component {
                 </TableHead>
                 <TableBody>
                   { this.state.vendors.map( (item, key) => 
-                    <TableRow key={key}>
+                    <TableRow key={key} style={{ backgroundColor: parseInt(item.is_show) == 0 ? '#e5e5e5' : '#fff' }}>
                       <TableCell><Typography onClick={ this.openModalVendor.bind(this, item) } style={{ cursor: 'pointer', width: 'max-content' }}>{item.name}</Typography></TableCell>
                       <TableCell style={{ textAlign: 'center' }}><DirectionsCarIcon onClick={ this.openModalItems.bind(this, item) } style={{ cursor: 'pointer' }} /></TableCell>
                       <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon /> }</TableCell>

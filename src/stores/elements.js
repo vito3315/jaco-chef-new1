@@ -27,6 +27,13 @@ import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 
 import Typography from '@mui/material/Typography';
 
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 export function formatDate(date) {
   var d = new Date(date),
       month = '' + (d.getMonth() + 1),
@@ -511,6 +518,30 @@ export class TextEditor extends React.PureComponent {
         {this.props.text}
 
       </tinymce-editor>
+    )
+  }
+}
+
+export class MyAlert extends React.Component {
+  render(){
+    return (
+      <Snackbar 
+        open={this.props.isOpen} 
+        autoHideDuration={30000}
+        anchorOrigin={{  
+          vertical: 'top',
+          horizontal: 'center', 
+        }}
+        onClose={this.props.onClose}
+      >
+        <Alert 
+          onClose={this.props.onClose} 
+          severity={ this.props.status ? "success" : "error" } 
+          sx={{ width: '100%' }}
+        >
+          { this.props.status ? 'Данные успешно сохранены!' : this.props.text }
+        </Alert>
+      </Snackbar>
     )
   }
 }

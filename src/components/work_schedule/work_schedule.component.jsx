@@ -59,7 +59,7 @@ import {
   MyTimePicker,
   MyDatePickerGraph,
   formatDate,
-  MyAutocomplite
+  MyAlert
 } from '../../stores/elements';
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 
@@ -964,6 +964,10 @@ class WorkSchedule_ extends React.Component {
       allUsers: [],
       smena: null,
       newSmenaName: '',
+
+      operAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
@@ -1222,13 +1226,21 @@ class WorkSchedule_ extends React.Component {
         mainMenuSmena: false,
         isOpenModalH: false,
         userInfo: null,
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
       });
 
       setTimeout(() => {
         this.updateData();
       }, 300);
     } else {
-      alert(res['text']);
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
     }
   }
 
@@ -1278,13 +1290,21 @@ class WorkSchedule_ extends React.Component {
         mainMenu: false,
         mainMenuH: false,
         mainMenuSmena: false,
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
       });
 
       setTimeout(() => {
         this.updateData();
       }, 300);
     } else {
-      alert(res['text']);
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
     }
   }
 
@@ -1305,13 +1325,21 @@ class WorkSchedule_ extends React.Component {
         mainMenu: false,
         mainMenuH: false,
         mainMenuSmena: false,
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
       });
 
       setTimeout(() => {
         this.updateData();
       }, 300);
     } else {
-      alert(res['text']);
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
     }
   }
 
@@ -1334,11 +1362,19 @@ class WorkSchedule_ extends React.Component {
         mainMenu: false,
         mainMenuH: false,
         mainMenuPrice: false,
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
       });
 
       this.updateData();
     } else {
-      alert(res['text']);
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
     }
   }
 
@@ -1369,13 +1405,21 @@ class WorkSchedule_ extends React.Component {
         mainMenu: false,
         mainMenuPoints: false,
         chooseUser: null,
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
       });
 
       setTimeout(() => {
         this.updateData();
       }, 300);
     } else {
-      alert(res['text']);
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
     }
   }
 
@@ -1405,13 +1449,21 @@ class WorkSchedule_ extends React.Component {
     if (res['st'] == true) {
       this.setState({
         mainMenuLVDIR: false,
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
       });
 
       setTimeout(() => {
         this.updateData();
       }, 300);
     } else {
-      alert(res['text']);
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
     }
   }
 
@@ -1442,11 +1494,19 @@ class WorkSchedule_ extends React.Component {
     if (res['st'] == true) {
       this.setState({
         mainMenuDopBonus: false,
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
       });
 
       this.updateData();
     } else {
-      alert(res['text']);
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
     }
   }
 
@@ -1561,13 +1621,21 @@ class WorkSchedule_ extends React.Component {
       this.setState({
         isOpenModalM: false,
         userInfo: null,
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
       });
 
       setTimeout(() => {
         this.updateData();
       }, 300);
     } else {
-      alert(res['text']);
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
     }
   }
 
@@ -1614,13 +1682,21 @@ class WorkSchedule_ extends React.Component {
       this.setState({
         mainMenuZP: false,
         userInfo: null,
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
       });
 
       setTimeout(() => {
         this.updateData();
       }, 300);
     } else {
-      alert(res['text']);
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
     }
   }
 
@@ -1678,13 +1754,21 @@ class WorkSchedule_ extends React.Component {
       this.setState({
         isShowErr: false,
         showErr: null,
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
       });
 
       setTimeout(() => {
         this.updateData();
       }, 300);
     } else {
-      alert(res['text']);
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
     }
   }
 
@@ -1721,7 +1805,11 @@ class WorkSchedule_ extends React.Component {
 
     this.setState({
       showErrCam: res,
-      isShowErrCam: true
+      isShowErrCam: true,
+
+      operAlert: true,
+      err_status: res.st,
+      err_text: res.text,
     })
   }
 
@@ -1775,13 +1863,21 @@ class WorkSchedule_ extends React.Component {
         newSmenaName: '',
         newSmena: false,
         allUsers: [],
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
       });
 
       setTimeout(() => {
         this.updateData();
       }, 300);
     } else {
-      alert(res['text']);
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
     }
   }
 
@@ -1803,13 +1899,21 @@ class WorkSchedule_ extends React.Component {
         editSmena: false,
         smena: null,
         allUsers: [],
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
       });
 
       setTimeout(() => {
         this.updateData();
       }, 300);
     } else {
-      alert(res['text']);
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
     }
   }
 
@@ -1831,13 +1935,21 @@ class WorkSchedule_ extends React.Component {
           editSmena: false,
           smena: null,
           allUsers: [],
+
+          operAlert: true,
+          err_status: res.st,
+          err_text: res.text,
         });
   
         setTimeout(() => {
           this.updateData();
         }, 300);
       } else {
-        alert(res['text']);
+        this.setState({
+          operAlert: true,
+          err_status: res.st,
+          err_text: res.text,
+        })
       }
     } 
   }
@@ -1863,6 +1975,12 @@ class WorkSchedule_ extends React.Component {
         <Backdrop open={this.state.is_load} style={{ zIndex: 999 }}>
           <CircularProgress color="inherit" />
         </Backdrop>
+
+        <MyAlert 
+          isOpen={this.state.operAlert} 
+          onClose={() => { this.setState({ operAlert: false }); }} 
+          status={this.state.err_status} 
+          text={this.state.err_text} />
 
         <Dialog
           onClose={() => {
