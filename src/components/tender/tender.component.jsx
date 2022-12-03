@@ -50,12 +50,8 @@ class TenderCell extends React.Component {
     return (
       <TableCell
         className={className}
-        onClick={this.props.changePrice.bind(
-          this,
-          vendor.id,
-          item.id,
-          price.price
-        )}
+        style={{ cursor: 'pointer' }}
+        onClick={this.props.changePrice.bind(this, vendor.id, item.id, price.price )}
       >
         {price.price}
       </TableCell>
@@ -407,7 +403,7 @@ class Tender_ extends React.Component {
           <Grid container spacing={3}>
             <Grid item xs={12} sm={12}>
               <TableContainer sx={{ maxHeight: { xs: 'none', sm: 1000 } }}>
-                <Table stickyHeader aria-label="sticky table" size="small">
+                <Table stickyHeader size="small">
                   <TableHead style={{ position: 'sticky', top: 0, zIndex: 7 }}>
                     <TableRow>
                       <TableCell sx={{ zIndex: 7 }}>Средний закуп</TableCell>
@@ -454,10 +450,28 @@ class Tender_ extends React.Component {
                           style={{
                             maxWidth: 150,
                             textAlign: 'center',
+                            cursor: 'pointer'
                           }}
                           onClick={this.downLoadVendor.bind(this, vendor.id)}
                         >
                           скачать
+                        </TableCell>
+                      ))}
+                    </TableRow>
+
+                    <TableRow>
+                      <TableCell style={{ zIndex: 3 }}></TableCell>
+                      <TableCell></TableCell>
+                      <TableCell></TableCell>
+                      {this.state.vendors.map((vendor, key) => (
+                        <TableCell
+                          key={key}
+                          style={{
+                            maxWidth: 150,
+                            textAlign: 'center',
+                          }}
+                        >
+                          {vendor.date_last_update}
                         </TableCell>
                       ))}
                     </TableRow>
@@ -563,9 +577,7 @@ class Tender_ extends React.Component {
 
                             {category.items.map((item, k) => (
                               <TableRow key={k} hover>
-                                <TableCell variant="head">
-                                  {item.name}
-                                </TableCell>
+                                <TableCell variant="head">{item.name}</TableCell>
                                 <TableCell>{item.price}</TableCell>
                                 <TableCell>{item.ras}</TableCell>
                                 {this.state.vendors.map((vendor, key) => (
