@@ -27,135 +27,16 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
 import {
   MySelect,
   MyCheckBox,
   MyTextInput,
   MyAutocomplite,
+  MyAlert,
 } from '../../stores/elements';
 
 const queryString = require('query-string');
 
-class PolufabricatModule_Modal_Edit extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      is_show: '',
-      show_in_rev: '',
-      show_in_order: '',
-    };
-  }
-
-  componentDidUpdate(prevProps) {
-    // console.log(this.props);
-
-    if (!this.props) {
-      return;
-    }
-
-    if (this.props !== prevProps) {
-      this.setState({
-        is_show: this.props.is_show,
-        show_in_rev: this.props.show_in_rev,
-        show_in_order: this.props.show_in_order,
-      });
-    }
-  }
-
-  changeItemChecked(data, event) {
-    let vendor = this.state[data];
-    vendor = event.target.checked === true ? 1 : 0;
-
-    this.setState({
-      [data]: vendor,
-    });
-  }
-
-  save() {
-    this.props.changeTableItem(this.props.id, this.props.type, this.state.is_show, this.state.show_in_rev, this.state.show_in_order);
-
-    this.onClose();
-  }
-
-  onClose() {
-    this.setState({
-      is_show: '',
-      show_in_rev: '',
-      show_in_order: '',
-    });
-
-    this.props.onClose();
-  }
-
-  render() {
-    return (
-      <Dialog
-        open={this.props.open}
-        onClose={this.onClose.bind(this)}
-        fullWidth={true}
-        maxWidth={'sm'}
-      >
-        <DialogTitle>
-          <Typography>{this.props.itemName} изменить:</Typography>
-          <Typography>- Активность</Typography>
-          <Typography>- Ревизию</Typography>
-          <Typography>- Заявку</Typography>
-        </DialogTitle>
-
-        <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell style={{ width: '35%' }}>Активность</TableCell>
-                  <TableCell style={{ width: '35%' }}>Ревизия</TableCell>
-                  <TableCell style={{ width: '30%' }}>Заявка</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableRow sx={{ '& td': { border: 0 } }}>
-                  <TableCell>
-                    <MyCheckBox
-                      label=""
-                      value={parseInt(this.state.is_show) == 1 ? true : false}
-                      func={this.changeItemChecked.bind(this, 'is_show')}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <MyCheckBox
-                      label=""
-                      value={parseInt(this.state.show_in_rev) == 1 ? true : false}
-                      func={this.changeItemChecked.bind(this, 'show_in_rev')}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <MyCheckBox
-                      label=""
-                      value={parseInt(this.state.show_in_order) == 1 ? true : false}
-                      func={this.changeItemChecked.bind(this, 'show_in_order')}
-                    />
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </DialogContent>
-
-        <DialogActions>
-          <Button onClick={this.save.bind(this)}>Сохранить</Button>
-        </DialogActions>
-      </Dialog>
-    );
-  }
-}
 
 class PolufabricatModule_Modal extends React.Component {
   constructor(props) {
@@ -169,15 +50,24 @@ class PolufabricatModule_Modal extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    // console.log(this.props);
+    // console.log(this.props.event);
 
     if (!this.props.event) {
       return;
     }
 
     if (this.props.event !== prevProps.event) {
+
+      const item = this.props.event;
+
+      if(this.props.mark === 'newItem') {
+
+        item.item.this_storages = [];
+
+      }
+
       this.setState({
-        item: this.props.event,
+        item,
       });
     }
   }
@@ -265,6 +155,7 @@ class PolufabricatModule_Modal extends React.Component {
 
             <Grid item xs={12} sm={6}>
               <MySelect
+                is_none={false}
                 label="Категория"
                 data={this.state.item ? this.state.item.cat_pf : []}
                 value={this.state.item ? this.state.item.item.cat_pf_id : ''}
@@ -272,8 +163,9 @@ class PolufabricatModule_Modal extends React.Component {
               />
             </Grid>
 
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={6}>
               <MySelect
+                is_none={false}
                 label="Ед измерения"
                 data={this.state.item ? this.state.item.ed_izmer : []}
                 value={this.state.item ? this.state.item.item.ed_izmer_id : ''}
@@ -281,7 +173,7 @@ class PolufabricatModule_Modal extends React.Component {
               />
             </Grid>
 
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={6}>
               <MyTextInput
                 label="Минимальный остаток"
                 value={this.state.item ? this.state.item.item.min_count : ''}
@@ -289,7 +181,7 @@ class PolufabricatModule_Modal extends React.Component {
               />
             </Grid>
 
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={12}>
               <MyTextInput
                 label="Срок годности"
                 value={this.state.item ? this.state.item.item.shelf_life : ''}
@@ -346,7 +238,6 @@ class PolufabricatModule_ extends React.Component {
       freeItems: [],
 
       modalDialog: false,
-      modalDialogEdit: false,
 
       mark: '',
       method: '',
@@ -354,13 +245,10 @@ class PolufabricatModule_ extends React.Component {
       item: null,
       itemName: '',
 
-      snackbar: false,
-      error: '',
+      openAlert: false,
+      err_status: true,
+      err_text: '',
 
-      show_in_rev: '',
-      show_in_order: '',
-      is_show: '',
-      id: '',
       type: 0,
     };
   }
@@ -453,45 +341,39 @@ class PolufabricatModule_ extends React.Component {
     }
   }
 
-  openModalItemEdit(id, type, name, is_show, show_in_rev, show_in_order) {
-    this.setState({
-      modalDialogEdit: true,
-      show_in_rev,
-      show_in_order,
-      is_show,
-      id,
-      type,
-      itemName: name,
-    });
-  }
-
   changeTableItem(item_id, type, is_show, show_in_rev, show_in_order) {
 
-    if (parseInt(type) == 1) {
-      if (this.state.is_show != is_show) {
-        this.saveItem(item_id, 'active', is_show);
+    const is_show_edit = parseInt(is_show) == 1 ? 0 : 1;
+    const show_in_rev_edit = parseInt(show_in_rev) == 1 ? 0 : 1;
+    const show_in_order_edit = parseInt(show_in_order) == 1 ? 0 : 1;
+
+    if (parseInt(type) == 1 || parseInt(type) == 2 || parseInt(type) == 3) {
+
+
+      if (parseInt(type) == 1) {
+        this.saveItem(item_id, 'active', is_show_edit);
       }
 
-      if (this.state.show_in_rev != show_in_rev) {
-        this.saveItem(item_id, 'rev', show_in_rev);
+      if (parseInt(type) == 2) {
+        this.saveItem(item_id, 'rev', show_in_rev_edit);
       }
 
-      if (this.state.show_in_order != show_in_order) {
-        this.saveItem(item_id, 'order', show_in_order);
+      if (parseInt(type) == 3) {
+        this.saveItem(item_id, 'order', show_in_order_edit);
       }
     }
 
-    if (parseInt(type) == 2) {
-      if (this.state.is_show != is_show) {
-        this.saveItem(item_id, 'active', is_show);
+    if (parseInt(type) == 4 || parseInt(type) == 5 || parseInt(type) == 6) {
+      if (parseInt(type) == 4) {
+        this.saveItem(item_id, 'active', is_show_edit);
       }
 
-      if (this.state.show_in_rev != show_in_rev) {
-        this.saveItem(item_id, 'rev', show_in_rev);
+      if (parseInt(type) == 5) {
+        this.saveItem(item_id, 'rev', show_in_rev_edit);
       }
 
-      if (this.state.show_in_order != show_in_order) {
-        this.saveItem(item_id, 'order', show_in_order);
+      if (parseInt(type) == 6) {
+        this.saveItem(item_id, 'order', show_in_order_edit);
       }
     }
   }
@@ -503,15 +385,20 @@ class PolufabricatModule_ extends React.Component {
       is_show,
     };
 
-    let res = await this.getData('update_order_rev', data);
+    // console.log(data);
+
+    let res = await this.getData('update_order_rev_active', data);
 
     if (!res.st) {
       this.setState({
-        error: res.text,
-        snackbar: true,
+        openAlert: true,
+        err_status: res.st,
+        err_text: res.text,
       });
     } else {
-      this.update();
+      setTimeout(() => {
+          this.update();
+      }, 300);
     }
   }
 
@@ -547,20 +434,11 @@ class PolufabricatModule_ extends React.Component {
           <CircularProgress color="inherit" />
         </Backdrop>
 
-        <Snackbar
-          open={this.state.snackbar}
-          autoHideDuration={30000}
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          onClose={() => this.setState({ snackbar: false })}
-        >
-          <Alert
-            onClose={() => this.setState({ snackbar: false })}
-            severity={'error'}
-            sx={{ width: '100%' }}
-          >
-            {this.state.error}
-          </Alert>
-        </Snackbar>
+        <MyAlert 
+          isOpen={this.state.openAlert} 
+          onClose={() => this.setState({ openAlert: false }) } 
+          status={this.state.err_status} 
+          text={this.state.err_text} />
 
         <PolufabricatModule_Modal
           open={this.state.modalDialog}
@@ -572,20 +450,6 @@ class PolufabricatModule_ extends React.Component {
           mark={this.state.mark}
           save={this.save.bind(this)}
           itemName={this.state.itemName}
-        />
-
-        <PolufabricatModule_Modal_Edit
-          open={this.state.modalDialogEdit}
-          onClose={() => {
-            this.setState({ modalDialogEdit: false });
-          }}
-          id={this.state.id}
-          type={this.state.type}
-          itemName={this.state.itemName}
-          show_in_rev={this.state.show_in_rev}
-          is_show={this.state.is_show}
-          show_in_order={this.state.show_in_order}
-          changeTableItem={this.changeTableItem.bind(this)}
         />
 
         <Grid container spacing={3} mb={3}>
@@ -630,19 +494,19 @@ class PolufabricatModule_ extends React.Component {
                             {category.items.map((it, k) => (
                               <TableRow key={k}>
                                 <TableCell>{it.id}</TableCell>
-                                <TableCell onClick={this.openModalItemEdit.bind(this, it.id, 1, it.name, it.is_show, it.show_in_rev, it.show_in_order)}>
+                                <TableCell onClick={this.changeTableItem.bind(this, it.id, 1, it.is_show, it.show_in_rev, it.show_in_order)}>
                                   <MyCheckBox
                                     label=""
                                     value={parseInt(it.is_show) == 1 ? true : false}
                                   />
                                 </TableCell>
-                                <TableCell onClick={this.openModalItemEdit.bind(this, it.id, 1, it.name, it.is_show, it.show_in_rev, it.show_in_order)}>
+                                <TableCell onClick={this.changeTableItem.bind(this, it.id, 2, it.is_show, it.show_in_rev, it.show_in_order)}>
                                   <MyCheckBox
                                     label=""
                                     value={parseInt(it.show_in_rev) == 1 ? true : false}
                                   />
                                 </TableCell>
-                                <TableCell onClick={this.openModalItemEdit.bind(this, it.id, 1, it.name, it.is_show, it.show_in_rev, it.show_in_order)}>
+                                <TableCell onClick={this.changeTableItem.bind(this, it.id, 3, it.is_show, it.show_in_rev, it.show_in_order)}>
                                   <MyCheckBox
                                     label=""
                                     value={parseInt(it.show_in_order) == 1 ? true : false}
@@ -688,19 +552,19 @@ class PolufabricatModule_ extends React.Component {
                       {this.state.freeItems.map((cat, key) => (
                         <TableRow key={key}>
                           <TableCell>{cat.id}</TableCell>
-                          <TableCell onClick={this.openModalItemEdit.bind(this, cat.id, 2, cat.name, cat.is_show, cat.show_in_rev, cat.show_in_order)}>
+                          <TableCell onClick={this.changeTableItem.bind(this, cat.id, 4, cat.is_show, cat.show_in_rev, cat.show_in_order)}>
                             <MyCheckBox
                               label=""
                               value={parseInt(cat.is_show) == 1 ? true : false}
                             />
                           </TableCell>
-                          <TableCell onClick={this.openModalItemEdit.bind(this, cat.id, 2, cat.name, cat.is_show, cat.show_in_rev, cat.show_in_order)}>
+                          <TableCell onClick={this.changeTableItem.bind(this, cat.id, 5, cat.is_show, cat.show_in_rev, cat.show_in_order)}>
                             <MyCheckBox
                               label=""
                               value={parseInt(cat.show_in_rev) == 1 ? true : false}
                             />
                           </TableCell>
-                          <TableCell onClick={this.openModalItemEdit.bind(this, cat.id, 2, cat.name, cat.is_show, cat.show_in_rev, cat.show_in_order)}>
+                          <TableCell onClick={this.changeTableItem.bind(this, cat.id, 6, cat.is_show, cat.show_in_rev, cat.show_in_order)}>
                             <MyCheckBox
                               label=""
                               value={parseInt(cat.show_in_order) == 1 ? true : false}
