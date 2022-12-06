@@ -69,6 +69,8 @@ class ReceptModule_Modal_Container extends React.Component {
   }
 
   render() {
+    const { rec, storages, apps, pf_list, all_pf_list, changeItem } = this.props;
+
     return (
       <Grid container spacing={3}>
         <Grid item xs={12}>
@@ -76,15 +78,15 @@ class ReceptModule_Modal_Container extends React.Component {
             <Grid item xs={12} sm={6}>
               <MyTextInput
                 label="Наименование рецепта"
-                value={this.state.item.name}
-                func={this.props.changeItem.bind(this, 'name')}
+                value={rec.name}
+                func={changeItem.bind(this, 'name')}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <MyTextInput
                 label="Время приготовления 1кг (ММ:СС)"
-                value={this.state.item.time_stagе}
-                func={this.props.changeItem.bind(this, 'time_stagе')}
+                value={rec.time_min}
+                func={changeItem.bind(this, 'time_min')}
               />
             </Grid>
           </Grid>
@@ -92,20 +94,20 @@ class ReceptModule_Modal_Container extends React.Component {
             <Grid item xs={12} sm={6}>
               <MyTextInput
                 label="Срок хранения"
-                value={this.state.item.term}
-                func={this.props.changeItem.bind(this, 'term')}
+                value={rec.shelf_life}
+                func={changeItem.bind(this, 'shelf_life')}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <MyAutocomplite
                 label="Должность на кухне"
                 multiple={false}
-                data={this.state.item.post}
-                value={this.state.item.post.id}
+                data={apps}
+                value={rec.app_id}
                 func={(event, value) => {
-                  let this_storages = this.state.item;
-                  this_storages.post.id = value;
-                  this.setState({ item: this_storages });
+                  //let this_storages = this.state.item;
+                  //this_storages.post.id = value;
+                  //this.setState({ item: this_storages });
                 }}
               />
             </Grid>
@@ -115,86 +117,60 @@ class ReceptModule_Modal_Container extends React.Component {
             <MyAutocomplite
               label="Места хранения"
               multiple={true}
-              data={this.state.item.location}
-              value={this.state.item.location.id}
+              data={storages}
+              value={rec.storages}
               func={(event, value) => {
-                let this_storages = this.state.item;
-                this_storages.location.id = value;
-                this.setState({ item: this_storages });
+                //let this_storages = this.state.item;
+                //this_storages.location.id = value;
+                //this.setState({ item: this_storages });
               }}
             />
           </Grid>
 
-          {this.props.method === 'Редактирование рецепта' ? (
-            <Grid item xs={12}>
-              <MyCheckBox
-                label="Активность"
-                value={parseInt(this.state.item.is_show) == 1 ? true : false}
-                func={this.props.changeItemChecked.bind(this, 'is_show')}
-              />
-            </Grid>
-          ) : null}
-
-          <Divider />
-
-          <Grid container spacing={3} mt={1}>
+          <Grid item xs={12}>
+            <MyCheckBox
+              label="Активность"
+              value={parseInt(rec.is_show) == 1 ? true : false}
+              //func={this.props.changeItemChecked.bind(this, 'is_show')}
+            />
+          </Grid>
+          
+          <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
-              <MyTextInput
-                label="Поиск"
-                value={this.state.searchValue}
-                func={this.searchPf.bind(this)}
-              />
-              <Table size="small" style={{ whiteSpace: 'nowrap' }}>
+              <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell>Название</TableCell>
                     <TableCell>Кол-во</TableCell>
-                    <TableCell>Ед измер</TableCell>
-                    <TableCell></TableCell>
+                    <TableCell colSpan={2}>Ед измер</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {this.state.item.pf_list
-                    .filter((value) => {
-                      if (
-                        this.state.searchValue === '' ||
-                        this.state.searchValue.length < 2
-                      ) {
-                        return value;
-                      } else {
-                        return value.name
-                          .toLowerCase()
-                          .includes(this.state.searchValue.toLowerCase());
-                      }
-                    })
-                    .map((item, key) => (
-                      <TableRow key={key}>
-                        <TableCell>{item.name}</TableCell>
-                        <TableCell>
-                          <MyTextInput
-                            type="number"
-                            defaultValue={''}
-                            func={this.props.changeQuantity.bind(this)}
-                          />
-                        </TableCell>
-                        <TableCell>{item.ed_izmer}</TableCell>
-                        <TableCell>
-                          <AddIcon
-                            onClick={this.props.addIngredientsRecipe.bind(
-                              this,
-                              item
-                            )}
-                            style={{ cursor: 'pointer' }}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                  {all_pf_list.map((item, key) => (
+                    <TableRow key={key}>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>
+                        <MyTextInput
+                          type="number"
+                          defaultValue={''}
+                          //func={this.props.changeQuantity.bind(this)}
+                        />
+                      </TableCell>
+                      <TableCell>{item.ei_name}</TableCell>
+                      <TableCell>
+                        <AddIcon
+                          //onClick={this.props.addIngredientsRecipe.bind(this, item)}
+                          style={{ cursor: 'pointer' }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </Grid>
 
-            <Grid item xs={12} sm={6} mt={5}>
-              <Table size="small" style={{ whiteSpace: 'nowrap' }}>
+            <Grid item xs={12} sm={6}>
+              <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell>Название</TableCell>
@@ -204,19 +180,15 @@ class ReceptModule_Modal_Container extends React.Component {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {this.state.item.recipe.map((item, key) => (
+                  {pf_list.map((item, key) => (
                     <TableRow key={key}>
                       <TableCell>{item.name}</TableCell>
                       <TableCell>
-                        {item.quantity} {item.ed_izmer}
+                        {item.count} {item.ei_name}
                       </TableCell>
-                      <TableCell>{`${item.percent} %`}</TableCell>
+                      <TableCell>{item.percent} %</TableCell>
                       <TableCell>
                         <CloseIcon
-                          onClick={this.props.deleteIngredientsRecipe.bind(
-                            this,
-                            item.id
-                          )}
                           style={{ cursor: 'pointer' }}
                         />
                       </TableCell>
@@ -224,7 +196,7 @@ class ReceptModule_Modal_Container extends React.Component {
                   ))}
                   <TableRow sx={{ '& td': { border: 0 } }}>
                     <TableCell>Всего:</TableCell>
-                    <TableCell>{`${this.props.total} гр`}</TableCell>
+                    <TableCell></TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -471,26 +443,19 @@ class ReceptModule_Modal_Edit extends React.Component {
     });
   }
 
-  onClose() {
-    this.setState({
-      item: null,
-      ItemTab: '2',
-      quantity: '',
-      total: ''
-    });
-
-    this.props.onClose();
-  }
+  
 
   render() {
+    const { isOpen, onClose, changeItem, rec, storages, apps, pf_list, all_pf_list } = this.props;
+
     return (
       <Dialog
-        open={this.props.open}
+        open={isOpen}
         fullWidth={true}
         maxWidth={'lg'}
-        onClose={this.onClose.bind(this)}
+        onClose={onClose.bind(this)}
       >
-        <DialogTitle>{this.props.method}</DialogTitle>
+        <DialogTitle>Редактирование рецепта</DialogTitle>
         <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
@@ -519,16 +484,12 @@ class ReceptModule_Modal_Edit extends React.Component {
                 </TabPanel>
                 <TabPanel value="2">
                   <ReceptModule_Modal_Container
-                    method={this.props.method}
-                    event={this.state.item}
-                    changeItem={this.changeItem.bind(this)}
-                    changeItemChecked={this.changeItemChecked.bind(this)}
-                    addIngredientsRecipe={this.addIngredientsRecipe.bind(this)}
-                    changeQuantity={this.changeQuantity.bind(this)}
-                    deleteIngredientsRecipe={this.deleteIngredientsRecipe.bind(
-                      this
-                    )}
-                    total={this.state.total}
+                    rec={rec}
+                    storages={storages}
+                    apps={apps}
+                    pf_list={pf_list}
+                    all_pf_list={all_pf_list}
+                    changeItem={changeItem.bind(this)}
                   />
                 </TabPanel>
 
@@ -542,18 +503,7 @@ class ReceptModule_Modal_Edit extends React.Component {
                       />
                     </Grid>
                   </Grid>
-                  <ReceptModule_Modal_Container
-                    method={this.props.method}
-                    event={this.state.item}
-                    changeItem={this.changeItem.bind(this)}
-                    changeItemChecked={this.changeItemChecked.bind(this)}
-                    addIngredientsRecipe={this.addIngredientsRecipe.bind(this)}
-                    changeQuantity={this.changeQuantity.bind(this)}
-                    deleteIngredientsRecipe={this.deleteIngredientsRecipe.bind(
-                      this
-                    )}
-                    total={this.state.total}
-                  />
+                  
                 </TabPanel>
               </TabContext>
             </Grid>
@@ -594,6 +544,8 @@ class ReceptModule_Table extends React.Component {
   }
 
   render() {
+    const { recipes, openModalEdit } = this.props;
+
     return (
       <Table>
         <TableHead>
@@ -607,9 +559,9 @@ class ReceptModule_Table extends React.Component {
         </TableHead>
 
         <TableBody>
-          {this.props.recipes.map((item, i) => (
-            <TableRow key={i}>
-              <TableCell>{item.id}</TableCell>
+          {recipes.map((item, key) => (
+            <TableRow key={key}>
+              <TableCell>{key+1}</TableCell>
               <TableCell>
                 {parseInt(item.is_show) == 1 ? (
                   <VisibilityIcon />
@@ -626,15 +578,11 @@ class ReceptModule_Table extends React.Component {
               </TableCell>
               <TableCell
                 style={{ cursor: 'pointer' }}
-                onClick={this.props.openModalRecipes.bind(
-                  this,
-                  'Редактирование рецепта',
-                  item.id
-                )}
+                onClick={openModalEdit.bind(this, item.id)}
               >
                 {item.name}
               </TableCell>
-              <TableCell>{item.location[0]}</TableCell>
+              <TableCell>{item.storage_name}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -652,436 +600,29 @@ class ReceptModule_ extends React.Component {
       module_name: '',
       is_load: false,
 
-      item: {
-        allRecipes: [
-          {
-            id: '1',
-            is_show: 1,
-            show_in_rev: 0,
-            name: 'Паста вареная',
-            location: ['Кухня Пицца'],
-            time_stagе: '10:00',
-            term: '72 часа',
-            post: {
-              id: '2',
-              name: 'Повар',
-            },
-            recipe: [
-              {
-                id: '1',
-                name: '7Up 0.6 л',
-                ed_izmer: 'гр',
-                quantity: 10,
-              },
-              {
-                id: '2',
-                name: 'Бахилы полиэтиленовые',
-                ed_izmer: 'шт',
-                quantity: 5,
-              },
-            ],
-            pf_list: [
-              {
-                id: '1',
-                name: '7Up 0.6 л',
-                ed_izmer: 'гр',
-              },
-              {
-                id: '2',
-                name: 'Бахилы полиэтиленовые',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '3',
-                name: 'Васаби 5г.',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '4',
-                name: 'Вилка черная, одноразовая',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '6',
-                name: 'Aqua Minerale Не газ.',
-                ed_izmer: 'кг',
-              },
-              {
-                id: '7',
-                name: 'Губка металлическая',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '8',
-                name: 'Губки для посуды',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '9',
-                name: 'Зиплок 10*100',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '10',
-                name: 'Икра масаго красная',
-                ed_izmer: 'гр',
-              },
-              {
-                id: '11',
-                name: 'Имбирь 30 г.',
-                ed_izmer: 'шт',
-              },
-            ],
-          },
-          {
-            id: '3',
-            is_show: 1,
-            show_in_rev: 0,
-            name: 'Кляр',
-            location: ['Стеллаж'],
-            time_stagе: '15:00',
-            term: '30 часов',
-            post: {
-              id: '3',
-              name: 'Кухонный работник',
-            },
-            recipe: [
-              {
-                iid: '7',
-                name: 'Губка металлическая',
-                ed_izmer: 'шт',
-                quantity: 10,
-              },
-              {
-                id: '2',
-                name: 'Бахилы полиэтиленовые',
-                ed_izmer: 'шт',
-                quantity: 5,
-              },
-            ],
-            pf_list: [
-              {
-                id: '1',
-                name: '7Up 0.6 л',
-                ed_izmer: 'гр',
-              },
-              {
-                id: '2',
-                name: 'Бахилы полиэтиленовые',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '3',
-                name: 'Васаби 5г.',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '4',
-                name: 'Вилка черная, одноразовая',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '6',
-                name: 'Aqua Minerale Не газ.',
-                ed_izmer: 'кг',
-              },
-              {
-                id: '7',
-                name: 'Губка металлическая',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '8',
-                name: 'Губки для посуды',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '9',
-                name: 'Зиплок 10*100',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '10',
-                name: 'Икра масаго красная',
-                ed_izmer: 'гр',
-              },
-              {
-                id: '11',
-                name: 'Имбирь 30 г.',
-                ed_izmer: 'шт',
-              },
-            ],
-          },
-          {
-            id: '4',
-            is_show: 0,
-            show_in_rev: 1,
-            name: 'Лососевый замес',
-            location: ['Холодильник'],
-            time_stagе: '20:00',
-            term: '15 часов',
-            post: {
-              id: '2',
-              name: 'Повар',
-            },
-            recipe: [
-              {
-                id: '1',
-                name: '7Up 0.6 л',
-                ed_izmer: 'гр',
-                quantity: 10,
-              },
-              {
-                id: '4',
-                name: 'Вилка черная, одноразовая',
-                ed_izmer: 'шт',
-                quantity: 5,
-              },
-            ],
-            pf_list: [
-              {
-                id: '1',
-                name: '7Up 0.6 л',
-                ed_izmer: 'гр',
-              },
-              {
-                id: '2',
-                name: 'Бахилы полиэтиленовые',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '3',
-                name: 'Васаби 5г.',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '4',
-                name: 'Вилка черная, одноразовая',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '6',
-                name: 'Aqua Minerale Не газ.',
-                ed_izmer: 'кг',
-              },
-              {
-                id: '7',
-                name: 'Губка металлическая',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '8',
-                name: 'Губки для посуды',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '9',
-                name: 'Зиплок 10*100',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '10',
-                name: 'Икра масаго красная',
-                ed_izmer: 'гр',
-              },
-              {
-                id: '11',
-                name: 'Имбирь 30 г.',
-                ed_izmer: 'шт',
-              },
-            ],
-          },
-          {
-            id: '5',
-            is_show: 1,
-            show_in_rev: 0,
-            name: 'Соус Спайси',
-            location: ['Холодильник'],
-            time_stagе: '11:00',
-            term: '50 часов',
-            post: {
-              id: '3',
-              name: 'Кухонный работник',
-            },
-            recipe: [
-              {
-                id: '1',
-                name: '7Up 0.6 л',
-                ed_izmer: 'гр',
-                quantity: 10,
-              },
-              {
-                id: '3',
-                name: 'Васаби 5г.',
-                ed_izmer: 'шт',
-                quantity: 5,
-              },
-            ],
-            pf_list: [
-              {
-                id: '1',
-                name: '7Up 0.6 л',
-                ed_izmer: 'гр',
-              },
-              {
-                id: '2',
-                name: 'Бахилы полиэтиленовые',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '3',
-                name: 'Васаби 5г.',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '4',
-                name: 'Вилка черная, одноразовая',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '6',
-                name: 'Aqua Minerale Не газ.',
-                ed_izmer: 'кг',
-              },
-              {
-                id: '7',
-                name: 'Губка металлическая',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '8',
-                name: 'Губки для посуды',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '9',
-                name: 'Зиплок 10*100',
-                ed_izmer: 'шт',
-              },
-              {
-                id: '10',
-                name: 'Икра масаго красная',
-                ed_izmer: 'гр',
-              },
-              {
-                id: '11',
-                name: 'Имбирь 30 г.',
-                ed_izmer: 'шт',
-              },
-            ],
-          },
-        ],
-      },
+      rec: null,
+      storages: [],
+      apps: [],
+      pf_list: [],
+      all_pf_list: [],
 
       modalDialogNew: false,
       modalDialogEdit: false,
       method: null,
 
-      itemNew: {
-        name: '',
-        time_stagе: '00:00',
-        term: '',
-        recipe: [],
-        location: [
-          {
-            id: '1',
-            name: 'Стеллаж',
-          },
-          {
-            id: '2',
-            name: 'Холодильник',
-          },
-          {
-            id: '3',
-            name: 'Кухня Роллы',
-          },
-        ],
-        post: [
-          {
-            id: '1',
-            name: 'Не требуется',
-          },
-          {
-            id: '2',
-            name: 'Повар',
-          },
-          {
-            id: '3',
-            name: 'Кухонный работник',
-          },
-        ],
-        pf_list: [
-          {
-            id: '1',
-            name: '7Up 0.6 л',
-            ed_izmer: 'гр',
-          },
-          {
-            id: '2',
-            name: 'Бахилы полиэтиленовые',
-            ed_izmer: 'шт',
-          },
-          {
-            id: '3',
-            name: 'Васаби 5г.',
-            ed_izmer: 'шт',
-          },
-          {
-            id: '4',
-            name: 'Вилка черная, одноразовая',
-            ed_izmer: 'шт',
-          },
-          {
-            id: '6',
-            name: 'Aqua Minerale Не газ.',
-            ed_izmer: 'кг',
-          },
-          {
-            id: '7',
-            name: 'Губка металлическая',
-            ed_izmer: 'шт',
-          },
-          {
-            id: '8',
-            name: 'Губки для посуды',
-            ed_izmer: 'шт',
-          },
-          {
-            id: '9',
-            name: 'Зиплок 10*100',
-            ed_izmer: 'шт',
-          },
-          {
-            id: '10',
-            name: 'Икра масаго красная',
-            ed_izmer: 'гр',
-          },
-          {
-            id: '11',
-            name: 'Имбирь 30 г.',
-            ed_izmer: 'шт',
-          },
-        ],
-      },
-
-      recipes: null,
+      items: []
     };
   }
 
   async componentDidMount() {
-    let data = await this.getData('get_all');
+    let res = await this.getData('get_all');
 
     this.setState({
-      // points: data.points,
-      // point: data.points[0].id,
-      module_name: data.module_info.name,
-      // mounths: data.mounth,
-      // mounth: data.this_m,
-      // years: data.years,
-      // year: data.this_y,
+      module_name: res.module_info.name,
+      items: res.items
     });
 
-    document.title = data.module_info.name;
+    document.title = res.module_info.name;
   }
 
   getData = (method, data = {}) => {
@@ -1130,7 +671,7 @@ class ReceptModule_ extends React.Component {
   openModalRecipes(method, id) {
     // const item = this.state.item.find(el => el.id === id)
 
-    if (method === 'Новый рецепт') {
+    if (method === 'new') {
       // let res = await this.getData('get_all_for_new');
 
       // console.log(res)
@@ -1141,16 +682,32 @@ class ReceptModule_ extends React.Component {
         // item:
       });
     } else {
-      const data = this.state.item;
-
-      const recipes = data.allRecipes.find((el) => el.id === id);
+      
 
       this.setState({
         modalDialogEdit: true,
         method,
-        recipes,
       });
     }
+  }
+
+  async openModalEdit(id){
+    let data = {
+      id: id
+    };
+  
+    let res = await this.getData('get_one', data);
+
+    console.log( res )
+
+    this.setState({
+      modalDialogEdit: true,
+      rec: res.rec,
+      apps: res.apps,
+      pf_list: res.pf_list,
+      all_pf_list: res.all_pf_list,
+      storages: res.all_storages
+    });
   }
 
   async saveNewItem(newItem, recipe) {
@@ -1175,6 +732,16 @@ class ReceptModule_ extends React.Component {
       modalDialogEdit: false,
       // item
     });
+  }
+
+  changeItem(type, event){
+    let rec = this.state.rec;
+
+    rec[ type ] = event.target.value;
+
+    this.setState({
+      rec: rec
+    })
   }
 
   render() {
@@ -1210,19 +777,25 @@ class ReceptModule_ extends React.Component {
         />
 
         <ReceptModule_Modal_Edit
-          open={this.state.modalDialogEdit}
+          isOpen={this.state.modalDialogEdit}
           onClose={() => {
             this.setState({ modalDialogEdit: false });
           }}
-          method={this.state.method}
-          event={this.state.recipes}
+          changeItem={this.changeItem.bind(this)}
+          rec={this.state.rec}
+          storages={this.state.storages}
+          apps={this.state.apps}
+          pf_list={this.state.pf_list}
+          all_pf_list={this.state.all_pf_list}
           save={this.saveEditItem.bind(this)}
         />
 
         <Grid item xs={12}>
           <ReceptModule_Table
-            recipes={this.state.item.allRecipes}
-            openModalRecipes={this.openModalRecipes.bind(this)}
+            recipes={this.state.items}
+            isOpen={this.state.modalDialogEdit}
+            onClose={ () => { this.setState({ modalDialogEdit: false }) } }
+            openModalEdit={this.openModalEdit.bind(this)}
           />
         </Grid>
       </>

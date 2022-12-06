@@ -11,14 +11,6 @@ td, th {
   border-right: solid 1px #e5e5e5;
 }
 
-tbody tr:nth-child(odd) {
-  background-color: rgba(229, 229, 229, 0.5);
-}
-
-tbody tr:nth-child(even) {
-  background-color: #fff; 
-}
-
 .tdprice{
   white-space: nowrap;
   text-align: center!important;
