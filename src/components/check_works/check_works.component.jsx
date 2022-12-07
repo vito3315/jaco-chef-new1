@@ -813,10 +813,8 @@ class Checkworks_ extends React.Component {
                 <Grid item xs={12} sm={12}>
                   <TableContainer>
                     <Grid mb={2} mt={2}>
-                      <Button variant="outlined" onClick={this.filterButton.bind(this)}>
-                        <Typography style={{ textDecoration: this.state.filter ? 'underline' : '' }}>Только удаленные</Typography>
-                        <Typography>&nbsp;/&nbsp;</Typography>
-                        <Typography style={{ textDecoration: !this.state.filter ? 'underline' : '' }}>Все</Typography>
+                      <Button variant="contained" onClick={this.filterButton.bind(this)} style={{ backgroundColor: '#9e9e9e' }}>
+                       Только удаленные / Все
                       </Button>
                     </Grid>
                     {!this.state.work.length ? null : (
@@ -835,7 +833,8 @@ class Checkworks_ extends React.Component {
 
                         <TableBody>
                           {this.state.work.map((item, key) => (
-                            <TableRow key={key} hover sx={{ '& td': {backgroundColor: item.is_delete === '1' ? '#eb4d4b' : null, color: item.is_delete === '1' ? '#fff' : null}}}>
+                            <TableRow key={key} hover sx={{ '& td': {backgroundColor: item.is_delete === '1' ? '#eb4d4b' : null, color: item.is_delete === '1' ? '#fff' : null, 
+                            fontWeight: item.is_delete === '1' ? 700 : null} }}>
                               <TableCell >{item.name_work}</TableCell>
                               <TableCell >{item.user_name}</TableCell>
                               <TableCell >{item.date_start_work}</TableCell>
@@ -912,31 +911,30 @@ class Checkworks_ extends React.Component {
                       <Table>
                         <TableHead>
                           <TableRow>
-                            <TableCell style={{ width: '13%' }} >Позиция</TableCell>
+                            <TableCell style={{ width: '20%' }} >Позиция</TableCell>
                             <TableCell style={{ width: '14%' }} >Время забития</TableCell>
-                            <TableCell style={{ width: '10%' }} >Объем заготовки</TableCell>
-                            <TableCell style={{ width: '9%' }} >Объем отходов</TableCell>
-                            <TableCell style={{ width: '9%' }} >Ед измерения</TableCell>
+                            <TableCell style={{ width: '11%' }} >Объем заготовки</TableCell>
+                            <TableCell style={{ width: '11%' }} >Объем отходов</TableCell>
+                            <TableCell style={{ width: '11%' }} >Ед измерения</TableCell>
                             <TableCell style={{ width: '11%' }} >Сотрудник</TableCell>
-                            <TableCell style={{ width: '9%' }} >Объем товара</TableCell>
-                            <TableCell style={{ width: '14%' }} >Подтвердили</TableCell>
+                            <TableCell style={{ width: '11%' }} >Подтвердили</TableCell>
                             <TableCell style={{ width: '11%', padding: 0 }} >Подтвердивший</TableCell>
                           </TableRow>
                         </TableHead>
 
                         <TableBody>
                           {this.state.pf_list.map((item, key) => (
-                            <TableRow key={key} hover sx={{ '& td': {backgroundColor: item.is_delete === '1' ? '#eb4d4b' : null} }}>
+                            <TableRow key={key} hover sx={{ '& td': {backgroundColor: item.is_delete === '1' ? '#eb4d4b' : null,  fontWeight: item.is_delete === '1' ? 700 : null} }}>
                               <TableCell  sx={{cursor: 'pointer' }}
                                 onClick={this.openModal.bind(this, 'editItem', 'Редактирование заготовки', item)}>
-                                  <Link variant="button" color={item.is_delete === '1' ? "inherit" : "primary"}> {item.name_work}</Link>
+                                  <Link variant="button" underline='none' color={item.is_delete === '1' ? "inherit" : "primary"} 
+                                  style={{ fontWeight: item.is_delete === '1' ? 700 : null }}> {item.name_work}</Link>
                               </TableCell>
                               <TableCell >{item.date_time}</TableCell>
                               <TableCell >{item.count_pf}</TableCell>
                               <TableCell >{item.count_trash}</TableCell>
                               <TableCell >{item.ei_name}</TableCell>
                               <TableCell >{item.user_name}</TableCell>
-                              <TableCell >{item.count_item}</TableCell>
                               <TableCell >{item.manager_time}</TableCell>
                               <TableCell  style={{ padding: 0 }}>
                                 {item.namager_name || !this.state.check_cook ? item.namager_name ?? '' : (
