@@ -542,6 +542,8 @@ class ReceptModule_ extends React.Component {
       operAlert: false,
       err_status: false,
       err_text: '',
+
+      type: ''
     };
   }
 
@@ -630,6 +632,33 @@ class ReceptModule_ extends React.Component {
     }
   }
 
+  async openModalNew(id){
+    let data = {
+      id: id
+    };
+  
+    let res = await this.getData('get_one', data);
+
+    console.log( res )
+
+    let allCount = 0;
+
+    res.pf_list.map( ( it ) => { 
+      allCount += parseFloat(it.count) 
+    } )
+
+    this.setState({
+      modalDialogEdit: true,
+      rec: res.rec,
+      apps: res.apps,
+      pf_list: res.pf_list,
+      all_pf_list: res.all_pf_list,
+      storages: res.all_storages,
+      allCount: allCount,
+      type: 'edit'
+    });
+  }
+
   async openModalEdit(id){
     let data = {
       id: id
@@ -652,7 +681,8 @@ class ReceptModule_ extends React.Component {
       pf_list: res.pf_list,
       all_pf_list: res.all_pf_list,
       storages: res.all_storages,
-      allCount: allCount
+      allCount: allCount,
+      type: 'edit'
     });
   }
 
