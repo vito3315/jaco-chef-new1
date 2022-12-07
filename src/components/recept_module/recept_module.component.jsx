@@ -36,6 +36,7 @@ import {
   MyTextInput,
   MyAutocomplite,
   MyDatePickerNew,
+  MyAlert
 } from '../../stores/elements';
 
 const queryString = require('query-string');
@@ -69,7 +70,7 @@ class ReceptModule_Modal_Container extends React.Component {
   }
 
   render() {
-    const { rec, storages, apps, pf_list, all_pf_list, changeItem } = this.props;
+    const { rec, allCount, storages, apps, pf_list, all_pf_list, changeItem, changeItemData, changeItemChecked, addIngredientsRecipe, dellIngredientsRecipe } = this.props;
 
     return (
       <Grid container spacing={3}>
@@ -104,11 +105,7 @@ class ReceptModule_Modal_Container extends React.Component {
                 multiple={false}
                 data={apps}
                 value={rec.app_id}
-                func={(event, value) => {
-                  //let this_storages = this.state.item;
-                  //this_storages.post.id = value;
-                  //this.setState({ item: this_storages });
-                }}
+                func={changeItemData.bind(this, 'app_id')}
               />
             </Grid>
           </Grid>
@@ -119,11 +116,7 @@ class ReceptModule_Modal_Container extends React.Component {
               multiple={true}
               data={storages}
               value={rec.storages}
-              func={(event, value) => {
-                //let this_storages = this.state.item;
-                //this_storages.location.id = value;
-                //this.setState({ item: this_storages });
-              }}
+              func={changeItemData.bind(this, 'storages')}
             />
           </Grid>
 
@@ -131,7 +124,7 @@ class ReceptModule_Modal_Container extends React.Component {
             <MyCheckBox
               label="Активность"
               value={parseInt(rec.is_show) == 1 ? true : false}
-              //func={this.props.changeItemChecked.bind(this, 'is_show')}
+              func={changeItemChecked.bind(this, 'is_show')}
             />
           </Grid>
           
@@ -152,14 +145,15 @@ class ReceptModule_Modal_Container extends React.Component {
                       <TableCell>
                         <MyTextInput
                           type="number"
-                          defaultValue={''}
-                          //func={this.props.changeQuantity.bind(this)}
+                          id={'item_for_add_'+item.id}
+                          //defaultValue={''}
+                          //func={changeQuantity.bind(this)}
                         />
                       </TableCell>
                       <TableCell>{item.ei_name}</TableCell>
                       <TableCell>
                         <AddIcon
-                          //onClick={this.props.addIngredientsRecipe.bind(this, item)}
+                          onClick={addIngredientsRecipe.bind(this, item)}
                           style={{ cursor: 'pointer' }}
                         />
                       </TableCell>
@@ -183,12 +177,11 @@ class ReceptModule_Modal_Container extends React.Component {
                   {pf_list.map((item, key) => (
                     <TableRow key={key}>
                       <TableCell>{item.name}</TableCell>
-                      <TableCell>
-                        {item.count} {item.ei_name}
-                      </TableCell>
+                      <TableCell>{item.count} {item.ei_name}</TableCell>
                       <TableCell>{item.percent} %</TableCell>
                       <TableCell>
                         <CloseIcon
+                          onClick={dellIngredientsRecipe.bind(this, item)}
                           style={{ cursor: 'pointer' }}
                         />
                       </TableCell>
@@ -196,7 +189,7 @@ class ReceptModule_Modal_Container extends React.Component {
                   ))}
                   <TableRow sx={{ '& td': { border: 0 } }}>
                     <TableCell>Всего:</TableCell>
-                    <TableCell></TableCell>
+                    <TableCell>{allCount}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -367,86 +360,14 @@ class ReceptModule_Modal_Edit extends React.Component {
     return null;
   }
 
-  changeItem(data, event) {
-    let vendor = this.state.item;
-    vendor[data] = event.target.value;
-
-    this.setState({
-      item: vendor,
-    });
-  }
-
-  changeItemChecked(data, event) {
-    let vendor = this.state.item;
-    vendor[data] = event.target.checked === true ? 1 : 0;
-
-    this.setState({
-      item: vendor,
-    });
-  }
-
-  changeQuantity(event) {
-    this.setState({
-      quantity: event.target.value,
-    });
-  }
-
-  addIngredientsRecipe(item) {
-    const vendor = this.state.item;
-
-    const id = vendor.recipe.find((el) => el.id === item.id);
-
-    if (id || this.state.quantity < 1) {
-      return;
-    }
-
-    item.quantity = this.state.quantity;
-
-    vendor.recipe.push(item);
-
-    const percent = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0) / 100;
-
-    vendor.recipe.map(el => el.percent = (el.quantity / percent).toFixed(2));
-
-    const total = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0)
-
-    this.setState({
-      recipe: vendor,
-      quantity: '',
-      total
-    });
-  }
-
-  deleteIngredientsRecipe(id) {
-
-    const vendor = this.state.item;
-
-    const newVendor = vendor.recipe.filter((el) => el.id !== id);
-
-    vendor.recipe = newVendor;
-
-    const percent = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0) / 100;
-
-    vendor.recipe.map(el => el.percent = (el.quantity / percent).toFixed(2));
-
-    const total = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0)
-
-    this.setState({
-      recipe: newVendor,
-      total
-    });
-  }
-
   changeTab(event, value) {
     this.setState({
       ItemTab: value,
     });
   }
 
-  
-
   render() {
-    const { isOpen, onClose, changeItem, rec, storages, apps, pf_list, all_pf_list } = this.props;
+    const { isOpen, onClose, changeItem, changeItemData, changeItemChecked, addIngredientsRecipe, dellIngredientsRecipe, rec, storages, apps, pf_list, all_pf_list, allCount } = this.props;
 
     return (
       <Dialog
@@ -485,11 +406,16 @@ class ReceptModule_Modal_Edit extends React.Component {
                 <TabPanel value="2">
                   <ReceptModule_Modal_Container
                     rec={rec}
+                    allCount={allCount}
                     storages={storages}
                     apps={apps}
                     pf_list={pf_list}
                     all_pf_list={all_pf_list}
                     changeItem={changeItem.bind(this)}
+                    changeItemData={changeItemData.bind(this)}
+                    changeItemChecked={changeItemChecked.bind(this)}
+                    addIngredientsRecipe={addIngredientsRecipe.bind(this)}
+                    dellIngredientsRecipe={dellIngredientsRecipe.bind(this)}
                   />
                 </TabPanel>
 
@@ -605,12 +531,17 @@ class ReceptModule_ extends React.Component {
       apps: [],
       pf_list: [],
       all_pf_list: [],
+      allCount: 0,
 
       modalDialogNew: false,
       modalDialogEdit: false,
       method: null,
 
-      items: []
+      items: [],
+
+      operAlert: false,
+      err_status: false,
+      err_text: '',
     };
   }
 
@@ -623,6 +554,14 @@ class ReceptModule_ extends React.Component {
     });
 
     document.title = res.module_info.name;
+  }
+
+  async getItems(){
+    let res = await this.getData('get_all');
+
+    this.setState({
+      items: res.items
+    });
   }
 
   getData = (method, data = {}) => {
@@ -700,13 +639,20 @@ class ReceptModule_ extends React.Component {
 
     console.log( res )
 
+    let allCount = 0;
+
+    res.pf_list.map( ( it ) => { 
+      allCount += parseFloat(it.count) 
+    } )
+
     this.setState({
       modalDialogEdit: true,
       rec: res.rec,
       apps: res.apps,
       pf_list: res.pf_list,
       all_pf_list: res.all_pf_list,
-      storages: res.all_storages
+      storages: res.all_storages,
+      allCount: allCount
     });
   }
 
@@ -723,25 +669,113 @@ class ReceptModule_ extends React.Component {
     });
   }
 
-  async saveEditItem(editItem, recipe) {
-    // console.log(editItem, recipe);
+  async saveEditItem() {
+    let data = {
+      rec: this.state.rec,
+      pf_list: this.state.pf_list
+    };
+  
+    let res = await this.getData('save_edit', data);
 
-    // await this.getData('save_edit', data);
+    if (res['st'] == true) {
+      this.setState({
+        modalDialogEdit: false,
 
-    this.setState({
-      modalDialogEdit: false,
-      // item
-    });
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+
+      setTimeout(() => {
+        this.getItems();
+      }, 300);
+    } else {
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
+    }
   }
 
   changeItem(type, event){
     let rec = this.state.rec;
-
     rec[ type ] = event.target.value;
 
     this.setState({
       rec: rec
     })
+  }
+
+  changeItemData(type, event, data) {
+    let rec = this.state.rec;
+    rec[type] = data;
+
+    this.setState({
+      rec: rec,
+    });
+  }
+
+  changeItemChecked(data, event) {
+    let rec = this.state.rec;
+    rec[data] = event.target.checked === true ? 1 : 0;
+
+    this.setState({
+      rec: rec,
+    });
+  }
+
+  addIngredientsRecipe(item){
+    let pf_list = [...this.state.pf_list];
+
+    let check = pf_list.find((el) => el.id === item.id);
+
+    let quantity = document.getElementById('item_for_add_'+item.id).value
+
+    if( check || quantity < 1) {
+      return;
+    }
+
+    pf_list.push({
+      count: quantity,
+      ei_name: item.ei_name,
+      item_id: item.id,
+      name: item.name,
+      percent: 0,
+      recipies_id: this.state.rec.id
+    })
+
+    let allCount = 0;
+
+    pf_list.map( ( it ) => { 
+      allCount += parseFloat(it.count) 
+    } )
+
+    pf_list.map(el => el.percent = ( 100 / ( allCount / parseFloat(el.count) ) ).toFixed(2));
+
+    this.setState({
+      pf_list: pf_list,
+      allCount: allCount
+    });
+  }
+
+  dellIngredientsRecipe(item){
+    let pf_list = [...this.state.pf_list];
+
+    pf_list = pf_list.filter((el) => el.id !== item.id);
+
+    let allCount = 0;
+
+    pf_list.map( ( it ) => { 
+      allCount += parseFloat(it.count) 
+    } )
+
+    pf_list.map(el => el.percent = ( 100 / ( allCount / parseFloat(el.count) ) ).toFixed(2));
+
+    this.setState({
+      pf_list: pf_list,
+      allCount: allCount
+    });
   }
 
   render() {
@@ -750,6 +784,12 @@ class ReceptModule_ extends React.Component {
         <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
+
+        <MyAlert 
+          isOpen={this.state.operAlert} 
+          onClose={() => { this.setState({ operAlert: false }); }} 
+          status={this.state.err_status} 
+          text={this.state.err_text} />
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
@@ -782,7 +822,12 @@ class ReceptModule_ extends React.Component {
             this.setState({ modalDialogEdit: false });
           }}
           changeItem={this.changeItem.bind(this)}
+          changeItemData={this.changeItemData.bind(this)}
+          changeItemChecked={this.changeItemChecked.bind(this)}
+          addIngredientsRecipe={this.addIngredientsRecipe.bind(this)}
+          dellIngredientsRecipe={this.dellIngredientsRecipe.bind(this)}
           rec={this.state.rec}
+          allCount={this.state.allCount}
           storages={this.state.storages}
           apps={this.state.apps}
           pf_list={this.state.pf_list}
