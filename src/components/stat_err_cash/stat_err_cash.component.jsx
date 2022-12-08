@@ -29,7 +29,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
-import ReactImageMagnify from 'react-image-magnify';
+import ModalImage from "react-modal-image";
 
 import { MySelect, MyDatePickerNew, MyAlert } from '../../stores/elements';
 
@@ -234,7 +234,7 @@ class StatErrCash_Modal extends React.Component {
 
               <Grid item xs={12} sm={12} display="flex" flexDirection="column" alignItems="center">
                 <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>
-                  {this.props.mark === 'errOrder' ? 'Ошибка заказа' : 'Ошибка'}
+                  {this.props.mark === 'errOrder' ? 'Комментарий оператора' : 'Ошибка'}
                 </Typography>
                 <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>
                   {this.props.mark === 'errOrder' ? this.state.item ? this.state.item.order_desc : 'Не указана' : this.state.item ? this.state.item.fine_name : 'Не указан'}
@@ -290,44 +290,23 @@ class StatErrCash_Modal extends React.Component {
                 <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Фото ошибки</Typography>
                 <Grid sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
                   {this.props.mark === 'errOrder' ? this.state.item ? !this.state.item.imgs.length ? 'Фото отсутствует' : (
-                        <ReactImageMagnify
-                        {...
-                          {
-                            smallImage: {
-                                alt: '',
-                                isFluidWidth: true,
-                                src: 'https://jacochef.ru/src/img/err_orders/uploads/' + this.state.item.imgs[0],
-                            },
-                            largeImage: {
-                                src: 'https://jacochef.ru/src/img/err_orders/uploads/' + this.state.item.imgs[0],
-                                width: 500,
-                                height: 600,
-                            },
-                            enlargedImagePosition: 'over',
-                            isEnlargedImagePortalEnabledForTouch: true,
-                            isActivatedOnTouch: true,
-                        }}
-                    />
+                        <ModalImage
+                          small={'https://jacochef.ru/src/img/err_orders/uploads/' + this.state.item.imgs[0]}
+                          large={'https://jacochef.ru/src/img/err_orders/uploads/' + this.state.item.imgs[0]}
+                          hideDownload={true}
+                          hideZoom={false}
+                          showRotate={true}
+                        />
                       ) 
                       : 'Фото отсутствует'
                   : this.state.item ? !this.state.item.imgs.length ? 'Фото отсутствует' : (
-                      <ReactImageMagnify
-                      {...{
-                          smallImage: {
-                              alt: '',
-                              isFluidWidth: true,
-                              src: 'https://jacochef.ru/src/img/fine_err/uploads/' + this.state.item.imgs[0],
-                          },
-                          largeImage: {
-                              src: 'https://jacochef.ru/src/img/fine_err/uploads/' + this.state.item.imgs[0],
-                              width: 500,
-                              height: 600,
-                          },
-                          enlargedImagePosition: 'over',
-                          isEnlargedImagePortalEnabledForTouch: true,
-                          isActivatedOnTouch: true,
-                      }}
-                  />
+                        <ModalImage
+                          small={'https://jacochef.ru/src/img/fine_err/uploads/' + this.state.item.imgs[0]}
+                          large={'https://jacochef.ru/src/img/fine_err/uploads/' + this.state.item.imgs[0]}
+                          hideDownload={true}
+                          hideZoom={false}
+                          showRotate={true}
+                        />
                     ) : 'Фото отсутствует'}
                 </Grid>
               </Grid>
@@ -441,18 +420,36 @@ class StatErrCash_ extends React.Component {
       });
   };
 
-  changePoint(event) {
+  async changePoint(event) {
     const point = event.target.value;
+
+    const date_start = this.state.date_start;
+    const date_end = this.state.date_end;
 
     this.setState({
       point,
-      stat_true: '',
-      stat_false: '',
-      svod: [],
-      svod_new: [],
-      all_data: [],
-      all_data_new: [],
-      all_data_new_stat: '',
+    });
+
+    if (!date_start || !date_end) {
+      return;
+    }
+
+    const data = {
+      point_id: point,
+      date_start,
+      date_end,
+    };
+
+    const res = await this.getData('get_data', data);
+
+    this.setState({
+      stat_true: res.stat_true_false.tru,
+      stat_false: res.stat_true_false.fals,
+      svod: res.svod,
+      svod_new: res.svod_new,
+      all_data: res.all_data,
+      all_data_new: res.all_data_new,
+      all_data_new_stat: res.all_data_new_stat,
     });
   }
 
@@ -488,6 +485,10 @@ class StatErrCash_ extends React.Component {
     const date_start = this.state.date_start;
 
     const date_end = this.state.date_end;
+
+    if (!date_start || !date_end) {
+      return;
+    }
 
     const data = {
       point_id,

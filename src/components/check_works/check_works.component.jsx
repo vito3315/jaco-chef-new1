@@ -924,11 +924,10 @@ class Checkworks_ extends React.Component {
 
                         <TableBody>
                           {this.state.pf_list.map((item, key) => (
-                            <TableRow key={key} hover sx={{ '& td': {backgroundColor: item.is_delete === '1' ? '#eb4d4b' : null,  fontWeight: item.is_delete === '1' ? 700 : null} }}>
-                              <TableCell  sx={{cursor: 'pointer' }}
-                                onClick={this.openModal.bind(this, 'editItem', 'Редактирование заготовки', item)}>
-                                  <Link variant="button" underline='none' color={item.is_delete === '1' ? "inherit" : "primary"} 
-                                  style={{ fontWeight: item.is_delete === '1' ? 700 : null }}> {item.name_work}</Link>
+                            <TableRow key={key} hover sx={{ '& td': {backgroundColor: item.is_delete === '1' ? '#eb4d4b' : null,  fontWeight: item.is_delete === '1' ? 700 : null, 
+                            color: item.is_delete === '1' ? '#fff' : null } }}>
+                              <TableCell  sx={{cursor: 'pointer' }} onClick={this.openModal.bind(this, 'editItem', 'Редактирование заготовки', item)}>
+                                  <Link variant="button" underline='none' color={item.is_delete === '1' ? "inherit" : "primary"} style={{ fontWeight: 700 }}> {item.name_work}</Link>
                               </TableCell>
                               <TableCell >{item.date_time}</TableCell>
                               <TableCell >{item.count_pf}</TableCell>
