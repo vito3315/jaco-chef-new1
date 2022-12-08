@@ -297,24 +297,8 @@ class Tender_ extends React.Component {
       date: this.state.tender['name']
     };
 
-     const res =  await this.getData('downLoadVendor', data);
-
-    // правка
-    console.log('res', res);
-    this.setState({
-      url: res.url
-    });
-  }
-
-  // убрать
-  async downLoadAll(){
-    const data = {
-      city_id: this.state.city,
-      date: this.state.tender['name']
-    };
-
-    // правка
-    const res =  await this.getData('downLoadAll', data);
+    const res =  await this.getData('downLoadVendor', data);
+    
     this.setState({
       url: res.url
     });
