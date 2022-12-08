@@ -71,6 +71,8 @@ class Tender_ extends React.Component {
       cities: [],
       city: '',
 
+      url: '',
+
       allVendors: [],
       allTenders: [],
 
@@ -186,13 +188,17 @@ class Tender_ extends React.Component {
       city_id: this.state.city,
       vendors: this.state.vendor,
       cat: this.state.newCat,
-      date: this.state.tender.name
+      date: this.state.tender.name,
     };
 
     const res = await this.getData('get_data', data);
 
     console.log(res);
 
+    // передаем урл для скачивания Excel
+    this.setState({
+      url: res.url
+    });
     this.getDataTableCell(res);
   }
 
@@ -283,6 +289,7 @@ class Tender_ extends React.Component {
     // console.log(res)
   }
 
+  // запрос на подготовку  Excel вендора
   async downLoadVendor(vendor_id){
     const data = {
       city_id: this.state.city,
@@ -290,16 +297,35 @@ class Tender_ extends React.Component {
       date: this.state.tender['name']
     };
 
-    await this.getData('downLoadVendor', data);
+     const res =  await this.getData('downLoadVendor', data);
+
+    // правка
+    console.log('res', res);
+    this.setState({
+      url: res.url
+    });
   }
 
+  // убрать
   async downLoadAll(){
     const data = {
       city_id: this.state.city,
       date: this.state.tender['name']
     };
 
-    await this.getData('downLoadAll', data);
+    // правка
+    const res =  await this.getData('downLoadAll', data);
+    this.setState({
+      url: res.url
+    });
+  }
+
+  onDownload() {
+    const url = this.state.url;
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.click();
   }
 
   render() {
@@ -389,12 +415,12 @@ class Tender_ extends React.Component {
                     backgroundColor: '#00a550',
                     color: 'white',
                   }}
-                  onClick={this.downLoadAll.bind(this)}
+                  onClick={this.onDownload.bind(this)}
                 >
-                  скачать
+                  Скачать
                 </Button>
-              </Grid>
-
+              </Grid>   
+                  
             </Grid>
           </Grid>
         </Grid>
@@ -454,8 +480,29 @@ class Tender_ extends React.Component {
                           }}
                           onClick={this.downLoadVendor.bind(this, vendor.id)}
                         >
+                          подготовить
+                        </TableCell>
+                       
+                      ))}
+                    </TableRow>
+
+                    <TableRow>
+                      <TableCell style={{ zIndex: 3 }}></TableCell>
+                      <TableCell></TableCell>
+                      <TableCell></TableCell>
+                      {this.state.vendors.map((vendor, key) => (
+                        <TableCell
+                          key={key}
+                          style={{
+                            maxWidth: 150,
+                            textAlign: 'center',
+                            cursor: 'pointer'
+                          }}
+                          onClick={this.onDownload.bind(this, vendor.id)}
+                        >
                           скачать
                         </TableCell>
+                       
                       ))}
                     </TableRow>
 
