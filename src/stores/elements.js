@@ -259,6 +259,7 @@ export class MyTextInput extends React.PureComponent {
   render(){
     return (
       <TextField
+        id={ this.props.id ? this.props.id : null }
         label={this.props.label}
         value={this.props.value}
         onChange={this.props.func}

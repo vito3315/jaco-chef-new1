@@ -29,14 +29,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
+import ModalImage from "react-modal-image";
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
-import { MySelect, MyDatePickerNew } from '../../stores/elements';
+import { MySelect, MyDatePickerNew, MyAlert } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -65,13 +60,14 @@ class StatErrCash_Modal extends React.Component {
       confirmDialog: false,
       percent: 0,
 
-      snackbar: false,
-      error: '',
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
   componentDidUpdate(prevProps) {
-    // console.log(this.props.item);
+    // console.log(this.props);
 
     if (!this.props.item) {
       return;
@@ -155,8 +151,9 @@ class StatErrCash_Modal extends React.Component {
         this.props.update();
       } else {
         this.setState({
-          error: res.text,
-          snackbar: true,
+          openAlert: true,
+          err_status: res.st,
+          err_text: res.text,
         });
       }
     }
@@ -164,7 +161,7 @@ class StatErrCash_Modal extends React.Component {
 
   onClose() {
     this.setState({
-      item: null,
+      item: this.props.item ? this.props.item : null,
       percent: 0,
       error: '',
     });
@@ -175,20 +172,11 @@ class StatErrCash_Modal extends React.Component {
   render() {
     return (
       <>
-        <Snackbar
-          open={this.state.snackbar}
-          autoHideDuration={30000}
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          onClose={() => this.setState({ snackbar: false })}
-        >
-          <Alert
-            onClose={() => this.setState({ snackbar: false })}
-            severity={'error'}
-            sx={{ width: '100%' }}
-          >
-            {this.state.error}
-          </Alert>
-        </Snackbar>
+        <MyAlert 
+          isOpen={this.state.openAlert} 
+          onClose={() => this.setState({ openAlert: false }) } 
+          status={this.state.err_status} 
+          text={this.state.err_text} />
 
         <Dialog
           sx={{ '& .MuiDialog-paper': { width: '80%', maxHeight: 435 } }}
@@ -224,6 +212,7 @@ class StatErrCash_Modal extends React.Component {
             ) : null}
           </DialogTitle>
           <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+
             <Grid container spacing={3} justifyContent="center" mb={3}>
 
               <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
@@ -245,12 +234,21 @@ class StatErrCash_Modal extends React.Component {
 
               <Grid item xs={12} sm={12} display="flex" flexDirection="column" alignItems="center">
                 <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>
-                  {this.props.mark === 'errOrder' ? 'Ошибка заказа' : 'Ошибка'}
+                  {this.props.mark === 'errOrder' ? 'Комментарий оператора' : 'Ошибка'}
                 </Typography>
                 <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>
                   {this.props.mark === 'errOrder' ? this.state.item ? this.state.item.order_desc : 'Не указана' : this.state.item ? this.state.item.fine_name : 'Не указан'}
                 </Typography>
               </Grid>
+
+              {this.props.mark !== 'errCam' ? null : (
+              <Grid item xs={12} sm={12} display="flex" flexDirection="column" alignItems="center">
+                <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Комментарий</Typography>
+                <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>
+                  {this.state.item ? this.state.item.comment ?? 'Не указан' : 'Не указан'}
+                </Typography>
+              </Grid>
+              )}
 
               {this.props.mark !== 'errOrder' ? null : (
                 <Grid item xs={12} sm={3} display="flex" flexDirection="column" alignItems="center">
@@ -292,10 +290,23 @@ class StatErrCash_Modal extends React.Component {
                 <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Фото ошибки</Typography>
                 <Grid sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
                   {this.props.mark === 'errOrder' ? this.state.item ? !this.state.item.imgs.length ? 'Фото отсутствует' : (
-                        <img src={'https://jacochef.ru/src/img/err_orders/uploads/' + this.state.item.imgs[0]} style={{ maxWidth: 300, maxHeight: 400 }}/>
-                      ) : 'Фото отсутствует'
+                        <ModalImage
+                          small={'https://jacochef.ru/src/img/err_orders/uploads/' + this.state.item.imgs[0]}
+                          large={'https://jacochef.ru/src/img/err_orders/uploads/' + this.state.item.imgs[0]}
+                          hideDownload={true}
+                          hideZoom={false}
+                          showRotate={true}
+                        />
+                      ) 
+                      : 'Фото отсутствует'
                   : this.state.item ? !this.state.item.imgs.length ? 'Фото отсутствует' : (
-                      <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + this.state.item.imgs[0]} style={{ maxWidth: 300, maxHeight: 400 }}/>
+                        <ModalImage
+                          small={'https://jacochef.ru/src/img/fine_err/uploads/' + this.state.item.imgs[0]}
+                          large={'https://jacochef.ru/src/img/fine_err/uploads/' + this.state.item.imgs[0]}
+                          hideDownload={true}
+                          hideZoom={false}
+                          showRotate={true}
+                        />
                     ) : 'Фото отсутствует'}
                 </Grid>
               </Grid>
@@ -409,18 +420,36 @@ class StatErrCash_ extends React.Component {
       });
   };
 
-  changePoint(event) {
+  async changePoint(event) {
     const point = event.target.value;
+
+    const date_start = this.state.date_start;
+    const date_end = this.state.date_end;
 
     this.setState({
       point,
-      stat_true: '',
-      stat_false: '',
-      svod: [],
-      svod_new: [],
-      all_data: [],
-      all_data_new: [],
-      all_data_new_stat: '',
+    });
+
+    if (!date_start || !date_end) {
+      return;
+    }
+
+    const data = {
+      point_id: point,
+      date_start,
+      date_end,
+    };
+
+    const res = await this.getData('get_data', data);
+
+    this.setState({
+      stat_true: res.stat_true_false.tru,
+      stat_false: res.stat_true_false.fals,
+      svod: res.svod,
+      svod_new: res.svod_new,
+      all_data: res.all_data,
+      all_data_new: res.all_data_new,
+      all_data_new_stat: res.all_data_new_stat,
     });
   }
 
@@ -456,6 +485,10 @@ class StatErrCash_ extends React.Component {
     const date_start = this.state.date_start;
 
     const date_end = this.state.date_end;
+
+    if (!date_start || !date_end) {
+      return;
+    }
 
     const data = {
       point_id,

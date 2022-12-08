@@ -108,7 +108,7 @@ class Fines_err_Modal_item extends React.Component {
     if (data === 'user') {
       this.setState({
         [data]: value,
-        selected: value.id,
+        selected: value ? value.id : '',
       });
     } else {
       this.setState({
@@ -156,8 +156,6 @@ class Fines_err_Modal_item extends React.Component {
     }
 
     this.props.save(data);
-
-    this.onClose();
   }
 
   onClose() {
@@ -312,12 +310,12 @@ class Fines_err_Modal_NewItem extends React.Component {
   dropzoneOptions = {
     autoProcessQueue: false,
     autoQueue: true,
-    maxFiles: 1,
+    maxFiles: 10,
     timeout: 0,
     parallelUploads: 10,
     acceptedFiles: 'image/jpeg,image/png',
     addRemoveLinks: true,
-    url: 'https://jacochef.ru/src/img/users/upload.php',
+    url: 'https://jacochef.ru/src/img/fine_err/upload.php',
   };
   myDropzone = null;
   isInit = false;
@@ -494,8 +492,6 @@ class Fines_err_Modal_NewItem extends React.Component {
 
     const res = await this.props.getData('get_users', data);
 
-    // console.log(res);
-
     this.setState({
       fines: res.fines,
       users: res.users,
@@ -539,7 +535,7 @@ class Fines_err_Modal_NewItem extends React.Component {
     });
   }
 
-  save() {
+  async save() {
     if (!this.click) {
       this.click = true;
 
@@ -548,8 +544,11 @@ class Fines_err_Modal_NewItem extends React.Component {
       const date = this.state.date;
       const user = this.state.user;
       const time = this.state.time;
+      const comment = this.state.comment;
 
-      if (!point_id || !fine || !date || !user || !time || time === '00:00' || !user.id || !fine.id) {
+      const is_active = this.state.is_active;
+
+      if (!point_id || !fine || !date || !time || time === '00:00' || comment.length == 0 || ( !user.id && is_active === false ) || !fine.id) {
         const text = 'Для сохранения новой Ошибки, необходимо выбрать: Точку, Дату, Ошибку, Сотрудника и указать Время ошибки';
 
         this.setState({
@@ -564,62 +563,72 @@ class Fines_err_Modal_NewItem extends React.Component {
         return;
       }
 
-      let img = 0;
-
-      if (this.myDropzone['files'].length > 0 && this.isInit === false) {
-        img = 1;
-
-        this.isInit = true;
-
-        this.myDropzone.on('sending', (file, xhr, data) => {
-          i++;
-          let file_type = file.name.split('.');
-          file_type = file_type[file_type.length - 1];
-          file_type = file_type.toLowerCase();
-
-          // "file_1_point_id_1_id_2226.jpg"
-
-          data.append('filetype', 'file_' + i + '_point_id_' + point + '_id_' + fines_err.global_new_id + '.' + file_type);
-
-          this.getOrientation(file, function (orientation) {
-            data.append('orientation', orientation);
-          });
-        });
-
-        this.myDropzone.on('queuecomplete', (data) => {
-          var check_img = false;
-
-          this.myDropzone['files'].map(function (item, key) {
-            if (item['status'] == 'error') {
-              check_img = true;
-            }
-          });
-
-          if (check_img) {
-            this.setState({
-              error: 'Ошибка при загрузке фотографии',
-              snackbar: true,
-            });
-
-            return;
-          }
-
-          this.isInit = false;
-        });
-      }
-
       const data = {
         fine: fine.id,
-        user: user.id,
+        user: user && user.id ? user.id : 0,
         point_id,
         date,
-        time,
-        img,
+        time_err: time,
+        no_user: is_active,
+        comment: comment,
+        img: this.myDropzone['files'].length > 0 ? 1 : 0,
       };
 
-      this.props.save(data);
+      const res = await this.props.getData('save_new', data);
 
-      this.onClose();
+      if( res.st === false ){
+        this.setState({
+          error: res.text,
+          snackbar: true,
+        });
+      }else{
+        if( this.myDropzone['files'].length > 0 ){
+          var i = 0;
+
+          if(this.myDropzone['files'].length > 0 && this.isInit === false) {
+            this.isInit = true;
+    
+            this.myDropzone.on('sending', (file, xhr, data) => {
+              i++;
+              let file_type = file.name.split('.');
+              file_type = file_type[file_type.length - 1];
+              file_type = file_type.toLowerCase();
+    
+              data.append('filetype', 'file_' + i + '_point_id_' + point_id + '_id_' + res.err_id + '.' + file_type);
+    
+            });
+    
+            this.myDropzone.on('queuecomplete', (data) => {
+              var check_img = false;
+    
+              this.myDropzone['files'].map( (item, key) => {
+                if (item['status'] == 'error') {
+                  check_img = true;
+                }
+              });
+    
+              if (check_img) {
+                this.setState({
+                  error: 'Ошибка при загрузке фотографии',
+                  snackbar: true,
+                });
+    
+                return;
+              }else{
+                setTimeout( () => {
+                  this.onClose();
+                }, 1000 )
+              }
+    
+              this.isInit = false;
+            });
+          }
+
+          this.myDropzone.processQueue();
+        }else{
+          this.onClose();
+        }
+      }
 
       setTimeout(() => {
         this.click = false;
@@ -651,7 +660,7 @@ class Fines_err_Modal_NewItem extends React.Component {
       chooseApp: '',
     });
 
-    this.props.onClose();
+    this.props.onCloseFull();
   }
 
   render() {
@@ -1028,9 +1037,17 @@ class Fines_err_ extends React.Component {
   async saveEditItem(data) {
     console.log(data);
 
-    // await this.getData('update', data);
+    let res = await this.getData('update', data);
 
-    // this.getItems();
+    if( res.st ){
+      this.setState({ modalDialog: false });
+
+      setTimeout( () => {
+        this.getItems();
+      }, 300 )
+    }else{
+      alert( res.text )
+    }
   }
 
   async saveNewItem(data) {
@@ -1039,6 +1056,22 @@ class Fines_err_ extends React.Component {
     // await this.getData('save_new', data);
 
     // this.getItems();
+  }
+
+  fullCloseDialog(){
+    this.setState({ 
+      modalDialog: false,
+      modalDialogNew: false 
+    });
+
+    this.getItems();
+  }
+
+  closeDialog(){
+    this.setState({ 
+      modalDialog: false,
+      modalDialogNew: false 
+    });
   }
 
   render() {
@@ -1050,9 +1083,8 @@ class Fines_err_ extends React.Component {
 
         <Fines_err_Modal_NewItem
           open={this.state.modalDialogNew}
-          onClose={() => {
-            this.setState({ modalDialogNew: false });
-          }}
+          onClose={this.closeDialog.bind(this)}
+          onCloseFull={this.fullCloseDialog.bind(this)}
           method={this.state.method}
           points={this.state.pointsDialog}
           text={this.state.text}
@@ -1062,9 +1094,8 @@ class Fines_err_ extends React.Component {
 
         <Fines_err_Modal_item
           open={this.state.modalDialog}
-          onClose={() => {
-            this.setState({ modalDialog: false });
-          }}
+          onClose={this.closeDialog.bind(this)}
+          onCloseFull={this.fullCloseDialog.bind(this)}
           method={this.state.method}
           text={this.state.text}
           item={this.state.item}

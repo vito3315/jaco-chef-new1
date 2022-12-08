@@ -37,6 +37,14 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
+import Link from '@mui/material/Link';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+
+import Avatar from '@mui/material/Avatar';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+
 import { MySelect, MyDatePickerNew, MyTextInput } from '../../stores/elements';
 
 const queryString = require('query-string');
@@ -131,7 +139,6 @@ class CheckWorks_Modal_New extends React.Component {
 
     this.state = {
       item: [],
-      work: '',
     };
   }
 
@@ -145,25 +152,12 @@ class CheckWorks_Modal_New extends React.Component {
     if (this.props.event !== prevProps.event) {
       this.setState({
         item: this.props.event,
-        work: this.props.event[0].id,
       });
     }
   }
 
-  changeItem(data, event) {
-    this.setState({
-      [data]: event.target.value,
-    });
-  }
-
-  save() {
-    const work = this.state.work;
-
-    const item = this.state.item;
-
-    const res = item.find((it) => it.id === work);
-
-    this.props.save(res);
+  save(work) {
+    this.props.save(work);
 
     this.onClose();
   }
@@ -171,7 +165,6 @@ class CheckWorks_Modal_New extends React.Component {
   onClose() {
     this.setState({
       item: [],
-      work: '',
     });
 
     this.props.onClose();
@@ -187,27 +180,24 @@ class CheckWorks_Modal_New extends React.Component {
       >
         <DialogTitle className="button">
           <Typography>{this.props.method}</Typography>
+          <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
+            <CloseIcon />
+          </IconButton>
         </DialogTitle>
         <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={12}>
-              <MySelect
-                label="Уборка"
-                is_none={false}
-                data={this.state.item}
-                value={this.state.work}
-                func={this.changeItem.bind(this, 'work')}
-              />
-            </Grid>
-          </Grid>
+          <List sx={{ pt: 0 }}>
+            {this.state.item.map((it, i) => 
+              <ListItem key={i} autoFocus button onClick={this.save.bind(this, it)}>
+                <ListItemAvatar>
+                  <Avatar>
+                    <AddCircleOutlineOutlinedIcon />
+                  </Avatar>
+                </ListItemAvatar>
+                {it.name}
+              </ListItem>
+            )}
+          </List>
         </DialogContent>
-
-        <DialogActions className="button">
-          <Button style={{ color: '#00a550' }} onClick={this.save.bind(this)}>
-            Добавить
-          </Button>
-          <Button onClick={this.onClose.bind(this)}>Отмена</Button>
-        </DialogActions>
       </Dialog>
     );
   }
@@ -294,7 +284,9 @@ class CheckWorks_Modal_Edit extends React.Component {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle className="button">
-          <Typography>{this.props.method}</Typography>
+          <Typography sx={{ fontWeight: 'bold' }}>
+            {this.props.method}: {this.state.item ? this.state.item.name_work ? this.state.item.name_work : '' : ''}
+          </Typography>
           {this.state.fullScreen ? (
             <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
               <CloseIcon />
@@ -322,14 +314,10 @@ class CheckWorks_Modal_Edit extends React.Component {
                 {this.state.item ? this.state.item.namager_name ? this.state.item.namager_name : 'Не указано' : 'Не указано'}
               </Typography>
             </Grid>
+            
+            <Grid item xs={12} sm={12} display="flex" justifyContent="space-around" sx={{ flexDirection: {xs: 'column', sm: 'row'} }}>
 
-            <Grid item xs={12} sm={2} display="flex" sx={{ justifyContent: { sm: 'end', xs: 'center' } }}>
-              <Typography sx={{ whiteSpace: 'nowrap', fontWeight: 'bold' }}>
-                {this.state.item ? this.state.item.name_work ? this.state.item.name_work : 'Не указано' : 'Не указано'}
-              </Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={3} display="flex" justifyContent="center">
+            <Grid item xs={12} sm={3} sx={{ marginBottom: {xs: 3, sm: 0} }}>
               <MyTextInput
                 label="Объем заготовки"
                 value={this.state.item ? this.state.item.count_pf : ''}
@@ -337,12 +325,13 @@ class CheckWorks_Modal_Edit extends React.Component {
               />
             </Grid>
 
-            <Grid item xs={12} sm={3} display="flex" justifyContent="center">
+            <Grid item xs={12} sm={3}>
               <MyTextInput
                 label="Объем отходов"
                 value={this.state.item ? this.state.item.count_trash : ''}
                 func={this.changeItem.bind(this, 'count_trash')}
               />
+            </Grid>
             </Grid>
 
             {/* аккордион */}
@@ -388,8 +377,8 @@ class CheckWorks_Modal_Edit extends React.Component {
         </DialogContent>
 
         <DialogActions className="button">
-          <Button style={{ color: '#00a550' }} onClick={this.save.bind(this)}>Сохранить</Button>
-          <Button onClick={this.onClose.bind(this)}>Отмена</Button>
+          <Button color="success" variant="contained" onClick={this.save.bind(this)}>Сохранить</Button>
+          <Button onClick={this.onClose.bind(this)} variant="contained">Отмена</Button>
         </DialogActions>
       </Dialog>
     );
@@ -761,7 +750,8 @@ class Checkworks_ extends React.Component {
           save={this.saveWork.bind(this)}
         />
 
-        <Grid container spacing={3} mb={3}>
+        {/* кнопки и выбор дат */}
+        <Grid container spacing={3} mb={5}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
@@ -802,7 +792,7 @@ class Checkworks_ extends React.Component {
 
           <Grid item xs={12} sm={3}>
             <Button onClick={this.getItems.bind(this)} variant="contained">
-              Показать уборки
+              Обновить
             </Button>
           </Grid>
         </Grid>
@@ -812,7 +802,7 @@ class Checkworks_ extends React.Component {
           <Grid item xs={12} sm={12}>
             <TabContext value={this.state.ItemTab}>
               <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <TabList onChange={this.changeTab.bind(this)} variant="scrollable" scrollButtons allowScrollButtonsMobile>
+                <TabList onChange={this.changeTab.bind(this)} variant="fullWidth">
                   <Tab label="Уборки" value="1" />
                   <Tab label="Оставшиеся уборки" value="2" />
                   <Tab label="Заготовки" value="3" />
@@ -822,35 +812,36 @@ class Checkworks_ extends React.Component {
               <TabPanel value="1">
                 <Grid item xs={12} sm={12}>
                   <TableContainer>
-                    <Grid mb={2}>
-                      <Button onClick={this.filterButton.bind(this)} variant="contained" style={{ whiteSpace: 'nowrap' }}>
-                        Только удаленные / Все
+                    <Grid mb={2} mt={2}>
+                      <Button variant="contained" onClick={this.filterButton.bind(this)} style={{ backgroundColor: '#9e9e9e' }}>
+                       Только удаленные / Все
                       </Button>
                     </Grid>
                     {!this.state.work.length ? null : (
                       <Table>
                         <TableHead>
                           <TableRow>
-                            <TableCell style={{ width: '25%' }} align="center">Уборка</TableCell>
-                            <TableCell style={{ width: '10%' }} align="center">Сотрудник</TableCell>
-                            <TableCell style={{ width: '10%' }} align="center">Дата уборки</TableCell>
-                            <TableCell style={{ width: '15%' }} align="center">Уборку начали</TableCell>
-                            <TableCell style={{ width: '15%' }} align="center">Уборку закончили</TableCell>
-                            <TableCell style={{ width: '15%' }} align="center">Подтвердили</TableCell>
-                            <TableCell style={{ width: '10%' }} align="center">Подтвердивший</TableCell>
+                            <TableCell style={{ width: '25%' }} >Уборка</TableCell>
+                            <TableCell style={{ width: '10%' }} >Сотрудник</TableCell>
+                            <TableCell style={{ width: '10%' }} >Дата уборки</TableCell>
+                            <TableCell style={{ width: '15%' }} >Уборку начали</TableCell>
+                            <TableCell style={{ width: '15%' }} >Уборку закончили</TableCell>
+                            <TableCell style={{ width: '15%' }} >Подтвердили</TableCell>
+                            <TableCell style={{ width: '10%', padding: 0 }} >Подтвердивший</TableCell>
                           </TableRow>
                         </TableHead>
 
                         <TableBody>
                           {this.state.work.map((item, key) => (
-                            <TableRow key={key} hover sx={{ '& td': {backgroundColor: item.is_delete === '1' ? '#eb4d4b' : null, color: item.is_delete === '1' ? '#fff' : null}}}>
-                              <TableCell align="center">{item.name_work}</TableCell>
-                              <TableCell align="center">{item.user_name}</TableCell>
-                              <TableCell align="center">{item.date_start_work}</TableCell>
-                              <TableCell align="center">{item.date_time_start}</TableCell>
-                              <TableCell align="center">{item.date_time_end}</TableCell>
-                              <TableCell align="center">{item.manager_time}</TableCell>
-                              <TableCell align="center" style={{ padding: 0 }}>
+                            <TableRow key={key} hover sx={{ '& td': {backgroundColor: item.is_delete === '1' ? '#eb4d4b' : null, color: item.is_delete === '1' ? '#fff' : null, 
+                            fontWeight: item.is_delete === '1' ? 700 : null} }}>
+                              <TableCell >{item.name_work}</TableCell>
+                              <TableCell >{item.user_name}</TableCell>
+                              <TableCell >{item.date_start_work}</TableCell>
+                              <TableCell >{item.date_time_start}</TableCell>
+                              <TableCell >{item.date_time_end}</TableCell>
+                              <TableCell >{item.manager_time}</TableCell>
+                              <TableCell  style={{ padding: 0 }}>
                                 {item.namager_name || item.is_delete === '1' || !this.state.check_cook ? item.namager_name ?? '' : (
                                   <Grid display="flex" sx={{ justifyContent: { sm: 'space-evenly', xs: 'space-around' } }}>
                                     {item.date_time_end ? (
@@ -884,20 +875,20 @@ class Checkworks_ extends React.Component {
                       <Table>
                         <TableHead>
                           <TableRow>
-                            <TableCell style={{ width: '15%' }} align="center">Дата добавления</TableCell>
-                            <TableCell style={{ width: '45%' }} align="center">Уборки</TableCell>
-                            <TableCell style={{ width: '30%' }} align="center">Должность уборки</TableCell>
-                            <TableCell style={{ width: '10%' }} align="center"></TableCell>
+                            <TableCell style={{ width: '15%' }} >Дата добавления</TableCell>
+                            <TableCell style={{ width: '45%' }} >Уборки</TableCell>
+                            <TableCell style={{ width: '30%' }} >Должность уборки</TableCell>
+                            <TableCell style={{ width: '10%' }} ></TableCell>
                           </TableRow>
                         </TableHead>
 
                         <TableBody>
                           {this.state.all_work.map((item, key) => (
                             <TableRow key={key} hover>
-                              <TableCell align="center">{item.date}</TableCell>
-                              <TableCell align="center">{item.name_work}</TableCell>
-                              <TableCell align="center">{item.app_name}</TableCell>
-                              <TableCell align="center">
+                              <TableCell >{item.date}</TableCell>
+                              <TableCell >{item.name_work}</TableCell>
+                              <TableCell >{item.app_name}</TableCell>
+                              <TableCell >
                                 {!this.state.check_cook ? null : (
                                   <Button onClick={this.openConfirm.bind(this, item, 'deleteWork')} style={{ cursor: 'pointer' }} color="error" variant="contained">
                                     <ClearIcon />
@@ -920,33 +911,31 @@ class Checkworks_ extends React.Component {
                       <Table>
                         <TableHead>
                           <TableRow>
-                            <TableCell style={{ width: '13%' }} align="center">Позиция</TableCell>
-                            <TableCell style={{ width: '9%' }} align="center">Объем товара</TableCell>
-                            <TableCell style={{ width: '10%' }} align="center">Объем заготовки</TableCell>
-                            <TableCell style={{ width: '9%' }} align="center">Объем отходов</TableCell>
-                            <TableCell style={{ width: '9%' }} align="center">Ед измерения</TableCell>
-                            <TableCell style={{ width: '11%' }} align="center">Сотрудник</TableCell>
-                            <TableCell style={{ width: '14%' }} align="center">Время забития</TableCell>
-                            <TableCell style={{ width: '14%' }} align="center">Подтвердили</TableCell>
-                            <TableCell style={{ width: '11%' }} align="center">Подтвердивший</TableCell>
+                            <TableCell style={{ width: '20%' }} >Позиция</TableCell>
+                            <TableCell style={{ width: '14%' }} >Время забития</TableCell>
+                            <TableCell style={{ width: '11%' }} >Объем заготовки</TableCell>
+                            <TableCell style={{ width: '11%' }} >Объем отходов</TableCell>
+                            <TableCell style={{ width: '11%' }} >Ед измерения</TableCell>
+                            <TableCell style={{ width: '11%' }} >Сотрудник</TableCell>
+                            <TableCell style={{ width: '11%' }} >Подтвердили</TableCell>
+                            <TableCell style={{ width: '11%', padding: 0 }} >Подтвердивший</TableCell>
                           </TableRow>
                         </TableHead>
 
                         <TableBody>
                           {this.state.pf_list.map((item, key) => (
-                            <TableRow key={key} hover sx={{ '& td': {backgroundColor: item.is_delete === '1' ? '#eb4d4b' : null, color: item.is_delete === '1' ? '#fff' : null}}}>
-                              <TableCell align="center" sx={{cursor: 'pointer', '&:hover': {color: item.is_delete === '1' ? 'rgba(0, 0, 0, 0.87)' : '#c03'} }}
-                                onClick={this.openModal.bind(this, 'editItem', 'Редактирование заготовки', item)}>
-                                {item.name_work}
+                            <TableRow key={key} hover sx={{ '& td': {backgroundColor: item.is_delete === '1' ? '#eb4d4b' : null,  fontWeight: item.is_delete === '1' ? 700 : null, 
+                            color: item.is_delete === '1' ? '#fff' : null } }}>
+                              <TableCell  sx={{cursor: 'pointer' }} onClick={this.openModal.bind(this, 'editItem', 'Редактирование заготовки', item)}>
+                                  <Link variant="button" underline='none' color={item.is_delete === '1' ? "inherit" : "primary"} style={{ fontWeight: 700 }}> {item.name_work}</Link>
                               </TableCell>
-                              <TableCell align="center">{item.count_item}</TableCell>
-                              <TableCell align="center">{item.count_pf}</TableCell>
-                              <TableCell align="center">{item.count_trash}</TableCell>
-                              <TableCell align="center">{item.ei_name}</TableCell>
-                              <TableCell align="center">{item.user_name}</TableCell>
-                              <TableCell align="center">{item.date_time}</TableCell>
-                              <TableCell align="center">{item.manager_time}</TableCell>
-                              <TableCell align="center" style={{ padding: 0 }}>
+                              <TableCell >{item.date_time}</TableCell>
+                              <TableCell >{item.count_pf}</TableCell>
+                              <TableCell >{item.count_trash}</TableCell>
+                              <TableCell >{item.ei_name}</TableCell>
+                              <TableCell >{item.user_name}</TableCell>
+                              <TableCell >{item.manager_time}</TableCell>
+                              <TableCell  style={{ padding: 0 }}>
                                 {item.namager_name || !this.state.check_cook ? item.namager_name ?? '' : (
                                   <Grid display="flex" justifyContent="space-evenly">
                                     <Button onClick={this.openConfirm.bind(this, item, 'savePf')} style={{cursor: 'pointer'}} color="success" variant="contained">
