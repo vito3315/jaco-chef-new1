@@ -50,8 +50,6 @@ const queryString = require('query-string');
 
 class TableStages extends React.Component{
   render (){
-    console.log( this.props.data )
-
     return (
       <Table size='small' style={{ marginBottom: 50 }}>
         <TableHead>
@@ -458,7 +456,6 @@ class SiteItems_ extends React.Component {
     }, 300 )
   }
 
- 
   async openNew(){
     let res = await this.getData('get_all_for_new');
     console.log('it',res.item); 
@@ -552,10 +549,9 @@ class SiteItems_ extends React.Component {
     console.log( item )
   }
 
-    // todo
   chooseStage(stage){
     let type = this.state.openMenuitem.storage_id ? 'pf' : 'rec';
-    console.log('chooseStage='+stage); 
+    
 
     // правка от 13.11.22, убрал if this.state.openMenuitem.type == 'pf'
     //if( this.state.openMenuitem.type == 'pf' ){
