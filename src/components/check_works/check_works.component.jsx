@@ -407,7 +407,6 @@ class Checkworks_ extends React.Component {
       ItemTab: '1',
 
       filter: false,
-      workCopy: [],
 
       confirmDialog: false,
       mark: '',
@@ -514,7 +513,6 @@ class Checkworks_ extends React.Component {
       all_work: res.all_work,
       work: res.work,
       pf_list: res.pf_list,
-      workCopy: res.work,
       filter: false,
       check_cook: res.check_cook,
     });
@@ -542,7 +540,6 @@ class Checkworks_ extends React.Component {
       all_work: res.all_work,
       work: res.work,
       pf_list: res.pf_list,
-      workCopy: res.work,
       filter: false,
       check_cook: res.check_cook,
     });
@@ -552,34 +549,6 @@ class Checkworks_ extends React.Component {
     this.setState({
       ItemTab: value,
     });
-  }
-
-  filterButton() {
-    this.setState({
-      filter: !this.state.filter,
-    });
-
-    setTimeout(() => {
-      this.filterItems();
-    }, 10);
-  }
-
-  filterItems() {
-    if (this.state.filter) {
-      const work = this.state.work;
-
-      const is_delete = work.filter((item) => item.is_delete === '1');
-
-      this.setState({
-        work: is_delete,
-      });
-    } else {
-      const work = this.state.workCopy;
-
-      this.setState({
-        work,
-      });
-    }
   }
 
   openConfirm(item, mark) {
@@ -713,7 +682,6 @@ class Checkworks_ extends React.Component {
       all_work: res.all_work,
       work: res.work,
       pf_list: res.pf_list,
-      workCopy: res.work,
       filter: false,
       check_cook: res.check_cook,
     });
@@ -813,7 +781,7 @@ class Checkworks_ extends React.Component {
                 <Grid item xs={12} sm={12}>
                   <TableContainer>
                     <Grid mb={2} mt={2}>
-                      <Button variant="contained" onClick={this.filterButton.bind(this)} style={{ backgroundColor: '#9e9e9e' }}>
+                      <Button variant="contained" onClick={() => this.setState({ filter: !this.state.filter })} style={{ backgroundColor: '#9e9e9e' }}>
                        Только удаленные / Все
                       </Button>
                     </Grid>
@@ -832,7 +800,9 @@ class Checkworks_ extends React.Component {
                         </TableHead>
 
                         <TableBody>
-                          {this.state.work.map((item, key) => (
+                          {this.state.work
+                          .filter(item => this.state.filter ? item.is_delete === '1' : item)
+                          .map((item, key) => (
                             <TableRow key={key} hover sx={{ '& td': {backgroundColor: item.is_delete === '1' ? '#eb4d4b' : null, color: item.is_delete === '1' ? '#fff' : null, 
                             fontWeight: item.is_delete === '1' ? 700 : null} }}>
                               <TableCell >{item.name_work}</TableCell>

@@ -69,6 +69,7 @@ const AppWork = React.lazy(() => import("../app_work"));
 const AppWorkShow = React.lazy(() => import("../app_work_show"));
 const SiteStatMarc = React.lazy(() => import("../site_stat_marc"));
 const AdvertisingCompany = React.lazy(() => import("../advertising_company"));
+const SitePageText = React.lazy(() => import("../site_page_text"));
 
 const RasBillAndCook = React.lazy(() => import("../ras_bill_and_cook"));
 const SkladItemsModule = React.lazy(() => import("../sklad_items_module"));
@@ -360,6 +361,7 @@ export function App () {
                   <Route path={'/site_sale_2/stat'} exact={ true } element={ <SiteSale2_Stat /> } />
                   <Route path={'/site_sale_2/stat_list'} exact={ true } element={ <SiteSale2_StatList /> } />
                   <Route path={'/site_sale_2/analitic_list'} exact={ true } element={ <SiteSale2_AnaliticList /> } />
+                  <Route path={'/site_page_text'} exact={ true } element={ <SitePageText /> } />
 
                   <Route path={'/drive_map_stat_all'} exact={ true } element={ <DriveMapStatAll /> } />
                   <Route path={'/driver_stat'} exact={ true } element={ <DriverStat /> } />
