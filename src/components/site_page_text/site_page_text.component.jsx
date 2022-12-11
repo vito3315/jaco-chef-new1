@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -29,6 +29,39 @@ import {
 } from '../../stores/elements';
 
 const queryString = require('query-string');
+
+function App() {
+  const editorRef = useRef(null);
+  const log = () => {
+    if (editorRef.current) {
+      console.log(editorRef.current.getContent());
+    }
+  };
+  return (
+    <>
+      <Editor
+        apiKey='qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc'
+        onInit={(evt, editor) => editorRef.current = editor}
+        initialValue=""
+        init={{
+          height: 500,
+          //menubar: false,
+          plugins: [
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'fonts', 'font size',
+            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+            'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+          ],
+          toolbar: 'undo redo | blocks | fonts | font size | ' +
+            'bold italic forecolor | alignleft aligncenter ' +
+            'alignright alignjustify | bullist numlist outdent indent | ' +
+            'removeformat | link image | code | fullscreen | help',
+          content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+        }}
+      />
+      <button onClick={log}>Log editor content</button>
+    </>
+  );
+}
 
 class SitePageText_Modal extends React.Component {
   constructor(props) {
@@ -63,6 +96,16 @@ class SitePageText_Modal extends React.Component {
     });
   }
 
+  changeItemText(data, value) {
+    const item = this.state.item;
+
+    item.page[data] = value;
+
+    this.setState({
+      item,
+    });
+  }
+
   changePages(data, event, value) {
     const item = this.state.item;
 
@@ -82,94 +125,89 @@ class SitePageText_Modal extends React.Component {
   }
 
   onClose() {
-    this.setState({
-      item: null,
-    });
-
     this.props.onClose();
   }
 
   render() {
     return (
-      <>
-        <Dialog
-          open={this.props.open}
-          onClose={this.onClose.bind(this)}
-          fullScreen={this.props.fullScreen}
-          fullWidth={true}
-          maxWidth={'lg'}
-        >
-          <DialogTitle className="button">
-            {this.props.method}{this.props.itemName ? `: ${this.props.itemName}` : null}
-            {this.props.fullScreen ? (
-              <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
-                <CloseIcon />
-              </IconButton>
-            ) : null}
-          </DialogTitle>
-          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <MySelect
-                  is_none={false}
-                  label="Город"
-                  data={this.state.item ? this.state.item.cities : []}
-                  value={this.state.item ? this.state.item.page.city_id : ''}
-                  func={this.changeItem.bind(this, 'city_id')}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <MyAutocomplite
-                  label="Страница"
-                  multiple={false}
-                  data={this.state.item ? this.state.item.all_pages : []}
-                  value={this.state.item ? this.state.item.page.page_id : ''}
-                  func={this.changePages.bind(this, 'page_id')}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <MyTextInput
-                  label="Заголовок (H1-H2)"
-                  value={this.state.item ? this.state.item.page.page_h : ''}
-                  func={this.changeItem.bind(this, 'page_h')}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <MyTextInput
-                  label="Заголовок (title)"
-                  value={this.state.item ? this.state.item.page.title : ''}
-                  func={this.changeItem.bind(this, 'title')}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={12}>
-                <MyTextInput
-                  label="Текст на сайте"
-                  multiline={true}
-                  maxRows={5}
-                  value={this.state.item ? this.state.item.page.description : ''}
-                  func={this.changeItem.bind(this, 'description')}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={12}>
-                <TextEditor
-                  text={this.state.item ? this.state.item.page.content : ''}
-                  onChange={this.changeItem.bind(this, 'content')}
-                />
-              </Grid>
+      <Dialog
+        disableEnforceFocus
+        open={this.props.open}
+        onClose={this.onClose.bind(this)}
+        fullScreen={this.props.fullScreen}
+        fullWidth={true}
+        maxWidth={'lg'}
+      >
+        <DialogTitle className="button">
+          {this.props.method}{this.props.itemName ? `: ${this.props.itemName}` : null}
+          {this.props.fullScreen ? (
+            <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
+              <CloseIcon />
+            </IconButton>
+          ) : null}
+        </DialogTitle>
+        <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={6}>
+              <MySelect
+                is_none={false}
+                label="Город"
+                data={this.state.item ? this.state.item.cities : []}
+                value={this.state.item ? this.state.item.page.city_id : ''}
+                func={this.changeItem.bind(this, 'city_id')}
+              />
             </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button color="primary" onClick={this.save.bind(this)}>
-              Сохранить
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </>
+
+            <Grid item xs={12} sm={6}>
+              <MyAutocomplite
+                label="Страница"
+                multiple={false}
+                data={this.state.item ? this.state.item.all_pages : []}
+                value={this.state.item ? this.state.item.page.page_id : ''}
+                func={this.changePages.bind(this, 'page_id')}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <MyTextInput
+                label="Заголовок (H1-H2)"
+                value={this.state.item ? this.state.item.page.page_h : ''}
+                func={this.changeItem.bind(this, 'page_h')}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <MyTextInput
+                label="Заголовок (title)"
+                value={this.state.item ? this.state.item.page.title : ''}
+                func={this.changeItem.bind(this, 'title')}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={12}>
+              <MyTextInput
+                label="Текст на сайте"
+                multiline={true}
+                maxRows={5}
+                value={this.state.item ? this.state.item.page.description : ''}
+                func={this.changeItem.bind(this, 'description')}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={12}>
+              <TextEditor
+                value={this.state.item ? this.state.item.page.content : ''}
+                func={this.changeItemText.bind(this, 'content')}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button color="primary" onClick={this.save.bind(this)}>
+            Сохранить
+          </Button>
+        </DialogActions>
+      </Dialog>
     );
   }
 }
@@ -336,8 +374,6 @@ class SitePageText_ extends React.Component {
         page_text: item.content,
       };
 
-      // console.log(data);
-
       await this.getData('save_new', data);
     }
 
@@ -351,8 +387,6 @@ class SitePageText_ extends React.Component {
         page_description: item.description,
         page_text: item.content,
       };
-
-      // console.log(data);
 
       await this.getData('save_edit', data);
     }
@@ -414,7 +448,8 @@ class SitePageText_ extends React.Component {
         </Grid>
 
         <Grid container mt={3} spacing={3} mb={5}>
-          <Grid item xs={12} sm={12}>
+
+        <Grid item xs={12} sm={12}>
             <TableContainer>
               <Table>
                 <TableHead>
@@ -430,7 +465,7 @@ class SitePageText_ extends React.Component {
 
                 <TableBody>
                   {this.state.pages
-                    .filter((page) => this.state.city !== '-1' ? page.city_id === this.state.city : page)
+                    .filter((page) => this.state.city !== '-1' ? ( page.city_id === this.state.city || parseInt(page.city_id) === -1 ) : page)
                     .map((item, key) => (
                       <TableRow key={key} hover style={{ cursor: 'pointer' }} onClick={this.openModal.bind(this, 'editPage', 'Редактирование страницы', item.id)}>
                         <TableCell>{key + 1}</TableCell>
