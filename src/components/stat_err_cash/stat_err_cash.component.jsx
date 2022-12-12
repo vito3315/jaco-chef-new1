@@ -51,11 +51,8 @@ class StatErrCash_Modal extends React.Component {
   constructor(props) {
     super(props);
 
-    this.handleResize = this.handleResize.bind(this);
-
     this.state = {
       item: null,
-      fullScreen: false,
 
       confirmDialog: false,
       percent: 0,
@@ -76,23 +73,6 @@ class StatErrCash_Modal extends React.Component {
     if (this.props.item !== prevProps.item) {
       this.setState({
         item: this.props.item,
-      });
-    }
-  }
-
-  componentDidMount() {
-    this.handleResize();
-    window.addEventListener('resize', this.handleResize);
-  }
-
-  handleResize() {
-    if (window.innerWidth < 601) {
-      this.setState({
-        fullScreen: true,
-      });
-    } else {
-      this.setState({
-        fullScreen: false,
       });
     }
   }
@@ -201,13 +181,13 @@ class StatErrCash_Modal extends React.Component {
         <Dialog
           open={this.props.open}
           onClose={this.onClose.bind(this)}
-          fullScreen={this.state.fullScreen}
+          fullScreen={this.props.fullScreen}
           fullWidth={true}
           maxWidth={'md'}
         >
           <DialogTitle className="button">
             {this.props.method} №{this.props.mark === 'errOrder' ? this.state.item ? this.state.item.order_id : 'Отсутствует' : this.state.item ? this.state.item.id : 'Отсутствует'}
-            {this.state.fullScreen ? (
+            {this.props.fullScreen ? (
               <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
                 <CloseIcon />
               </IconButton>
@@ -346,8 +326,8 @@ class StatErrCash_ extends React.Component {
       points: [],
       point: '0',
 
-      date_start: '',
-      date_end: '',
+      date_start: formatDate(new Date()),
+      date_end: formatDate(new Date()),
 
       stat_true: '',
       stat_false: '',
@@ -364,6 +344,7 @@ class StatErrCash_ extends React.Component {
       method: '',
       mark: '',
       item: null,
+      fullScreen: false,
     };
   }
 
@@ -377,6 +358,19 @@ class StatErrCash_ extends React.Component {
     });
 
     document.title = data.module_info.name;
+  }
+
+  handleResize() {
+
+    if (window.innerWidth < 601) {
+          this.setState({
+            fullScreen: true,
+          });
+        } else {
+          this.setState({
+            fullScreen: false,
+          });
+        }
   }
 
   getData = (method, data = {}) => {
@@ -462,6 +456,8 @@ class StatErrCash_ extends React.Component {
   }
 
   openModal(mark, method, item) {
+    this.handleResize();
+
     if (mark === 'errOrder') {
       this.setState({
         modalDialog: true,
@@ -528,6 +524,7 @@ class StatErrCash_ extends React.Component {
           item={this.state.item}
           getData={this.getData.bind(this)}
           update={this.getItems.bind(this)}
+          fullScreen={this.state.fullScreen}
         />
 
         <Grid container spacing={3}>

@@ -17,7 +17,6 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import TableContainer from '@mui/material/TableContainer';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -41,8 +40,6 @@ const queryString = require('query-string');
 class PolufabricatModule_Modal extends React.Component {
   constructor(props) {
     super(props);
-
-    this.handleResize = this.handleResize.bind(this);
 
     this.state = {
       item: null,
@@ -68,23 +65,6 @@ class PolufabricatModule_Modal extends React.Component {
 
       this.setState({
         item,
-      });
-    }
-  }
-
-  componentDidMount() {
-    this.handleResize();
-    window.addEventListener('resize', this.handleResize);
-  }
-
-  handleResize() {
-    if (window.innerWidth < 601) {
-      this.setState({
-        fullScreen: true,
-      });
-    } else {
-      this.setState({
-        fullScreen: false,
       });
     }
   }
@@ -130,14 +110,14 @@ class PolufabricatModule_Modal extends React.Component {
       <Dialog
         open={this.props.open}
         onClose={this.onClose.bind(this)}
-        fullScreen={this.state.fullScreen}
+        fullScreen={this.props.fullScreen}
         fullWidth={true}
         maxWidth={'md'}
       >
         <DialogTitle className="button">
           <Typography>{this.props.method}{this.props.itemName ? ': ' + this.props.itemName : ''}
           </Typography>
-          {this.state.fullScreen ? (
+          {this.props.fullScreen ? (
             <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
               <CloseIcon />
             </IconButton>
@@ -158,7 +138,7 @@ class PolufabricatModule_Modal extends React.Component {
                 is_none={false}
                 label="Категория"
                 data={this.state.item ? this.state.item.cat_pf : []}
-                value={this.state.item ? this.state.item.item.cat_pf_id : ''}
+                value={this.state.item ? parseInt(this.state.item.item.cat_pf_id) == 0 ? '' : this.state.item.item.cat_pf_id : ''}
                 func={this.changeItem.bind(this, 'cat_pf_id')}
               />
             </Grid>
@@ -168,7 +148,7 @@ class PolufabricatModule_Modal extends React.Component {
                 is_none={false}
                 label="Ед измерения"
                 data={this.state.item ? this.state.item.ed_izmer : []}
-                value={this.state.item ? this.state.item.item.ed_izmer_id : ''}
+                value={this.state.item ? parseInt(this.state.item.item.ed_izmer_id) == 0 ? '' : this.state.item.item.ed_izmer_id : ''}
                 func={this.changeItem.bind(this, 'ed_izmer_id')}
               />
             </Grid>
@@ -238,6 +218,7 @@ class PolufabricatModule_ extends React.Component {
       freeItems: [],
 
       modalDialog: false,
+      fullScreen: false,
 
       mark: '',
       method: '',
@@ -265,6 +246,19 @@ class PolufabricatModule_ extends React.Component {
     });
 
     document.title = data.module_info.name;
+  }
+
+  handleResize() {
+
+    if (window.innerWidth < 601) {
+          this.setState({
+            fullScreen: true,
+          });
+        } else {
+          this.setState({
+            fullScreen: false,
+          });
+        }
   }
 
   getData = (method, data = {}) => {
@@ -311,6 +305,8 @@ class PolufabricatModule_ extends React.Component {
   };
 
   async openModal(mark, method, item_id) {
+    this.handleResize();
+
     if (mark === 'newItem') {
       const res = await this.getData('get_all_for_new');
 
@@ -403,19 +399,31 @@ class PolufabricatModule_ extends React.Component {
   }
 
   async save(item, mark) {
+    let res;
+
     const data = {
       item,
     };
 
     if (mark === 'newItem') {
-      await this.getData('save_new', data);
+      res = await this.getData('save_new', data);
     }
 
     if (mark === 'itemEdit') {
-      await this.getData('update', data);
+      res = await this.getData('update', data);
     }
 
-    this.update();
+    if (!res.st) {
+      this.setState({
+        openAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+    } else {
+      setTimeout(() => {
+          this.update();
+      }, 300);
+    }
   }
 
   async update() {
@@ -442,14 +450,13 @@ class PolufabricatModule_ extends React.Component {
 
         <PolufabricatModule_Modal
           open={this.state.modalDialog}
-          onClose={() => {
-            this.setState({ modalDialog: false, itemName: '' });
-          }}
+          onClose={() => this.setState({ modalDialog: false, itemName: '' })}
           method={this.state.method}
           event={this.state.item}
           mark={this.state.mark}
           save={this.save.bind(this)}
           itemName={this.state.itemName}
+          fullScreen={this.state.fullScreen}
         />
 
         <Grid container spacing={3} mb={3}>

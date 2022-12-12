@@ -26,20 +26,14 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
-
 import DownloadIcon from '@mui/icons-material/Download';
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
 
 import {
   MyCheckBox,
   MyAutocomplite,
   MyDatePickerNew,
   MyTextInput,
+  MyAlert
 } from '../../stores/elements';
 
 const queryString = require('query-string');
@@ -60,11 +54,8 @@ class ListFakeUsers_Modal extends React.Component {
   constructor(props) {
     super(props);
 
-    this.handleResize = this.handleResize.bind(this);
-
     this.state = {
       item: {},
-      fullScreen: false,
     };
   }
 
@@ -82,26 +73,9 @@ class ListFakeUsers_Modal extends React.Component {
     }
   }
 
-  componentDidMount() {
-    this.handleResize();
-    window.addEventListener('resize', this.handleResize);
-  }
-
-  handleResize() {
-    if (window.innerWidth < 601) {
-      this.setState({
-        fullScreen: true,
-      });
-    } else {
-      this.setState({
-        fullScreen: false,
-      });
-    }
-  }
-
   onClose() {
     this.setState({
-      item: this.props.event ? this.props.event : [],
+      item: this.props.event ? this.props.event : {},
     });
 
     this.props.onClose();
@@ -112,7 +86,7 @@ class ListFakeUsers_Modal extends React.Component {
       <Dialog
         open={this.props.open}
         onClose={this.onClose.bind(this)}
-        fullScreen={this.state.fullScreen}
+        fullScreen={this.props.fullScreen}
         fullWidth={true}
         maxWidth={'lg'}
         aria-labelledby="alert-dialog-title"
@@ -120,7 +94,7 @@ class ListFakeUsers_Modal extends React.Component {
       >
         <DialogTitle className="button">
           <Typography style={{ fontWeight: 'bold' }}>Информация о клиенте</Typography>
-          {this.state.fullScreen ? (
+          {this.props.fullScreen ? (
             <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
               <CloseIcon />
             </IconButton>
@@ -209,7 +183,7 @@ class ListFakeUsers_Modal extends React.Component {
                   <Typography style={{ fontWeight: 'bold' }}>Заказы</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  {this.state.fullScreen ? null : (
+                  {this.props.fullScreen ? null : (
                     <Accordion expanded={true}>
                       <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ opacity: 0 }} />} aria-controls="panel1a-content">
                         <Grid item xs display="flex" flexDirection="row">
@@ -231,27 +205,27 @@ class ListFakeUsers_Modal extends React.Component {
                         <Grid item xs display="flex" sx={{ flexDirection: { sm: 'row', xs: 'column' } }}>
 
                           <Typography style={{ width: '15%' }} sx={{ noWrap: { sm: true, xs: false }, whiteSpace: { xs: 'nowrap' } }}>
-                            {this.state.fullScreen ? `Номер: ${item.order_id}` : item.order_id}
+                            {this.props.fullScreen ? `Номер: ${item.order_id}` : item.order_id}
                           </Typography>
 
                           <Typography style={{ width: '25%' }} sx={{ noWrap: { sm: true, xs: false }, whiteSpace: { xs: 'nowrap' } }}>
-                            {this.state.fullScreen ? `Дата: ${item.date}/${item.time}` : `${item.date}/${item.time}`}
+                            {this.props.fullScreen ? `Дата: ${item.date}/${item.time}` : `${item.date}/${item.time}`}
                           </Typography>
 
                           <Typography style={{ width: '20%' }} sx={{ noWrap: { sm: true, xs: false }, whiteSpace: { xs: 'nowrap' } }}>
-                            {this.state.fullScreen ? `Точка: ${item.addr}` : item.addr}
+                            {this.props.fullScreen ? `Точка: ${item.addr}` : item.addr}
                           </Typography>
 
                           <Typography style={{ width: '10%' }} sx={{ noWrap: { sm: true, xs: false }, whiteSpace: { xs: 'nowrap' } }}>
-                            {this.state.fullScreen ? `Сумма: ${item.summ}` : item.summ}
+                            {this.props.fullScreen ? `Сумма: ${item.summ}` : item.summ}
                           </Typography>
 
                           <Typography style={{ width: '15%' }} sx={{ noWrap: { sm: true, xs: false }, whiteSpace: { xs: 'nowrap' } }}>
-                            {this.state.fullScreen ? `Промик: ${item.promo_name ?? 'Нет'}` : item.promo_name ?? 'Нет'}
+                            {this.props.fullScreen ? `Промик: ${item.promo_name ?? 'Нет'}` : item.promo_name ?? 'Нет'}
                           </Typography>
 
                           <Typography style={{ width: '15%' }} sx={{ noWrap: { sm: true, xs: false }, whiteSpace: { xs: 'nowrap' } }}>
-                            {this.state.fullScreen ? `Тип: ${item.xy === '' ? 'Самовывоз' : 'Доставка'}` : item.xy === '' ? 'Самовывоз' : 'Доставка'}
+                            {this.props.fullScreen ? `Тип: ${item.xy === '' ? 'Самовывоз' : 'Доставка'}` : item.xy === '' ? 'Самовывоз' : 'Доставка'}
                           </Typography>
 
                           <Typography style={{ width: '15%', overflow: 'hidden' }} sx={{ noWrap: { sm: true, xs: false }, whiteSpace: { xs: 'nowrap' } }}>
@@ -313,8 +287,6 @@ class ListFakeUsers_ extends React.Component {
       item: [],
       users: [],
 
-      snackbar: false,
-      error: '',
       url: '',
 
       date_start_true: '',
@@ -330,6 +302,11 @@ class ListFakeUsers_ extends React.Component {
       modalDialog: false,
       modalDialogDwn: false,
       user: null,
+      fullScreen: false,
+
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
@@ -345,6 +322,19 @@ class ListFakeUsers_ extends React.Component {
     });
 
     document.title = data.module_info.name;
+  }
+
+  handleResize() {
+
+    if (window.innerWidth < 601) {
+          this.setState({
+            fullScreen: true,
+          });
+        } else {
+          this.setState({
+            fullScreen: false,
+          });
+        }
   }
 
   getData = (method, data = {}) => {
@@ -417,8 +407,9 @@ class ListFakeUsers_ extends React.Component {
     } else {
       this.setState({
         users: [],
-        error: res.text,
-        snackbar: true,
+        openAlert: true,
+        err_status: res.st,
+        err_text: res.text,
       });
     }
   }
@@ -462,6 +453,8 @@ class ListFakeUsers_ extends React.Component {
   }
 
   async openModal(item) {
+    this.handleResize();
+
     const date_start_true = this.state.date_start_true;
 
     const date_end_true = this.state.date_end_true;
@@ -488,8 +481,9 @@ class ListFakeUsers_ extends React.Component {
       });
     } else {
       this.setState({
-        error: res.text,
-        snackbar: true,
+        openAlert: true,
+        err_status: res.st,
+        err_text: res.text,
       });
     }
   }
@@ -509,25 +503,17 @@ class ListFakeUsers_ extends React.Component {
           <CircularProgress color="inherit" />
         </Backdrop>
 
-        <Snackbar
-          open={this.state.snackbar}
-          autoHideDuration={30000}
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          onClose={() => this.setState({ snackbar: false })}
-        >
-          <Alert
-            onClose={() => this.setState({ snackbar: false })}
-            severity={'error'}
-            sx={{ width: '100%' }}
-          >
-            {this.state.error}
-          </Alert>
-        </Snackbar>
+        <MyAlert 
+          isOpen={this.state.openAlert} 
+          onClose={() => this.setState({ openAlert: false }) } 
+          status={this.state.err_status} 
+          text={this.state.err_text} />
 
         <ListFakeUsers_Modal
           open={this.state.modalDialog}
           onClose={() => this.setState({ modalDialog: false })}
           event={this.state.user}
+          fullScreen={this.state.fullScreen}
         />
 
         <Grid item xs={12} mb={3}>
@@ -555,11 +541,7 @@ class ListFakeUsers_ extends React.Component {
           <Grid item xs={12} sm={3} sx={{ order: { sm: 2, xs: 2 } }} display="flex" flexDirection="row">
 
             <Grid>
-              <Button
-                variant="contained"
-                style={{ whiteSpace: 'nowrap' }}
-                onClick={this.getUsers.bind(this)}
-              >
+              <Button variant="contained" style={{ whiteSpace: 'nowrap' }} onClick={this.getUsers.bind(this)}>
                 Получить список клиентов
               </Button>
             </Grid>
@@ -626,9 +608,7 @@ class ListFakeUsers_ extends React.Component {
           <Grid item xs={12} sm={3}>
             <MyCheckBox
               label="Была оформлена ошибка на последний заказ"
-              value={
-                parseInt(this.state.is_show_claim_last) == 1 ? true : false
-              }
+              value={parseInt(this.state.is_show_claim_last) == 1 ? true : false}
               func={this.changeItemChecked.bind(this, 'is_show_claim_last')}
             />
           </Grid>
