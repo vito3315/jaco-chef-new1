@@ -30,18 +30,12 @@ import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
 
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
 import {
   MySelect,
   MyAutocomplite2,
   MyTimePicker,
   MyDatePickerNew,
+  MyAlert
 } from '../../stores/elements';
 
 const queryString = require('query-string');
@@ -62,14 +56,13 @@ class EventTime1_Modal extends React.Component {
   constructor(props) {
     super(props);
 
-    this.handleResize = this.handleResize.bind(this);
-
     this.state = {
       item: null,
-      fullScreen: false,
       data: [],
-      snackbar: false,
-      error: '',
+      
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
@@ -90,23 +83,6 @@ class EventTime1_Modal extends React.Component {
       this.setState({
         item: this.props.event,
         data,
-      });
-    }
-  }
-
-  componentDidMount() {
-    this.handleResize();
-    window.addEventListener('resize', this.handleResize);
-  }
-
-  handleResize() {
-    if (window.innerWidth < 601) {
-      this.setState({
-        fullScreen: true,
-      });
-    } else {
-      this.setState({
-        fullScreen: false,
       });
     }
   }
@@ -144,30 +120,22 @@ class EventTime1_Modal extends React.Component {
   save() {
     const message = 'Необходимо заполнить все данные!';
 
-    if (
-      this.props.mark === 'newDay' &&
-      (!this.state.item.date ||
-        !this.state.item.time_start ||
-        !this.state.item.time_end ||
-        !this.state.item.time_dev)
-    ) {
+    if (this.props.mark === 'newDay' && (!this.state.item.date || !this.state.item.time_start || !this.state.item.time_end || !this.state.item.time_dev)) {
       this.setState({
-        error: message,
-        snackbar: true,
+        openAlert: true,
+        err_status: res.st,
+        err_text: message,
       });
 
       return;
     }
 
-    if (
-      (this.props.mark === 'newEvent' || this.props.mark === 'editEvent') && 
-      (!this.state.item.time_start ||
-      !this.state.item.time_end ||
-      !this.state.item.time_dev)
-    ) {
+    if ((this.props.mark === 'newEvent' || this.props.mark === 'editEvent') && 
+    (!this.state.item.time_start || !this.state.item.time_end || !this.state.item.time_dev)) {
       this.setState({
-        error: message,
-        snackbar: true,
+        openAlert: true,
+        err_status: res.st,
+        err_text: message,
       });
 
       return;
@@ -182,7 +150,8 @@ class EventTime1_Modal extends React.Component {
     this.setState({
       item: this.props.event ? this.props.event : null,
       data: [],
-      error: '',
+      err_status: true,
+      err_text: '',
     });
 
     this.props.onClose();
@@ -191,32 +160,16 @@ class EventTime1_Modal extends React.Component {
   render() {
     return (
       <>
-        <Snackbar
-          open={this.state.snackbar}
-          autoHideDuration={30000}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
-          }}
-          onClose={() => {
-            this.setState({ snackbar: false });
-          }}
-        >
-          <Alert
-            onClose={() => {
-              this.setState({ snackbar: false });
-            }}
-            severity={'error'}
-            sx={{ width: '100%' }}
-          >
-            {this.state.error}
-          </Alert>
-        </Snackbar>
+        <MyAlert 
+          isOpen={this.state.openAlert} 
+          onClose={() => this.setState({ openAlert: false }) } 
+          status={this.state.err_status} 
+          text={this.state.err_text} />
 
         <Dialog
           open={this.props.open}
           onClose={this.onClose.bind(this)}
-          fullScreen={this.state.fullScreen}
+          fullScreen={this.props.fullScreen}
           fullWidth={true}
           maxWidth={this.props.mark !== 'newDay' ? 'md' : 'lg'}
           aria-labelledby="alert-dialog-title"
@@ -224,7 +177,7 @@ class EventTime1_Modal extends React.Component {
         >
           <DialogTitle className="button">
             <Typography style={{ fontWeight: 'normal' }}>{this.props.method}</Typography>
-            {this.state.fullScreen ? (
+            {this.props.fullScreen ? (
               <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
                 <CloseIcon />
               </IconButton>
@@ -296,6 +249,7 @@ class EventTime1_ extends React.Component {
       modalDialog: false,
       method: '',
       mark: '',
+      fullScreen: false,
 
       item: [],
       itemData: [],
@@ -379,6 +333,19 @@ class EventTime1_ extends React.Component {
     });
 
     document.title = data.module_info.name;
+  }
+
+  handleResize() {
+
+    if (window.innerWidth < 601) {
+          this.setState({
+            fullScreen: true,
+          });
+        } else {
+          this.setState({
+            fullScreen: false,
+          });
+        }
   }
 
   getData = (method, data = {}) => {
@@ -465,6 +432,7 @@ class EventTime1_ extends React.Component {
   }
 
   openModal(method, mark, item) {
+    this.handleResize();
 
     if (mark === 'newDay') {
 
@@ -588,13 +556,12 @@ class EventTime1_ extends React.Component {
         {/* модалка */}
         <EventTime1_Modal
           open={this.state.modalDialog}
-          onClose={() => {
-            this.setState({ modalDialog: false });
-          }}
+          onClose={() => this.setState({ modalDialog: false })}
           method={this.state.method}
           event={this.state.event}
           save={this.saveItem.bind(this)}
           mark={this.state.mark}
+          fullScreen={this.state.fullScreen}
         />
 
         {/* выбор и кнопка */}
@@ -609,11 +576,7 @@ class EventTime1_ extends React.Component {
             />
           </Grid>
           <Grid item xs={12} sm={5}>
-            <Button
-              variant="contained"
-              style={{ whiteSpace: 'nowrap' }}
-              onClick={this.openModal.bind(this, 'Особый день', 'newDay')}
-            >
+            <Button variant="contained" style={{ whiteSpace: 'nowrap' }} onClick={this.openModal.bind(this, 'Особый день', 'newDay')}>
               Добавить особый день
             </Button>
           </Grid>
@@ -637,8 +600,7 @@ class EventTime1_ extends React.Component {
                             <TableCell style={{ width: '10%' }}></TableCell>
                           </TableRow>
                         </TableHead>
-                        <TableBody sx={{ '& td': { border: 0 }, borderBottom: 1, borderColor: 'divider' }}
-                        >
+                        <TableBody sx={{ '& td': { border: 0 }, borderBottom: 1, borderColor: 'divider' }}>
                         {this.state.item.map((item, key) => (
                             <TableRow  key={key + 100}>
                               <TableCell>{item.date}</TableCell>
@@ -685,11 +647,7 @@ class EventTime1_ extends React.Component {
                     ))}
                     </TableBody>
                   </Table>
-                  <Button
-                    size="sm"
-                    fullWidth={true}
-                    onClick={this.openModal.bind(this, '- текущие заказы', 'newEvent', item)}
-                  >
+                  <Button size="sm" fullWidth={true} onClick={this.openModal.bind(this, '- текущие заказы', 'newEvent', item)}>
                     Добавить
                   </Button>
                 </Card>

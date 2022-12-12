@@ -45,7 +45,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 
-import { MySelect, MyDatePickerNew, MyTextInput } from '../../stores/elements';
+import { MySelect, MyDatePickerNew, MyTextInput, MyAlert } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -207,11 +207,8 @@ class CheckWorks_Modal_Edit extends React.Component {
   constructor(props) {
     super(props);
 
-    this.handleResize = this.handleResize.bind(this);
-
     this.state = {
       item: null,
-      fullScreen: false,
     };
   }
 
@@ -225,23 +222,6 @@ class CheckWorks_Modal_Edit extends React.Component {
     if (this.props.event !== prevProps.event) {
       this.setState({
         item: this.props.event,
-      });
-    }
-  }
-
-  componentDidMount() {
-    this.handleResize();
-    //window.addEventListener('resize', this.handleResize);
-  }
-
-  handleResize() {
-    if (window.innerWidth < 601) {
-      this.setState({
-        fullScreen: true,
-      });
-    } else {
-      this.setState({
-        fullScreen: false,
       });
     }
   }
@@ -277,7 +257,7 @@ class CheckWorks_Modal_Edit extends React.Component {
       <Dialog
         open={this.props.open}
         onClose={this.onClose.bind(this)}
-        fullScreen={this.state.fullScreen}
+        fullScreen={this.props.fullScreen}
         fullWidth={true}
         maxWidth={'md'}
         aria-labelledby="alert-dialog-title"
@@ -287,7 +267,7 @@ class CheckWorks_Modal_Edit extends React.Component {
           <Typography sx={{ fontWeight: 'bold' }}>
             {this.props.method}: {this.state.item ? this.state.item.name_work ? this.state.item.name_work : '' : ''}
           </Typography>
-          {this.state.fullScreen ? (
+          {this.props.fullScreen ? (
             <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
               <CloseIcon />
             </IconButton>
@@ -411,6 +391,7 @@ class Checkworks_ extends React.Component {
       confirmDialog: false,
       mark: '',
       item: null,
+      fullScreen: false,
 
       modalDialogNew: false,
       works: [],
@@ -420,6 +401,10 @@ class Checkworks_ extends React.Component {
       itemEdit: null,
 
       check_cook: false,
+
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
@@ -439,6 +424,19 @@ class Checkworks_ extends React.Component {
       this.getItems();
     }, 300 )
     
+  }
+
+  handleResize() {
+
+    if (window.innerWidth < 601) {
+          this.setState({
+            fullScreen: true,
+          });
+        } else {
+          this.setState({
+            fullScreen: false,
+          });
+        }
   }
 
   getData = (method, data = {}) => {
@@ -563,6 +561,8 @@ class Checkworks_ extends React.Component {
 
     const mark = this.state.mark;
 
+    let res;
+
     const data = {
       work_id: item.id,
       point_id: item.point_id,
@@ -570,16 +570,25 @@ class Checkworks_ extends React.Component {
     };
 
     if (mark === 'deleteWork') {
-      await this.getData('close_work', data);
+      res = await this.getData('close_work', data);
     }
 
     if (mark === 'deletePf') {
-      await this.getData('close_pf_work', data);
+      res = await this.getData('close_pf_work', data);
     }
 
-    setTimeout( () => {
-      this.update();
-    }, 300 )
+    if(!res.st) {
+      this.setState({
+        openAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+    } else {
+      setTimeout( () => {
+        this.update();
+      }, 300 )
+    }
+
   }
 
   async saveItem() {
@@ -587,55 +596,77 @@ class Checkworks_ extends React.Component {
 
     const mark = this.state.mark;
 
+    let res;
+
     const data = {
       work_id: item.id,
       point_id: item.point_id,
     };
 
     if (mark === 'saveWork') {
-      await this.getData('check_work', data);
+      res = await this.getData('check_work', data);
     }
 
     if (mark === 'savePf') {
-      await this.getData('check_pf_work', data);
+      res = await this.getData('check_pf_work', data);
     }
 
     if (mark === 'clearWork') {
-      await this.getData('clear_work', data);
+      res = await this.getData('clear_work', data);
     }
 
-    setTimeout( () => {
-      this.update();
-    }, 300 )
+    if(!res.st) {
+      this.setState({
+        openAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+    } else {
+      setTimeout( () => {
+        this.update();
+      }, 300 )
+    }
   }
 
   async saveWork(work) {
     const mark = this.state.mark;
 
-    if (mark === 'newItem') {
-      const point_id = this.state.point;
+    const point_id = this.state.point;
 
+    let res;
+
+    if (mark === 'newItem') {
       const data = {
         point_id,
         work_id: work.id,
       };
 
-      await this.getData('add_new_work', data);
+      res = await this.getData('add_new_work', data);
     }
 
     if (mark === 'editItem') {
       const data = {
+        point_id,
         id: work.id,
         count_pf: work.count_pf,
         count_trash: work.count_trash,
       };
 
-      await this.getData('save_edit', data);
+      res = await this.getData('save_edit', data);
     }
 
-    setTimeout( () => {
-      this.update();
-    }, 300 )
+    if(!res.st) {
+      this.setState({
+        openAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+    } else {
+      setTimeout( () => {
+        this.update();
+      }, 300 )
+    }
+   
   }
 
   async openModal(mark, method, itemEdit) {
@@ -657,6 +688,8 @@ class Checkworks_ extends React.Component {
     }
 
     if (mark === 'editItem') {
+      this.handleResize();
+
       this.setState({
         modalDialogEdit: true,
         itemEdit,
@@ -691,6 +724,12 @@ class Checkworks_ extends React.Component {
           <CircularProgress color="inherit" />
         </Backdrop>
 
+        <MyAlert 
+          isOpen={this.state.openAlert} 
+          onClose={() => this.setState({ openAlert: false }) } 
+          status={this.state.err_status} 
+          text={this.state.err_text} />
+
         <CheckWorks_Confirm
           open={this.state.confirmDialog}
           onClose={() => this.setState({ confirmDialog: false })}
@@ -713,6 +752,7 @@ class Checkworks_ extends React.Component {
           method={this.state.method}
           event={this.state.itemEdit}
           save={this.saveWork.bind(this)}
+          fullScreen={this.state.fullScreen}
         />
 
         {/* кнопки и выбор дат */}

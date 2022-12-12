@@ -51,12 +51,9 @@ class CountUsers_Modal extends React.Component {
   constructor(props) {
     super(props);
 
-    this.handleResize = this.handleResize.bind(this);
-
     this.state = {
       item: [],
       date_start: '',
-      fullScreen: false,
     };
   }
 
@@ -71,23 +68,6 @@ class CountUsers_Modal extends React.Component {
       this.setState({
         item: JSON.parse(JSON.stringify(this.props.event)),
         date_start: JSON.parse(JSON.stringify(this.props.event[0].date)),
-      });
-    }
-  }
-
-  componentDidMount() {
-    this.handleResize();
-    window.addEventListener('resize', this.handleResize);
-  }
-
-  handleResize() {
-    if (window.innerWidth < 601) {
-      this.setState({
-        fullScreen: true,
-      });
-    } else {
-      this.setState({
-        fullScreen: false,
       });
     }
   }
@@ -257,21 +237,16 @@ class CountUsers_Modal extends React.Component {
       <Dialog
         open={this.props.open}
         onClose={this.onClose.bind(this)}
-        fullScreen={this.state.fullScreen}
+        fullScreen={this.props.fullScreen}
         fullWidth={true}
         maxWidth={'md'}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle className="button">
-          <Typography style={{ fontWeight: 'normal' }}>
-            {this.props.method}
-          </Typography>
-          {this.state.fullScreen ? (
-            <IconButton
-              onClick={this.onClose.bind(this)}
-              style={{ cursor: 'pointer' }}
-            >
+          <Typography style={{ fontWeight: 'normal' }}>{this.props.method}</Typography>
+          {this.props.fullScreen ? (
+            <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
               <CloseIcon />
             </IconButton>
           ) : null}
@@ -291,15 +266,7 @@ class CountUsers_Modal extends React.Component {
             <React.Fragment key={key}>
               <Grid container spacing={3}>
                 <Grid item xs={8} sm={3} mt={2}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-around',
-                      height: '100%',
-                      minHeight: 120,
-                    }}
-                  >
+                  <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around', height: '100%', minHeight: 120}}>
                     <MyTimePicker
                       value={item.time_start}
                       func={this.changeTimeStart.bind(this, item)}
@@ -312,43 +279,14 @@ class CountUsers_Modal extends React.Component {
                     />
                   </div>
                 </Grid>
-                <Grid
-                  item
-                  xs={4}
-                  sm={0}
-                  sx={{
-                    display: { xs: 'flex', sm: 'none' },
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <CloseIcon
-                    fontSize="large"
-                    onClick={this.deleteItem.bind(this, item.id)}
-                    style={{ cursor: 'pointer' }}
-                  />
+                <Grid item xs={4} sm={0} sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'center', alignItems: 'center'}}>
+                  <CloseIcon fontSize="large" onClick={this.deleteItem.bind(this, item.id)} style={{ cursor: 'pointer' }}/>
                 </Grid>
 
                 <Grid item sm={8}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      height: '100%',
-                    }}
-                  >
+                  <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%'}}>
                     {item.apps.map((el, i) => (
-                      <div
-                        key={i + 10}
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginBottom: 20,
-                          marginTop: i === 0 ? 20 : 0,
-                        }}
-                      >
+                      <div key={i + 10} style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 20, marginTop: i === 0 ? 20 : 0}}>
                         <span style={{ minWidth: 200 }}>{el.app_name}</span>
                         <MyTextInput
                           value={el.count}
@@ -360,21 +298,8 @@ class CountUsers_Modal extends React.Component {
                   </div>
                 </Grid>
 
-                <Grid
-                  item
-                  xs={4}
-                  sm={1}
-                  sx={{
-                    display: { xs: 'none', sm: 'flex' },
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <CloseIcon
-                    fontSize="large"
-                    onClick={this.deleteItem.bind(this, item.id)}
-                    style={{ cursor: 'pointer' }}
-                  />
+                <Grid item xs={4} sm={1} sx={{display: { xs: 'none', sm: 'flex' }, justifyContent: 'center', alignItems: 'center'}}>
+                  <CloseIcon fontSize="large" onClick={this.deleteItem.bind(this, item.id)} style={{ cursor: 'pointer' }}/>
                 </Grid>
               </Grid>
               <Divider />
@@ -383,10 +308,7 @@ class CountUsers_Modal extends React.Component {
         </DialogContent>
 
         <DialogActions className="button">
-          <Button
-            style={{ whiteSpace: 'nowrap' }}
-            onClick={this.addItem.bind(this)}
-          >
+          <Button style={{ whiteSpace: 'nowrap' }} onClick={this.addItem.bind(this)}>
             Добавить
           </Button>
           <Button style={{ color: '#00a550' }} onClick={this.save.bind(this)}>
@@ -757,6 +679,8 @@ class CountUsers_ extends React.Component {
 
       dows: [],
       dow: [],
+
+      fullScreen: false,
     };
   }
 
@@ -787,6 +711,19 @@ class CountUsers_ extends React.Component {
     });
 
     document.title = data.module_info.name;
+  }
+
+  handleResize() {
+
+    if (window.innerWidth < 601) {
+          this.setState({
+            fullScreen: true,
+          });
+        } else {
+          this.setState({
+            fullScreen: false,
+          });
+        }
   }
 
   getData = (method, data = {}) => {
@@ -871,6 +808,8 @@ class CountUsers_ extends React.Component {
   }
 
   async openModal(method, item, event) {
+    this.handleResize();
+
     if (method === 'Особый день') {
       const item = [
         {
@@ -1104,12 +1043,11 @@ class CountUsers_ extends React.Component {
         {/* модалка */}
         <CountUsers_Modal
           open={this.state.modalDialog}
-          onClose={() => {
-            this.setState({ modalDialog: false });
-          }}
+          onClose={() => this.setState({ modalDialog: false })}
           method={this.state.method}
           event={this.state.item}
           save={this.save.bind(this)}
+          fullScreen={this.state.fullScreen}
         />
 
         <Grid container spacing={3}>
@@ -1128,11 +1066,7 @@ class CountUsers_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <Button
-              variant="contained"
-              style={{ whiteSpace: 'nowrap' }}
-              onClick={this.openModal.bind(this, 'Особый день')}
-            >
+            <Button variant="contained" style={{ whiteSpace: 'nowrap' }} onClick={this.openModal.bind(this, 'Особый день')}>
               Добавить особый день
             </Button>
           </Grid>
@@ -1141,12 +1075,7 @@ class CountUsers_ extends React.Component {
           {this.state.point < 1 ? null : (
             <Grid item xs={12} sm={8}>
               <TabContext value={this.state.ItemTab}>
-                <Box
-                  sx={{
-                    borderBottom: 1,
-                    borderColor: 'divider',
-                  }}
-                >
+                <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
                   <TabList
                     onChange={this.changeTab.bind(this)}
                     variant="scrollable"
@@ -1175,35 +1104,14 @@ class CountUsers_ extends React.Component {
           {!this.state.other_days.length ? null : (
             <Grid item xs={12} sm={4} mb={3}>
               <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content">
                   <Typography>Даты</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   {this.state.other_days.map((item, i) => (
-                    <Accordion
-                      key={i}
-                      expanded={true}
-                      sx={{ borderBottom: 1, borderColor: 'divider' }}
-                    >
-                      <AccordionSummary
-                        expandIcon={
-                          <CloseIcon
-                            onClick={this.deleteItem.bind(this, item)}
-                          />
-                        }
-                      >
-                        <Typography
-                          onClick={this.openModal.bind(
-                            this,
-                            'Редактировать особый день',
-                            item
-                          )}
-                        >
-                          {item.date}
-                        </Typography>
+                    <Accordion key={i} expanded={true} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                      <AccordionSummary expandIcon={<CloseIcon onClick={this.deleteItem.bind(this, item)}/>}>
+                        <Typography onClick={this.openModal.bind(this, 'Редактировать особый день', item)}>{item.date}</Typography>
                       </AccordionSummary>
                     </Accordion>
                   ))}
