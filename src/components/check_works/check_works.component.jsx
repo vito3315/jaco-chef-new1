@@ -231,7 +231,7 @@ class CheckWorks_Modal_Edit extends React.Component {
 
   componentDidMount() {
     this.handleResize();
-    window.addEventListener('resize', this.handleResize);
+    //window.addEventListener('resize', this.handleResize);
   }
 
   handleResize() {
@@ -397,8 +397,8 @@ class Checkworks_ extends React.Component {
       points: [],
       point: '',
 
-      date_start: '',
-      date_end: '',
+      date_start: formatDate(new Date()),
+      date_end: formatDate(new Date()),
 
       all_work: [],
       work: [],
@@ -419,14 +419,12 @@ class Checkworks_ extends React.Component {
       modalDialogEdit: false,
       itemEdit: null,
 
-      check_cook: null,
+      check_cook: false,
     };
   }
 
   async componentDidMount() {
     const data = await this.getData('get_all');
-
-    // console.log(data);
 
     this.setState({
       points: data.points,
@@ -436,6 +434,11 @@ class Checkworks_ extends React.Component {
     });
 
     document.title = data.module_info.name;
+
+    setTimeout( () => {
+      this.getItems();
+    }, 300 )
+    
   }
 
   getData = (method, data = {}) => {
@@ -507,8 +510,6 @@ class Checkworks_ extends React.Component {
 
     const res = await this.getData('get_data', data);
 
-    // console.log(res);
-
     this.setState({
       all_work: res.all_work,
       work: res.work,
@@ -533,8 +534,6 @@ class Checkworks_ extends React.Component {
     };
 
     const res = await this.getData('get_data', data);
-
-    // console.log(res);
 
     this.setState({
       all_work: res.all_work,
@@ -570,8 +569,6 @@ class Checkworks_ extends React.Component {
       text,
     };
 
-    // console.log(data);
-
     if (mark === 'deleteWork') {
       await this.getData('close_work', data);
     }
@@ -580,7 +577,9 @@ class Checkworks_ extends React.Component {
       await this.getData('close_pf_work', data);
     }
 
-    this.update();
+    setTimeout( () => {
+      this.update();
+    }, 300 )
   }
 
   async saveItem() {
@@ -592,8 +591,6 @@ class Checkworks_ extends React.Component {
       work_id: item.id,
       point_id: item.point_id,
     };
-
-    // console.log(data);
 
     if (mark === 'saveWork') {
       await this.getData('check_work', data);
@@ -607,7 +604,9 @@ class Checkworks_ extends React.Component {
       await this.getData('clear_work', data);
     }
 
-    this.update();
+    setTimeout( () => {
+      this.update();
+    }, 300 )
   }
 
   async saveWork(work) {
@@ -621,8 +620,6 @@ class Checkworks_ extends React.Component {
         work_id: work.id,
       };
 
-      // console.log(data);
-
       await this.getData('add_new_work', data);
     }
 
@@ -633,12 +630,12 @@ class Checkworks_ extends React.Component {
         count_trash: work.count_trash,
       };
 
-      // console.log(data);
-
       await this.getData('save_edit', data);
     }
 
-    this.update();
+    setTimeout( () => {
+      this.update();
+    }, 300 )
   }
 
   async openModal(mark, method, itemEdit) {
@@ -803,8 +800,7 @@ class Checkworks_ extends React.Component {
                           {this.state.work
                           .filter(item => this.state.filter ? item.is_delete === '1' : item)
                           .map((item, key) => (
-                            <TableRow key={key} hover sx={{ '& td': {backgroundColor: item.is_delete === '1' ? '#eb4d4b' : null, color: item.is_delete === '1' ? '#fff' : null, 
-                            fontWeight: item.is_delete === '1' ? 700 : null} }}>
+                            <TableRow key={key} hover sx={{ '& td': {backgroundColor: item.is_delete === '1' ? '#eb4d4b' : null, color: item.is_delete === '1' ? '#fff' : null, fontWeight: item.is_delete === '1' ? 700 : null} }}>
                               <TableCell >{item.name_work}</TableCell>
                               <TableCell >{item.user_name}</TableCell>
                               <TableCell >{item.date_start_work}</TableCell>
@@ -812,7 +808,7 @@ class Checkworks_ extends React.Component {
                               <TableCell >{item.date_time_end}</TableCell>
                               <TableCell >{item.manager_time}</TableCell>
                               <TableCell  style={{ padding: 0 }}>
-                                {item.namager_name || item.is_delete === '1' || !this.state.check_cook ? item.namager_name ?? '' : (
+                                {item.namager_name || item.is_delete === '1' || this.state.check_cook ? item.namager_name ?? '' : (
                                   <Grid display="flex" sx={{ justifyContent: { sm: 'space-evenly', xs: 'space-around' } }}>
                                     {item.date_time_end ? (
                                       <Button onClick={this.openConfirm.bind(this, item, 'saveWork')} style={{ cursor: 'pointer' }} color="success" variant="contained">
@@ -859,7 +855,7 @@ class Checkworks_ extends React.Component {
                               <TableCell >{item.name_work}</TableCell>
                               <TableCell >{item.app_name}</TableCell>
                               <TableCell >
-                                {!this.state.check_cook ? null : (
+                                {this.state.check_cook ? null : (
                                   <Button onClick={this.openConfirm.bind(this, item, 'deleteWork')} style={{ cursor: 'pointer' }} color="error" variant="contained">
                                     <ClearIcon />
                                   </Button>
@@ -906,7 +902,7 @@ class Checkworks_ extends React.Component {
                               <TableCell >{item.user_name}</TableCell>
                               <TableCell >{item.manager_time}</TableCell>
                               <TableCell  style={{ padding: 0 }}>
-                                {item.namager_name || !this.state.check_cook ? item.namager_name ?? '' : (
+                                {item.namager_name || this.state.check_cook ? item.namager_name ?? '' : (
                                   <Grid display="flex" justifyContent="space-evenly">
                                     <Button onClick={this.openConfirm.bind(this, item, 'savePf')} style={{cursor: 'pointer'}} color="success" variant="contained">
                                       <CheckIcon />

@@ -20,7 +20,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
-import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+//import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
 
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
@@ -29,6 +29,8 @@ import Typography from '@mui/material/Typography';
 
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+
+import { Editor } from '@tinymce/tinymce-react';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -48,7 +50,7 @@ export function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-export class MyDaterange extends React.PureComponent {
+/*export class MyDaterange extends React.PureComponent {
   constructor(props) {
     super(props);
         
@@ -79,7 +81,7 @@ export class MyDaterange extends React.PureComponent {
       </LocalizationProvider>
     )
   }
-}
+}*/
 
 export class MyAutocomplite extends React.PureComponent {
   constructor(props) {
@@ -490,35 +492,27 @@ export class MyCheckBox extends React.PureComponent {
 }
 
 export class TextEditor extends React.PureComponent {
-  constructor(props) {
-    super(props);
-        
-    this.state = {
-    };
-  }
-  
   render(){
     return (
-      <tinymce-editor
-        apiKey="r0ihgs4ukfpmudzw7aexxgb88tnx5jw26h1xx9x6409ji3gx"
-        id={this.props.id}
-        menubar={true}
-        plugins="advlist autolink lists link image charmap print preview anchor
-        searchreplace visualblocks code fullscreen
-        insertdatetime media table paste code help wordcount"
-        toolbar="undo redo | formatselect | bold italic backcolor |
-        alignleft aligncenter alignright alignjustify |
-        bullist numlist outdent indent | removeformat | help"
-        content_style="body
-        {
-          font-family:Helvetica,Arial,sans-serif;
-          font-size:14px
-        }"
-        >
-
-        {this.props.text}
-
-      </tinymce-editor>
+      <Editor
+        apiKey='qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc'
+        value={this.props.value}
+        onEditorChange={this.props.func}
+        init={{
+          height: 500,
+          //menubar: false,
+          plugins: [
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+            'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+          ],
+          toolbar: 'undo redo | blocks | ' +
+            'bold italic forecolor | alignleft aligncenter ' +
+            'alignright alignjustify | bullist numlist outdent indent | ' +
+            'removeformat | link image | code | fullscreen | help',
+          content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+        }}
+      />
     )
   }
 }

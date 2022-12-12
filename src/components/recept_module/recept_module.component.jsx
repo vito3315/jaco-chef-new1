@@ -2,8 +2,6 @@ import React from 'react';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-
-import Divider from '@mui/material/Divider';
 import Box from '@mui/material/Box';
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -201,138 +199,6 @@ class ReceptModule_Modal_Container extends React.Component {
   }
 }
 
-class ReceptModule_Modal_New extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      item: null,
-
-      quantity: '',
-
-      total: ''
-    };
-
-    console.log(this.state.item);
-  }
-
-  static getDerivedStateFromProps(nextProps, prevState) {
-    if (!nextProps.event) {
-      return null;
-    }
-
-    if (nextProps.event !== prevState.event) {
-      return { item: nextProps.event }; // <- this is setState equivalent
-    }
-    return null;
-  }
-
-  changeItem(data, event) {
-    let vendor = this.state.item;
-    vendor[data] = event.target.value;
-
-    this.setState({
-      item: vendor,
-    });
-  }
-
-  changeQuantity(event) {
-    this.setState({
-      quantity: event.target.value,
-    });
-  }
-
-  addIngredientsRecipe(item) {
-    const vendor = this.state.item;
-
-    const id = vendor.recipe.find((el) => el.id === item.id);
-
-    if (id || this.state.quantity < 1) {
-      return;
-    }
-
-    item.quantity = this.state.quantity;
-
-    vendor.recipe.push(item);
-
-    const percent = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0) / 100;
-
-    vendor.recipe.map(el => el.percent = (el.quantity / percent).toFixed(2));
-
-    const total = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0)
-
-    this.setState({
-      item: vendor,
-      quantity: '',
-      total
-    });
-  }
-
-  deleteIngredientsRecipe(id) {
-
-    const vendor = this.state.item;
-
-    const newVendor = vendor.recipe.filter((el) => el.id !== id);
-
-    vendor.recipe = newVendor;
-
-    const percent = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0) / 100;
-
-    vendor.recipe.map(el => el.percent = (el.quantity / percent).toFixed(2));
-
-    const total = vendor.recipe.reduce((acc, el) => acc + Number(el.quantity), 0)
-
-    this.setState({
-      item: newVendor,
-      total
-    });
-  }
-
-  onClose() {
-    this.setState({
-      item: null,
-      quantity: '',
-      total: ''
-    });
-    this.props.onClose();
-  }
-
-  render() {
-    return (
-      <Dialog
-        open={this.props.open}
-        fullWidth={true}
-        maxWidth={'lg'}
-        onClose={this.onClose.bind(this)}
-      >
-        <DialogTitle>{this.props.method}</DialogTitle>
-        <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-          <ReceptModule_Modal_Container
-            method={this.props.method}
-            event={this.state.item}
-            changeItem={this.changeItem.bind(this)}
-            addIngredientsRecipe={this.addIngredientsRecipe.bind(this)}
-            changeQuantity={this.changeQuantity.bind(this)}
-            deleteIngredientsRecipe={this.deleteIngredientsRecipe.bind(this)}
-            total={this.state.total}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={this.props.save.bind(
-              this,
-              this.state.item
-            )}
-            color="primary"
-          >
-            Сохранить
-          </Button>
-        </DialogActions>
-      </Dialog>
-    );
-  }
-}
-
 class ReceptModule_Modal_Edit extends React.Component {
   constructor(props) {
     super(props);
@@ -376,7 +242,7 @@ class ReceptModule_Modal_Edit extends React.Component {
         maxWidth={'lg'}
         onClose={onClose.bind(this)}
       >
-        <DialogTitle>Редактирование рецепта</DialogTitle>
+        <DialogTitle>{ this.props.type == 'new' ? 'Новый рецепт' : 'Редактирование рецепта' }</DialogTitle>
         <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
@@ -437,13 +303,10 @@ class ReceptModule_Modal_Edit extends React.Component {
         </DialogContent>
         <DialogActions>
           <Button
-            onClick={this.props.save.bind(
-              this,
-              this.state.item
-            )}
+            onClick={ this.props.type == 'new' ? this.props.saveNew.bind(this, this.state.item) : this.props.saveEdit.bind(this, this.state.item) }
             color="primary"
           >
-            Сохранить
+            { this.props.type == 'new' ? 'Сохранить' : 'Обновить' }
           </Button>
         </DialogActions>
       </Dialog>
@@ -543,7 +406,7 @@ class ReceptModule_ extends React.Component {
       err_status: false,
       err_text: '',
 
-      type: ''
+      type: 'new'
     };
   }
 
@@ -632,14 +495,12 @@ class ReceptModule_ extends React.Component {
     }
   }
 
-  async openModalNew(id){
+  async openModalNew(){
     let data = {
-      id: id
+      id: 0
     };
   
     let res = await this.getData('get_one', data);
-
-    console.log( res )
 
     let allCount = 0;
 
@@ -655,7 +516,7 @@ class ReceptModule_ extends React.Component {
       all_pf_list: res.all_pf_list,
       storages: res.all_storages,
       allCount: allCount,
-      type: 'edit'
+      type: 'new'
     });
   }
 
@@ -666,13 +527,13 @@ class ReceptModule_ extends React.Component {
   
     let res = await this.getData('get_one', data);
 
-    console.log( res )
-
     let allCount = 0;
 
     res.pf_list.map( ( it ) => { 
       allCount += parseFloat(it.count) 
     } )
+
+    res.rec.app_id = res.apps.find( app => parseInt(app.id) == parseInt(res.rec.app_id) );
 
     this.setState({
       modalDialogEdit: true,
@@ -686,17 +547,33 @@ class ReceptModule_ extends React.Component {
     });
   }
 
-  async saveNewItem(newItem, recipe) {
-    // console.log(newItem)
+  async saveNewItem() {
+    let data = {
+      rec: this.state.rec,
+      pf_list: this.state.pf_list
+    };
+  
+    let res = await this.getData('save_new', data);
 
-    // console.log(recipe)
+    if (res['st'] == true) {
+      this.setState({
+        modalDialogEdit: false,
 
-    // await this.getData('save_new_item', data);
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
 
-    this.setState({
-      modalDialogNew: false,
-      // item
-    });
+      setTimeout(() => {
+        this.getItems();
+      }, 300);
+    } else {
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
+    }
   }
 
   async saveEditItem() {
@@ -760,9 +637,11 @@ class ReceptModule_ extends React.Component {
 
     let check = pf_list.find((el) => el.id === item.id);
 
-    let quantity = document.getElementById('item_for_add_'+item.id).value
+    let quantity = document.getElementById('item_for_add_'+item.id).value;
 
     if( check || quantity < 1) {
+
+      document.getElementById('item_for_add_'+item.id).value = '';
       return;
     }
 
@@ -782,6 +661,8 @@ class ReceptModule_ extends React.Component {
     } )
 
     pf_list.map(el => el.percent = ( 100 / ( allCount / parseFloat(el.count) ) ).toFixed(2));
+
+    document.getElementById('item_for_add_'+item.id).value = '';
 
     this.setState({
       pf_list: pf_list,
@@ -828,23 +709,13 @@ class ReceptModule_ extends React.Component {
 
           <Grid item xs={12} sm={3} mb={3}>
             <Button
-              onClick={this.openModalRecipes.bind(this, 'Новый рецепт')}
+              onClick={this.openModalNew.bind(this)}
               variant="contained"
             >
               Добавить рецепт
             </Button>
           </Grid>
         </Grid>
-
-        <ReceptModule_Modal_New
-          open={this.state.modalDialogNew}
-          onClose={() => {
-            this.setState({ modalDialogNew: false });
-          }}
-          method={this.state.method}
-          event={this.state.itemNew}
-          save={this.saveNewItem.bind(this)}
-        />
 
         <ReceptModule_Modal_Edit
           isOpen={this.state.modalDialogEdit}
@@ -862,7 +733,9 @@ class ReceptModule_ extends React.Component {
           apps={this.state.apps}
           pf_list={this.state.pf_list}
           all_pf_list={this.state.all_pf_list}
-          save={this.saveEditItem.bind(this)}
+          saveEdit={this.saveEditItem.bind(this)}
+          saveNew={this.saveNewItem.bind(this)}
+          type={this.state.type}
         />
 
         <Grid item xs={12}>
