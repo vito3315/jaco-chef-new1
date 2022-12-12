@@ -130,8 +130,9 @@ class StatErrCash_Modal extends React.Component {
         this.props.update();
       } else {
         this.setState({
-          error: res.text,
-          snackbar: true,
+          openAlert: true,
+          err_status: res.st,
+          err_text: res.text,
         });
       }
     }
@@ -163,7 +164,8 @@ class StatErrCash_Modal extends React.Component {
     this.setState({
       item: this.props.item ? this.props.item : null,
       percent: 0,
-      error: '',
+      err_status: true,
+      err_text: '',
     });
 
     this.props.onClose();

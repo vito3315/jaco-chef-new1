@@ -21,14 +21,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
 import Dropzone from 'dropzone';
+
+import ModalImage from "react-modal-image";
 
 import {
   MyDatePickerNew,
@@ -37,6 +32,7 @@ import {
   MyTimePicker,
   MyCheckBox,
   MyTextInput,
+  MyAlert
 } from '../../stores/elements';
 
 const queryString = require('query-string');
@@ -57,18 +53,20 @@ class Fines_err_Modal_item extends React.Component {
   constructor(props) {
     super(props);
 
-    this.handleResize = this.handleResize.bind(this);
-
     this.state = {
       item: null,
-      fullScreen: false,
 
       users: [],
       user: '',
       selected: '',
 
-      snackbar: false,
-      error: '',
+      apps: [],
+      app: '',
+      app_for_search: '',
+
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
@@ -83,56 +81,75 @@ class Fines_err_Modal_item extends React.Component {
       this.setState({
         item: this.props.item,
         users: this.props.item.users,
+        apps: this.props.item.apps,
+        app: this.props.item.apps[0],
       });
     }
   }
 
-  componentDidMount() {
-    this.handleResize();
-    window.addEventListener('resize', this.handleResize);
-  }
+  changeUser(event, value) {
 
-  handleResize() {
-    if (window.innerWidth < 601) {
+    const apps = this.state.apps;
+
+    if (value) {
+      
+      const app = apps.find(app => app.id === (value.new_app === '0' ? value.app_id : value.new_app));
+
       this.setState({
-        fullScreen: true,
+        user: value,
+        selected: value.id,
+        app,
+        app_for_search: app.id,
       });
     } else {
       this.setState({
-        fullScreen: false,
+        user: value,
+        selected: '',
+        app: apps[0],
+        app_for_search: '',
       });
     }
   }
 
-  changeAutocomplite(data, event, value) {
-    if (data === 'user') {
+  changePost(data, event, value) {
+
+    const user = this.state.user;
+    
+    if(user && value.id !== -1) {
       this.setState({
         [data]: value,
-        selected: value ? value.id : '',
       });
     } else {
       this.setState({
         [data]: value,
+        app_for_search: value.id === -1 ? '' : value.id,
+        selected: '',
+        user: '',
       });
     }
+
   }
 
   changeClass(user, event) {
+    const apps = this.state.apps;
+
+    const app = apps.find(app => app.id === (user.new_app === '0' ? user.app_id : user.new_app));
+
     if (event.target.classList.contains('choose_user')) {
       this.setState({
         user: '',
+        app: apps[0],
+        app_for_search: '',
+        selected: '',
       });
     } else {
       this.setState({
         user,
+        app,
+        app_for_search: app.id,
+        selected: user.id,
       });
     }
-
-    event.target.classList.toggle('choose_user');
-
-    this.setState({
-      selected: user.id,
-    });
   }
 
   save() {
@@ -141,8 +158,9 @@ class Fines_err_Modal_item extends React.Component {
 
     if(!user) {
       this.setState({
-        error: 'Укажите сотрудника!',
-        snackbar: true,
+        openAlert: true,
+        err_status: res.st,
+        err_text: 'Укажите сотрудника!',
       });
 
       return;
@@ -164,7 +182,11 @@ class Fines_err_Modal_item extends React.Component {
       users: [],
       user: '',
       selected: '',
-      error: '',
+      apps: [],
+      app: '',
+      app_for_search: '',
+      err_status: true,
+      err_text: '',
     });
 
     this.props.onClose();
@@ -173,32 +195,22 @@ class Fines_err_Modal_item extends React.Component {
   render() {
     return (
     <>
-      <Snackbar
-          open={this.state.snackbar}
-          autoHideDuration={30000}
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          onClose={() => this.setState({ snackbar: false })}
-        >
-          <Alert
-            onClose={() => this.setState({ snackbar: false })}
-            severity={'error'}
-            sx={{ width: '100%' }}
-          >
-            {this.state.error}
-          </Alert>
-        </Snackbar>
-    
+      <MyAlert 
+        isOpen={this.state.openAlert} 
+        onClose={() => this.setState({ openAlert: false }) } 
+        status={this.state.err_status} 
+        text={this.state.err_text} />
     
       <Dialog
         open={this.props.open}
         onClose={this.onClose.bind(this)}
-        fullScreen={this.state.fullScreen}
+        fullScreen={this.props.fullScreen}
         fullWidth={true}
-        maxWidth={'md'}
+        maxWidth={'lg'}
       >
         <DialogTitle className="button">
           {this.props.text}
-          {this.state.fullScreen ? (
+          {this.props.fullScreen ? (
             <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
               <CloseIcon />
             </IconButton>
@@ -231,7 +243,7 @@ class Fines_err_Modal_item extends React.Component {
             <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
               <Typography sx={{ whiteSpace: 'nowrap', fontWeight: 'bold' }}>Комментарии</Typography>
               <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>
-                {this.state.item ? this.state.item.err.comment : 'не указаны'}
+                {this.state.item ? this.state.item.err.comment ? this.state.item.err.comment : 'не указаны' : 'не указаны'}
               </Typography>
             </Grid>
 
@@ -244,9 +256,20 @@ class Fines_err_Modal_item extends React.Component {
 
             <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
               <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Фото ошибки</Typography>
-              <Grid sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
+              <Grid sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }} display="flex" flexDirection="column" justifyContent="center">
                 {this.state.item ? !this.state.item.imgs.length ? 'Фото отсутствует' : (
-                    <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + this.state.item.imgs[0]} style={{ maxWidth: 300, maxHeight: 400 }}/>
+                    this.state.item.imgs.map((img, key) => (
+                      <React.Fragment key={key}>
+                        <ModalImage
+                          className="img_modal"
+                          small={'https://jacochef.ru/src/img/fine_err/uploads/' + img}
+                          large={'https://jacochef.ru/src/img/fine_err/uploads/' + img}
+                          hideDownload={true}
+                          hideZoom={false}
+                          showRotate={true}
+                        />
+                      </React.Fragment>
+                    ))
                   ) : 'Фото отсутствует'}
               </Grid>
             </Grid>
@@ -264,22 +287,33 @@ class Fines_err_Modal_item extends React.Component {
                   </Grid>
                 </Grid>
               ) : (
-                <Grid container spacing={3} justifyContent="center" mt={1}>
-
+                <>
                   <Grid item xs={12} sm={12} sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} align="center">Указать сотрудника</Grid>
 
-                  <Grid item xs={12} sm={6} sx={{ marginLeft: { xs: '24px'} }}>
+                  <Grid item xs={12} sm={6}>
+                    <MyAutocomplite
+                      multiple={false}
+                      data={this.state.apps}
+                      value={this.state.app}
+                      func={this.changePost.bind(this, 'app')}
+                      label="Должность"
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
                     <MyAutocomplite
                       label="Сотрудник"
                       multiple={false}
                       data={this.state.users}
                       value={this.state.user}
-                      func={this.changeAutocomplite.bind(this, 'user')}
+                      func={this.changeUser.bind(this)}
                     />
                   </Grid>
 
                   <Grid item xs={12} sm={12} display="flex" flexWrap="wrap" justifyContent="center">
-                    {this.state.users.map((user, key) => (
+                    {this.state.users
+                    .filter(user => this.state.app_for_search ? user.app_id === this.state.app_for_search || user.new_app === this.state.app_for_search : user)
+                    .map((user, key) => (
                       <React.Fragment key={key}>
                         {!user.img ? null : (
                           <img src={'https://storage.yandexcloud.net/user-img/max-img/' + user.img}
@@ -291,7 +325,7 @@ class Fines_err_Modal_item extends React.Component {
                       </React.Fragment>
                     ))}
                   </Grid>
-                </Grid>
+                </>
             ) : 'ФИО и Фото отсутствует'}
           </Grid>
         </DialogContent>
@@ -323,8 +357,6 @@ class Fines_err_Modal_NewItem extends React.Component {
   constructor(props) {
     super(props);
 
-    this.handleResize = this.handleResize.bind(this);
-
     this.state = {
       points: [],
       point: '',
@@ -337,19 +369,18 @@ class Fines_err_Modal_NewItem extends React.Component {
 
       apps: [],
       app: '',
+      app_for_search: '',
 
       date: '',
       time: '00:00',
       is_active: 0,
       comment: '',
 
-      fullScreen: false,
       selected: '',
 
-      snackbar: false,
-      error: '',
-
-      chooseApp: '',
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
@@ -363,24 +394,7 @@ class Fines_err_Modal_NewItem extends React.Component {
     if (this.props.points !== prevProps.points) {
       this.setState({
         points: this.props.points,
-        point: this.props.points[0].id,
-      });
-    }
-  }
-
-  componentDidMount() {
-    this.handleResize();
-    window.addEventListener('resize', this.handleResize);
-  }
-
-  handleResize() {
-    if (window.innerWidth < 601) {
-      this.setState({
-        fullScreen: true,
-      });
-    } else {
-      this.setState({
-        fullScreen: false,
+        point: this.props.point,
       });
     }
   }
@@ -388,7 +402,7 @@ class Fines_err_Modal_NewItem extends React.Component {
   changeUser(event, value) {
 
     const apps = this.state.apps;
-    
+
     if (value) {
       
       const app = apps.find(app => app.id === (value.new_app === '0' ? value.app_id : value.new_app));
@@ -397,13 +411,14 @@ class Fines_err_Modal_NewItem extends React.Component {
         user: value,
         selected: value.id,
         app,
-        chooseApp: '',
+        app_for_search: app.id,
       });
     } else {
       this.setState({
         user: value,
         selected: '',
         app: apps[0],
+        app_for_search: '',
       });
     }
   }
@@ -431,7 +446,7 @@ class Fines_err_Modal_NewItem extends React.Component {
   changePost(data, event, value) {
 
     const user = this.state.user;
-
+    
     if(user && value.id !== -1) {
       this.setState({
         [data]: value,
@@ -439,7 +454,7 @@ class Fines_err_Modal_NewItem extends React.Component {
     } else {
       this.setState({
         [data]: value,
-        chooseApp: value.id,
+        app_for_search: value.id === -1 ? '' : value.id,
         selected: '',
         user: '',
       });
@@ -462,11 +477,12 @@ class Fines_err_Modal_NewItem extends React.Component {
 
     this.setState({
       [data]: event.target.value,
-      chooseApp: '',
+      app_for_search: '',
       fine: '',
       time: '00:00',
       is_active: 0,
       comment: '',
+      selected: '',
     });
   }
 
@@ -512,48 +528,37 @@ class Fines_err_Modal_NewItem extends React.Component {
 
     const app = apps.find(app => app.id === (user.new_app === '0' ? user.app_id : user.new_app));
 
-    this.setState({
-      chooseApp: '',
-      app,
-    });
-
     if (event.target.classList.contains('choose_user')) {
       this.setState({
         user: '',
         app: apps[0],
+        app_for_search: '',
+        selected: '',
       });
     } else {
       this.setState({
         user,
+        app,
+        app_for_search: app.id,
+        selected: user.id,
       });
     }
-
-    event.target.classList.toggle('choose_user');
-
-    this.setState({
-      selected: user.id,
-    });
+  
   }
 
   async save() {
     if (!this.click) {
       this.click = true;
 
-      const point_id = this.state.point;
-      const fine = this.state.fine;
-      const date = this.state.date;
-      const user = this.state.user;
-      const time = this.state.time;
-      const comment = this.state.comment;
-
-      const is_active = this.state.is_active;
+      const {point_id, fine, date, user, time, comment, is_active} = this.state;
 
       if (!point_id || !fine || !date || !time || time === '00:00' || comment.length == 0 || ( !user.id && is_active === false ) || !fine.id) {
         const text = 'Для сохранения новой Ошибки, необходимо выбрать: Точку, Дату, Ошибку, Сотрудника и указать Время ошибки';
 
         this.setState({
-          error: text,
-          snackbar: true,
+          openAlert: true,
+          err_status: res.st,
+          err_text: res.text,
         });
 
         setTimeout(() => {
@@ -576,12 +581,13 @@ class Fines_err_Modal_NewItem extends React.Component {
 
       const res = await this.props.getData('save_new', data);
 
-      if( res.st === false ){
+      if(res.st === false){
         this.setState({
-          error: res.text,
-          snackbar: true,
+          openAlert: true,
+          err_status: res.st,
+          err_text: res.text,
         });
-      }else{
+      } else {
         if( this.myDropzone['files'].length > 0 ){
           var i = 0;
 
@@ -609,12 +615,13 @@ class Fines_err_Modal_NewItem extends React.Component {
     
               if (check_img) {
                 this.setState({
-                  error: 'Ошибка при загрузке фотографии',
-                  snackbar: true,
+                  openAlert: true,
+                  err_status: false,
+                  err_text: 'Ошибка при загрузке фотографии',
                 });
     
                 return;
-              }else{
+              } else {
                 setTimeout( () => {
                   this.onClose();
                 }, 1000 )
@@ -625,7 +632,7 @@ class Fines_err_Modal_NewItem extends React.Component {
           }
 
           this.myDropzone.processQueue();
-        }else{
+        } else {
           this.onClose();
         }
       }
@@ -657,7 +664,10 @@ class Fines_err_Modal_NewItem extends React.Component {
 
       selected: '',
 
-      chooseApp: '',
+      err_status: true,
+      err_text: '',
+
+      app_for_search: '',
     });
 
     this.props.onCloseFull();
@@ -666,31 +676,22 @@ class Fines_err_Modal_NewItem extends React.Component {
   render() {
     return (
       <>
-        <Snackbar
-          open={this.state.snackbar}
-          autoHideDuration={30000}
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          onClose={() => this.setState({ snackbar: false })}
-        >
-          <Alert
-            onClose={() => this.setState({ snackbar: false })}
-            severity={'error'}
-            sx={{ width: '100%' }}
-          >
-            {this.state.error}
-          </Alert>
-        </Snackbar>
+        <MyAlert 
+          isOpen={this.state.openAlert} 
+          onClose={() => this.setState({ openAlert: false }) } 
+          status={this.state.err_status} 
+          text={this.state.err_text} />
 
         <Dialog
           open={this.props.open}
           onClose={this.onClose.bind(this)}
-          fullScreen={this.state.fullScreen}
+          fullScreen={this.props.fullScreen}
           fullWidth={true}
           maxWidth={'lg'}
         >
           <DialogTitle className="button">
             {this.props.text}
-            {this.state.fullScreen ? (
+            {this.props.fullScreen ? (
               <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
                 <CloseIcon />
               </IconButton>
@@ -701,6 +702,7 @@ class Fines_err_Modal_NewItem extends React.Component {
 
               <Grid item xs={12} sm={6}>
                 <MySelect
+                  is_none={false}
                   data={this.state.points}
                   value={this.state.point}
                   func={this.changePoint.bind(this, 'point')}
@@ -754,7 +756,6 @@ class Fines_err_Modal_NewItem extends React.Component {
                     />
                   </Grid>
 
-
                   <Grid item xs={12} sm={12}>
                     <div
                       className="dropzone"
@@ -784,12 +785,13 @@ class Fines_err_Modal_NewItem extends React.Component {
                   </Grid>
 
                   <Grid item xs={12} sm={12} display="flex" flexWrap="wrap" justifyContent="center">
-                    {this.state.users.map((user, key) => (
+                    {this.state.users
+                    .filter(user => this.state.app_for_search ? user.app_id === this.state.app_for_search || user.new_app === this.state.app_for_search : user)
+                    .map((user, key) => (
                       <React.Fragment key={key}>
                         {!user.img ? null : (
                           <img src={'https://storage.yandexcloud.net/user-img/max-img/' + user.img}
-                            style={{ maxWidth: 300, maxHeight: 300, 
-                              border: this.state.chooseApp === (user.new_app === '0' ?  user.app_id : user.new_app) ? '10px #00a550 solid' : null }}
+                            style={{ maxWidth: 300, maxHeight: 300 }}
                             onClick={this.changeClass.bind(this, user)}
                             className={this.state.selected === user.id ? 'choose_user' : ''}
                           />
@@ -851,10 +853,12 @@ class Fines_err_Table extends React.Component {
                 <TableCell>{item.date_close}</TableCell>
                 <TableCell>{item.fine_name}</TableCell>
                 <TableCell>
-                  {item.imgs.length == 0 ? null : (
-                    <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + item.imgs[0]}
-                      style={{ maxWidth: 150, maxHeight: 150 }}
-                    />
+                  {!item.imgs.length ? null : (
+                    item.imgs.map((img, key) => (
+                      <React.Fragment key={key}>
+                        <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + img} style={{ maxWidth: 150, maxHeight: 150, marginRight: 5 }}/>
+                      </React.Fragment>
+                    ))
                   )}
                 </TableCell>
               </TableRow>
@@ -870,10 +874,12 @@ class Fines_err_Table extends React.Component {
                 <TableCell>{item.date_close}</TableCell>
                 <TableCell>{item.fine_name}</TableCell>
                 <TableCell>
-                  {item.imgs.length == 0 ? null : (
-                    <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + item.imgs[0]}
-                      style={{ maxWidth: 150, maxHeight: 150 }}
-                    />
+                  {!item.imgs.length ? null : (
+                    item.imgs.map((img, key) => (
+                      <React.Fragment key={key}>
+                        <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + img} style={{ maxWidth: 150, maxHeight: 150, marginRight: 5 }}/>
+                      </React.Fragment>
+                    ))
                   )}
                 </TableCell>
               </TableRow>
@@ -911,6 +917,11 @@ class Fines_err_ extends React.Component {
       text: '',
 
       item: null,
+      fullScreen: false,
+
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
@@ -921,9 +932,24 @@ class Fines_err_ extends React.Component {
       points: data.points,
       point: data.points[0].id,
       module_name: data.module_info.name,
+      date_start: formatDate(new Date()),
+      date_end: formatDate(new Date()),
     });
 
     document.title = data.module_info.name;
+  }
+
+  handleResize() {
+
+    if (window.innerWidth < 601) {
+          this.setState({
+            fullScreen: true,
+          });
+        } else {
+          this.setState({
+            fullScreen: false,
+          });
+        }
   }
 
   getData = (method, data = {}) => {
@@ -992,6 +1018,8 @@ class Fines_err_ extends React.Component {
   }
 
   async openModal(method, text, id) {
+    this.handleResize();
+
     if (method === 'newItem') {
       const res = await this.getData('get_all_for_new');
 
@@ -1035,22 +1063,31 @@ class Fines_err_ extends React.Component {
   }
 
   async saveEditItem(data) {
-    console.log(data);
+    // console.log(data);
 
     let res = await this.getData('update', data);
 
-    if( res.st ){
+    if(res.st) {
+
       this.setState({ modalDialog: false });
 
       setTimeout( () => {
         this.getItems();
       }, 300 )
-    }else{
-      alert( res.text )
+
+    } else {
+
+      this.setState({
+        openAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+
     }
   }
 
   async saveNewItem(data) {
+
     console.log(data);
 
     // await this.getData('save_new', data);
@@ -1081,15 +1118,23 @@ class Fines_err_ extends React.Component {
           <CircularProgress color="inherit" />
         </Backdrop>
 
+        <MyAlert 
+          isOpen={this.state.openAlert} 
+          onClose={() => this.setState({ openAlert: false }) } 
+          status={this.state.err_status} 
+          text={this.state.err_text} />
+
         <Fines_err_Modal_NewItem
           open={this.state.modalDialogNew}
           onClose={this.closeDialog.bind(this)}
           onCloseFull={this.fullCloseDialog.bind(this)}
           method={this.state.method}
           points={this.state.pointsDialog}
+          point={this.state.point}
           text={this.state.text}
           getData={this.getData.bind(this)}
           save={this.saveNewItem.bind(this)}
+          fullScreen={this.state.fullScreen}
         />
 
         <Fines_err_Modal_item
@@ -1100,6 +1145,7 @@ class Fines_err_ extends React.Component {
           text={this.state.text}
           item={this.state.item}
           save={this.saveEditItem.bind(this)}
+          fullScreen={this.state.fullScreen}
         />
 
         <Grid container spacing={3}>
@@ -1118,6 +1164,7 @@ class Fines_err_ extends React.Component {
 
           <Grid item xs={12} sm={3}>
             <MySelect
+              is_none={false}
               data={this.state.points}
               value={this.state.point}
               func={this.changePoint.bind(this)}
