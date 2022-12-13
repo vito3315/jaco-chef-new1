@@ -39,6 +39,20 @@ import {
 
 const queryString = require('query-string');
 
+function formatDate(date) {
+  var d = new Date(date),
+      month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear();
+
+  if (month.length < 2) 
+      month = '0' + month;
+  if (day.length < 2) 
+      day = '0' + day;
+
+  return [year, month, day].join('-');
+}
+
 class ReceptModule_Modal_Container extends React.Component {
   constructor(props) {
     super(props);
@@ -206,7 +220,7 @@ class ReceptModule_Modal_Edit extends React.Component {
     this.state = {
       item: null,
 
-      ItemTab: '2',
+      ItemTab: '0',
 
       quantity: '',
 
@@ -214,7 +228,7 @@ class ReceptModule_Modal_Edit extends React.Component {
     };
   }
 
-  static getDerivedStateFromProps(nextProps, prevState) {
+  /*static getDerivedStateFromProps(nextProps, prevState) {
 
     if (!nextProps.event) {
       return null;
@@ -224,16 +238,32 @@ class ReceptModule_Modal_Edit extends React.Component {
       return { item: nextProps.event }; 
     }
     return null;
-  }
+  }*/
 
   changeTab(event, value) {
     this.setState({
       ItemTab: value,
     });
+
+    if( parseInt(value) === -1 ){
+      this.props.openModalHistNew();
+    }
+
+    if( parseInt(value) === 0 ){
+      console.log('Edit', this.props.rec && this.props.rec.rec_id ? this.props.rec.rec_id : this.props.rec.id)
+      this.props.openModalEdit( this.props.rec && this.props.rec.rec_id ? this.props.rec.rec_id : this.props.rec.id );
+    }
+
+    if( parseInt(value) > 0 ){
+      console.log('HistEdit', value)
+      this.props.openModalHistEdit(value);
+    }
   }
 
   render() {
     const { isOpen, onClose, changeItem, changeItemData, changeItemChecked, addIngredientsRecipe, dellIngredientsRecipe, rec, storages, apps, pf_list, all_pf_list, allCount } = this.props;
+
+    const { changeDate, dateUpdate, saveNewHist, saveEditHist, hist } = this.props;
 
     return (
       <Dialog
@@ -252,62 +282,80 @@ class ReceptModule_Modal_Edit extends React.Component {
                     onChange={this.changeTab.bind(this)}
                     variant="fullWidth"
                   >
-                    <Tab label="Дата обновления" value="1" />
-                    <Tab label="Текущая" value="2" />
-                    <Tab label="Добавить" value="3" />
+                    { hist.map( (item, key) =>
+                      <Tab key={key} label={item.date_start} value={item.id} />
+                    ) }
+                    <Tab label="Текущая" value="0" />
+                    <Tab label="Добавить" value="-1" />
                   </TabList>
                 </Box>
 
-                <TabPanel value="1">
-                  <Grid container spacing={3} mb={2}>
-                    <Grid item xs={12} sm={4}>
+                <Grid container spacing={3} style={{ marginTop: 5 }}>
+                  { parseInt(this.state.ItemTab) == -1 || parseInt(this.state.ItemTab) > 0 ?
+                    <Grid item xs={4}>
                       <MyDatePickerNew
                         label="Дата обновления"
-                        // value={this.state.date_start}
-                        // func={this.changeDateRange.bind(this, 'date_start')}
+                        value={dateUpdate}
+                        func={changeDate.bind(this)}
                       />
                     </Grid>
-                  </Grid>
-                </TabPanel>
-                <TabPanel value="2">
-                  <ReceptModule_Modal_Container
-                    rec={rec}
-                    allCount={allCount}
-                    storages={storages}
-                    apps={apps}
-                    pf_list={pf_list}
-                    all_pf_list={all_pf_list}
-                    changeItem={changeItem.bind(this)}
-                    changeItemData={changeItemData.bind(this)}
-                    changeItemChecked={changeItemChecked.bind(this)}
-                    addIngredientsRecipe={addIngredientsRecipe.bind(this)}
-                    dellIngredientsRecipe={dellIngredientsRecipe.bind(this)}
-                  />
-                </TabPanel>
+                      :
+                    null
+                  }
 
-                <TabPanel value="3">
-                  <Grid container spacing={3} mb={2}>
-                    <Grid item xs={12} sm={4}>
-                      <MyDatePickerNew
-                        label="Дата обновления"
-                        // value={this.state.date_start}
-                        // func={this.changeDateRange.bind(this, 'date_start')}
-                      />
-                    </Grid>
-                  </Grid>
+                  <Grid item xs={12}>
+                    <ReceptModule_Modal_Container
+                      rec={rec}
+                      allCount={allCount}
+                      storages={storages}
+                      apps={apps}
+                      pf_list={pf_list}
+                      all_pf_list={all_pf_list}
+                      changeItem={changeItem.bind(this)}
+                      changeItemData={changeItemData.bind(this)}
+                      changeItemChecked={changeItemChecked.bind(this)}
+                      addIngredientsRecipe={addIngredientsRecipe.bind(this)}
+                      dellIngredientsRecipe={dellIngredientsRecipe.bind(this)}
+                    />
+                  </Grid>  
+                </Grid>
                   
-                </TabPanel>
+                
               </TabContext>
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={ this.props.type == 'new' ? this.props.saveNew.bind(this, this.state.item) : this.props.saveEdit.bind(this, this.state.item) }
-            color="primary"
-          >
-            { this.props.type == 'new' ? 'Сохранить' : 'Обновить' }
-          </Button>
+          { parseInt( this.state.ItemTab ) == -1 ?
+            <Button
+              onClick={saveNewHist.bind(this) }
+              color="primary"
+            >
+              Сохранить
+            </Button>
+              :
+            null
+          }
+          { parseInt( this.state.ItemTab ) == 0 ?
+            <Button
+              onClick={ this.props.type == 'new' ? this.props.saveNew.bind(this, this.state.item) : this.props.saveEdit.bind(this, this.state.item) }
+              color="primary"
+            >
+              { this.props.type == 'new' ? 'Сохранить' : 'Обновить' }
+            </Button>
+              :
+            null
+          }
+          { parseInt( this.state.ItemTab ) > 0 ?
+            <Button
+              onClick={saveEditHist.bind(this) }
+              color="primary"
+            >
+              Сохранить
+            </Button>
+              :
+            null
+          }
         </DialogActions>
       </Dialog>
     );
@@ -315,35 +363,19 @@ class ReceptModule_Modal_Edit extends React.Component {
 }
 
 class ReceptModule_Table extends React.Component {
-  shouldComponentUpdate(nextProps) {
-    // console.log(nextProps.recipes);
-    // console.log(this.props.recipes);
-
-    // var array1 = nextProps.recipes;
-    // var array2 = this.props.recipes;
-
-    // var is_same = (array1.length == array2.length) && array1.every(function(element, index) {
-    //   return element === array2[index];
-    // });
-
-    //console.log(is_same)
-
-    // return is_same;
-    return true;
-  }
-
   render() {
-    const { recipes, openModalEdit } = this.props;
+    const { recipes, openModalEdit, changeTableCheck } = this.props;
 
     return (
       <Table>
         <TableHead>
           <TableRow>
             <TableCell style={{ width: '2%' }}>#</TableCell>
-            <TableCell style={{ width: '2%' }}></TableCell>
+            <TableCell style={{ width: '3%' }}>Активность</TableCell>
             <TableCell style={{ width: '3%' }}>Ревизия</TableCell>
-            <TableCell style={{ width: '30%' }}>Название</TableCell>
-            <TableCell style={{ width: '65%' }}>Место хранения</TableCell>
+            <TableCell style={{ width: '10%' }}>Обновление</TableCell>
+            <TableCell style={{ width: '25%' }}>Название</TableCell>
+            <TableCell style={{ width: '59%' }}>Место хранения</TableCell>
           </TableRow>
         </TableHead>
 
@@ -352,19 +384,20 @@ class ReceptModule_Table extends React.Component {
             <TableRow key={key}>
               <TableCell>{key+1}</TableCell>
               <TableCell>
-                {parseInt(item.is_show) == 1 ? (
-                  <VisibilityIcon />
-                ) : (
-                  <VisibilityOffIcon />
-                )}
+                <MyCheckBox
+                  label=""
+                  value={parseInt(item.is_show) == 1 ? true : false}
+                  func={ changeTableCheck.bind(this, item.id, 'is_show') }
+                />
               </TableCell>
               <TableCell>
                 <MyCheckBox
                   label=""
                   value={parseInt(item.show_in_rev) == 1 ? true : false}
-                  //func={ this.props.changeTableItem.bind(this, it.id, this.props.type[0]) }
+                  func={ changeTableCheck.bind(this, item.id, 'show_in_rev') }
                 />
               </TableCell>
+              <TableCell>{item.date_update}</TableCell>
               <TableCell
                 style={{ cursor: 'pointer' }}
                 onClick={openModalEdit.bind(this, item.id)}
@@ -395,6 +428,9 @@ class ReceptModule_ extends React.Component {
       pf_list: [],
       all_pf_list: [],
       allCount: 0,
+      hist: [],
+
+      dateUpdate: '',
 
       modalDialogNew: false,
       modalDialogEdit: false,
@@ -520,6 +556,33 @@ class ReceptModule_ extends React.Component {
     });
   }
 
+  async openModalHistNew(){
+    let data = {
+      id: this.state.rec.rec_id ? this.state.rec.rec_id : this.state.rec.id
+    };
+  
+    let res = await this.getData('get_one', data);
+
+    let allCount = 0;
+
+    res.pf_list.map( ( it ) => { 
+      allCount += parseFloat(it.count) 
+    } )
+
+    res.rec.app_id = res.apps.find( app => parseInt(app.id) == parseInt(res.rec.app_id) );
+
+    this.setState({
+      modalDialogEdit: true,
+      rec: res.rec,
+      apps: res.apps,
+      pf_list: res.pf_list,
+      all_pf_list: res.all_pf_list,
+      storages: res.all_storages,
+      allCount: allCount,
+      type: 'edit'
+    });
+  }
+
   async openModalEdit(id){
     let data = {
       id: id
@@ -543,6 +606,37 @@ class ReceptModule_ extends React.Component {
       all_pf_list: res.all_pf_list,
       storages: res.all_storages,
       allCount: allCount,
+      hist: res.hist,
+      type: 'edit'
+    });
+  }
+
+  async openModalHistEdit(id){
+    let data = {
+      rec_id: this.state.rec.id,
+      hist_id: id
+    };
+  
+    let res = await this.getData('get_one_hist', data);
+
+    let allCount = 0;
+
+    res.pf_list.map( ( it ) => { 
+      allCount += parseFloat(it.count) 
+    } )
+
+    res.rec.app_id = res.apps.find( app => parseInt(app.id) == parseInt(res.rec.app_id) );
+
+    this.setState({
+      modalDialogEdit: true,
+      rec: res.rec,
+      apps: res.apps,
+      pf_list: res.pf_list,
+      all_pf_list: res.all_pf_list,
+      storages: res.all_storages,
+      allCount: allCount,
+      hist: res.hist,
+      dateUpdate: res.rec.date_start,
       type: 'edit'
     });
   }
@@ -583,6 +677,66 @@ class ReceptModule_ extends React.Component {
     };
   
     let res = await this.getData('save_edit', data);
+
+    if (res['st'] == true) {
+      this.setState({
+        modalDialogEdit: false,
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+
+      setTimeout(() => {
+        this.getItems();
+      }, 300);
+    } else {
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
+    }
+  }
+
+  async saveNewHist() {
+    let data = {
+      date_update: this.state.dateUpdate,
+      rec: this.state.rec,
+      pf_list: this.state.pf_list
+    };
+  
+    let res = await this.getData('save_new_hist', data);
+
+    if (res['st'] == true) {
+      this.setState({
+        modalDialogEdit: false,
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+
+      setTimeout(() => {
+        this.getItems();
+      }, 300);
+    } else {
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
+    }
+  }
+
+  async saveEditHist(){
+    let data = {
+      date_update: this.state.dateUpdate,
+      rec: this.state.rec,
+      pf_list: this.state.pf_list
+    };
+  
+    let res = await this.getData('save_edit_hist', data);
 
     if (res['st'] == true) {
       this.setState({
@@ -689,6 +843,34 @@ class ReceptModule_ extends React.Component {
     });
   }
 
+  changeDate(data, event){
+    this.setState({
+      dateUpdate: formatDate(data)
+    })
+  }
+
+  async changeTableCheck(id, type, event, value){
+    let data = {
+      type: type,
+      rec_id: id,
+      value: value ? 1 : 0
+    };
+  
+    let res = await this.getData('save_check', data);
+
+    if (res['st'] == true) {
+      setTimeout(() => {
+        this.getItems();
+      }, 300);
+    } else {
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      })
+    }
+  }
+
   render() {
     return (
       <>
@@ -719,14 +901,13 @@ class ReceptModule_ extends React.Component {
 
         <ReceptModule_Modal_Edit
           isOpen={this.state.modalDialogEdit}
-          onClose={() => {
-            this.setState({ modalDialogEdit: false });
-          }}
+          onClose={() => { this.setState({ modalDialogEdit: false }); }}
           changeItem={this.changeItem.bind(this)}
           changeItemData={this.changeItemData.bind(this)}
           changeItemChecked={this.changeItemChecked.bind(this)}
           addIngredientsRecipe={this.addIngredientsRecipe.bind(this)}
           dellIngredientsRecipe={this.dellIngredientsRecipe.bind(this)}
+          openModalHistNew={this.openModalHistNew.bind(this)}
           rec={this.state.rec}
           allCount={this.state.allCount}
           storages={this.state.storages}
@@ -736,6 +917,13 @@ class ReceptModule_ extends React.Component {
           saveEdit={this.saveEditItem.bind(this)}
           saveNew={this.saveNewItem.bind(this)}
           type={this.state.type}
+          changeDate={this.changeDate.bind(this)}
+          dateUpdate={this.state.dateUpdate}
+          saveNewHist={this.saveNewHist.bind(this)}
+          hist={this.state.hist}
+          openModalHistEdit={this.openModalHistEdit.bind(this)}
+          saveEditHist={this.saveEditHist.bind(this)}
+          openModalEdit={this.openModalEdit.bind(this)}
         />
 
         <Grid item xs={12}>
@@ -744,6 +932,7 @@ class ReceptModule_ extends React.Component {
             isOpen={this.state.modalDialogEdit}
             onClose={ () => { this.setState({ modalDialogEdit: false }) } }
             openModalEdit={this.openModalEdit.bind(this)}
+            changeTableCheck={this.changeTableCheck.bind(this)}
           />
         </Grid>
       </>
