@@ -85,6 +85,7 @@ const HotMap = React.lazy(() => import("../hot_map"));
 const ShowCook = React.lazy(() => import("../show_cook"));
 const СafeUprEdit = React.lazy(() => import("../cafe_upr_edit"));
 const CheckCheck = React.lazy(() => import("../check_check"));
+const OptionToWin = React.lazy(() => import("../option_to_win"));
 
 const CountUsers = React.lazy(() => import("../count_users"));
 const Fines = React.lazy(() => import("../fines"));
@@ -368,6 +369,7 @@ export function App () {
                   <Route path={'/concenter'} exact={ true } element={ <Concenter /> } />
                   <Route path={'/socialnetwork'} exact={ true } element={ <SocialNetwork /> } />
                   <Route path={'/cat_work'} exact={ true } element={ <CatWork /> } />
+                  <Route path={'/option_to_win'} exact={ true } element={ <OptionToWin /> } />
 
                   <Route path={'/app_work_point'} exact={ true } element={ <AppWorkPoint /> } />
                   <Route path={'/app_work'} exact={ true } element={ <AppWork /> } />
