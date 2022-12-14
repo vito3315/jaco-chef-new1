@@ -447,13 +447,14 @@ class OptionToWin_ extends React.Component {
                   {this.state.items.map((item, key) => (
                     <TableRow key={key} hover>
                       <TableCell>{key + 1}</TableCell>
-                      <TableCell onClick={this.openModal.bind(this, 'editItem', 'Редактирование жалобы', item.id)} style={{color: '#ff1744', fontWeight: 700, cursor: 'pointer'}}>
+                      <TableCell onClick={this.openModal.bind(this, 'editItem', 'Редактирование жалобы', item.id)} style={{fontWeight: 700, cursor: 'pointer'}}>
                         {item.name}
                       </TableCell>
-                      <TableCell onClick={this.changeItemChecked.bind(this, item.id, item.is_active, 'editItem')}>
+                      <TableCell>
                         <MyCheckBox
                           label=""
                           value={parseInt(item.is_active) == 1 ? true : false}
+                          onClick={this.changeItemChecked.bind(this, item.id, item.is_active, 'editItem')}
                         />
                       </TableCell>
                     </TableRow>
