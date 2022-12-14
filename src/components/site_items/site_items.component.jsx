@@ -1512,7 +1512,7 @@ class SiteItems_ extends React.Component {
                     <TabContext value={this.state.ItemTab1}>
                       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <TabList onChange={ this.changeTab1.bind(this) } variant="fullWidth">
-                        { this.state.openHist.map( (item, key) => 
+                          { this.state.openHist.map( (item, key) => 
                             <Tab key={key} label={item.date_start} value={item.id} />
                           ) }
                           <Tab label="Текущая" value="0" />
