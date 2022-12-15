@@ -6,6 +6,9 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -283,34 +286,6 @@ class CitiesModules_ extends React.Component {
     }
   }
 
-  async changeItemChecked(id, is_show, mark) {
-   
-    const is_show_edit = parseInt(is_show) == 1 ? 0 : 1;
-
-    const cities = this.state.cities;
-
-    cities.map((city) => {
-      if (city.id === id) {
-        city.is_show = is_show_edit;
-      }
-    });
-
-    this.setState({
-      cities,
-      mark,
-    });
-
-    const data = {
-      city_id: id,
-    };
-
-    const item = await this.getData('get_one', data);
-
-    item.city.is_show = is_show_edit;
-
-    this.save(item.city);
-  }
-
   async save(item) {
 
     if (this.state.mark === 'newItem') {
@@ -435,13 +410,7 @@ class CitiesModules_ extends React.Component {
                         {item.name}
                       </TableCell>
                       <TableCell>{item.lavel_name}</TableCell>
-                      <TableCell >
-                        <MyCheckBox
-                          label=""
-                          value={parseInt(item.is_show) == 1 ? true : false}
-                          func={this.changeItemChecked.bind(this, item.id, item.is_show, 'editItem')}
-                        />
-                      </TableCell>
+                      <TableCell >{parseInt(item.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon />}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
