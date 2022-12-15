@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import CheckIcon from '@mui/icons-material/Check';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -907,12 +908,14 @@ class Fines_err_Table extends React.Component {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell style={{ width: '10%' }}>Кто добавил</TableCell>
-              <TableCell style={{ width: '10%' }}>Сотрудник</TableCell>
-              <TableCell style={{ width: '10%' }}>Дата ошибки</TableCell>
-              <TableCell style={{ width: '10%' }}>Дата закрытия</TableCell>
-              <TableCell style={{ width: '30%' }}>Ошибка</TableCell>
-              <TableCell style={{ width: '30%' }}>Фото</TableCell>
+              <TableCell>Кто добавил</TableCell>
+              <TableCell>Сотрудник</TableCell>
+              <TableCell>Дата ошибки</TableCell>
+              <TableCell>Дата закрытия</TableCell>
+              <TableCell>Ошибка</TableCell>
+              <TableCell>Фото</TableCell>
+              <TableCell>Обжалована</TableCell>
+              <TableCell>Изменина сумма</TableCell>
             </TableRow>
           </TableHead>
 
@@ -933,6 +936,9 @@ class Fines_err_Table extends React.Component {
                     ))
                   )}
                 </TableCell>
+
+                <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.change_win) == 1 ? <CheckIcon /> : null }</TableCell>
+                <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.change_sum) == 1 ? <CheckIcon /> : null }</TableCell>
               </TableRow>
             ))}
             {this.props.all_list.map((item, i) => (
@@ -952,6 +958,9 @@ class Fines_err_Table extends React.Component {
                     ))
                   )}
                 </TableCell>
+
+                <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.change_win) == 1 ? <CheckIcon /> : null }</TableCell>
+                <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.change_sum) == 1 ? <CheckIcon /> : null }</TableCell>
               </TableRow>
             ))}
           </TableBody>
