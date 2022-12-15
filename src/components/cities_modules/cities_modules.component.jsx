@@ -21,11 +21,11 @@ import TableRow from '@mui/material/TableRow';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MyTextInput, MyAutocomplite, MyCheckBox } from '../../stores/elements';
+import { MyTextInput, MySelect, MyCheckBox } from '../../stores/elements';
 
 const queryString = require('query-string');
 
-class OptionToWin_Modal extends React.Component {
+class CitiesModules_Modal extends React.Component {
   constructor(props) {
     super(props);
 
@@ -51,37 +51,17 @@ class OptionToWin_Modal extends React.Component {
   changeItem(data, event) {
     const item = this.state.item;
 
-    item.err[data] = event.target.value;
+    item.city[data] = event.target.value;
 
     this.setState({
       item,
     });
   }
 
-  changeItemAutocomplite(data, event, value) {
-    const item = this.state.item;
-
-    if (this.props.mark === 'newItem') {
-      item.err[data] = value;
-
-      this.setState({
-        item,
-      });
-    }
-
-    if (this.props.mark === 'editItem') {
-      item[data] = value;
-
-      this.setState({
-        item,
-      });
-    }
-  }
-
   changeItemChecked(data, event) {
     const item = this.state.item;
 
-    item.err[data] = event.target.checked === true ? 1 : 0;
+    item.city[data] = event.target.checked === true ? 1 : 0;
 
     this.setState({
       item,
@@ -91,13 +71,7 @@ class OptionToWin_Modal extends React.Component {
   save() {
     const item = this.state.item;
 
-    if (this.props.mark === 'newItem') {
-      this.props.save(item.err);
-    }
-
-    if (this.props.mark === 'editItem') {
-      this.props.save(item);
-    }
+    this.props.save(item.city);
 
     this.onClose();
   }
@@ -129,59 +103,65 @@ class OptionToWin_Modal extends React.Component {
         </DialogTitle>
         <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
           <Grid container spacing={3}>
+            {this.props.mark === 'newItem' ? (
+              <>
+                <Grid item xs={12} sm={4}>
+                  <MyTextInput
+                    label="Название города"
+                    value={this.state.item ? this.state.item.city.name : ''}
+                    func={this.changeItem.bind(this, 'name')}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <MyTextInput
+                    label="Склонение города (Меня нет в ...)"
+                    value={this.state.item ? this.state.item.city.name_2 : ''}
+                    func={this.changeItem.bind(this, 'name_2')}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <MyTextInput
+                    label="Адрес (URL)"
+                    value={this.state.item ? this.state.item.city.link : ''}
+                    func={this.changeItem.bind(this, 'link')}
+                  />
+                </Grid>
+              </>
+            ) : null}
+
+            <Grid item xs={12} sm={6}>
+              <MySelect
+                label="Уровень цен"
+                is_none={false}
+                data={this.state.item ? this.state.item.lavel_price : []}
+                value={this.state.item ? this.state.item.city.price_lavel_id : ''}
+                func={this.changeItem.bind(this, 'price_lavel_id')}
+              />
+            </Grid>
+
             <Grid item xs={12} sm={6}>
               <MyTextInput
-                label="Наименование"
-                value={this.state.item ? this.state.item.err.name : ''}
-                func={this.changeItem.bind(this, 'name')}
+                label="Телефон контакт-центра"
+                value={this.state.item ? this.state.item.city.phone : ''}
+                func={this.changeItem.bind(this, 'phone')}
               />
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <MyAutocomplite
-                label="Варианты решения"
-                multiple={true}
-                data={this.state.item ? this.state.item.err_to_win ? this.state.item.err_to_win : this.state.item.all_wins : []}
-                value={this.state.item ? this.state.item.this_wins ? this.state.item.this_wins : this.state.item.err.id_win : []}
-                func={this.changeItemAutocomplite.bind(this, this.props.mark === 'newItem' ? 'id_win' : 'this_wins')}
+              <MyTextInput
+                label="Коэф. роллов для бонуса (С текущего периода)"
+                value={this.state.item ? this.state.item.city.k_rolls : ''}
+                func={this.changeItem.bind(this, 'k_rolls')}
               />
             </Grid>
 
-            <Grid item xs={12} sm={4}>
-              <MyAutocomplite
-                label="Этапы ошибки роллы"
-                multiple={true}
-                data={this.state.item ? this.state.item.all_stages ? this.state.item.all_stages : this.state.item.stages : []}
-                value={this.state.item ? this.state.item.this_stages_1 ? this.state.item.this_stages_1 : this.state.item.err.stage_err_1 : []}
-                func={this.changeItemAutocomplite.bind(this, this.props.mark === 'newItem' ? 'stage_err_1' : 'this_stages_1')}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={4}>
-              <MyAutocomplite
-                label="Этапы ошибки пицца"
-                multiple={true}
-                data={this.state.item ? this.state.item.all_stages ? this.state.item.all_stages : this.state.item.stages : []}
-                value={this.state.item ? this.state.item.this_stages_2 ? this.state.item.this_stages_2 : this.state.item.err.stage_err_2 : []}
-                func={this.changeItemAutocomplite.bind(this, this.props.mark === 'newItem' ? 'stage_err_2' : 'this_stages_2')}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={4}>
-              <MyAutocomplite
-                label="Этапы ошибки напитки / допы"
-                multiple={true}
-                data={this.state.item ? this.state.item.all_stages ? this.state.item.all_stages : this.state.item.stages : []}
-                value={this.state.item ? this.state.item.this_stages_3 ? this.state.item.this_stages_3 : this.state.item.err.stage_err_3 : []}
-                func={this.changeItemAutocomplite.bind(this, this.props.mark === 'newItem' ? 'stage_err_3' : 'this_stages_3')}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={3}>
-              <MyCheckBox
-                label="Картинка"
-                value={this.state.item ? parseInt(this.state.item.err.need_photo) == 1 ? true : false : false}
-                func={this.changeItemChecked.bind(this, 'need_photo')}
+            <Grid item xs={12} sm={6}>
+              <MyTextInput
+                label="Коэф. пиццы для бонуса (С текущего периода)"
+                value={this.state.item ? this.state.item.city.k_pizza : ''}
+                func={this.changeItem.bind(this, 'k_pizza')}
               />
             </Grid>
 
@@ -189,8 +169,8 @@ class OptionToWin_Modal extends React.Component {
               <Grid item xs={12} sm={3}>
                 <MyCheckBox
                   label="Активность"
-                  value={this.state.item ? parseInt(this.state.item.err.is_active) == 1 ? true : false : false}
-                  func={this.changeItemChecked.bind(this, 'is_active')}
+                  value={this.state.item ? parseInt(this.state.item.city.is_show) == 1 ? true : false : false}
+                  func={this.changeItemChecked.bind(this, 'is_show')}
                 />
               </Grid>
             ) : null}
@@ -206,16 +186,16 @@ class OptionToWin_Modal extends React.Component {
   }
 }
 
-class OptionToWin_ extends React.Component {
+class CitiesModules_ extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      module: 'option_to_win',
+      module: 'cities_modules',
       module_name: '',
       is_load: false,
 
-      items: [],
+      cities: [],
 
       fullScreen: false,
 
@@ -226,12 +206,13 @@ class OptionToWin_ extends React.Component {
       itemName: '',
 
       itemNew: {
-        stage_err_1: [],
-        stage_err_2: [],
-        stage_err_3: [],
-        id_win: [],
         name: '',
-        need_photo: 0,
+        name_2: '',
+        link: '',
+        price_lavel_id: '',
+        phone: '',
+        k_rolls: '',
+        k_pizza: '',
       },
     };
   }
@@ -240,7 +221,7 @@ class OptionToWin_ extends React.Component {
     const data = await this.getData('get_all');
 
     this.setState({
-      items: data.items,
+      cities: data.cities,
       module_name: data.module_info.name,
     });
 
@@ -302,55 +283,57 @@ class OptionToWin_ extends React.Component {
     }
   }
 
-  async changeItemChecked(id, is_active, mark) {
-    const is_active_edit = parseInt(is_active) == 1 ? 0 : 1;
+  async changeItemChecked(id, is_show, mark) {
+   
+    const is_show_edit = parseInt(is_show) == 1 ? 0 : 1;
 
-    const items = this.state.items;
+    const cities = this.state.cities;
 
-    items.map((item) => {
-      if (item.id === id) {
-        item.is_active = is_active_edit;
+    cities.map((city) => {
+      if (city.id === id) {
+        city.is_show = is_show_edit;
       }
     });
 
     this.setState({
-      items,
+      cities,
       mark,
     });
 
     const data = {
-      id,
+      city_id: id,
     };
 
     const item = await this.getData('get_one', data);
 
-    item.err.is_active = is_active_edit;
+    item.city.is_show = is_show_edit;
 
-    this.save(item);
+    this.save(item.city);
   }
 
   async save(item) {
+
     if (this.state.mark === 'newItem') {
+
       const data = item;
 
-      console.log(data);
+      // console.log(data);
 
       await this.getData('save_new', data);
     }
 
     if (this.state.mark === 'editItem') {
-      const data = {
-        id: item.err.id,
-        name: item.err.name,
-        is_active: item.err.is_active,
-        need_photo: item.err.need_photo,
-        id_win: item.this_wins,
-        stage_err_1: item.this_stages_1,
-        stage_err_2: item.this_stages_2,
-        stage_err_3: item.this_stages_3,
-      };
 
-      console.log(data);
+      const data = {
+        city_id: item.id,
+        lavel_price: item.price_lavel_id,
+        phone: item.phone,
+        k_rolls: item.k_rolls,
+        k_pizza: item.k_pizza,
+        is_show: item.is_show,
+      }
+
+      // console.log(data);
 
       await this.getData('save_edit', data);
     }
@@ -364,7 +347,7 @@ class OptionToWin_ extends React.Component {
     const data = await this.getData('get_all');
 
     this.setState({
-      items: data.items,
+      cities: data.cities,
     });
   }
 
@@ -376,7 +359,7 @@ class OptionToWin_ extends React.Component {
 
       const item = await this.getData('get_all_for_new');
 
-      item.err = itemNew;
+      item.city = itemNew;
 
       this.setState({
         modalDialog: true,
@@ -388,17 +371,17 @@ class OptionToWin_ extends React.Component {
 
     if (mark === 'editItem') {
       const data = {
-        id,
+        city_id: id,
       };
 
       const item = await this.getData('get_one', data);
 
       this.setState({
+        itemName: item.city.name,
         modalDialog: true,
         method,
         mark,
         item,
-        itemName: item.err.name,
       });
     }
   }
@@ -410,7 +393,7 @@ class OptionToWin_ extends React.Component {
           <CircularProgress color="inherit" />
         </Backdrop>
 
-        <OptionToWin_Modal
+        <CitiesModules_Modal
           open={this.state.modalDialog}
           onClose={() => this.setState({ modalDialog: false, itemName: '' })}
           method={this.state.method}
@@ -427,8 +410,8 @@ class OptionToWin_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={3}>
-            <Button onClick={this.openModal.bind(this, 'newItem', 'Новый вариант жалобы')} variant="contained">
-              Новая жалоба
+            <Button onClick={this.openModal.bind(this, 'newItem', 'Новый город')} variant="contained">
+              Добавить город
             </Button>
           </Grid>
 
@@ -438,23 +421,25 @@ class OptionToWin_ extends React.Component {
                 <TableHead>
                   <TableRow>
                     <TableCell style={{ width: '5%' }}>#</TableCell>
-                    <TableCell style={{ width: '55%' }}>Наименование</TableCell>
-                    <TableCell style={{ width: '40%' }}>Активность</TableCell>
+                    <TableCell style={{ width: '30%' }}>Название города</TableCell>
+                    <TableCell style={{ width: '30%' }}>Уровень цен</TableCell>
+                    <TableCell style={{ width: '35%' }}>Активность</TableCell>
                   </TableRow>
                 </TableHead>
 
                 <TableBody>
-                  {this.state.items.map((item, key) => (
+                  {this.state.cities.map((item, key) => (
                     <TableRow key={key} hover>
                       <TableCell>{key + 1}</TableCell>
-                      <TableCell onClick={this.openModal.bind(this, 'editItem', 'Редактирование жалобы', item.id)} style={{fontWeight: 700, cursor: 'pointer'}}>
+                      <TableCell onClick={this.openModal.bind(this, 'editItem', 'Редактирование города', item.id)} style={{ fontWeight: 700, cursor: 'pointer' }}>
                         {item.name}
                       </TableCell>
-                      <TableCell>
+                      <TableCell>{item.lavel_name}</TableCell>
+                      <TableCell >
                         <MyCheckBox
                           label=""
-                          value={parseInt(item.is_active) == 1 ? true : false}
-                          func={this.changeItemChecked.bind(this, item.id, item.is_active, 'editItem')}
+                          value={parseInt(item.is_show) == 1 ? true : false}
+                          func={this.changeItemChecked.bind(this, item.id, item.is_show, 'editItem')}
                         />
                       </TableCell>
                     </TableRow>
@@ -469,6 +454,6 @@ class OptionToWin_ extends React.Component {
   }
 }
 
-export function OptionToWin() {
-  return <OptionToWin_ />;
+export function CitiesModules() {
+  return <CitiesModules_ />;
 }
