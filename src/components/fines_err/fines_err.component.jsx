@@ -194,73 +194,73 @@ class Fines_err_Modal_item extends React.Component {
 
   render() {
     return (
-    <>
-      <MyAlert 
-        isOpen={this.state.openAlert} 
-        onClose={() => this.setState({ openAlert: false }) } 
-        status={this.state.err_status} 
-        text={this.state.err_text} />
-    
-      <Dialog
-        open={this.props.open}
-        onClose={this.onClose.bind(this)}
-        fullScreen={this.props.fullScreen}
-        fullWidth={true}
-        maxWidth={'lg'}
-      >
-        <DialogTitle className="button">
-          {this.props.text}
-          {this.props.fullScreen ? (
-            <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
-              <CloseIcon />
-            </IconButton>
-          ) : null}
-        </DialogTitle>
-        <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-          <Grid container spacing={3} justifyContent="center" mb={3}>
+      <>
+        <MyAlert 
+          isOpen={this.state.openAlert} 
+          onClose={() => this.setState({ openAlert: false }) } 
+          status={this.state.err_status} 
+          text={this.state.err_text} />
+      
+        <Dialog
+          open={this.props.open}
+          onClose={this.onClose.bind(this)}
+          fullScreen={this.props.fullScreen}
+          fullWidth={true}
+          maxWidth={'lg'}
+        >
+          <DialogTitle className="button">
+            {this.props.text}
+            {this.props.fullScreen ? (
+              <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
+                <CloseIcon />
+              </IconButton>
+            ) : null}
+          </DialogTitle>
+          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+            <Grid container spacing={3} justifyContent="center" mb={3}>
 
-            <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
-              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Точка</Typography>
-              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap'}}>
-                {this.state.item ? this.state.item.point_info.name : 'не указана'}
-              </Typography>
-            </Grid>
+              <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
+                <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Точка</Typography>
+                <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap'}}>
+                  {this.state.item ? this.state.item.point_info.name : 'не указана'}
+                </Typography>
+              </Grid>
 
-            <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
-              <Typography sx={{ whiteSpace: 'nowrap', fontWeight: 'bold' }}>Дата ошибки</Typography>
-              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap'}}>
-                {this.state.item ? this.state.item.err.date : 'не указана'}
-              </Typography>
-            </Grid>
+              <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
+                <Typography sx={{ whiteSpace: 'nowrap', fontWeight: 'bold' }}>Дата ошибки</Typography>
+                <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap'}}>
+                  {this.state.item ? this.state.item.err.date : 'не указана'}
+                </Typography>
+              </Grid>
 
-            <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
-              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Время совершения ошибки</Typography>
-              <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
-                {this.state.item ? this.state.item.err.time : 'не указано'}
-              </Typography>
-            </Grid>
+              <Grid item xs={12} sm={4} display="flex" flexDirection="column" alignItems="center">
+                <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Время совершения ошибки</Typography>
+                <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
+                  {this.state.item ? this.state.item.err.time : 'не указано'}
+                </Typography>
+              </Grid>
 
-            <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
-              <Typography sx={{ whiteSpace: 'nowrap', fontWeight: 'bold' }}>Комментарии</Typography>
-              <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>
-                {this.state.item ? this.state.item.err.comment ? this.state.item.err.comment : 'не указаны' : 'не указаны'}
-              </Typography>
-            </Grid>
+              <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
+                <Typography sx={{ whiteSpace: 'nowrap', fontWeight: 'bold' }}>Комментарии</Typography>
+                <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>
+                  {this.state.item ? this.state.item.err.comment ? this.state.item.err.comment : 'не указаны' : 'не указаны'}
+                </Typography>
+              </Grid>
 
-            <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
-              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Ошибка</Typography>
-              <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>
-                {this.state.item ? this.state.item.err.fine_name : 'не указана'}
-              </Typography>
-            </Grid>
+              <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
+                <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Ошибка</Typography>
+                <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>
+                  {this.state.item ? this.state.item.err.fine_name : 'не указана'}
+                </Typography>
+              </Grid>
 
-            <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
-              <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Фото ошибки</Typography>
-              <Grid sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }} display="flex" flexDirection="column" justifyContent="center">
-                {this.state.item ? !this.state.item.imgs.length ? 'Фото отсутствует' : (
-                    this.state.item.imgs.map((img, key) => (
-                      <React.Fragment key={key}>
+              <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
+                <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Фото ошибки</Typography>
+                <Grid sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }} display="flex" flexDirection="column" justifyContent="center">
+                  {this.state.item ? !this.state.item.imgs.length ? 'Фото отсутствует' : (
+                      this.state.item.imgs.map((img, key) => (
                         <ModalImage
+                          key={key}
                           className="img_modal"
                           small={'https://jacochef.ru/src/img/fine_err/uploads/' + img}
                           large={'https://jacochef.ru/src/img/fine_err/uploads/' + img}
@@ -268,74 +268,73 @@ class Fines_err_Modal_item extends React.Component {
                           hideZoom={false}
                           showRotate={true}
                         />
-                      </React.Fragment>
-                    ))
-                  ) : 'Фото отсутствует'}
-              </Grid>
-            </Grid>
-
-            {this.state.item ? this.state.item.user.name ? (
-                <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
-                  <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Сотрудник</Typography>
-                  <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
-                    {this.state.item.user.name}
-                  </Typography>
-                  <Grid sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
-                    {this.state.item ? this.state.item.user.img ? (
-                        <img src={'https://storage.yandexcloud.net/user-img/max-img/' + this.state.item.user.img} style={{ maxWidth: 300, maxHeight: 300 }}/>
-                      ) : 'Фото отсутствует' : 'Фото отсутствует'}
-                  </Grid>
+                      ))
+                    ) : 'Фото отсутствует'}
                 </Grid>
-              ) : (
-                <>
-                  <Grid item xs={12} sm={12} sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} align="center">Указать сотрудника</Grid>
+              </Grid>
 
-                  <Grid item xs={12} sm={6}>
-                    <MyAutocomplite
-                      multiple={false}
-                      data={this.state.apps}
-                      value={this.state.app}
-                      func={this.changePost.bind(this, 'app')}
-                      label="Должность"
-                    />
+              {this.state.item ? this.state.item.user.name ? (
+                  <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
+                    <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Сотрудник</Typography>
+                    <Typography sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
+                      {this.state.item.user.name}
+                    </Typography>
+                    <Grid sx={{ fontWeight: 'normal', whiteSpace: 'nowrap' }}>
+                      {this.state.item ? this.state.item.user.img ? (
+                          <img src={'https://storage.yandexcloud.net/user-img/max-img/' + this.state.item.user.img} style={{ maxWidth: 300, maxHeight: 300 }}/>
+                        ) : 'Фото отсутствует' : 'Фото отсутствует'}
+                    </Grid>
                   </Grid>
+                ) : (
+                  <>
+                    <Grid item xs={12} sm={12} sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} align="center">Указать сотрудника</Grid>
 
-                  <Grid item xs={12} sm={6}>
-                    <MyAutocomplite
-                      label="Сотрудник"
-                      multiple={false}
-                      data={this.state.users}
-                      value={this.state.user}
-                      func={this.changeUser.bind(this)}
-                    />
-                  </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <MyAutocomplite
+                        multiple={false}
+                        data={this.state.apps}
+                        value={this.state.app}
+                        func={this.changePost.bind(this, 'app')}
+                        label="Должность"
+                      />
+                    </Grid>
 
-                  <Grid item xs={12} sm={12} display="flex" flexWrap="wrap" justifyContent="center">
-                    {this.state.users
-                    .filter(user => this.state.app_for_search ? user.app_id === this.state.app_for_search || user.new_app === this.state.app_for_search : user)
-                    .map((user, key) => (
-                      <React.Fragment key={key}>
-                        {!user.img ? null : (
-                          <img src={'https://storage.yandexcloud.net/user-img/max-img/' + user.img}
-                            style={{ maxWidth: 300, maxHeight: 300 }}
-                            onClick={this.changeClass.bind(this, user)}
-                            className={this.state.selected === user.id ? 'choose_user' : ''}
-                          />
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </Grid>
-                </>
-            ) : 'ФИО и Фото отсутствует'}
-          </Grid>
-        </DialogContent>
-        {this.state.item ? !this.state.item.user.name ? (
-        <DialogActions>
-            <Button color="primary" style={{ whiteSpace: 'nowrap' }} onClick={this.save.bind(this)}>Coxpанить</Button>
-          </DialogActions>
-        ) : null : null}
-      </Dialog>
-    </>
+                    <Grid item xs={12} sm={6}>
+                      <MyAutocomplite
+                        label="Сотрудник"
+                        multiple={false}
+                        data={this.state.users}
+                        value={this.state.user}
+                        func={this.changeUser.bind(this)}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={12} display="flex" flexWrap="wrap" justifyContent="center">
+                      {this.state.users
+                      .filter(user => this.state.app_for_search ? user.app_id === this.state.app_for_search || user.new_app === this.state.app_for_search : user)
+                      .map((user, key) => (
+                        <React.Fragment key={key}>
+                          {!user.img ? null : (
+                            <img src={'https://storage.yandexcloud.net/user-img/max-img/' + user.img}
+                              style={{ maxWidth: 300, maxHeight: 300, height: 'fit-content' }}
+                              onClick={this.changeClass.bind(this, user)}
+                              className={this.state.selected === user.id ? 'choose_user' : ''}
+                            />
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </Grid>
+                  </>
+              ) : 'ФИО и Фото отсутствует'}
+            </Grid>
+          </DialogContent>
+          {this.state.item ? !this.state.item.user.name ? (
+            <DialogActions>
+              <Button color="primary" style={{ whiteSpace: 'nowrap' }} onClick={this.save.bind(this)}>Coxpанить</Button>
+            </DialogActions>
+          ) : null : null}
+        </Dialog>
+      </>
     );
   }
 }
@@ -553,12 +552,32 @@ class Fines_err_Modal_NewItem extends React.Component {
       const {point_id, fine, date, user, time, comment, is_active} = this.state;
 
       if (!point_id || !fine || !date || !time || time === '00:00' || comment.length == 0 || ( !user.id && is_active === false ) || !fine.id) {
-        const text = 'Для сохранения новой Ошибки, необходимо выбрать: Точку, Дату, Ошибку, Сотрудника и указать Время ошибки';
+        let text = 'Для сохранения новой Ошибки, необходимо выбрать: Точку, Дату, Ошибку, Сотрудника и указать Время ошибки';
+
+        if( !point_id ){
+          text = 'Не указана точка';
+        }
+
+        if( !fine || !fine.id ){
+          text = 'Не указана ошибка';
+        }
+
+        if( !time || time === '00:00' ){
+          text = 'Не указано время';
+        }
+
+        if( comment.length == 0 ){
+          text = 'Не указан комментарий';
+        }
+
+        if( !user.id && is_active === false ){
+          text = 'Не указан виновный';
+        }
 
         this.setState({
           openAlert: true,
-          err_status: res.st,
-          err_text: res.text,
+          err_status: false,
+          err_text: text,
         });
 
         setTimeout(() => {
@@ -791,7 +810,7 @@ class Fines_err_Modal_NewItem extends React.Component {
                       <React.Fragment key={key}>
                         {!user.img ? null : (
                           <img src={'https://storage.yandexcloud.net/user-img/max-img/' + user.img}
-                            style={{ maxWidth: 300, maxHeight: 300 }}
+                            style={{ maxWidth: 300, maxHeight: 300, height: 'fit-content' }}
                             onClick={this.changeClass.bind(this, user)}
                             className={this.state.selected === user.id ? 'choose_user' : ''}
                           />
@@ -855,9 +874,7 @@ class Fines_err_Table extends React.Component {
                 <TableCell>
                   {!item.imgs.length ? null : (
                     item.imgs.map((img, key) => (
-                      <React.Fragment key={key}>
-                        <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + img} style={{ maxWidth: 150, maxHeight: 150, marginRight: 5 }}/>
-                      </React.Fragment>
+                      <img key={key} src={'https://jacochef.ru/src/img/fine_err/uploads/' + img} style={{ maxWidth: 150, maxHeight: 150, marginRight: 5 }}/>
                     ))
                   )}
                 </TableCell>
@@ -876,9 +893,7 @@ class Fines_err_Table extends React.Component {
                 <TableCell>
                   {!item.imgs.length ? null : (
                     item.imgs.map((img, key) => (
-                      <React.Fragment key={key}>
-                        <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + img} style={{ maxWidth: 150, maxHeight: 150, marginRight: 5 }}/>
-                      </React.Fragment>
+                      <img key={key} src={'https://jacochef.ru/src/img/fine_err/uploads/' + img} style={{ maxWidth: 150, maxHeight: 150, marginRight: 5 }}/>
                     ))
                   )}
                 </TableCell>
