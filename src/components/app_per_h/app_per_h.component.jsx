@@ -13,7 +13,7 @@ import TableRow from '@mui/material/TableRow';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MyTextInput, MySelect } from '../../stores/elements';
+import { MyTextInput, MySelect, MyAlert } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -30,6 +30,10 @@ class AppPerH_ extends React.Component {
       city: '',
 
       items: [],
+
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
@@ -136,6 +140,12 @@ class AppPerH_ extends React.Component {
 
     await this.getData('save_edit', data);
 
+    this.setState({
+      openAlert: true,
+      err_status: true,
+      err_text: 'Обновлено',
+    });
+
     setTimeout(() => {
       this.update();
     }, 300);
@@ -161,6 +171,12 @@ class AppPerH_ extends React.Component {
         <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
+
+        <MyAlert 
+          isOpen={this.state.openAlert} 
+          onClose={() => this.setState({ openAlert: false }) } 
+          status={this.state.err_status} 
+          text={this.state.err_text} />
 
         <Grid container spacing={3} mb={3}>
           <Grid item xs={12} sm={12}>
