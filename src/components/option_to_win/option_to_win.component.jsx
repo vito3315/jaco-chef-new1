@@ -320,13 +320,17 @@ class OptionToWin_ extends React.Component {
 
     const data = {
       id,
+      is_active: is_active_edit,
     };
 
-    const item = await this.getData('get_one', data);
+    console.log(data);
 
-    item.err.is_active = is_active_edit;
+    await this.getData('change_active', data);
 
-    this.save(item);
+    setTimeout(() => {
+      this.update();
+    }, 300);
+
   }
 
   async save(item) {
