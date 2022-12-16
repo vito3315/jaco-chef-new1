@@ -605,12 +605,12 @@ class Fines_err_Modal_NewItem extends React.Component {
     if (!this.click) {
       this.click = true;
 
-      const {point_id, fine, date, user, time, comment, is_active} = this.state;
+      const {point, fine, date, user, time, comment, is_active} = this.state;
 
-      if (!point_id || !fine || !date || !time || time === '00:00' || comment.length == 0 || ( !user.id && is_active === false ) || !fine.id) {
+      if (!point || !fine || !date || !time || time === '00:00' || comment.length == 0 || ( !user.id && is_active === false ) || !fine.id) {
         let text = 'Для сохранения новой Ошибки, необходимо выбрать: Точку, Дату, Ошибку, Сотрудника и указать Время ошибки';
 
-        if( !point_id ){
+        if( !point ){
           text = 'Не указана точка';
         }
 
@@ -646,7 +646,7 @@ class Fines_err_Modal_NewItem extends React.Component {
       const data = {
         fine: fine.id,
         user: user && user.id ? user.id : 0,
-        point_id,
+        point_id: point,
         date,
         time_err: time,
         no_user: is_active,
@@ -675,7 +675,7 @@ class Fines_err_Modal_NewItem extends React.Component {
               file_type = file_type[file_type.length - 1];
               file_type = file_type.toLowerCase();
     
-              data.append('filetype', 'file_' + i + '_point_id_' + point_id + '_id_' + res.err_id + '.' + file_type);
+              data.append('filetype', 'file_' + i + '_point_id_' + point + '_id_' + res.err_id + '.' + file_type);
     
             });
     
