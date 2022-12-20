@@ -921,7 +921,7 @@ class Fines_err_Table extends React.Component {
 
           <TableBody>
             {this.props.ret_list.map((item, i) => (
-              <TableRow key={i} style={{ cursor: 'pointer' }}
+              <TableRow key={i} style={{ cursor: 'pointer', backgroundColor: item.user_name == null ? '#926eae' : '#6ab04c', color: '#fff', fontWeight: 300 }}
                 onClick={this.props.openModal.bind(this, 'item', 'Ошибка сотрудника', item.id)}
               >
                 <TableCell>{item.find_user_name}</TableCell>
