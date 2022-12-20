@@ -2678,19 +2678,23 @@ class SiteSale2_AnaliticList_ extends React.Component {
       date_start: formatDate(new Date()),
       date_end: formatDate(new Date()),
 
-      promo_list: []
+      promo_list: [],
+
+      city_list: [],
+      city_id: ''
     };
   }
   
   async componentDidMount(){
     
-    let data = await this.getData('get_spam_list');
+    let data = await this.getData('get_analitic_all');
     
     console.log( data )
     
     this.setState({
       module_name: data.module_info.name,
-      spam_list: data.spam_list
+      city_list: data.cities,
+      city_id: -1
     })
     
     document.title = data.module_info.name;
@@ -2761,6 +2765,7 @@ class SiteSale2_AnaliticList_ extends React.Component {
 
   async getUsers(){
     let data = {
+      city_id: this.state.city_id,
       dateStart: this.state.date_start,
       dateEnd: this.state.date_end,
     }
@@ -2795,6 +2800,10 @@ class SiteSale2_AnaliticList_ extends React.Component {
           <Grid container direction="row" style={{ paddingTop: 20 }} spacing={3}>
 
             <Grid item xs={12} sm={3}>
+              <MySelect is_none={false} data={this.state.city_list} value={this.state.city_id} func={ (event) => { this.setState({city_id: event.target.value}) } } label='Город' />
+            </Grid>
+
+            <Grid item xs={12} sm={3}>
               <MyDatePickerNew label="Дата от" value={ this.state.date_start } func={ this.changeDateRange.bind(this, 'date_start') } />
             </Grid>
             <Grid item xs={12} sm={3}>
@@ -2817,31 +2826,33 @@ class SiteSale2_AnaliticList_ extends React.Component {
                   <Typography>{item.name}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <span>Удаленных: {item.stat.is_delete_perc}%</span>
+                  <span>Удаленных: {item.stat.is_delete_perc}</span>
                   <br />
-                  <span>Активированных: {item.stat.is_active_perc}%</span>
+                  <span>Активированных: {item.stat.is_active_perc}</span>
                   <br />
-                  <span>Не активированных: {item.stat.is_nonactive_perc}%</span>
+                  <span>Не активированных: {item.stat.is_nonactive_perc}</span>
                   <br />
                   <span>------------------------------</span>
                   <br />
-                  <span>Новых клиентов: {item.stat.is_new_perc}%</span>
+                  <span>Новых клиентов: {item.stat.is_new_perc}</span>
+                  <br />
+                  <span>Не заказывали 90 и более и сделали заказ по промику: {item.stat.is_return_90}</span>
                   <br />
                   <span>(относительно количества выписанных промиков)</span>
                   <br />
                   <span>------------------------------</span>
                   <br />
-                  <span>Доставка: {item.stat.type_dev}%</span>
+                  <span>Доставка: {item.stat.type_dev}</span>
                   <br />
-                  <span>Самовывоз: {item.stat.type_pic}%</span>
+                  <span>Самовывоз: {item.stat.type_pic}</span>
                   <br />
-                  <span>Зал: {item.stat.type_hall}%</span>
+                  <span>Зал: {item.stat.type_hall}</span>
                   <br />
                   <span>------------------------------</span>
                   <br />
-                  <span>Оформил клиент: {item.stat.is_client}%</span>
+                  <span>Оформил клиент: {item.stat.is_client}</span>
                   <br />
-                  <span>Оформил контакт-центр: {item.stat.is_center}%</span>
+                  <span>Оформил контакт-центр: {item.stat.is_center}</span>
                   <br />
                 </AccordionDetails>
               </Accordion>

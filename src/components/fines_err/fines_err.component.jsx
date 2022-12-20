@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import CheckIcon from '@mui/icons-material/Check';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -55,6 +56,7 @@ class Fines_err_Modal_item extends React.Component {
 
     this.state = {
       item: null,
+      text: '',
 
       users: [],
       user: '',
@@ -93,40 +95,40 @@ class Fines_err_Modal_item extends React.Component {
 
     if (value) {
       
-      const app = apps.find(app => app.id === (value.new_app === '0' ? value.app_id : value.new_app));
+      //const app = apps.find(app => app.id === (value.new_app === '0' ? value.app_id : value.new_app));
 
       this.setState({
         user: value,
         selected: value.id,
-        app,
-        app_for_search: app.id,
+        //app,
+        //app_for_search: app.id,
       });
     } else {
       this.setState({
         user: value,
         selected: '',
-        app: apps[0],
-        app_for_search: '',
+        //app: apps[0],
+        //app_for_search: '',
       });
     }
   }
 
   changePost(data, event, value) {
 
-    const user = this.state.user;
+    //const user = this.state.user;
     
-    if(user && value.id !== -1) {
+    /*if(user && value.id !== -1) {
       this.setState({
         [data]: value,
       });
-    } else {
+    } else {*/
       this.setState({
         [data]: value,
         app_for_search: value.id === -1 ? '' : value.id,
         selected: '',
         user: '',
       });
-    }
+    //}
 
   }
 
@@ -138,15 +140,15 @@ class Fines_err_Modal_item extends React.Component {
     if (event.target.classList.contains('choose_user')) {
       this.setState({
         user: '',
-        app: apps[0],
-        app_for_search: '',
+        //app: apps[0],
+        //app_for_search: '',
         selected: '',
       });
     } else {
       this.setState({
         user,
-        app,
-        app_for_search: app.id,
+        //app,
+        //app_for_search: app.id,
         selected: user.id,
       });
     }
@@ -171,6 +173,7 @@ class Fines_err_Modal_item extends React.Component {
     const data = {
       id: item.err.id,
       user: user.id,
+      text: this.state.text
     }
 
     this.props.save(data);
@@ -190,6 +193,17 @@ class Fines_err_Modal_item extends React.Component {
     });
 
     this.props.onClose();
+  }
+
+  saveErr(type){
+    const data = {
+      id: item.err.id,
+      type: type
+    }
+
+    if (confirm( (type === 'true' ? 'Подтвердить' : 'Удалить' ) + ' ошибку ?')) {
+      this.props.saveErr(data);
+    } 
   }
 
   render() {
@@ -253,6 +267,48 @@ class Fines_err_Modal_item extends React.Component {
                   {this.state.item ? this.state.item.err.fine_name : 'не указана'}
                 </Typography>
               </Grid>
+
+              { this.state.item && parseInt(this.state.item.err.manager_create) == 1 && parseInt(this.state.item.err.status) == 2 && parseInt(this.state.item.err.for_dir) == 1 ?
+                <>
+                  <Grid item xs={12} sm={6}>
+                    <Button color="primary" onClick={this.saveErr.bind(this, 'true')}>Подтвердить ошибку</Button>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Button color="primary" onClick={this.saveErr.bind(this, 'false')}>Отменить ошибку</Button>
+                  </Grid>
+                </>
+                  :
+                null
+              }
+
+              { this.state.item && this.state.item.err.text_one.length > 0 ?
+                <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
+                  <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Причина обжалования</Typography>
+                  <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>{this.state.item.err.text_one}</Typography>
+                </Grid>
+                  :
+                null
+              }
+
+              { this.state.item && this.state.item.err.text_one.length > 0 ?
+                this.state.item.err.text_two.length > 0 ?
+                  <Grid item xs={12} sm={6}>
+                    <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Описание решения</Typography>
+                    <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>{this.state.item.err.text_one}</Typography>
+                  </Grid>
+                    :
+                  <Grid item xs={12} sm={6}>
+                    <MyTextInput 
+                      label="Описание решения" 
+                      value={this.state.text} 
+                      func={ (event) => { this.setState({ text: event.target.value }) } }
+                      multiline={true}
+                      maxRows={7}
+                    />
+                  </Grid>
+                  :
+                null
+              }
 
               <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
                 <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Фото ошибки</Typography>
@@ -404,20 +460,20 @@ class Fines_err_Modal_NewItem extends React.Component {
 
     if (value) {
       
-      const app = apps.find(app => app.id === (value.new_app === '0' ? value.app_id : value.new_app));
+      //const app = apps.find(app => app.id === (value.new_app === '0' ? value.app_id : value.new_app));
 
       this.setState({
         user: value,
         selected: value.id,
-        app,
-        app_for_search: app.id,
+        //app,
+        //app_for_search: app.id,
       });
     } else {
       this.setState({
         user: value,
         selected: '',
-        app: apps[0],
-        app_for_search: '',
+        //app: apps[0],
+        //app_for_search: '',
       });
     }
   }
@@ -444,20 +500,20 @@ class Fines_err_Modal_NewItem extends React.Component {
 
   changePost(data, event, value) {
 
-    const user = this.state.user;
+    //const user = this.state.user;
     
-    if(user && value.id !== -1) {
+    /*if(user && value.id !== -1) {
       this.setState({
         [data]: value,
       });
-    } else {
+    } else {*/
       this.setState({
         [data]: value,
         app_for_search: value.id === -1 ? '' : value.id,
         selected: '',
         user: '',
       });
-    }
+    //}
 
   }
 
@@ -530,15 +586,15 @@ class Fines_err_Modal_NewItem extends React.Component {
     if (event.target.classList.contains('choose_user')) {
       this.setState({
         user: '',
-        app: apps[0],
-        app_for_search: '',
+        //app: apps[0],
+        //app_for_search: '',
         selected: '',
       });
     } else {
       this.setState({
         user,
-        app,
-        app_for_search: app.id,
+        //app,
+        //app_for_search: app.id,
         selected: user.id,
       });
     }
@@ -549,12 +605,12 @@ class Fines_err_Modal_NewItem extends React.Component {
     if (!this.click) {
       this.click = true;
 
-      const {point_id, fine, date, user, time, comment, is_active} = this.state;
+      const {point, fine, date, user, time, comment, is_active} = this.state;
 
-      if (!point_id || !fine || !date || !time || time === '00:00' || comment.length == 0 || ( !user.id && is_active === false ) || !fine.id) {
+      if (!point || !fine || !date || !time || time === '00:00' || comment.length == 0 || ( !user.id && is_active === false ) || !fine.id) {
         let text = 'Для сохранения новой Ошибки, необходимо выбрать: Точку, Дату, Ошибку, Сотрудника и указать Время ошибки';
 
-        if( !point_id ){
+        if( !point ){
           text = 'Не указана точка';
         }
 
@@ -590,7 +646,7 @@ class Fines_err_Modal_NewItem extends React.Component {
       const data = {
         fine: fine.id,
         user: user && user.id ? user.id : 0,
-        point_id,
+        point_id: point,
         date,
         time_err: time,
         no_user: is_active,
@@ -619,7 +675,7 @@ class Fines_err_Modal_NewItem extends React.Component {
               file_type = file_type[file_type.length - 1];
               file_type = file_type.toLowerCase();
     
-              data.append('filetype', 'file_' + i + '_point_id_' + point_id + '_id_' + res.err_id + '.' + file_type);
+              data.append('filetype', 'file_' + i + '_point_id_' + point + '_id_' + res.err_id + '.' + file_type);
     
             });
     
@@ -852,12 +908,14 @@ class Fines_err_Table extends React.Component {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell style={{ width: '10%' }}>Кто добавил</TableCell>
-              <TableCell style={{ width: '10%' }}>Сотрудник</TableCell>
-              <TableCell style={{ width: '10%' }}>Дата ошибки</TableCell>
-              <TableCell style={{ width: '10%' }}>Дата закрытия</TableCell>
-              <TableCell style={{ width: '30%' }}>Ошибка</TableCell>
-              <TableCell style={{ width: '30%' }}>Фото</TableCell>
+              <TableCell>Кто добавил</TableCell>
+              <TableCell>Сотрудник</TableCell>
+              <TableCell>Дата ошибки</TableCell>
+              <TableCell>Дата закрытия</TableCell>
+              <TableCell>Ошибка</TableCell>
+              <TableCell>Фото</TableCell>
+              <TableCell>Обжалована</TableCell>
+              <TableCell>Изменина сумма</TableCell>
             </TableRow>
           </TableHead>
 
@@ -878,6 +936,9 @@ class Fines_err_Table extends React.Component {
                     ))
                   )}
                 </TableCell>
+
+                <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.change_win) == 1 ? <CheckIcon /> : null }</TableCell>
+                <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.change_sum) == 1 ? <CheckIcon /> : null }</TableCell>
               </TableRow>
             ))}
             {this.props.all_list.map((item, i) => (
@@ -897,6 +958,9 @@ class Fines_err_Table extends React.Component {
                     ))
                   )}
                 </TableCell>
+
+                <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.change_win) == 1 ? <CheckIcon /> : null }</TableCell>
+                <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.change_sum) == 1 ? <CheckIcon /> : null }</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -1078,8 +1142,6 @@ class Fines_err_ extends React.Component {
   }
 
   async saveEditItem(data) {
-    // console.log(data);
-
     let res = await this.getData('update', data);
 
     if(res.st) {
@@ -1108,6 +1170,27 @@ class Fines_err_ extends React.Component {
     // await this.getData('save_new', data);
 
     // this.getItems();
+  }
+
+  async saveErr(data){
+    let res = await this.getData('saveErr', data);
+
+    if(res.st) {
+      this.setState({ modalDialog: false });
+
+      setTimeout( () => {
+        this.getItems();
+      }, 300 )
+
+    } else {
+
+      this.setState({
+        openAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+
+    }
   }
 
   fullCloseDialog(){

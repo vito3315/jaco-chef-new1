@@ -3,6 +3,7 @@ import React from 'react';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
+import CheckIcon from '@mui/icons-material/Check';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -673,12 +674,14 @@ class StatErrCash_ extends React.Component {
                     <TableCell colSpan={6} sx={{ fontWeight: 'bold' }}>Все данные (камеры)</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell style={{ width: '10%' }} align="center">Сотрудник</TableCell>
-                    <TableCell style={{ width: '15%' }} align="center">Дата внесения ошибки</TableCell>
-                    <TableCell style={{ width: '20%' }} align="center">Дата и время совершения ошибки</TableCell>
-                    <TableCell style={{ width: '30%' }} align="center">Ошибка</TableCell>
-                    <TableCell style={{ width: '15%' }} align="center">Сумма ошибки</TableCell>
-                    <TableCell style={{ width: '10%' }} align="center">Фото</TableCell>
+                    <TableCell align="center">Сотрудник</TableCell>
+                    <TableCell align="center">Дата внесения ошибки</TableCell>
+                    <TableCell align="center">Дата и время совершения ошибки</TableCell>
+                    <TableCell align="center">Ошибка</TableCell>
+                    <TableCell align="center">Сумма ошибки</TableCell>
+                    <TableCell align="center">Фото</TableCell>
+                    <TableCell align="center">Обжалована</TableCell>
+                    <TableCell align="center">Изменина сумма</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell colSpan={6} sx={{ fontWeight: 'bold' }}>Кол-во не обработанных ошибок: {this.state.all_data_new_stat}</TableCell>
@@ -698,6 +701,9 @@ class StatErrCash_ extends React.Component {
                           <img src={'https://jacochef.ru/src/img/fine_err/uploads/' + item.imgs[0]} style={{ maxWidth: 100, maxHeight: 100 }}/>
                         )}
                       </TableCell>
+
+                      <TableCell align="center">{ parseInt(item.change_win) == 1 ? <CheckIcon /> : null }</TableCell>
+                      <TableCell align="center">{ parseInt(item.change_sum) == 1 ? <CheckIcon /> : null }</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
