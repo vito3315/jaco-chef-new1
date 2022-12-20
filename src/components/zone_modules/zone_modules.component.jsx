@@ -23,7 +23,7 @@ import TableRow from '@mui/material/TableRow';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyTextInput, MyCheckBox } from '../../stores/elements';
+import { MySelect, MyTextInput, MyCheckBox, MyAlert } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -471,6 +471,10 @@ class ZoneModules_ extends React.Component {
         free_drive: 0,
         new_zone: [],
       },
+
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
@@ -562,6 +566,8 @@ class ZoneModules_ extends React.Component {
   }
 
   async save(item) {
+    let res;
+
     if (this.state.mark === 'newZone') {
       const data = {
         point_id: item.point_id,
@@ -572,9 +578,9 @@ class ZoneModules_ extends React.Component {
         new_zone: item.new_zone,
       };
 
-      console.log(data);
-      await this.getData('save_new', data);
+      res = await this.getData('save_new', data);
     }
+
     if (this.state.mark === 'editZone') {
       const data = {
         point_id: item.point_id,
@@ -586,12 +592,20 @@ class ZoneModules_ extends React.Component {
         zone_id: item.id,
       };
 
-      console.log(data);
-      await this.getData('save_edit', data);
+      res = await this.getData('save_edit', data);
     }
-    setTimeout(() => {
-      this.update();
-    }, 300);
+
+    if(!res.st) {
+      this.setState({
+        openAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+    } else {
+      setTimeout( () => {
+        this.update();
+      }, 300)
+    }
   }
 
   async update() {
@@ -658,6 +672,12 @@ class ZoneModules_ extends React.Component {
         <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
+
+        <MyAlert 
+          isOpen={this.state.openAlert} 
+          onClose={() => this.setState({ openAlert: false }) } 
+          status={this.state.err_status} 
+          text={this.state.err_text} />
 
         <ZoneModules_Modal
           open={this.state.modalDialog}
