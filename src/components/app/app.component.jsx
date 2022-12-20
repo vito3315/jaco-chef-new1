@@ -81,6 +81,7 @@ const CloseBuy = React.lazy(() => import("../close_buy"));
 const PolufabricatModule = React.lazy(() => import("../polufabricat_module"));
 const Checkworks = React.lazy(() => import("../check_works"));
 const CitiesModules = React.lazy(() => import("../cities_modules"));
+const ZoneModules = React.lazy(() => import("../zone_modules"));
 
 const HotMap = React.lazy(() => import("../hot_map"));
 const ShowCook = React.lazy(() => import("../show_cook"));
@@ -373,6 +374,7 @@ export function App () {
                   <Route path={'/cat_work'} exact={ true } element={ <CatWork /> } />
                   <Route path={'/option_to_win'} exact={ true } element={ <OptionToWin /> } />
                   <Route path={'/cities_modules'} exact={ true } element={ <CitiesModules /> } />
+                  <Route path={'/zone_modules'} exact={ true } element={ <ZoneModules /> } />
                   <Route path={'/app_per_h'} exact={ true } element={ <AppPerH /> } />
 
                   <Route path={'/app_work_point'} exact={ true } element={ <AppWorkPoint /> } />
