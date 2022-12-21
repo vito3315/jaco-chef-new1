@@ -293,9 +293,9 @@ class Fines_err_Modal_item extends React.Component {
 
               { this.state.item && this.state.item.err.text_one.length > 0 ?
                 this.state.item.err.text_two.length > 0 ?
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
                     <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Описание решения</Typography>
-                    <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>{this.state.item.err.text_one}</Typography>
+                    <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>{this.state.item.err.text_two}</Typography>
                   </Grid>
                     :
                   <Grid item xs={12} sm={6}>
