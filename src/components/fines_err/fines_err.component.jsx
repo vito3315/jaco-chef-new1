@@ -384,7 +384,7 @@ class Fines_err_Modal_item extends React.Component {
               ) : 'ФИО и Фото отсутствует'}
             </Grid>
           </DialogContent>
-          {this.state.item ? !this.state.item.user.name ? (
+          {this.state.item ? parseInt(this.state.item.err.for_dir) == 1 && (!this.state.item.user.name || parseInt(this.state.item.err.status) == 2) ? (
             <DialogActions>
               <Button color="primary" style={{ whiteSpace: 'nowrap' }} onClick={this.save.bind(this)}>Coxpанить</Button>
             </DialogActions>
@@ -921,7 +921,7 @@ class Fines_err_Table extends React.Component {
 
           <TableBody>
             {this.props.ret_list.map((item, i) => (
-              <TableRow key={i} style={{ cursor: 'pointer', backgroundColor: item.user_name == null ? '#926eae' : '#6ab04c', color: '#fff', fontWeight: 300 }}
+              <TableRow key={i} style={{ cursor: 'pointer', backgroundColor: '#926eae', color: '#fff', fontWeight: 300 }}
                 onClick={this.props.openModal.bind(this, 'item', 'Ошибка сотрудника', item.id)}
               >
                 <TableCell>{item.find_user_name}</TableCell>
