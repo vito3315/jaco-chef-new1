@@ -83,6 +83,7 @@ class Fines_err_Modal_item extends React.Component {
       this.setState({
         item: this.props.item,
         users: this.props.item.users,
+        user: this.props.item.user,
         apps: this.props.item.apps,
         app: this.props.item.apps[0],
       });
@@ -161,7 +162,7 @@ class Fines_err_Modal_item extends React.Component {
     if(!user) {
       this.setState({
         openAlert: true,
-        err_status: res.st,
+        err_status: false,
         err_text: 'Укажите сотрудника!',
       });
 
