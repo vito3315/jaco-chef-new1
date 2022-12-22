@@ -83,6 +83,7 @@ class Fines_err_Modal_item extends React.Component {
       this.setState({
         item: this.props.item,
         users: this.props.item.users,
+        user: this.props.item.user,
         apps: this.props.item.apps,
         app: this.props.item.apps[0],
       });
@@ -161,7 +162,7 @@ class Fines_err_Modal_item extends React.Component {
     if(!user) {
       this.setState({
         openAlert: true,
-        err_status: res.st,
+        err_status: false,
         err_text: 'Укажите сотрудника!',
       });
 
@@ -292,9 +293,9 @@ class Fines_err_Modal_item extends React.Component {
 
               { this.state.item && this.state.item.err.text_one.length > 0 ?
                 this.state.item.err.text_two.length > 0 ?
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} sm={6} display="flex" flexDirection="column" alignItems="center">
                     <Typography sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>Описание решения</Typography>
-                    <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>{this.state.item.err.text_one}</Typography>
+                    <Typography sx={{ fontWeight: 'normal', textAlign: 'center' }}>{this.state.item.err.text_two}</Typography>
                   </Grid>
                     :
                   <Grid item xs={12} sm={6}>
@@ -384,7 +385,7 @@ class Fines_err_Modal_item extends React.Component {
               ) : 'ФИО и Фото отсутствует'}
             </Grid>
           </DialogContent>
-          {this.state.item ? !this.state.item.user.name ? (
+          {this.state.item ? parseInt(this.state.item.err.for_dir) == 1 && (!this.state.item.user.name || parseInt(this.state.item.err.status) == 2) ? (
             <DialogActions>
               <Button color="primary" style={{ whiteSpace: 'nowrap' }} onClick={this.save.bind(this)}>Coxpанить</Button>
             </DialogActions>
@@ -921,7 +922,7 @@ class Fines_err_Table extends React.Component {
 
           <TableBody>
             {this.props.ret_list.map((item, i) => (
-              <TableRow key={i} style={{ cursor: 'pointer', backgroundColor: item.user_name == null ? '#926eae' : '#6ab04c', color: '#fff', fontWeight: 300 }}
+              <TableRow key={i} style={{ cursor: 'pointer', backgroundColor: '#926eae', color: '#fff', fontWeight: 300 }}
                 onClick={this.props.openModal.bind(this, 'item', 'Ошибка сотрудника', item.id)}
               >
                 <TableCell>{item.find_user_name}</TableCell>
