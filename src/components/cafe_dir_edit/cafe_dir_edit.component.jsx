@@ -486,7 +486,7 @@ class CafeDirEdit_ extends React.Component {
         />
 
         {/* кнопки и выбор точки */}
-        <Grid container spacing={2} mb={3}>
+        <Grid container spacing={3} mb={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
@@ -501,29 +501,16 @@ class CafeDirEdit_ extends React.Component {
             />
           </Grid>
 
-          <Grid item xs={12} sm={3} display="flex" justifyContent="space-around" sx={{ flexDirection: { xs: 'column', sm: 'row' } }}>
-            <Grid mb={2}>
-              <Button onClick={this.openModal.bind(this, 'new')} variant="contained">
-                Добавить точку
-              </Button>
-            </Grid>
-
-            <Grid>
-              <Button onClick={this.save.bind(this)} color="success" variant="contained">
-                Сохранить изменения
-              </Button>
-            </Grid>
+          <Grid item xs={12} sm={3}>
+            <Button onClick={this.openModal.bind(this, 'new')} variant="contained">
+              Добавить точку
+            </Button>
           </Grid>
 
-          <Grid item xs={12} sm={12} mt={2}>
-            <span style={{backgroundColor: '#ef5350', color: '#fff', padding: '10px 15px'}}>
-              Данные сохраняются с актуального периода
-            </span>
-          </Grid>
         </Grid>
 
         {/* табы */}
-        <Grid item xs={12} sm={12} mt={3}>
+        <Grid item xs={12} sm={12} mt={3} mb={5}>
           <TabContext value={this.state.ItemTab}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <TabList onChange={this.changeTab.bind(this)} variant="fullWidth">
@@ -667,6 +654,11 @@ class CafeDirEdit_ extends React.Component {
               </Grid>
             </TabPanel>
           </TabContext>
+          <Grid display='flex' sx={{ justifyContent: { sm: 'end', xs: 'start' }  }}>
+            <Button onClick={this.save.bind(this)} color="success" variant="contained" style={{ whiteSpace: 'nowrap' }}>
+              Сохранить изменения
+            </Button>
+          </Grid>
         </Grid>
       </>
     );
