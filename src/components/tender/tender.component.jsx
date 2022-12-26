@@ -307,11 +307,20 @@ class Tender_ extends React.Component {
     }
   }
 
-  onDownload() {
-    const url = this.state.url;
+  // правка 26.12 обновляем данные потом скачиваем файл
+  async onDownload() {
+    // const url = this.state.url;
+    const data = {
+      city_id: this.state.city,
+      vendors: this.state.vendor,
+      cat: this.state.newCat,
+      date: this.state.tender.name,
+    };
+
+    const res = await this.getData('get_data', data);
 
     const link = document.createElement('a');
-    link.href = url;
+    link.href = res.url;
     link.click();
   }
 
