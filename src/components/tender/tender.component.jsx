@@ -298,17 +298,29 @@ class Tender_ extends React.Component {
     };
 
     const res =  await this.getData('downLoadVendor', data);
-    
-    this.setState({
-      url: res.url
-    });
+
+    // правка 26.12 скачивания файла в один клик
+    if( res.url){
+      const link = document.createElement('a');
+      link.href = res.url;
+      link.click();
+    }
   }
 
-  onDownload() {
-    const url = this.state.url;
+  // правка 26.12 обновляем данные потом скачиваем файл
+  async onDownload() {
+    // const url = this.state.url;
+    const data = {
+      city_id: this.state.city,
+      vendors: this.state.vendor,
+      cat: this.state.newCat,
+      date: this.state.tender.name,
+    };
+
+    const res = await this.getData('get_data', data);
 
     const link = document.createElement('a');
-    link.href = url;
+    link.href = res.url;
     link.click();
   }
 
@@ -464,27 +476,7 @@ class Tender_ extends React.Component {
                           }}
                           onClick={this.downLoadVendor.bind(this, vendor.id)}
                         >
-                          подготовить
-                        </TableCell>
-                       
-                      ))}
-                    </TableRow>
-
-                    <TableRow>
-                      <TableCell style={{ zIndex: 3 }}></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      {this.state.vendors.map((vendor, key) => (
-                        <TableCell
-                          key={key}
-                          style={{
-                            maxWidth: 150,
-                            textAlign: 'center',
-                            cursor: 'pointer'
-                          }}
-                          onClick={this.onDownload.bind(this, vendor.id)}
-                        >
-                          скачать
+                          Скачать
                         </TableCell>
                        
                       ))}
