@@ -392,7 +392,7 @@ class VendorModule_ extends React.Component {
   changeMail(type, key, event, data){
     let thisMails = [...this.state.mails];
 
-    thisMails[key][ [type] ] = data ? data : event.target.value ? event.target.value : null;
+    thisMails[key][ [type] ] = data ? data : event.target.value || event.target.value == '' ? event.target.value : null;
 
     this.setState({
       mails: thisMails
@@ -600,7 +600,7 @@ class VendorModule_ extends React.Component {
                               </Button>
                             </Grid>
                             <Grid item xs={12}>
-                              <MyTextInput label="Контактные данные" value={ this.state.comment } func={ this.changeMail.bind(this, 'comment', key) } multiline={true} maxRows={5} />
+                              <MyTextInput label="Контактные данные" value={ mail.comment } func={ this.changeMail.bind(this, 'comment', key) } multiline={true} maxRows={5} />
                             </Grid>
                             <Grid item xs={12}>
                               <Divider />
@@ -727,7 +727,7 @@ class VendorModule_ extends React.Component {
                               </Button>
                             </Grid>
                             <Grid item xs={12}>
-                              <MyTextInput label="Контактные данные" value={ this.state.comment } func={ this.changeMail.bind(this, 'comment', key) } multiline={true} maxRows={5} />
+                              <MyTextInput label="Контактные данные" value={ mail.comment } func={ this.changeMail.bind(this, 'comment', key) } multiline={true} maxRows={5} />
                             </Grid>
                             <Grid item xs={12}>
                               <Divider />
