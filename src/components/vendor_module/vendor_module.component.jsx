@@ -61,6 +61,7 @@ class VendorModule_ extends React.Component {
 
       mailPoint: null,
       mailMail: '',
+      mailComment: '',
 
       nds: [
         { id: -1, name: 'Без НДС' },
@@ -391,7 +392,7 @@ class VendorModule_ extends React.Component {
   changeMail(type, key, event, data){
     let thisMails = [...this.state.mails];
 
-    thisMails[key][ [type] ] = data ? data : event.target.value;
+    thisMails[key][ [type] ] = data ? data : event.target.value ? event.target.value : null;
 
     this.setState({
       mails: thisMails
@@ -405,18 +406,20 @@ class VendorModule_ extends React.Component {
   }
 
   checkAddMail(){
-    if( this.state.mailMail.length > 0 && this.state.mailPoint !== null ){
+    if( this.state.mailMail.length > 0 && this.state.mailPoint !== null && this.state.mailComment.length > 0 ){
       let thisMails = [...this.state.mails];
 
       thisMails.push({
         point_id: this.state.mailPoint,
-        mail: this.state.mailMail
+        mail: this.state.mailMail,
+        comment: this.state.mailComment
       })
 
       this.setState({
         mails: thisMails,
         mailMail: '',
-        mailPoint: null
+        mailPoint: null,
+        mailComment: ''
       })
     }
   }
@@ -579,35 +582,51 @@ class VendorModule_ extends React.Component {
                   <Grid item xs={12} sm={10}>
 
                     <Typography>Почта поставщика</Typography>
-                    <Divider style={{ marginBottom: 10 }} />
+                    <Divider style={{ marginBottom: 15 }} />
 
                     <Grid container spacing={3}>
                       {this.state.mails.map( (mail, key) => 
-                        <React.Fragment key={key}>
-                          <Grid item xs={5}>
-                            <MyAutocomplite multiple={false} label='' data={this.state.need_points} value={mail.point_id} func={ this.changeMail.bind(this, 'point_id', key) } />
+                        <Grid item xs={12} key={key}>
+                          <Grid container spacing={3} >
+                            <Grid item xs={5}>
+                              <MyAutocomplite multiple={false} label='Точка' data={this.state.need_points} value={mail.point_id} func={ this.changeMail.bind(this, 'point_id', key) } />
+                            </Grid>
+                            <Grid item xs={5}>
+                              <MyTextInput label="Почта" value={ mail.mail } func={ this.changeMail.bind(this, 'mail', key) } />
+                            </Grid>
+                            <Grid item xs={1}>
+                              <Button variant="contained" color='primary' style={{ width: '100%' }} onClick={this.delMail.bind(this, key)}>
+                                <CloseIcon />
+                              </Button>
+                            </Grid>
+                            <Grid item xs={12}>
+                              <MyTextInput label="Контактные данные" value={ this.state.comment } func={ this.changeMail.bind(this, 'comment', key) } multiline={true} maxRows={5} />
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Divider />
+                            </Grid>
                           </Grid>
-                          <Grid item xs={5}>
-                            <MyTextInput label="" value={ mail.mail } func={ this.changeMail.bind(this, 'mail', key) } />
-                          </Grid>
-                          <Grid item xs={1}>
-                            <Button variant="contained" color='primary' style={{ width: '100%' }} onClick={this.delMail.bind(this, key)}>
-                              <CloseIcon />
-                            </Button>
-                          </Grid>
-                        </React.Fragment>
+                        </Grid>
                       )}
 
-                      <>
-                        <Grid item xs={6}>
-                          <MyAutocomplite multiple={false} label='' data={this.state.need_points} value={this.state.mailPoint} func={ this.changeMailNew.bind(this, 'mailPoint', 0) } onBlur={this.checkAddMail.bind(this)} />
+                      <Grid item xs={12}>
+                        <Grid container spacing={3}>
+                          <Grid item xs={5}>
+                            <MyAutocomplite multiple={false} label='Точка' data={this.state.need_points} value={this.state.mailPoint} func={ this.changeMailNew.bind(this, 'mailPoint', 0) } onBlur={this.checkAddMail.bind(this)} />
+                          </Grid>
+                          <Grid item xs={5}>
+                            <MyTextInput label="Почта" value={ this.state.mailMail } func={ this.changeMailNew.bind(this, 'mailMail', 0) } onBlur={this.checkAddMail.bind(this)} />
+                          </Grid>
+                          <Grid item xs={12}>
+                            <MyTextInput label="Контактные данные" value={ this.state.mailComment } func={ this.changeMailNew.bind(this, 'mailComment', 0) } onBlur={this.checkAddMail.bind(this)} multiline={true} maxRows={5} />
+                          </Grid>
                         </Grid>
-                        <Grid item xs={6}>
-                          <MyTextInput label="" value={ this.state.mailMail } func={ this.changeMailNew.bind(this, 'mailMail', 0) } onBlur={this.checkAddMail.bind(this)} />
-                        </Grid>
-                      </>
+                      </Grid>
+
                     </Grid>
+
                   </Grid>
+                  
                 </>
                   :
                 null
@@ -690,34 +709,49 @@ class VendorModule_ extends React.Component {
                   <Grid item xs={12} sm={10}>
 
                     <Typography>Почта поставщика</Typography>
-                    <Divider style={{ marginBottom: 10 }} />
+                    <Divider style={{ marginBottom: 15 }} />
 
                     <Grid container spacing={3}>
                       {this.state.mails.map( (mail, key) => 
-                        <React.Fragment key={key}>
-                          <Grid item xs={5}>
-                            <MyAutocomplite multiple={false} label='' data={this.state.need_points} value={mail.point_id} func={ this.changeMail.bind(this, 'point_id', key) } />
+                        <Grid item xs={12} key={key}>
+                          <Grid container spacing={3} >
+                            <Grid item xs={5}>
+                              <MyAutocomplite multiple={false} label='Точка' data={this.state.need_points} value={mail.point_id} func={ this.changeMail.bind(this, 'point_id', key) } />
+                            </Grid>
+                            <Grid item xs={5}>
+                              <MyTextInput label="Почта" value={ mail.mail } func={ this.changeMail.bind(this, 'mail', key) } />
+                            </Grid>
+                            <Grid item xs={1}>
+                              <Button variant="contained" color='primary' style={{ width: '100%' }} onClick={this.delMail.bind(this, key)}>
+                                <CloseIcon />
+                              </Button>
+                            </Grid>
+                            <Grid item xs={12}>
+                              <MyTextInput label="Контактные данные" value={ this.state.comment } func={ this.changeMail.bind(this, 'comment', key) } multiline={true} maxRows={5} />
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Divider />
+                            </Grid>
                           </Grid>
-                          <Grid item xs={5}>
-                            <MyTextInput label="" value={ mail.mail } func={ this.changeMail.bind(this, 'mail', key) } />
-                          </Grid>
-                          <Grid item xs={1}>
-                            <Button variant="contained" color='primary' style={{ width: '100%' }} onClick={this.delMail.bind(this, key)}>
-                              <CloseIcon />
-                            </Button>
-                          </Grid>
-                        </React.Fragment>
+                        </Grid>
                       )}
 
-                      <>
-                        <Grid item xs={6}>
-                          <MyAutocomplite multiple={false} label='' data={this.state.need_points} value={this.state.mailPoint} func={ this.changeMailNew.bind(this, 'mailPoint', 0) } onBlur={this.checkAddMail.bind(this)} />
+                      <Grid item xs={12}>
+                        <Grid container spacing={3}>
+                          <Grid item xs={5}>
+                            <MyAutocomplite multiple={false} label='Точка' data={this.state.need_points} value={this.state.mailPoint} func={ this.changeMailNew.bind(this, 'mailPoint', 0) } onBlur={this.checkAddMail.bind(this)} />
+                          </Grid>
+                          <Grid item xs={5}>
+                            <MyTextInput label="Почта" value={ this.state.mailMail } func={ this.changeMailNew.bind(this, 'mailMail', 0) } onBlur={this.checkAddMail.bind(this)} />
+                          </Grid>
+                          <Grid item xs={12}>
+                            <MyTextInput label="Контактные данные" value={ this.state.mailComment } func={ this.changeMailNew.bind(this, 'mailComment', 0) } onBlur={this.checkAddMail.bind(this)} multiline={true} maxRows={5} />
+                          </Grid>
                         </Grid>
-                        <Grid item xs={6}>
-                          <MyTextInput label="" value={ this.state.mailMail } func={ this.changeMailNew.bind(this, 'mailMail', 0) } onBlur={this.checkAddMail.bind(this)} />
-                        </Grid>
-                      </>
+                      </Grid>
+                      
                     </Grid>
+
                   </Grid>
                 </>
                   :
