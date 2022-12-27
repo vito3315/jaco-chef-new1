@@ -99,6 +99,7 @@ const ReceptModule = React.lazy(() => import("../recept_module"));
 const OrderPostRec = React.lazy(() => import("../order_post_rec"));
 
 const ListFakeUsers = React.lazy(() => import("../list_fake_users"));
+const VendorMini = React.lazy(() => import("../vendor_mini"));
 
 import { SiteSaleMin, SiteSaleMin_New, SiteSaleMin_Edit, SiteSaleMin_StatList } from '../site_sale_min';
 
@@ -414,6 +415,7 @@ export function App () {
                   <Route path={'/order_post_rec'} exact={ true } element={ <OrderPostRec /> } />
                   
                   <Route path={'/list_fake_users'} exact={ true } element={ <ListFakeUsers /> } />
+                  <Route path={'/vendor_mini'} exact={ true } element={ <VendorMini /> } />
 
                   <Route
                     component={ () =>
