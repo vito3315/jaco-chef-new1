@@ -1,45 +1,29 @@
 import React from 'react';
 
 import Grid from '@mui/material/Grid';
-import Button from '@mui/material/Button';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import IconButton from '@mui/material/IconButton';
-
-import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
-import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import Divider from '@mui/material/Divider';
 
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyAutocomplite, MyTextInput } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
-
-import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/Inbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
 
 const queryString = require('query-string');
 
@@ -171,9 +155,9 @@ class VendorMini_ extends React.Component {
         >
           <DialogTitle>Поставщик {this.state.openVendor ? this.state.openVendor.name : ''}</DialogTitle>
           
-            <IconButton onClick={() => this.setState({ modalVendor: false }) } style={{ cursor: 'pointer', position: 'absolute', top: 0, right: 0, padding: 20 }}>
-              <CloseIcon />
-            </IconButton>
+          <IconButton onClick={() => this.setState({ modalVendor: false }) } style={{ cursor: 'pointer', position: 'absolute', top: 0, right: 0, padding: 20 }}>
+            <CloseIcon />
+          </IconButton>
           
           <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             
