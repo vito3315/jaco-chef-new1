@@ -54,71 +54,21 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-function App() {
-  const editorRef = useRef(null);
-  const log = () => {
-    if (editorRef.current) {
-      console.log(editorRef.current.getContent());
-    }
-  };
-  return (
-    <>
-      <Editor
-        apiKey="qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc"
-        onInit={(evt, editor) => (editorRef.current = editor)}
-        initialValue=""
-        init={{
-          height: 500,
-          //menubar: false,
-          plugins: [
-            'advlist',
-            'autolink',
-            'lists',
-            'link',
-            'image',
-            'charmap',
-            'preview',
-            'fonts',
-            'font size',
-            'anchor',
-            'searchreplace',
-            'visualblocks',
-            'code',
-            'fullscreen',
-            'insertdatetime',
-            'media',
-            'table',
-            'code',
-            'help',
-            'wordcount',
-          ],
-          toolbar:
-            'undo redo | blocks | fonts | font size | ' +
-            'bold italic forecolor | alignleft aligncenter ' +
-            'alignright alignjustify | bullist numlist outdent indent | ' +
-            'removeformat | link image | code | fullscreen | help',
-          content_style:
-            'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-        }}
-      />
-      <button onClick={log}>Log editor content</button>
-    </>
-  );
-}
-
 class SiteAktii_Modal extends React.Component {
   dropzoneOptions = {
     autoProcessQueue: false,
     autoQueue: true,
-    maxFiles: 10,
+    maxFiles: 1,
     timeout: 0,
     parallelUploads: 10,
     acceptedFiles: 'image/jpeg,image/png',
     addRemoveLinks: true,
-    url: 'https://jacochef.ru/src/img/fine_err/upload.php',
+    url: 'https://jacochef.ru/src/img/site_aktii/upload_img.php',
   };
+
   myDropzone = null;
   isInit = false;
+  click = false;
 
   constructor(props) {
     super(props);
@@ -139,6 +89,12 @@ class SiteAktii_Modal extends React.Component {
       this.setState({
         item: this.props.item,
       });
+
+      console.log( this.props.item )
+
+      setTimeout( () => {
+        this.myDropzone = new Dropzone("#for_img_edit", this.dropzoneOptions);
+      }, 300 )
     }
   }
 
@@ -192,130 +148,263 @@ class SiteAktii_Modal extends React.Component {
     });
   }
 
-  save() {
-    const item = this.state.item;
+  async saveNew() {
+    if (!this.click) {
+      this.click = true;
 
-    item.akcia.promo_name = item.akcia.promo;
+      const item = this.state.item;
 
-    item.akcia.items = item.akcia_items;
+      item.akcia.promo_name = item.akcia.promo;
+      item.akcia.items = item.akcia_items;
 
-    this.props.save(item.akcia);
+      const data = item.akcia;
 
-    this.onClose();
+      const res = await this.props.getData('save_new', data);
+
+      if(res.st === false){
+        this.setState({
+          openAlert: true,
+          err_status: res.st,
+          err_text: res.text,
+        });
+      } else {
+        if( this.myDropzone['files'].length > 0 ){
+          
+          if(this.myDropzone['files'].length > 0 && this.isInit === false) {
+            this.isInit = true;
+    
+            this.myDropzone.on('sending', (file, xhr, data) => {
+              data.append('name', item.akcia.name);
+							data.append('id', res.id);
+							data.append('img_type', 'full');
+            });
+    
+            this.myDropzone.on('queuecomplete', (data) => {
+              var check_img = false;
+    
+              this.myDropzone['files'].map( (item, key) => {
+                if (item['status'] == 'error') {
+                  check_img = true;
+                }
+              });
+    
+              if (check_img) {
+                this.setState({
+                  openAlert: true,
+                  err_status: false,
+                  err_text: 'Ошибка при загрузке фотографии',
+                });
+    
+                return;
+              } else {
+                setTimeout( () => {
+                  this.onClose(true);
+                }, 1000 )
+              }
+    
+              this.isInit = false;
+            });
+          }
+
+          this.myDropzone.processQueue();
+        } else {
+          this.onClose(true);
+        }
+      }
+
+      setTimeout(() => {
+        this.click = false;
+      }, 300);
+    }
   }
 
-  onClose() {
-    this.props.onClose();
+  async saveEdit() {
+    if (!this.click) {
+      this.click = true;
+
+      const item = this.state.item;
+
+      item.akcia.promo_name = item.akcia.promo;
+      item.akcia.items = item.akcia_items;
+
+      const data = item.akcia;
+
+      const res = await this.props.getData('save_edit', data);
+
+      if(res.st === false){
+        this.setState({
+          openAlert: true,
+          err_status: res.st,
+          err_text: res.text,
+        });
+      } else {
+        if( this.myDropzone['files'].length > 0 ){
+          
+          if(this.myDropzone['files'].length > 0 && this.isInit === false) {
+            this.isInit = true;
+    
+            this.myDropzone.on('sending', (file, xhr, data) => {
+              data.append('name', item.akcia.name);
+							data.append('id', item.akcia.id);
+							data.append('img_type', 'full');
+            });
+    
+            this.myDropzone.on('queuecomplete', (data) => {
+              var check_img = false;
+    
+              this.myDropzone['files'].map( (item, key) => {
+                if (item['status'] == 'error') {
+                  check_img = true;
+                }
+              });
+    
+              if (check_img) {
+                this.setState({
+                  openAlert: true,
+                  err_status: false,
+                  err_text: 'Ошибка при загрузке фотографии',
+                });
+    
+                return;
+              } else {
+                setTimeout( () => {
+                  this.onClose(true);
+                }, 1000 )
+              }
+    
+              this.isInit = false;
+            });
+          }
+
+          this.myDropzone.processQueue();
+        } else {
+          this.onClose(true);
+        }
+      }
+
+      setTimeout(() => {
+        this.click = false;
+      }, 300);
+    }
+  }
+
+  onClose(is_reload = false) {
+    this.props.onClose(is_reload);
   }
 
   render() {
     return (
       <Dialog
         open={this.props.open}
-        onClose={this.onClose.bind(this)}
+        onClose={this.onClose.bind(this, false)}
         fullScreen={this.props.fullScreen}
         fullWidth={true}
         maxWidth={'xl'}
       >
-        <DialogTitle className="button">
-          {this.props.method}
-          {this.props.itemName ? `: ${this.props.itemName}` : null}
-          {this.props.fullScreen ? (
-            <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
-              <CloseIcon />
-            </IconButton>
-          ) : null}
-        </DialogTitle>
-        <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <MyTextInput
-                label="Название акции"
-                value={this.state.item ? this.state.item.akcia.name : ''}
-                func={this.changeItem.bind(this, 'name')}
-              />
-            </Grid>
+        <DialogTitle className="button">{this.props.method}{this.props.itemName ? `: ${this.props.itemName}` : null}</DialogTitle>
 
-            <Grid item xs={12} sm={6}>
-              <MySelect
-                is_none={false}
-                label="Город"
-                data={this.state.item ? this.state.item.cities : []}
-                value={this.state.item ? this.state.item.akcia.city_id : ''}
-                func={this.changeItem.bind(this, 'city_id')}
-              />
-            </Grid>
+        <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer', position: 'absolute', top: 0, right: 0, padding: 20 }}>
+          <CloseIcon />
+        </IconButton>
 
-            <Grid item xs={12} sm={6}>
-              <MyDatePickerNew
-                label="Дата старта"
-                value={this.state.item ? this.state.item.akcia.start_date : ''}
-                func={this.changeDateRange.bind(this, 'start_date')}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <MyDatePickerNew
-                label="Дата окончания"
-                value={this.state.item ? this.state.item.akcia.end_date : ''}
-                func={this.changeDateRange.bind(this, 'end_date')}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={this.props.mark === 'editAction' ? 10 : 12}>
-              <MyAutocomplite
-                label="Товары участвующие в акции"
-                multiple={true}
-                data={this.state.item ? this.state.item.all_items ? this.state.item.all_items : this.state.item.items : []}
-                value={this.state.item ? this.state.item.akcia_items : []}
-                func={this.changeAutocomplite.bind(this, 'akcia_items')}
-              />
-            </Grid>
-
-            {this.props.mark === 'editAction' ? (
-              <Grid item xs={12} sm={2}>
-                <MyCheckBox
-                  label="Активность"
-                  value={this.state.item ? parseInt(this.state.item.akcia.is_show) == 1 ? true : false : false}
-                  func={this.changeItemChecked.bind(this, 'is_show')}
+        { !this.state.item ? null :
+          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6}>
+                <MyTextInput
+                  label="Название акции"
+                  value={this.state.item ? this.state.item.akcia.name : ''}
+                  func={this.changeItem.bind(this, 'name')}
                 />
               </Grid>
-            ) : null}
 
-            <Grid item xs={12} sm={12}>
-              <div
-                className="dropzone"
-                id="for_img_new"
-                style={{ width: '100%', minHeight: 150 }}
-              />
-            </Grid>
+              <Grid item xs={12} sm={6}>
+                <MySelect
+                  is_none={false}
+                  label="Город"
+                  data={this.state.item ? this.state.item.cities : []}
+                  value={this.state.item ? this.state.item.akcia.city_id : ''}
+                  func={this.changeItem.bind(this, 'city_id')}
+                />
+              </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <MyTextInput
-                label="Заголовок акции"
-                value={this.state.item ? this.state.item.akcia.promo_title : ''}
-                func={this.changeItem.bind(this, 'promo_title')}
-              />
-            </Grid>
+              <Grid item xs={12} sm={6}>
+                <MyDatePickerNew
+                  label="Дата старта"
+                  value={this.state.item ? this.state.item.akcia.start_date : ''}
+                  func={this.changeDateRange.bind(this, 'start_date')}
+                />
+              </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <MyTextInput
-                label="Промокод"
-                value={this.state.item ? this.state.item.akcia.promo : ''}
-                func={this.changeItem.bind(this, 'promo')}
-              />
-            </Grid>
+              <Grid item xs={12} sm={6}>
+                <MyDatePickerNew
+                  label="Дата окончания"
+                  value={this.state.item ? this.state.item.akcia.end_date : ''}
+                  func={this.changeDateRange.bind(this, 'end_date')}
+                />
+              </Grid>
 
-            <Grid item xs={12} sm={12}>
-              <TextEditor
-                value={this.state.item ? this.state.item.akcia.text : ''}
-                func={this.changeItemText.bind(this, 'text')}
-              />
+              <Grid item xs={12} sm={this.props.mark === 'editAction' ? 10 : 12}>
+                <MyAutocomplite
+                  label="Товары участвующие в акции"
+                  multiple={true}
+                  data={this.state.item ? this.state.item.all_items ? this.state.item.all_items : this.state.item.items : []}
+                  value={this.state.item ? this.state.item.akcia_items : []}
+                  func={this.changeAutocomplite.bind(this, 'akcia_items')}
+                />
+              </Grid>
+
+              {this.props.mark === 'editAction' ? (
+                <Grid item xs={12} sm={2}>
+                  <MyCheckBox
+                    label="Активность"
+                    value={this.state.item ? parseInt(this.state.item.akcia.is_show) == 1 ? true : false : false}
+                    func={this.changeItemChecked.bind(this, 'is_show')}
+                  />
+                </Grid>
+              ) : null}
+
+              <Grid item xs={12} sm={12}>
+                <Typography variant="h6" component="h6">Картинка соотношением 1:1 (например: 750x750) только JPG</Typography>
+
+                { !this.state.item || this.state.item.akcia.img_new.length == 0 ? null :
+                  <img style={{ maxHeight: 150 }} src={`https://storage.yandexcloud.net/site-aktii/${this.state.item.akcia.img_new}750х750.jpg`} />
+                }
+
+                <div
+                  className="dropzone"
+                  id="for_img_edit"
+                  style={{ width: '100%', minHeight: 150 }}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <MyTextInput
+                  label="Заголовок акции"
+                  value={this.state.item ? this.state.item.akcia.promo_title : ''}
+                  func={this.changeItem.bind(this, 'promo_title')}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <MyTextInput
+                  label="Промокод"
+                  value={this.state.item ? this.state.item.akcia.promo : ''}
+                  func={this.changeItem.bind(this, 'promo')}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={12}>
+                <TextEditor
+                  value={this.state.item ? this.state.item.akcia.text : ''}
+                  func={this.changeItemText.bind(this, 'text')}
+                />
+              </Grid>
             </Grid>
-          </Grid>
-        </DialogContent>
+          </DialogContent>
+        }
         <DialogActions>
-          <Button variant="contained" onClick={this.save.bind(this)}>
+          <Button variant="contained" onClick={ this.props.mark == 'editAction' ? this.saveEdit.bind(this) : this.saveNew.bind(this) }>
             Сохранить
           </Button>
         </DialogActions>
@@ -364,6 +453,7 @@ class SiteAktii_ extends React.Component {
         name: '',
         text: '',
         promo: '',
+        img_new: ''
       },
     };
   }
@@ -444,6 +534,10 @@ class SiteAktii_ extends React.Component {
     this.setState({
       city: value,
     });
+
+    setTimeout( () => {
+      this.update();
+    }, 300 )
   }
 
   copyLink(item) {
@@ -583,35 +677,9 @@ class SiteAktii_ extends React.Component {
     }
   }
 
-  async save(data) {
-    let res;
-
-    if (this.state.mark === 'newAсtion') {
-      // console.log(data);
-      res = await this.getData('save_new', data);
-    }
-
-    if (this.state.mark === 'editAction') {
-      // console.log(data);
-      res = await this.getData('save_edit', data);
-    }
-
-    if(!res.st) {
-      this.setState({
-        openAlert: true,
-        err_status: res.st,
-        err_text: res.text,
-      });
-    } else {
-      setTimeout( () => {
-        this.update();
-      }, 300)
-    }
-  }
-
   async update() {
     const city = {
-      city_id: '-1',
+      city_id: this.state.city.id,
     };
 
     const data = await this.getData('get_all', city);
@@ -622,10 +690,21 @@ class SiteAktii_ extends React.Component {
     });
   }
 
+  onCloseModal(is_reload = false){
+    this.setState({ 
+      modalDialog: false, 
+      itemName: '' 
+    })
+
+    if( is_reload ){
+      this.update()
+    }
+  }
+
   render() {
     return (
       <>
-        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 999 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
 
@@ -638,13 +717,13 @@ class SiteAktii_ extends React.Component {
 
         <SiteAktii_Modal
           open={this.state.modalDialog}
-          onClose={() => this.setState({ modalDialog: false, itemName: '' })}
+          onClose={ this.onCloseModal.bind(this) }
           method={this.state.method}
           mark={this.state.mark}
           item={this.state.item}
           itemName={this.state.itemName}
-          save={this.save.bind(this)}
           fullScreen={this.state.fullScreen}
+          getData={this.getData.bind(this)}
         />
 
         <Grid container spacing={3} mb={3}>
@@ -685,36 +764,34 @@ class SiteAktii_ extends React.Component {
                 </TableHead>
 
                 <TableBody>
-                  {this.state.active
-                    .filter((item) => this.state.city.id !== '-1' ? this.state.city.name === item.city_name : item)
-                    .map((item, key) => (
-                      <TableRow key={key} hover>
-                        <TableCell>{key + 1}</TableCell>
-                        <TableCell onClick={this.openModal.bind(this, 'editAction', 'Редактирование акции', item.id)} style={{ fontWeight: 700, cursor: 'pointer' }}>
-                          {item.name}
-                        </TableCell>
-                        <TableCell>
-                          <ContentCopyIcon onClick={this.copyLink.bind(this, item)} style={{ cursor: 'pointer' }}/>
-                        </TableCell>
-                        <TableCell>
-                          <Grid item xs={12} sm={6}>
-                            <MyTextInput
-                              value={item.sort}
-                              func={this.changeSort.bind(this, 'sort', 'active', item)}
-                            />
-                          </Grid>
-                        </TableCell>
-                        <TableCell>{item.city_name}</TableCell>
-                        <TableCell>{item.start_date}</TableCell>
-                        <TableCell>{item.end_date}</TableCell>
-                        <TableCell>
-                          <MyCheckBox
-                            value={parseInt(item.is_show) == 1 ? true : false}
-                            func={this.changeChecked.bind(this, 'is_show', 'active', item)}
+                  {this.state.active.map((item, key) => (
+                    <TableRow key={key} hover>
+                      <TableCell>{key + 1}</TableCell>
+                      <TableCell onClick={this.openModal.bind(this, 'editAction', 'Редактирование акции', item.id)} style={{ fontWeight: 700, cursor: 'pointer' }}>
+                        {item.name}
+                      </TableCell>
+                      <TableCell>
+                        <ContentCopyIcon onClick={this.copyLink.bind(this, item)} style={{ cursor: 'pointer' }}/>
+                      </TableCell>
+                      <TableCell>
+                        <Grid item xs={12} sm={6}>
+                          <MyTextInput
+                            value={item.sort}
+                            func={this.changeSort.bind(this, 'sort', 'active', item)}
                           />
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                        </Grid>
+                      </TableCell>
+                      <TableCell>{item.city_name}</TableCell>
+                      <TableCell>{item.start_date}</TableCell>
+                      <TableCell>{item.end_date}</TableCell>
+                      <TableCell>
+                        <MyCheckBox
+                          value={parseInt(item.is_show) == 1 ? true : false}
+                          func={this.changeChecked.bind(this, 'is_show', 'active', item)}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -741,36 +818,34 @@ class SiteAktii_ extends React.Component {
                   </TableHead>
 
                   <TableBody>
-                    {this.state.non_active
-                      .filter((item) => this.state.city.id !== '-1' ? this.state.city.name === item.city_name : item)
-                      .map((item, key) => (
-                        <TableRow key={key} hover>
-                          <TableCell>{key + 1}</TableCell>
-                          <TableCell onClick={this.openModal.bind(this, 'editAction', 'Редактирование акции', item.id)} style={{ fontWeight: 700, cursor: 'pointer' }}>
-                            {item.name}
-                          </TableCell>
-                          <TableCell>
-                            <ContentCopyIcon onClick={this.copyLink.bind(this, item)} style={{ cursor: 'pointer' }}/>
-                          </TableCell>
-                          <TableCell>
-                            <Grid item xs={12} sm={6}>
-                              <MyTextInput
-                                value={item.sort}
-                                func={this.changeSort.bind(this, 'sort', 'nonActive', item)}
-                              />
-                            </Grid>
-                          </TableCell>
-                          <TableCell>{item.city_name}</TableCell>
-                          <TableCell>{item.start_date}</TableCell>
-                          <TableCell>{item.end_date}</TableCell>
-                          <TableCell>
-                            <MyCheckBox
-                              value={parseInt(item.is_show) == 1 ? true : false}
-                              func={this.changeChecked.bind(this, 'is_show', 'nonActive', item)}
+                    {this.state.non_active.map((item, key) => (
+                      <TableRow key={key} hover>
+                        <TableCell>{key + 1}</TableCell>
+                        <TableCell onClick={this.openModal.bind(this, 'editAction', 'Редактирование акции', item.id)} style={{ fontWeight: 700, cursor: 'pointer' }}>
+                          {item.name}
+                        </TableCell>
+                        <TableCell>
+                          <ContentCopyIcon onClick={this.copyLink.bind(this, item)} style={{ cursor: 'pointer' }}/>
+                        </TableCell>
+                        <TableCell>
+                          <Grid item xs={12} sm={6}>
+                            <MyTextInput
+                              value={item.sort}
+                              func={this.changeSort.bind(this, 'sort', 'nonActive', item)}
                             />
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                          </Grid>
+                        </TableCell>
+                        <TableCell>{item.city_name}</TableCell>
+                        <TableCell>{item.start_date}</TableCell>
+                        <TableCell>{item.end_date}</TableCell>
+                        <TableCell>
+                          <MyCheckBox
+                            value={parseInt(item.is_show) == 1 ? true : false}
+                            func={this.changeChecked.bind(this, 'is_show', 'nonActive', item)}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </AccordionDetails>
