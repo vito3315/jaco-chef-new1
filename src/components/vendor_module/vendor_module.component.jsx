@@ -18,6 +18,7 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import Divider from '@mui/material/Divider';
 
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -49,12 +50,19 @@ class VendorModule_ extends React.Component {
       
       allItems: [],
       vendor_items: [],
+      mails: [],
       openVendor: null,
       customAdd: 0,
       
       vendorCities: [],
       allCities: [],
-      
+      all_points: [],
+      need_points: [],
+
+      mailPoint: null,
+      mailMail: '',
+      mailComment: '',
+
       nds: [
         { id: -1, name: 'Без НДС' },
         { id: 10, name: '10% НДС' },
@@ -65,7 +73,7 @@ class VendorModule_ extends React.Component {
       ],
       
       cities: [],
-      city: -1
+      city: ''
     };
   }
   
@@ -76,7 +84,8 @@ class VendorModule_ extends React.Component {
     this.setState({
       module_name: data.module_info.name,
       vendors: data.vendors,
-      cities: data.cities
+      cities: data.cities,
+      city: data.cities[0].id,
     })
     
     document.title = data.module_info.name;
@@ -168,9 +177,62 @@ class VendorModule_ extends React.Component {
       openVendor: res.vendor,
       vendorCities: res.vendor_cities,
       allCities: res.all_cities,
+      mails: res.mails,
+      all_points: res.all_points
     })
+
+    setTimeout( () => {
+      this.changeCityPoint();
+    }, 300 )
   }
   
+  changeCityPoint(){
+    const { vendorCities, all_points, mails } = this.state;
+
+    let need_points = [];
+    let newMails = [];
+
+    vendorCities.map( city => {
+      all_points.map( point => {
+        if( parseInt(point.city_id) == parseInt(city.id) ){
+          need_points.push(point)
+        }
+      } )
+
+      mails.map( mail => {
+        if( parseInt(mail.point_id.city_id) == parseInt(city.id) ){
+          newMails.push(mail)
+        }
+      } )
+    } )
+
+    if( need_points.length > 0 ){
+      need_points.unshift(all_points[0]);
+
+      mails.map( mail => {
+        if( parseInt(mail.point_id.city_id) == -1 ){
+          newMails.unshift(mail)
+        }
+      } )
+    }
+
+    need_points = need_points.sort(function (a, b) {
+      if (a.id > b.id) {
+        return 1;
+      }
+      if (a.id < b.id) {
+        return -1;
+      }
+      
+      return 0;
+    });
+
+    this.setState({
+      need_points: need_points,
+      mails: newMails
+    })
+  }
+
   async openModalVendorNew(){
     let data = {
       vendor_id: 0
@@ -194,6 +256,8 @@ class VendorModule_ extends React.Component {
         text: "",
       },
       vendorCities: [],
+      mails: [],
+      all_points: res.all_points,
       allCities: res.all_cities,
     })
   }
@@ -225,7 +289,8 @@ class VendorModule_ extends React.Component {
     let data = {
       vendor: this.state.openVendor,
       vendor_cities: this.state.vendorCities,
-      city: this.state.city
+      city: this.state.city,
+      mails: this.state.mails
     }
     
     let res = await this.getData('update_vendor', data);
@@ -243,7 +308,8 @@ class VendorModule_ extends React.Component {
     let data = {
       vendor: this.state.openVendor,
       vendor_cities: this.state.vendorCities,
-      city: this.state.city
+      city: this.state.city,
+      mails: this.state.mails
     }
     
     let res = await this.getData('new_vendor', data);
@@ -323,18 +389,51 @@ class VendorModule_ extends React.Component {
     })
   }
   
-  changeSort(data, event){
-    this.state.vendor_items.map( (item, key) => {
-      if( parseInt(item.item_id) == parseInt(data) ){
-        this.state.vendor_items[key]['sort'] = event.target.value;
-      }
-    })
-    
+  changeMail(type, key, event, data){
+    let thisMails = [...this.state.mails];
+
+    thisMails[key][ [type] ] = data ? data : event.target.value || event.target.value == '' ? event.target.value : null;
+
     this.setState({
-      vendor_items: this.state.vendor_items
+      mails: thisMails
     })
   }
-  
+
+  changeMailNew(type, key, event, data){
+    this.setState({
+      [type]: data ? data : event.target.value
+    })
+  }
+
+  checkAddMail(){
+    if( this.state.mailMail.length > 0 && this.state.mailPoint !== null && this.state.mailComment.length > 0 ){
+      let thisMails = [...this.state.mails];
+
+      thisMails.push({
+        point_id: this.state.mailPoint,
+        mail: this.state.mailMail,
+        comment: this.state.mailComment
+      })
+
+      this.setState({
+        mails: thisMails,
+        mailMail: '',
+        mailPoint: null,
+        mailComment: ''
+      })
+    }
+  }
+
+  delMail(mailKey){
+    let thisMails = [...this.state.mails];
+
+    thisMails = thisMails.filter( (item, key) => parseInt(key) != parseInt(mailKey) )
+
+    this.setState({
+      mails: thisMails,
+    })
+  }
+
   render(){
     return (
       <>
@@ -388,9 +487,6 @@ class VendorModule_ extends React.Component {
                     { this.state.vendor_items.map( (item, key) => 
                       <TableRow key={key} style={{ height: 75 }}>
                         <TableCell>{item.item_name}</TableCell>
-                        <TableCell>
-                          <MyTextInput label="" value={ item.sort } func={ this.changeSort.bind(this, item.item_id) } />
-                        </TableCell>
                         <TableCell>
                           <MySelect data={this.state.nds} value={item.nds} func={ this.changeNDS.bind(this, item.item_id) } />
                         </TableCell>
@@ -477,11 +573,60 @@ class VendorModule_ extends React.Component {
                   </Grid>
                   
                   <Grid item xs={12} sm={6}>
-                    <MyAutocomplite multiple={true} label='Города' data={this.state.allCities} value={this.state.vendorCities} func={ (event, value) => { console.log(value); this.setState({ vendorCities: value }) } } />
+                    <MyAutocomplite multiple={true} label='Города' data={this.state.allCities} value={this.state.vendorCities} func={ (event, value) => { console.log(value); this.setState({ vendorCities: value }); setTimeout( () => { this.changeCityPoint(); }, 300 ) } } />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <MyCheckBox label="Приоритетный поставщик" value={ parseInt(this.state.openVendor.is_priority) == 1 ? true : false } func={ this.testChange.bind(this, 'is_priority') } />
                   </Grid>
+
+                  <Grid item xs={12} sm={10}>
+
+                    <Typography>Почта поставщика</Typography>
+                    <Divider style={{ marginBottom: 15 }} />
+
+                    <Grid container spacing={3}>
+                      {this.state.mails.map( (mail, key) => 
+                        <Grid item xs={12} key={key}>
+                          <Grid container spacing={3} >
+                            <Grid item xs={5}>
+                              <MyAutocomplite multiple={false} label='Точка' data={this.state.need_points} value={mail.point_id} func={ this.changeMail.bind(this, 'point_id', key) } />
+                            </Grid>
+                            <Grid item xs={5}>
+                              <MyTextInput label="Почта" value={ mail.mail } func={ this.changeMail.bind(this, 'mail', key) } />
+                            </Grid>
+                            <Grid item xs={1}>
+                              <Button variant="contained" color='primary' style={{ width: '100%' }} onClick={this.delMail.bind(this, key)}>
+                                <CloseIcon />
+                              </Button>
+                            </Grid>
+                            <Grid item xs={12}>
+                              <MyTextInput label="Контактные данные" value={ mail.comment } func={ this.changeMail.bind(this, 'comment', key) } multiline={true} maxRows={5} />
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Divider />
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                      )}
+
+                      <Grid item xs={12}>
+                        <Grid container spacing={3}>
+                          <Grid item xs={5}>
+                            <MyAutocomplite multiple={false} label='Точка' data={this.state.need_points} value={this.state.mailPoint} func={ this.changeMailNew.bind(this, 'mailPoint', 0) } onBlur={this.checkAddMail.bind(this)} />
+                          </Grid>
+                          <Grid item xs={5}>
+                            <MyTextInput label="Почта" value={ this.state.mailMail } func={ this.changeMailNew.bind(this, 'mailMail', 0) } onBlur={this.checkAddMail.bind(this)} />
+                          </Grid>
+                          <Grid item xs={12}>
+                            <MyTextInput label="Контактные данные" value={ this.state.mailComment } func={ this.changeMailNew.bind(this, 'mailComment', 0) } onBlur={this.checkAddMail.bind(this)} multiline={true} maxRows={5} />
+                          </Grid>
+                        </Grid>
+                      </Grid>
+
+                    </Grid>
+
+                  </Grid>
+                  
                 </>
                   :
                 null
@@ -558,7 +703,55 @@ class VendorModule_ extends React.Component {
                   </Grid>
                   
                   <Grid item xs={12} sm={6}>
-                    <MyAutocomplite label='Города' data={this.state.allCities} value={this.state.vendorCities} func={ (event, value) => { this.setState({ vendorCities: value }) } } />
+                    <MyAutocomplite multiple={true} label='Города' data={this.state.allCities} value={this.state.vendorCities} func={ (event, value) => { this.setState({ vendorCities: value }); setTimeout( () => { this.changeCityPoint(); }, 300 ) } } />
+                  </Grid>
+
+                  <Grid item xs={12} sm={10}>
+
+                    <Typography>Почта поставщика</Typography>
+                    <Divider style={{ marginBottom: 15 }} />
+
+                    <Grid container spacing={3}>
+                      {this.state.mails.map( (mail, key) => 
+                        <Grid item xs={12} key={key}>
+                          <Grid container spacing={3} >
+                            <Grid item xs={5}>
+                              <MyAutocomplite multiple={false} label='Точка' data={this.state.need_points} value={mail.point_id} func={ this.changeMail.bind(this, 'point_id', key) } />
+                            </Grid>
+                            <Grid item xs={5}>
+                              <MyTextInput label="Почта" value={ mail.mail } func={ this.changeMail.bind(this, 'mail', key) } />
+                            </Grid>
+                            <Grid item xs={1}>
+                              <Button variant="contained" color='primary' style={{ width: '100%' }} onClick={this.delMail.bind(this, key)}>
+                                <CloseIcon />
+                              </Button>
+                            </Grid>
+                            <Grid item xs={12}>
+                              <MyTextInput label="Контактные данные" value={ mail.comment } func={ this.changeMail.bind(this, 'comment', key) } multiline={true} maxRows={5} />
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Divider />
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                      )}
+
+                      <Grid item xs={12}>
+                        <Grid container spacing={3}>
+                          <Grid item xs={5}>
+                            <MyAutocomplite multiple={false} label='Точка' data={this.state.need_points} value={this.state.mailPoint} func={ this.changeMailNew.bind(this, 'mailPoint', 0) } onBlur={this.checkAddMail.bind(this)} />
+                          </Grid>
+                          <Grid item xs={5}>
+                            <MyTextInput label="Почта" value={ this.state.mailMail } func={ this.changeMailNew.bind(this, 'mailMail', 0) } onBlur={this.checkAddMail.bind(this)} />
+                          </Grid>
+                          <Grid item xs={12}>
+                            <MyTextInput label="Контактные данные" value={ this.state.mailComment } func={ this.changeMailNew.bind(this, 'mailComment', 0) } onBlur={this.checkAddMail.bind(this)} multiline={true} maxRows={5} />
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                      
+                    </Grid>
+
                   </Grid>
                 </>
                   :
