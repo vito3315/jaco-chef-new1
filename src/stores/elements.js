@@ -534,7 +534,7 @@ export class MyAlert extends React.Component {
           severity={ this.props.status ? "success" : "error" } 
           sx={{ width: '100%' }}
         >
-          { this.props.status ? 'Данные успешно сохранены!' : this.props.text }
+          { this.props.status ? this.props.text ? this.props.text : 'Данные успешно сохранены!' : this.props.text } 
         </Alert>
       </Snackbar>
     )
