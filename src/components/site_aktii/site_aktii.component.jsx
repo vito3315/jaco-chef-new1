@@ -294,6 +294,14 @@ class SiteAktii_Modal extends React.Component {
 
   render() {
     return (
+      <>
+      <MyAlert
+          isOpen={this.state.openAlert}
+          onClose={() => this.setState({ openAlert: false })}
+          status={this.state.err_status}
+          text={this.state.err_text}
+        />
+      
       <Dialog
         open={this.props.open}
         onClose={this.onClose.bind(this, false)}
@@ -409,6 +417,7 @@ class SiteAktii_Modal extends React.Component {
           </Button>
         </DialogActions>
       </Dialog>
+      </>
     );
   }
 }
@@ -416,8 +425,8 @@ class SiteAktii_Modal extends React.Component {
 class SiteAktii_ extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
+
       module: 'site_aktii',
       module_name: '',
       is_load: false,
