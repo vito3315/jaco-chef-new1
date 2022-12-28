@@ -296,11 +296,11 @@ class SiteAktii_Modal extends React.Component {
     return (
       <>
       <MyAlert
-          isOpen={this.state.openAlert}
-          onClose={() => this.setState({ openAlert: false })}
-          status={this.state.err_status}
-          text={this.state.err_text}
-        />
+        isOpen={this.state.openAlert}
+        onClose={() => this.setState({ openAlert: false })}
+        status={this.state.err_status}
+        text={this.state.err_text}
+      />
       
       <Dialog
         open={this.props.open}
