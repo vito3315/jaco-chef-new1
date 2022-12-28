@@ -545,22 +545,10 @@ class VendorModule_ extends React.Component {
                     <MyTextInput label="РС" value={ this.state.openVendor.rc } func={ this.testChange.bind(this, 'rc') } />
                   </Grid>
 
-                  <Grid item xs={12} sm={8}>
+                  <Grid item xs={12} sm={12}>
                     <MyTextInput label="Адрес компании" value={ this.state.openVendor.addr } func={ this.testChange.bind(this, 'addr') } />
                   </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Контактное лицо" value={ this.state.openVendor.user } func={ this.testChange.bind(this, 'user') } />
-                  </Grid>
                   
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Телефон" value={ this.state.openVendor.phone } func={ this.testChange.bind(this, 'phone') } />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Почта" value={ this.state.openVendor.email } func={ this.testChange.bind(this, 'email') } />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Доп почта" value={ this.state.openVendor.email_2 } func={ this.testChange.bind(this, 'email_2') } />
-                  </Grid>
                   
                   <Grid item xs={12} sm={4}>
                     <MyCheckBox label="Активность" value={ parseInt(this.state.openVendor.is_show) == 1 ? true : false } func={ this.testChange.bind(this, 'is_show') } />
@@ -678,21 +666,8 @@ class VendorModule_ extends React.Component {
                     <MyTextInput label="РС" value={ this.state.openVendor.rc } func={ this.testChange.bind(this, 'rc') } />
                   </Grid>
                   
-                  <Grid item xs={12} sm={8}>
+                  <Grid item xs={12} sm={12}>
                     <MyTextInput label="Адрес компании" value={ this.state.openVendor.addr } func={ this.testChange.bind(this, 'addr') } />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Контактное лицо" value={ this.state.openVendor.user } func={ this.testChange.bind(this, 'user') } />
-                  </Grid>
-                  
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Телефон" value={ this.state.openVendor.phone } func={ this.testChange.bind(this, 'phone') } />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Почта" value={ this.state.openVendor.email } func={ this.testChange.bind(this, 'email') } />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <MyTextInput label="Доп почта" value={ this.state.openVendor.email_2 } func={ this.testChange.bind(this, 'email_2') } />
                   </Grid>
                   
                   <Grid item xs={12} sm={6}>
