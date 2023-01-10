@@ -1583,29 +1583,28 @@ class SiteItems_ extends React.Component {
 
                               <Grid item xs={12}>
                                 <Grid container spacing={3}>
-                                  <Grid item xs={12} sm={4}>
+                                  <Grid item xs={12} sm={3}>
                                     <MyTextInput label="Стол" value={ this.state.editItem.stol } func={ this.changeItem.bind(this, 'stol') } />
                                   </Grid>
                                   
                                   { parseInt(this.state.editItem.category_id) == 6 ?
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid item xs={12} sm={3}>
                                       <MyTextInput label="Объем" value={ this.state.editItem.weight } func={ this.changeItem.bind(this, 'weight') } />
                                     </Grid>
                                       :
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid item xs={12} sm={3}>
                                       <MyTextInput label="Вес" value={ this.state.editItem.weight } func={ this.changeItem.bind(this, 'weight') } />
                                     </Grid>
                                   }
 
-                                  { parseInt(this.state.editItem.category_id) != 14 ?
-                                    <Grid item xs={12} sm={4}>
-                                      <MyTextInput label="Кол-во кусочков" value={ this.state.editItem.count_part } func={ this.changeItem.bind(this, 'count_part') } />
-                                    </Grid>
-                                      :
-                                    <Grid item xs={12} sm={4}>
-                                      <MyTextInput label="Размер пиццы" value={ this.state.editItem.size_pizza } func={ this.changeItem.bind(this, 'size_pizza') } />
-                                    </Grid>
-                                  }
+                                  <Grid item xs={12} sm={3}>
+                                    <MyTextInput label="Кол-во кусочков" value={ this.state.editItem.count_part } func={ this.changeItem.bind(this, 'count_part') } />
+                                  </Grid>
+                                    
+                                  <Grid item xs={12} sm={3}>
+                                    <MyTextInput label="Размер" value={ this.state.editItem.size_pizza } func={ this.changeItem.bind(this, 'size_pizza') } />
+                                  </Grid>
+                                  
                                 </Grid>
                               </Grid>
 
@@ -1614,17 +1613,14 @@ class SiteItems_ extends React.Component {
                               { parseInt( this.state.editItem.type ) != 2 ?
                                 <Grid item xs={12}>
                                   <Grid container spacing={3}>
-                                    <Grid item xs={12} sm={3}>
+                                    <Grid item xs={12} sm={4}>
                                       <MyTextInput label="Белки" value={ this.state.editItem.protein } func={ this.changeItem.bind(this, 'protein') } />
                                     </Grid>
-                                    <Grid item xs={12} sm={3}>
+                                    <Grid item xs={12} sm={4}>
                                       <MyTextInput label="Жиры" value={ this.state.editItem.fat } func={ this.changeItem.bind(this, 'fat') } />
                                     </Grid>
-                                    <Grid item xs={12} sm={3}>
+                                    <Grid item xs={12} sm={4}>
                                       <MyTextInput label="Углеводы" value={ this.state.editItem.carbohydrates } func={ this.changeItem.bind(this, 'carbohydrates') } />
-                                    </Grid>
-                                    <Grid item xs={12} sm={3}>
-                                      <MyTextInput label="Энергетическая ценность" value={ this.state.editItem.kkal } func={ this.changeItem.bind(this, 'kkal') } />
                                     </Grid>
                                   </Grid>
                                 </Grid>
@@ -1937,27 +1933,28 @@ class SiteItems_ extends React.Component {
 
                                 <Grid item xs={12}>
                                   <Grid container spacing={3}>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid item xs={12} sm={3}>
                                       <MyTextInput label="Стол" value={ this.state.editItem.stol } func={ this.changeItem.bind(this, 'stol') } />
                                     </Grid>
+
                                     { parseInt(this.state.editItem.category_id) == 6 ?
-                                      <Grid item xs={12} sm={4}>
+                                      <Grid item xs={12} sm={3}>
                                         <MyTextInput label="Объем" value={ this.state.editItem.weight } func={ this.changeItem.bind(this, 'weight') } />
                                       </Grid>
                                         :
-                                      <Grid item xs={12} sm={4}>
+                                      <Grid item xs={12} sm={3}>
                                         <MyTextInput label="Вес" value={ this.state.editItem.weight } func={ this.changeItem.bind(this, 'weight') } />
                                       </Grid>
                                     }
-                                    { parseInt(this.state.editItem.category_id) != 14 ?
-                                      <Grid item xs={12} sm={4}>
-                                        <MyTextInput label="Кол-во кусочков" value={ this.state.editItem.count_part } func={ this.changeItem.bind(this, 'count_part') } />
-                                      </Grid>
-                                        :
-                                      <Grid item xs={12} sm={4}>
-                                        <MyTextInput label="Размер пиццы" value={ this.state.editItem.size_pizza } func={ this.changeItem.bind(this, 'size_pizza') } />
-                                      </Grid>
-                                    }
+                                   
+                                    <Grid item xs={12} sm={3}>
+                                      <MyTextInput label="Кол-во кусочков" value={ this.state.editItem.count_part } func={ this.changeItem.bind(this, 'count_part') } />
+                                    </Grid>
+                                      
+                                    <Grid item xs={12} sm={3}>
+                                      <MyTextInput label="Размер" value={ this.state.editItem.size_pizza } func={ this.changeItem.bind(this, 'size_pizza') } />
+                                    </Grid>
+                                    
                                   </Grid>
                                 </Grid>
 
@@ -1966,18 +1963,16 @@ class SiteItems_ extends React.Component {
                                 { parseInt( this.state.editItem.type ) != 2 ?
                                   <Grid item xs={12}>
                                     <Grid container spacing={3}>
-                                      <Grid item xs={12} sm={3}>
+                                      <Grid item xs={12} sm={4}>
                                         <MyTextInput label="Белки" value={ this.state.editItem.protein } func={ this.changeItem.bind(this, 'protein') } />
                                       </Grid>
-                                      <Grid item xs={12} sm={3}>
+                                      <Grid item xs={12} sm={4}>
                                         <MyTextInput label="Жиры" value={ this.state.editItem.fat } func={ this.changeItem.bind(this, 'fat') } />
                                       </Grid>
-                                      <Grid item xs={12} sm={3}>
+                                      <Grid item xs={12} sm={4}>
                                         <MyTextInput label="Углеводы" value={ this.state.editItem.carbohydrates } func={ this.changeItem.bind(this, 'carbohydrates') } />
                                       </Grid>
-                                      <Grid item xs={12} sm={3}>
-                                        <MyTextInput label="Энергетическая ценность" value={ this.state.editItem.kkal } func={ this.changeItem.bind(this, 'kkal') } />
-                                      </Grid>
+                                      
                                     </Grid>
                                   </Grid>
                                     :
