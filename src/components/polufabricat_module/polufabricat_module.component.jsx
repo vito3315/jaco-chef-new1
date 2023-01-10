@@ -47,20 +47,15 @@ class PolufabricatModule_Modal extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    // console.log(this.props.event);
-
     if (!this.props.event) {
       return;
     }
 
     if (this.props.event !== prevProps.event) {
-
       const item = this.props.event;
 
       if(this.props.mark === 'newItem') {
-
         item.item.this_storages = [];
-
       }
 
       this.setState({
@@ -183,6 +178,28 @@ class PolufabricatModule_Modal extends React.Component {
               />
             </Grid>
 
+            <Grid item xs={12} sm={12}>
+              <MyTextInput
+                label="Состав"
+                value={this.state.item ? this.state.item.item.structure : ''}
+                func={this.changeItem.bind(this, 'structure')}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={12}>
+              <MyAutocomplite
+                label="Аллергены"
+                multiple={true}
+                data={this.state.item ? this.state.item.allergens : []}
+                value={this.state.item ? this.state.item.item.my_allergens : []}
+                func={(event, value) => {
+                  let item = this.state.item;
+                  item.item.my_allergens = value;
+                  this.setState({ item });
+                }}
+              />
+            </Grid>
+
             {this.props.mark === 'itemEdit' ? (
               <Grid item xs={12}>
                 <MyCheckBox
@@ -236,8 +253,6 @@ class PolufabricatModule_ extends React.Component {
 
   async componentDidMount() {
     const data = await this.getData('get_all');
-
-    // console.log(data);
 
     this.setState({
       module_name: data.module_info.name,
@@ -380,8 +395,6 @@ class PolufabricatModule_ extends React.Component {
       type,
       is_show,
     };
-
-    // console.log(data);
 
     let res = await this.getData('update_order_rev_active', data);
 
