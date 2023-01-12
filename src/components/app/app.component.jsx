@@ -91,6 +91,7 @@ const CheckCheck = React.lazy(() => import("../check_check"));
 const OptionToWin = React.lazy(() => import("../option_to_win"));
 const AppPerH = React.lazy(() => import("../app_per_h"));
 const SiteAktii = React.lazy(() => import("../site_aktii"));
+const Experience = React.lazy(() => import("../experience"));
 
 const CountUsers = React.lazy(() => import("../count_users"));
 const Fines = React.lazy(() => import("../fines"));
@@ -393,6 +394,7 @@ export function App () {
                   <Route path={'/promo_items_stat'} exact={ true } element={ <PromoItemsStat /> } />
                   <Route path={'/site_items'} exact={ true } element={ <SiteItems /> } />
                   <Route path={'/site_aktii'} exact={ true } element={ <SiteAktii /> } />
+                  <Route path={'/experience'} exact={ true } element={ <Experience /> } />
 
                   <Route path={'/hot_map'} exact={ true } element={ <HotMap /> } />
                   <Route path={'/site_sale_min'} exact={ true } element={ <SiteSaleMin /> } />
