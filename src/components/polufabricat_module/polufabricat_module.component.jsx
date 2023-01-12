@@ -200,6 +200,20 @@ class PolufabricatModule_Modal extends React.Component {
               />
             </Grid>
 
+            <Grid item xs={12} sm={12}>
+              <MyAutocomplite
+                label="Возможные аллергены"
+                multiple={true}
+                data={this.state.item ? this.state.item.allergens : []}
+                value={this.state.item ? this.state.item.item.my_allergens_other : []}
+                func={(event, value) => {
+                  let item = this.state.item;
+                  item.item.my_allergens_other = value;
+                  this.setState({ item });
+                }}
+              />
+            </Grid>
+
             {this.props.mark === 'itemEdit' ? (
               <Grid item xs={12}>
                 <MyCheckBox
