@@ -316,10 +316,11 @@ class CategoryItems_ extends React.Component {
   }
 
   async saveEditCat(editMainNameMy, editMainCatMy) {
+
     let data = {
       name: editMainNameMy,
       cat_id: editMainCatMy,
-      id: this.state.event.id,
+      id: this.state.data.id,
     };
 
     let res = await this.getData('edit_cat', data);
