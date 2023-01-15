@@ -25,7 +25,11 @@ import { MySelect, MyAutocomplite, MyAlert } from '../../stores/elements';
 
 const queryString = require('query-string');
 
-const experience = ['Стаж менее года', '1 года стажа', '2 года стажа', '3 года стажа', '4 года стажа', '5 лет стажа'];
+const formatter = new Intl.NumberFormat("ru", {
+  style: "unit",
+  unit: "year",
+  unitDisplay: "long"
+});
 
 class Experience_Modal extends React.Component {
   constructor(props) {
@@ -82,7 +86,7 @@ class Experience_Modal extends React.Component {
           <Grid container spacing={3}>
             <Grid item xs={12} sm={4} display="flex" justifyContent="center">
               {this.state.item ? this.state.item.photo ? (
-                  <img src={this.state.item.photo} style={{ maxWidth: 800, maxHeight: 800 }}/>
+                  <img src={this.state.item.photo} style={{ maxWidth: 250, maxHeight: 200 }}/>
                 ): 'Фото отсутствует' : 'Фото отсутствует'}
             </Grid>
 
@@ -138,6 +142,7 @@ class Experience_ extends React.Component {
       city: -1,
 
       points: [],
+      pointsCopy: [],
       point: [{ id: -1, name: 'Все точки', city_id: -1 }],
 
       stat: null,
@@ -157,6 +162,7 @@ class Experience_ extends React.Component {
 
     this.setState({
       points: data.points,
+      pointsCopy: data.points,
       cities: data.cities,
       module_name: data.module_info.name,
     });
@@ -224,9 +230,14 @@ class Experience_ extends React.Component {
   };
 
   changeCity(event) {
+    const data = JSON.parse(JSON.stringify(this.state.pointsCopy));
+
+    const points = data.filter((point) => event.target.value === -1 ? point : point.city_id === event.target.value);
+
     this.setState({
       city: event.target.value,
       point: [],
+      points,
     });
   }
 
@@ -253,13 +264,9 @@ class Experience_ extends React.Component {
       point_id: point,
     };
 
-    let stat, users;
+    let { stat, users } = await this.getData('get_info', data);
 
-    ({ stat, users } = await this.getData('get_info', data));
-
-    users.sort(
-      (a, b) => new Date(a.date_registration) - new Date(b.date_registration)
-    );
+    users.sort((a, b) => new Date(a.date_registration) - new Date(b.date_registration));
 
     this.setState({ stat, users });
   }
@@ -271,9 +278,7 @@ class Experience_ extends React.Component {
       user_id,
     };
 
-    let user;
-
-    ({ user } = await this.getData('get_user_info', data));
+    let { user } = await this.getData('get_user_info', data);
 
     this.setState({ modalDialog: true, user });
   }
@@ -303,7 +308,7 @@ class Experience_ extends React.Component {
           <h1>{this.state.module_name}</h1>
         </Grid>
 
-        <Grid container spacing={3} justifyContent="center">
+        <Grid container spacing={3}>
           <Grid item xs={12} sm={4}>
             <MySelect
               label="Город"
@@ -318,13 +323,13 @@ class Experience_ extends React.Component {
             <MyAutocomplite
               label="Точки"
               multiple={true}
-              data={this.state.points.filter((point) => this.state.city === -1 ? point : point.city_id === this.state.city)}
+              data={this.state.points}
               value={this.state.point}
               func={this.changePoint.bind(this, 'point')}
             />
           </Grid>
 
-          <Grid item xs={12} sm={1}>
+          <Grid item xs={12} sm={2}>
             <Button variant="contained" onClick={this.getInfo.bind(this)} sx={{ whiteSpace: 'nowrap' }}>
               Обновить данные
             </Button>
@@ -333,17 +338,19 @@ class Experience_ extends React.Component {
 
         {/* статистика */}
         {!this.state.stat ? null : (
-          <Grid container spacing={3} justifyContent="center" mt={3} mb={5}>
+          <Grid container spacing={3} mt={3} mb={5} justifyContent='center'>
             <Grid item xs={12} sm={4}>
               <TableContainer>
                 <Table>
                   <TableBody>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 700 }} align="center">Статистические данные</TableCell>
+                      <TableCell sx={{ fontWeight: 700 }} >Статистические данные</TableCell>
                     </TableRow>
                     {this.state.stat.map((stat, key) => (
                       <TableRow key={key}>
-                        <TableCell align="center">{experience[stat.days]} - {stat.count} сотрудника(-ов)</TableCell>
+                        <TableCell >
+                          {stat.days === '0' ? 'Стаж менее года' : `${formatter.format(stat.days)} стажа`} - {stat.count} сотрудника(-ов)
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -355,30 +362,30 @@ class Experience_ extends React.Component {
         
         {/* таблица */}
         {!this.state.users ? null : (
-          <Grid container justifyContent="center">
-            <Grid item xs={12} sm={9}>
+          <Grid container>
+            <Grid item xs={12} sm={12}>
               <TableContainer>
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell style={{ width: '5%' }} align="center">#</TableCell>
-                      <TableCell style={{ width: '35%' }} align="center">ФИО</TableCell>
-                      <TableCell style={{ width: '20%' }} align="center">Дата устройства на работу</TableCell>
-                      <TableCell style={{ width: '20%' }} align="center">Текущая организация</TableCell>
-                      <TableCell style={{ width: '20%' }} align="center">Общий стаж год/месяц</TableCell>
+                      <TableCell style={{ width: '5%' }} >#</TableCell>
+                      <TableCell style={{ width: '35%' }} >ФИО</TableCell>
+                      <TableCell style={{ width: '20%' }} >Дата устройства на работу</TableCell>
+                      <TableCell style={{ width: '20%' }} >Текущая организация</TableCell>
+                      <TableCell style={{ width: '20%' }} >Общий стаж год/месяц</TableCell>
                     </TableRow>
                   </TableHead>
 
                   <TableBody>
                     {this.state.users.map((item, i) => (
                       <TableRow key={i}>
-                        <TableCell align="center">{i + 1}</TableCell>
-                        <TableCell align="center" onClick={this.openModal.bind(this, item.id)} style={{ cursor: 'pointer', fontWeight: 700 }}>
+                        <TableCell >{i + 1}</TableCell>
+                        <TableCell  onClick={this.openModal.bind(this, item.id)} style={{ cursor: 'pointer', fontWeight: 700 }}>
                           {item.name}
                         </TableCell>
-                        <TableCell align="center">{item.date_registration}</TableCell>
-                        <TableCell align="center">{item.point}</TableCell>
-                        <TableCell align="center">{item.exp}</TableCell>
+                        <TableCell >{item.date_registration}</TableCell>
+                        <TableCell >{item.point}</TableCell>
+                        <TableCell >{item.exp}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
