@@ -86,7 +86,7 @@ class Experience_Modal extends React.Component {
           <Grid container spacing={3}>
             <Grid item xs={12} sm={4} display="flex" justifyContent="center">
               {this.state.item ? this.state.item.photo ? (
-                  <img src={this.state.item.photo} style={{ maxWidth: 250, maxHeight: 200 }}/>
+                  <img src={this.state.item.photo} style={{ width: '100%', height: 'auto' }}/>
                 ): 'Фото отсутствует' : 'Фото отсутствует'}
             </Grid>
 
@@ -338,7 +338,7 @@ class Experience_ extends React.Component {
 
         {/* статистика */}
         {!this.state.stat ? null : (
-          <Grid container spacing={3} mt={3} mb={5} justifyContent='center'>
+          <Grid container spacing={3} mt={3} mb={5}>
             <Grid item xs={12} sm={4}>
               <TableContainer>
                 <Table>

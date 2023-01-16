@@ -101,6 +101,8 @@ class Revizion_ extends React.Component {
       pf: [],
       all_items_list: [],
 
+      itemsCopy: [],
+      pfCopy: [],
       search: '',
 
       chooseTab: 0,
@@ -229,7 +231,28 @@ class Revizion_ extends React.Component {
     this.setState({
       items: res.item,
       pf: res.pf,
+      itemsCopy: res.item,
+      pfCopy: res.pf,
       all_items_list: res.all,
+    });
+  }
+
+  // поиск
+  search(event, value) {
+    const search = event.target.value ? event.target.value : value ? value : '';
+
+    const itemsCopy = JSON.parse(JSON.stringify(this.state.itemsCopy));
+
+    const pfCopy = JSON.parse(JSON.stringify(this.state.pfCopy));
+
+    const items = itemsCopy.filter((value) => search ? value.name === search : value);
+
+    const pf = pfCopy.filter((value) => search ? value.name === search : value);
+
+    this.setState({
+      search,
+      items,
+      pf,
     });
   }
 
@@ -261,8 +284,8 @@ class Revizion_ extends React.Component {
               multiple={false}
               data={this.state.all_items_list}
               value={this.state.search}
-              func={(event, value) => this.setState({search: event.target.value ? event.target.value : value ? value : ''})}
-              onBlur={(event, value) => this.setState({search: event.target.value ? event.target.value : value ? value : ''})}
+              func={this.search.bind(this)}
+              onBlur={this.search.bind(this)}
             />
           </Grid>
 
@@ -312,9 +335,7 @@ class Revizion_ extends React.Component {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {this.state.items
-                      .filter((value) => this.state.search ? value.name === this.state.search : value)
-                      .map((item, key) => (
+                    {this.state.items.map((item, key) => (
                         <TableRow key={key}>
                           <TableCell>{item.name}</TableCell>
                           <TableCell>{item.value} {item.ei_name}</TableCell>
@@ -334,9 +355,7 @@ class Revizion_ extends React.Component {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {this.state.pf
-                      .filter((value) => this.state.search ? value.name === this.state.search : value)
-                      .map((item, key) => (
+                    {this.state.pf.map((item, key) => (
                         <TableRow key={key}>
                           <TableCell>{item.name}</TableCell>
                           <TableCell>{item.value} {item.ei_name}</TableCell>
@@ -381,7 +400,9 @@ class RevizionNew_ extends React.Component {
       open: false,
 
       fullScreen: false,
-      sort: 0,
+
+      itemsCopy: [],
+      pfCopy: [],
     };
   }
 
@@ -416,7 +437,6 @@ class RevizionNew_ extends React.Component {
 
     this.setState({
       point: data,
-      sort: 0,
       saveEdit: false,
     });
 
@@ -477,11 +497,15 @@ class RevizionNew_ extends React.Component {
       point_id: this.state.point,
     };
 
-    let items, pf, storages;
+    let res = await this.getData('get_data_for_new_rev', data);
 
-    ({ items, pf, storages } = await this.getData('get_data_for_new_rev', data));
-
-    this.setState({ items, pf, storages });
+    this.setState({
+      items: res.items,
+      pf: res.pf,
+      storages: res.storages,
+      itemsCopy: res.items,
+      pfCopy: res.pf,
+    });
   }
 
   // предварительное сохранение
@@ -591,12 +615,29 @@ class RevizionNew_ extends React.Component {
     });
   }
 
+  // сортировка по месту хранения
+  sortItem(id) {
+
+    const itemsCopy = JSON.parse(JSON.stringify(this.state.itemsCopy));
+
+    const pfCopy = JSON.parse(JSON.stringify(this.state.pfCopy));
+
+    const items = itemsCopy.filter((item) => item.storages.find((storages) => id ? storages.storage_id === id : storages));
+
+    const pf = pfCopy.filter((item) => item.storages.find((storages) => id ? storages.storage_id === id : storages));
+
+    this.setState({
+      open: false,
+      items,
+      pf,
+    });
+  }
+
   // получение данных ревизии
   async saveRev() {
     let data = {
       point_id: this.state.point,
-      item: this.state.item,
-      rec: this.state.rec,
+      item: this.state.items,
       pf: this.state.pf,
     };
     console.log('saveRev ', data);
@@ -642,12 +683,10 @@ class RevizionNew_ extends React.Component {
             </Tabs>
 
             <div style={this.state.chooseTab == 0 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
-              {this.state.items
-                .filter((item) => item.storages.find((storages) => this.state.sort ? storages.storage_id === this.state.sort : storages))
-                .map((item, key) =>
+              {this.state.items.map((item, key) =>
                   parseInt(item.is_show) === 0 ? null : (
-                    <Accordion key={key} style={{ backgroundColor: !this.state.saveEdit ? null : '#ffc107'}}>
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Accordion key={key}>
+                      <AccordionSummary style={{ backgroundColor: this.state.saveEdit && !item.value ? '#ffc107' : null }} expandIcon={<ExpandMoreIcon />}>
                         <Typography style={{ width: '60%' }}>{item.name}</Typography>
                         <Typography style={{ width: '40%' }}>{!item.value ? '' : item.value} {!item.value ? '' : item.ei_name}</Typography>
                       </AccordionSummary>
@@ -697,12 +736,10 @@ class RevizionNew_ extends React.Component {
 
             {/* Заготовки */}
             <div style={this.state.chooseTab == 1 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
-              {this.state.pf
-                .filter((item) => item.storages.find((storages) => this.state.sort ? storages.storage_id === this.state.sort : storages))
-                .map((item, key) =>
+              {this.state.pf.map((item, key) =>
                   parseInt(item.is_show) === 0 ? null : (
-                    <Accordion key={key} style={{backgroundColor: !this.state.saveEdit ? null : '#ffc107'}}>
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Accordion key={key}>
+                      <AccordionSummary style={{ backgroundColor: this.state.saveEdit && item.value == 0 ? '#ffc107' : null }} expandIcon={<ExpandMoreIcon />}>
                         <Typography style={{ width: '60%' }}>{item.name}</Typography>
                         <Typography style={{ width: '40%' }}>{item.value == 0 ? '' : item.value} {item.value == 0 ? '' : item.ei_name}</Typography>
                       </AccordionSummary>
@@ -733,7 +770,7 @@ class RevizionNew_ extends React.Component {
           >
             <List style={{ width: '100%' }}>
               {this.state.storages.map((item, key) => (
-                <ListItemButton key={key} onClick={() => this.setState({ sort: item.id, open: false })}>
+                <ListItemButton key={key} onClick={this.sortItem.bind(this, item.id)}>
                   <ListItemText primary={item.name} />
                 </ListItemButton>
               ))}
