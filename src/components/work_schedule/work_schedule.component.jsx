@@ -1154,7 +1154,7 @@ class WorkSchedule_ extends React.Component {
       isOpenModalHMini: true,
       userInfo: res.h_info,
       //otherAppList: res.other_app,
-      //show_bonus: res.show_bonus,
+      show_bonus: res.show_bonus,
     });
   }
 
@@ -2342,6 +2342,12 @@ class WorkSchedule_ extends React.Component {
                   ' / Средняя нагрузка: ' +
                   this.state.userInfo.user.all_load_h}
               </Typography>
+
+              { !this.state.show_bonus ? null :
+                <Typography style={{ marginBottom: 10 }}>
+                  {'Бонус: ' + this.state.userInfo.user.bonus}
+                </Typography>
+              }
               
               {this.state.otherAppList.length == 0 ? null : (
                 <MySelect
