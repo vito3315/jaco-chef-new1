@@ -245,9 +245,13 @@ class Revizion_ extends React.Component {
 
     const pfCopy = JSON.parse(JSON.stringify(this.state.pfCopy));
 
-    const items = itemsCopy.filter((value) => search ? value.name === search : value);
+    const items = itemsCopy.filter((value) =>
+      search ? value.name === search : value
+    );
 
-    const pf = pfCopy.filter((value) => search ? value.name === search : value);
+    const pf = pfCopy.filter((value) =>
+      search ? value.name === search : value
+    );
 
     this.setState({
       search,
@@ -336,11 +340,11 @@ class Revizion_ extends React.Component {
                   </TableHead>
                   <TableBody>
                     {this.state.items.map((item, key) => (
-                        <TableRow key={key}>
-                          <TableCell>{item.name}</TableCell>
-                          <TableCell>{item.value} {item.ei_name}</TableCell>
-                        </TableRow>
-                      ))}
+                      <TableRow key={key}>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>{item.value} {item.ei_name}</TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -356,17 +360,178 @@ class Revizion_ extends React.Component {
                   </TableHead>
                   <TableBody>
                     {this.state.pf.map((item, key) => (
-                        <TableRow key={key}>
-                          <TableCell>{item.name}</TableCell>
-                          <TableCell>{item.value} {item.ei_name}</TableCell>
-                        </TableRow>
-                      ))}
+                      <TableRow key={key}>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>{item.value} {item.ei_name}</TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </TableContainer>
             </TabPanel>
           </Grid>
         </Grid>
+      </>
+    );
+  }
+}
+
+// Новая ревизия Список
+class RevizionNew_List extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      items: [],
+      pf: [],
+      id: '',
+    };
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    // console.log(nextProps);
+
+    if (!nextProps.items || !nextProps.pf) {
+      return null;
+    }
+
+    if (nextProps.items !== prevState.items || nextProps.pf !== prevState.pf) {
+      if (prevState.id) {
+        const id = prevState.id;
+
+        const itemsCopy = JSON.parse(JSON.stringify(nextProps.items));
+
+        const pfCopy = JSON.parse(JSON.stringify(nextProps.pf));
+
+        const items = itemsCopy.filter((item) => item.storages.find((storages) => id ? storages.storage_id === id : storages));
+
+        const pf = pfCopy.filter((item) => item.storages.find((storages) => id ? storages.storage_id === id : storages));
+
+        return { items, pf };
+      } else {
+        return {
+          items: JSON.parse(JSON.stringify(nextProps.items)),
+          pf: JSON.parse(JSON.stringify(nextProps.pf)),
+        };
+      }
+    }
+    return null;
+  }
+
+  // сортировка по месту хранения
+  sortItem(id) {
+
+    const itemsCopy = this.state.items;
+
+    const pfCopy = this.state.pf;
+
+    const items = itemsCopy.filter((item) => item.storages.find((storages) => id ? storages.storage_id === id : storages));
+
+    const pf = pfCopy.filter((item) => item.storages.find((storages) => id ? storages.storage_id === id : storages));
+
+    this.setState({ items, pf, id });
+
+    this.props.onClose();
+  }
+
+  render() {
+    console.log('RevizionNew_List render');
+
+    return (
+      <>
+        {/* Товары */}
+        <div style={ this.props.chooseTab == 0 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
+          {this.state.items.map((item, key) =>
+            parseInt(item.is_show) === 0 ? null : (
+              <Accordion key={key}>
+                <AccordionSummary style={{ backgroundColor: this.props.saveEdit && !item.value ? '#ffc107' : null }} expandIcon={<ExpandMoreIcon />}>
+                  <Typography style={{ width: '60%' }}>{item.name}</Typography>
+                  <Typography style={{ width: '40%' }}>{!item.value ? '' : item.value} {!item.value ? '' : item.ei_name}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  {item.counts.map((it, i) => (
+                    <React.Fragment key={i}>
+                      <Grid container spacing={3} style={{ paddingTop: 20, paddingBottom: 20 }}>
+                        <Grid item xs={12} sm={5}>
+                          <MySelect
+                            data={item.size}
+                            value={it.need_pq}
+                            func={(event) => this.props.saveData(event, 'item', item.id, 'need_pq', i)}
+                            label="Объем упаковки"
+                          />
+                        </Grid>
+                        <Grid item xs={i === 0 ? 12 : 9} sm={5}>
+                          <MyTextInput
+                            value={it.value === 0 ? '' : it.value}
+                            func={(event) => this.props.saveData(event, 'item', item.id, 'value', i)}
+                            label="Количество"
+                          />
+                        </Grid>
+                        {i === 0 ? null : (
+                          <Grid item xs={3} sm={1}>
+                            <Button variant="contained" onClick={() => this.props.clearData(item.id, i)}>
+                              <CloseIcon />
+                            </Button>
+                          </Grid>
+                        )}
+                      </Grid>
+                      {item.counts[item.counts.length - 1] === it ? null : <Divider />}
+                    </React.Fragment>
+                  ))}
+
+                  <Grid item xs={12} sm={6}>
+                    <Button variant="contained" onClick={() => this.props.copyData(item.id)}>
+                      Дублировать
+                    </Button>
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
+            )
+          )}
+        </div>
+
+        {/* Заготовки */}
+        <div style={this.props.chooseTab == 1 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
+          {this.state.pf.map((item, key) =>
+            parseInt(item.is_show) === 0 ? null : (
+              <Accordion key={key}>
+                <AccordionSummary style={{ backgroundColor: this.props.saveEdit && item.value == 0 ? '#ffc107' : null }} expandIcon={<ExpandMoreIcon />}>
+                  <Typography style={{ width: '60%' }}>{item.name}</Typography>
+                  <Typography style={{ width: '40%' }}>{item.value == 0 ? '' : item.value} {item.value == 0 ? '' : item.ei_name}</Typography>
+                </AccordionSummary>
+
+                {/* Заготовки */}
+                <AccordionDetails>
+                  <Grid item sm={5}>
+                    <MyTextInput
+                      value={item.value == 0 ? '' : item.value}
+                      func={(event) => this.props.saveData(event, 'pf', item.id, 'value', 0)}
+                      label="Количество"
+                    />
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
+            )
+          )}
+        </div>
+
+        {/* Боковая панель с выбором мест хранения */}
+        <React.Fragment>
+          <SwipeableDrawer
+            anchor={'left'}
+            open={this.props.open}
+            onClose={() => this.props.onClose()}
+            onOpen={() => this.props.onOpen()}
+          >
+            <List style={{ width: '100%' }}>
+              {this.props.storages.map((item, key) => (
+                <ListItemButton key={key} onClick={this.sortItem.bind(this, item.id)}>
+                  <ListItemText primary={item.name} />
+                </ListItemButton>
+              ))}
+            </List>
+          </SwipeableDrawer>
+        </React.Fragment>
       </>
     );
   }
@@ -390,7 +555,6 @@ class RevizionNew_ extends React.Component {
 
       storages: [],
       items: [],
-      rec: [],
       pf: [],
 
       chooseTab: 0,
@@ -400,9 +564,6 @@ class RevizionNew_ extends React.Component {
       open: false,
 
       fullScreen: false,
-
-      itemsCopy: [],
-      pfCopy: [],
     };
   }
 
@@ -509,11 +670,11 @@ class RevizionNew_ extends React.Component {
   }
 
   // предварительное сохранение
-  saveData(type, id, data, index, event) {
+  saveData(event, type, id, data, index) {
     // console.log(type, id, data, index);
 
     if (type == 'item') {
-      const items = JSON.parse(JSON.stringify(this.state.items));
+      const items = this.state.items;
 
       items.forEach((item) => {
         if (item.id === id) {
@@ -535,7 +696,7 @@ class RevizionNew_ extends React.Component {
     }
 
     if (type === 'pf') {
-      const pf = JSON.parse(JSON.stringify(this.state.pf));
+      const pf = this.state.pf;
 
       pf.forEach((pf) => {
         if (pf.id === id) {
@@ -615,24 +776,6 @@ class RevizionNew_ extends React.Component {
     });
   }
 
-  // сортировка по месту хранения
-  sortItem(id) {
-
-    const itemsCopy = JSON.parse(JSON.stringify(this.state.itemsCopy));
-
-    const pfCopy = JSON.parse(JSON.stringify(this.state.pfCopy));
-
-    const items = itemsCopy.filter((item) => item.storages.find((storages) => id ? storages.storage_id === id : storages));
-
-    const pf = pfCopy.filter((item) => item.storages.find((storages) => id ? storages.storage_id === id : storages));
-
-    this.setState({
-      open: false,
-      items,
-      pf,
-    });
-  }
-
   // получение данных ревизии
   async saveRev() {
     let data = {
@@ -682,101 +825,21 @@ class RevizionNew_ extends React.Component {
               <Tab label="Заготовки" {...a11yProps(1)} />
             </Tabs>
 
-            <div style={this.state.chooseTab == 0 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
-              {this.state.items.map((item, key) =>
-                  parseInt(item.is_show) === 0 ? null : (
-                    <Accordion key={key}>
-                      <AccordionSummary style={{ backgroundColor: this.state.saveEdit && !item.value ? '#ffc107' : null }} expandIcon={<ExpandMoreIcon />}>
-                        <Typography style={{ width: '60%' }}>{item.name}</Typography>
-                        <Typography style={{ width: '40%' }}>{!item.value ? '' : item.value} {!item.value ? '' : item.ei_name}</Typography>
-                      </AccordionSummary>
-
-                      {/* Товары */}
-                      <AccordionDetails>
-                        {item.counts.map((it, i) => (
-                          <React.Fragment key={i}>
-                            <Grid container spacing={3} style={{ paddingTop: 20, paddingBottom: 20 }}>
-                              <Grid item xs={12} sm={5}>
-                                <MySelect
-                                  data={item.size}
-                                  value={it.need_pq}
-                                  func={this.saveData.bind(this, 'item', item.id, 'need_pq', i)}
-                                  label="Объем упаковки"
-                                />
-                              </Grid>
-                              <Grid item xs={i === 0 ? 12 : 9} sm={5}>
-                                <MyTextInput
-                                  value={it.value === 0 ? '' : it.value}
-                                  func={this.saveData.bind(this, 'item', item.id, 'value', i)}
-                                  label="Количество"
-                                />
-                              </Grid>
-                              {i === 0 ? null : (
-                                <Grid item xs={3} sm={1}>
-                                  <Button variant="contained" onClick={this.clearData.bind(this, item.id, i)}>
-                                    <CloseIcon/>
-                                  </Button>
-                                </Grid>
-                              )}
-                            </Grid>
-                            {item.counts[item.counts.length - 1] === it ? null : <Divider />}
-                          </React.Fragment>
-                        ))}
-
-                        <Grid item xs={12} sm={6}>
-                          <Button variant="contained" onClick={this.copyData.bind(this, item.id)}>
-                            Дублировать
-                          </Button>
-                        </Grid>
-                      </AccordionDetails>
-                    </Accordion>
-                  )
-                )}
-            </div>
-
-            {/* Заготовки */}
-            <div style={this.state.chooseTab == 1 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
-              {this.state.pf.map((item, key) =>
-                  parseInt(item.is_show) === 0 ? null : (
-                    <Accordion key={key}>
-                      <AccordionSummary style={{ backgroundColor: this.state.saveEdit && item.value == 0 ? '#ffc107' : null }} expandIcon={<ExpandMoreIcon />}>
-                        <Typography style={{ width: '60%' }}>{item.name}</Typography>
-                        <Typography style={{ width: '40%' }}>{item.value == 0 ? '' : item.value} {item.value == 0 ? '' : item.ei_name}</Typography>
-                      </AccordionSummary>
-
-                      {/* Заготовки */}
-                      <AccordionDetails>
-                        <Grid item sm={5}>
-                          <MyTextInput
-                            value={item.value == 0 ? '' : item.value}
-                            func={this.saveData.bind(this, 'pf', item.id, 'value', 0)}
-                            label="Количество"
-                          />
-                        </Grid>
-                      </AccordionDetails>
-                    </Accordion>
-                  )
-                )}
-            </div>
+            <RevizionNew_List
+              chooseTab={this.state.chooseTab}
+              items={this.state.items}
+              pf={this.state.pf}
+              saveEdit={this.state.saveEdit}
+              saveData={this.saveData.bind(this)}
+              clearData={this.clearData.bind(this)}
+              copyData={this.copyData.bind(this)}
+              open={this.state.open}
+              onClose={() => this.setState({ open: false })}
+              onOpen={() => this.setState({ open: true })}
+              storages={this.state.storages}
+            />
           </Grid>
         </Grid>
-
-        <React.Fragment>
-          <SwipeableDrawer
-            anchor={'left'}
-            open={this.state.open}
-            onClose={() => this.setState({ open: false })}
-            onOpen={() => this.setState({ open: true })}
-          >
-            <List style={{ width: '100%' }}>
-              {this.state.storages.map((item, key) => (
-                <ListItemButton key={key} onClick={this.sortItem.bind(this, item.id)}>
-                  <ListItemText primary={item.name} />
-                </ListItemButton>
-              ))}
-            </List>
-          </SwipeableDrawer>
-        </React.Fragment>
 
         {this.state.storages.length == 0 ? null : this.state.fullScreen ? (
           <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
@@ -818,14 +881,12 @@ class RevizionNew_ extends React.Component {
           open={this.state.modalDialog}
           onClose={() => this.setState({ modalDialog: false })}
         >
-          <DialogTitle align="center" sx={{ fontWeight: 'bold' }}>
-            Не все данные заполнены!
-          </DialogTitle>
-          <DialogContent align="center" sx={{ fontWeight: 'bold' }}>
-            {this.state.text}
-          </DialogContent>
+          <DialogTitle align="center" sx={{ fontWeight: 'bold' }}>Не все данные заполнены!</DialogTitle>
+          <DialogContent align="center" sx={{ fontWeight: 'bold' }}>{this.state.text}</DialogContent>
           <DialogActions>
-            <Button autoFocus onClick={() => this.setState({ modalDialog: false })}>Отмена</Button>
+            <Button autoFocus onClick={() => this.setState({ modalDialog: false })}>
+              Отмена
+            </Button>
             <Button>Сохранить</Button>
           </DialogActions>
         </Dialog>
