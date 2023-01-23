@@ -112,7 +112,7 @@ class OrderPost2_ extends React.Component {
 }
 
 // Таблица на странице Ручная заявка
-class OrderPost2_List extends React.Component {
+class OrderPost2Manual_List extends React.Component {
   constructor(props) {
     super(props);
 
@@ -482,7 +482,7 @@ class OrderPost2Manual_ extends React.Component {
             />
           </Grid>
 
-          <OrderPost2_List
+          <OrderPost2Manual_List
             cats={this.state.cats}
             changeSelectItem={this.changeSelectItem.bind(this)}
             changeCountItem={this.changeCountItem.bind(this)}
