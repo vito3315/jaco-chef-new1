@@ -56,7 +56,7 @@ const Tender = React.lazy(() => import("../tender"));
 const WorkSchedule = React.lazy(() => import("../work_schedule"));
 
 import { Revizion, RevizionNew } from '../revizion';
-import { OrderPost2, OrderPost2New } from '../order_post_2';
+import { OrderPost2, OrderPost2New, OrderPost2Manual } from '../order_post_2';
 import { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat, SiteSale2_StatList, SiteSale2_AnaliticList } from '../site_sale_2';
 
 const DriveMapStatAll = React.lazy(() => import("../drive_map_stat_all"));
@@ -398,6 +398,7 @@ export function App () {
                   <Route path={'/experience'} exact={ true } element={ <Experience /> } />
                   <Route path={'/order_post_2'} exact={ true } element={ <OrderPost2 /> } />
                   <Route path={'/order_post_2/new'} exact={ true } element={ <OrderPost2New /> } />
+                  <Route path={'/order_post_2/manual'} exact={ true } element={ <OrderPost2Manual /> } />
 
                   <Route path={'/hot_map'} exact={ true } element={ <HotMap /> } />
                   <Route path={'/site_sale_min'} exact={ true } element={ <SiteSaleMin /> } />

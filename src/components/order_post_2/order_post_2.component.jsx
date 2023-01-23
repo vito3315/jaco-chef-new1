@@ -7,7 +7,6 @@ import Button from '@mui/material/Button';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableContainer from '@mui/material/TableContainer';
 
@@ -18,7 +17,101 @@ import { MySelect, MyAutocomplite2, MyTextInput } from '../../stores/elements';
 
 const queryString = require('query-string');
 
-// Таблица на главной странице
+// главная страница
+class OrderPost2_ extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      module: 'order_post_2',
+      module_name: '',
+      is_load: false,
+    };
+  }
+
+  async componentDidMount() {
+    const data = await this.getData('get_all');
+
+    this.setState({
+      module_name: data.module_info.name,
+    });
+
+    document.title = data.module_info.name;
+  }
+
+  getData = (method, data = {}) => {
+    this.setState({
+      is_load: true,
+    });
+
+    return fetch('https://jacochef.ru/api/index_new.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: queryString.stringify({
+        method: method,
+        module: this.state.module,
+        version: 2,
+        login: localStorage.getItem('token'),
+        data: JSON.stringify(data),
+      }),
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.st === false && json.type == 'redir') {
+          window.location.pathname = '/';
+          return;
+        }
+
+        if (json.st === false && json.type == 'auth') {
+          window.location.pathname = '/auth';
+          return;
+        }
+
+        setTimeout(() => {
+          this.setState({
+            is_load: false,
+          });
+        }, 300);
+
+        return json;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  render() {
+    return (
+      <>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+
+        <Grid container spacing={3} mb={3}>
+          <Grid item xs={12} sm={12}>
+            <h1>{this.state.module_name}</h1>
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <Button component={Link} to="/order_post_2/manual" variant="contained" sx={{ whiteSpace: 'nowrap' }}>
+              Ручная заявка
+            </Button>
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <Button component={Link} to="/order_post_2/new" variant="contained" sx={{ whiteSpace: 'nowrap' }}>
+              Рекомендуемая заявка
+            </Button>
+          </Grid>
+        </Grid>
+      </>
+    );
+  }
+}
+
+// Таблица на странице Ручная заявка
 class OrderPost2_List extends React.Component {
   constructor(props) {
     super(props);
@@ -100,9 +193,11 @@ class OrderPost2_List extends React.Component {
         </Grid>
 
         <Grid item xs={12} sm={2}>
-          <Button variant="contained" 
-            // onClick={this.save.bind(this)} 
-            sx={{ whiteSpace: 'nowrap' }}>
+          <Button
+            variant="contained"
+            // onClick={this.save.bind(this)}
+            sx={{ whiteSpace: 'nowrap' }}
+          >
             Сохранить заявку
           </Button>
         </Grid>
@@ -110,22 +205,20 @@ class OrderPost2_List extends React.Component {
         <Grid item xs={12} sm={12}>
           <TableContainer>
             <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell style={{ width: '20%' }}>Товар</TableCell>
-                  <TableCell style={{ width: '8%' }}>Остаток</TableCell>
-                  <TableCell style={{ width: '14%' }}>Ср.расх. за 7 дней</TableCell>
-                  <TableCell style={{ width: '10%' }}>Объем упаковки</TableCell>
-                  <TableCell style={{ width: '18%' }}>Заявка</TableCell>
-                  <TableCell style={{ width: '10%' }} align="center">Количество</TableCell>
-                  <TableCell style={{ width: '20%' }}>Поставщик</TableCell>
-                </TableRow>
-              </TableHead>
               <TableBody>
                 {this.state.cats.map((cat, key) => (
                   <React.Fragment key={key}>
                     <TableRow key={key}>
                       <TableCell colSpan={7} align="center" sx={{ fontWeight: 700 }}>{cat.name.toUpperCase()}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell style={{ width: '20%' }}>Товар</TableCell>
+                      <TableCell style={{ width: '8%' }}>Остаток</TableCell>
+                      <TableCell style={{ width: '14%' }}>Ср.расх. за 7 дней</TableCell>
+                      <TableCell style={{ width: '10%' }}>Объем упаковки</TableCell>
+                      <TableCell style={{ width: '18%' }}>Заявка</TableCell>
+                      <TableCell style={{ width: '10%' }} align="center">Количество</TableCell>
+                      <TableCell style={{ width: '20%' }}>Поставщик</TableCell>
                     </TableRow>
                     {cat.items.map((item, key_item) => (
                       <TableRow key={key_item} hover>
@@ -139,17 +232,18 @@ class OrderPost2_List extends React.Component {
                             />
                           )}
                         </TableCell>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
+                        <TableCell>{item.ost}</TableCell>
+                        <TableCell>{item.avg_ras}</TableCell>
                         <TableCell>{item.rec_pq} {item.ei_name}</TableCell>
                         <TableCell>
                           <MyTextInput
-                            // value={item.value == 0 ? '' : item.value}
-                            value={''}
-                            // func={this.saveData.bind(this, 'pf', item.id, 'value', 0)}
+                            value={item?.count ? item.count !== 0 ? parseFloat(item.count) / parseFloat(item.rec_pq) : '' : ''}
+                            func={(event) => this.props.changeCountItem(event, item.id)}
                           />
                         </TableCell>
-                        <TableCell align="center">0</TableCell>
+                        <TableCell align="center">
+                          {item?.count ? item.count : 0} {item?.count ? item.count !== 0 ? item.ei_name : null : null}
+                        </TableCell>
                         <TableCell>
                           {item.items.map((it, key_it) =>
                             it.id === item.rec_item_id ? it.vendors.length > 1 ? (
@@ -177,8 +271,8 @@ class OrderPost2_List extends React.Component {
   }
 }
 
-// главная страница
-class OrderPost2_ extends React.Component {
+// Ручная заявка
+class OrderPost2Manual_ extends React.Component {
   constructor(props) {
     super(props);
 
@@ -293,11 +387,21 @@ class OrderPost2_ extends React.Component {
       cat.items.forEach((item) => {
         item.items.forEach((it) => {
           all_items.push({ name: it.name });
+
+          if (item.rec_item_id === it.id) {
+            it.color = '#388e3c';
+          }
+
+          it.vendors.forEach((vendor) => {
+            if (item.rec_vendor_id === vendor.id) {
+              vendor.color = '#388e3c';
+            }
+          });
         });
       });
     });
 
-    // console.log(res);
+    console.log(res);
 
     this.setState({
       cats: res.cats,
@@ -312,13 +416,12 @@ class OrderPost2_ extends React.Component {
       cats.forEach((cat) => {
         cat.items.forEach((item) => {
           if (item.id === id) {
-            const itemNew = item.items.find(
-              (it) => it.id === event.target.value
-            );
+            const itemNew = item.items.find((it) => it.id === event.target.value);
             item.rec_item_id = itemNew.id;
             item.rec_item_name = itemNew.name;
             item.rec_vendor_id = itemNew.vendors[0].id;
             item.rec_vendor_name = itemNew.vendors[0].name;
+            item.count = 0;
           }
         });
       });
@@ -328,15 +431,29 @@ class OrderPost2_ extends React.Component {
       cats.forEach((cat) => {
         cat.items.forEach((item) => {
           if (item.id === id) {
-            const itemNew = item.items
-              .find((it) => it.id === item_id)
-              .vendors.find((vendor) => vendor.id === event.target.value);
+            const itemNew = item.items.find((it) => it.id === item_id).vendors.find((vendor) => vendor.id === event.target.value);
             item.rec_vendor_id = itemNew.id;
             item.rec_vendor_name = itemNew.name;
           }
         });
       });
     }
+
+    this.setState({
+      cats,
+    });
+  }
+
+  changeCountItem(event, id) {
+    const cats = this.state.cats;
+
+    cats.forEach((cat) => {
+      cat.items.forEach((item) => {
+        if (item.id === id) {
+          item.count = parseFloat(item.rec_pq) * parseFloat(event.target.value);
+        }
+      });
+    });
 
     this.setState({
       cats,
@@ -352,19 +469,7 @@ class OrderPost2_ extends React.Component {
 
         <Grid container spacing={3} mb={3}>
           <Grid item xs={12} sm={12}>
-            <h1>{this.state.module_name}</h1>
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <h2>Ручная заявка поставщикам New</h2>
-          </Grid>
-
-          <Grid item xs={12} sm={8}>
-            <Button variant="contained" sx={{ whiteSpace: 'nowrap' }}>
-              <Link style={{ color: '#fff' }} to="/order_post_2/new">
-                Рекомендуемая заявка
-              </Link>
-            </Button>
+            <h1>Ручная заявка поставщикам New</h1>
           </Grid>
 
           <Grid item xs={12} sm={4}>
@@ -380,6 +485,7 @@ class OrderPost2_ extends React.Component {
           <OrderPost2_List
             cats={this.state.cats}
             changeSelectItem={this.changeSelectItem.bind(this)}
+            changeCountItem={this.changeCountItem.bind(this)}
             data={this.state.all_items}
           />
         </Grid>
@@ -472,6 +578,10 @@ class OrderPost2New_ extends React.Component {
 
 export function OrderPost2() {
   return <OrderPost2_ />;
+}
+
+export function OrderPost2Manual() {
+  return <OrderPost2Manual_ />;
 }
 
 export function OrderPost2New() {
