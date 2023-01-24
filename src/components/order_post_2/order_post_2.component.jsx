@@ -10,10 +10,15 @@ import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import TableContainer from '@mui/material/TableContainer';
 
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyAutocomplite2, MyTextInput } from '../../stores/elements';
+import { MySelect, MyAutocomplite2, MyTextInput, MyAlert } from '../../stores/elements';
 
 const queryString = require('query-string');
 
@@ -111,6 +116,7 @@ class OrderPost2_ extends React.Component {
   }
 }
 
+// Строки таблицы на странице Ручная заявка
 class OrderPost2Manual_ListItem extends React.Component {
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -135,7 +141,7 @@ class OrderPost2Manual_ListItem extends React.Component {
         <TableCell>{item.ost}</TableCell>
         <TableCell>{item.avg_ras}</TableCell>
         <TableCell>{item.rec_pq} {item.ei_name}</TableCell>
-        <TableCell>
+        <TableCell style={{ minWidth: '100px' }}>
           <MyTextInput
             value={item?.count ? item.count !== 0 ? parseFloat(item.count) / parseFloat(item.rec_pq) : '' : ''}
             func={(event) => changeCountItem(event, item.id)}
@@ -245,11 +251,7 @@ class OrderPost2Manual_List extends React.Component {
         </Grid>
 
         <Grid item xs={12} sm={2}>
-          <Button
-            variant="contained"
-            // onClick={this.save.bind(this)}
-            sx={{ whiteSpace: 'nowrap' }}
-          >
+          <Button variant="contained" onClick={this.props.saveOrderPost.bind(this)} sx={{ whiteSpace: 'nowrap' }}>
             Сохранить заявку
           </Button>
         </Grid>
@@ -303,6 +305,14 @@ class OrderPost2Manual_ extends React.Component {
 
       all_items: [],
       cats: [],
+
+      modalDialog: false,
+      title: '',
+      description: '',
+
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
@@ -380,6 +390,8 @@ class OrderPost2Manual_ extends React.Component {
     this.setState({
       point: event.target.value,
       search: '',
+      all_items: [],
+      cats: [],
     });
 
     setTimeout(() => {
@@ -416,7 +428,7 @@ class OrderPost2Manual_ extends React.Component {
       });
     });
 
-    console.log(res);
+    // console.log(res);
 
     this.setState({
       cats: res.cats,
@@ -475,12 +487,71 @@ class OrderPost2Manual_ extends React.Component {
     });
   }
 
+  async saveOrderPost() {
+    const cats = this.state.cats;
+
+    const point_id = this.state.point;
+
+    const items = cats.reduce((items, cat) => items = [...items, ...cat.items], []);
+
+    const data = {
+      items,
+      point_id
+    }
+
+    const res = await this.getData('save_hanlde', data);
+
+    // console.log(res);
+
+    if(res.st) {
+      this.setState({
+        openAlert: true,
+        err_status: true,
+        err_text: 'Заявка успешно сохранена!',
+      });
+
+      setTimeout(() => {
+        this.getDataTable();
+      }, 300);
+
+    } else {
+      this.setState({
+        modalDialog: true,
+        title: res.title,
+        description: res.description,
+      });
+    }
+
+  }
+
   render() {
     return (
       <>
         <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
+
+        <MyAlert
+          isOpen={this.state.openAlert}
+          onClose={() => this.setState({ openAlert: false })}
+          status={this.state.err_status}
+          text={this.state.err_text}
+        />
+
+        <Dialog
+          sx={{ '& .MuiDialog-paper': { width: '80%', maxHeight: 435 } }}
+          maxWidth="sm"
+          open={this.state.modalDialog}
+          onClose={() => this.setState({ modalDialog: false })}
+        >
+          <DialogTitle align="center" sx={{ fontWeight: 'bold' }}>{this.state.title}</DialogTitle>
+          <DialogContent align="center" sx={{ fontWeight: 'bold' }}>{this.state.description}</DialogContent>
+          <DialogActions>
+            <Button autoFocus onClick={() => this.setState({ modalDialog: false })}>
+              Закрыть
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         <Grid container spacing={3} mb={3}>
           <Grid item xs={12} sm={12}>
@@ -501,6 +572,7 @@ class OrderPost2Manual_ extends React.Component {
             cats={this.state.cats}
             changeSelectItem={this.changeSelectItem.bind(this)}
             changeCountItem={this.changeCountItem.bind(this)}
+            saveOrderPost={this.saveOrderPost.bind(this)}
             data={this.state.all_items}
           />
         </Grid>
