@@ -111,6 +111,58 @@ class OrderPost2_ extends React.Component {
   }
 }
 
+class OrderPost2Manual_ListItem extends React.Component {
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextProps.item?.count !== this.props.item?.count || nextProps.item?.rec_item_id !== this.props.item?.rec_item_id || nextProps.item?.rec_vendor_id !== this.props.item?.rec_vendor_id
+  }
+
+  render(){
+    const {item, changeSelectItem, changeCountItem} = this.props;
+    console.log('item render');
+    return (
+      <TableRow hover>
+        <TableCell>
+          {item.items.length < 2 ? item.items[0].name : (
+            <MySelect
+              is_none={false}
+              data={item.items}
+              value={item.rec_item_id}
+              func={(event) => changeSelectItem(event, 'item', item.id, 0)}
+            />
+          )}
+        </TableCell>
+        <TableCell>{item.ost}</TableCell>
+        <TableCell>{item.avg_ras}</TableCell>
+        <TableCell>{item.rec_pq} {item.ei_name}</TableCell>
+        <TableCell>
+          <MyTextInput
+            value={item?.count ? item.count !== 0 ? parseFloat(item.count) / parseFloat(item.rec_pq) : '' : ''}
+            func={(event) => changeCountItem(event, item.id)}
+          />
+        </TableCell>
+        <TableCell align="center">
+          {item?.count ? item.count : 0} {item?.count ? item.count !== 0 ? item.ei_name : null : null}
+        </TableCell>
+        <TableCell>
+          {item.items.map((it, key_it) =>
+            it.id === item.rec_item_id ? it.vendors.length > 1 ? (
+                <React.Fragment key={key_it}>
+                  <MySelect
+                    is_none={false}
+                    data={it.vendors}
+                    value={item.rec_vendor_id}
+                    func={(event) => changeSelectItem(event, 'vendor', item.id, item.rec_item_id)}
+                  />
+                </React.Fragment>
+              ) : it.vendors[0].name : null
+          )}
+        </TableCell>
+      </TableRow>
+    )
+  }
+}
+
 // Таблица на странице Ручная заявка
 class OrderPost2Manual_List extends React.Component {
   constructor(props) {
@@ -221,44 +273,7 @@ class OrderPost2Manual_List extends React.Component {
                       <TableCell style={{ width: '20%' }}>Поставщик</TableCell>
                     </TableRow>
                     {cat.items.map((item, key_item) => (
-                      <TableRow key={key_item} hover>
-                        <TableCell>
-                          {item.items.length < 2 ? item.items[0].name : (
-                            <MySelect
-                              is_none={false}
-                              data={item.items}
-                              value={item.rec_item_id}
-                              func={(event) => this.props.changeSelectItem(event, 'item', item.id, 0)}
-                            />
-                          )}
-                        </TableCell>
-                        <TableCell>{item.ost}</TableCell>
-                        <TableCell>{item.avg_ras}</TableCell>
-                        <TableCell>{item.rec_pq} {item.ei_name}</TableCell>
-                        <TableCell>
-                          <MyTextInput
-                            value={item?.count ? item.count !== 0 ? parseFloat(item.count) / parseFloat(item.rec_pq) : '' : ''}
-                            func={(event) => this.props.changeCountItem(event, item.id)}
-                          />
-                        </TableCell>
-                        <TableCell align="center">
-                          {item?.count ? item.count : 0} {item?.count ? item.count !== 0 ? item.ei_name : null : null}
-                        </TableCell>
-                        <TableCell>
-                          {item.items.map((it, key_it) =>
-                            it.id === item.rec_item_id ? it.vendors.length > 1 ? (
-                                <React.Fragment key={key_it}>
-                                  <MySelect
-                                    is_none={false}
-                                    data={it.vendors}
-                                    value={item.rec_vendor_id}
-                                    func={(event) => this.props.changeSelectItem(event, 'vendor', item.id, item.rec_item_id)}
-                                  />
-                                </React.Fragment>
-                              ) : it.vendors[0].name : null
-                          )}
-                        </TableCell>
-                      </TableRow>
+                      <OrderPost2Manual_ListItem key={key_item} item={item} changeSelectItem={this.props.changeSelectItem.bind(this)} changeCountItem={this.props.changeCountItem.bind(this)} />
                     ))}
                   </React.Fragment>
                 ))}
