@@ -3,6 +3,9 @@ import React from 'react';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+
+import ClearIcon from '@mui/icons-material/Clear';
+import CheckIcon from '@mui/icons-material/Check';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -21,14 +24,31 @@ import TableContainer from '@mui/material/TableContainer';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyAutocomplite, MyAlert } from '../../stores/elements';
+import {
+  MySelect,
+  MyAutocomplite,
+  MyAlert,
+  MyDatePickerNew,
+} from '../../stores/elements';
 
 const queryString = require('query-string');
 
-const formatter = new Intl.NumberFormat("ru", {
-  style: "unit",
-  unit: "year",
-  unitDisplay: "long"
+function formatDate(date) {
+  var d = new Date(date),
+    month = '' + (d.getMonth() + 1),
+    day = '' + d.getDate(),
+    year = d.getFullYear();
+
+  if (month.length < 2) month = '0' + month;
+  if (day.length < 2) day = '0' + day;
+
+  return [year, month, day].join('-');
+}
+
+const formatter = new Intl.NumberFormat('ru', {
+  style: 'unit',
+  unit: 'year',
+  unitDisplay: 'long',
 });
 
 class Experience_Modal extends React.Component {
@@ -37,6 +57,13 @@ class Experience_Modal extends React.Component {
 
     this.state = {
       item: null,
+      setEdit: false,
+      pressCount: 0,
+      data: '',
+
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
@@ -50,13 +77,80 @@ class Experience_Modal extends React.Component {
     if (this.props.user !== prevProps.user) {
       this.setState({
         item: this.props.user,
+        data: this.props.user.date_registration,
       });
     }
+  }
+
+  changeDateRange(val) {
+    const item = this.state.item;
+
+    item.date_registration = val ? formatDate(val) : '';
+
+    this.setState({
+      item,
+    });
+  }
+
+  onDoubleClick() {
+    this.setState({ pressCount: this.state.pressCount + 1 });
+
+    setTimeout(() => {
+      if (this.state.pressCount == 2) {
+        this.setState({ setEdit: true });
+      }
+      this.setState({ pressCount: 0 });
+    }, 300);
+  }
+
+  closeEdit() {
+    const item = this.state.item;
+
+    item.date_registration = this.state.data;
+
+    this.setState({
+      item,
+      setEdit: false,
+    });
+  }
+
+  saveEdit() {
+    const item = this.state.item;
+
+    if (!item.date_registration) {
+      this.setState({
+        openAlert: true,
+        err_status: false,
+        err_text: 'Укажите дату!',
+      });
+
+      return;
+    }
+
+    if (item.date_registration === this.state.data) {
+      this.setState({
+        setEdit: false,
+      });
+
+      return;
+    }
+
+    this.props.saveEdit(item.date_registration, item.id);
+
+    this.setState({
+      setEdit: false,
+    });
   }
 
   onClose() {
     this.setState({
       item: null,
+      setEdit: false,
+      data: '',
+
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     });
 
     this.props.onClose();
@@ -64,67 +158,112 @@ class Experience_Modal extends React.Component {
 
   render() {
     return (
-      <Dialog
-        open={this.props.open}
-        onClose={this.onClose.bind(this)}
-        fullScreen={this.props.fullScreen}
-        fullWidth={true}
-        maxWidth={'md'}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle className="button">
-          <Typography style={{ fontWeight: 'bold' }}>Информация о сотруднике</Typography>
-          {this.props.fullScreen ? (
-            <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
-              <CloseIcon />
-            </IconButton>
-          ) : null}
-        </DialogTitle>
+      <>
+        <MyAlert
+          isOpen={this.state.openAlert}
+          onClose={() => this.setState({ openAlert: false })}
+          status={this.state.err_status}
+          text={this.state.err_text}
+        />
 
-        <DialogContent style={{ paddingTop: 10, paddingBottom: 10 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={4} display="flex" justifyContent="center">
-              {this.state.item ? this.state.item.photo ? (
-                  <img src={this.state.item.photo} style={{ width: '100%', height: 'auto' }}/>
-                ): 'Фото отсутствует' : 'Фото отсутствует'}
+        <Dialog
+          open={this.props.open}
+          onClose={this.onClose.bind(this)}
+          fullScreen={this.props.fullScreen}
+          fullWidth={true}
+          maxWidth={'md'}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle className="button">
+            <Typography style={{ fontWeight: 'bold' }}>Информация о сотруднике</Typography>
+            {this.props.fullScreen ? (
+              <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
+                <CloseIcon />
+              </IconButton>
+            ) : null}
+          </DialogTitle>
+
+          <DialogContent style={{ paddingTop: 10, paddingBottom: 10 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={4} display="flex" justifyContent="center">
+                {this.state.item ? this.state.item.photo ? (
+                    <img src={this.state.item.photo} style={{ width: '100%', height: 'auto' }}/>
+                  ) : 'Фото отсутствует' : 'Фото отсутствует'}
+              </Grid>
+
+              <Grid item xs={12} sm={6} display="flex" flexDirection="column">
+                <Grid display="flex" flexDirection="row" mb={2}>
+                  <Typography sx={{fontWeight: 'bold', whiteSpace: 'nowrap', marginRight: 2}}>ФИО:</Typography>
+                  <Typography sx={{ whiteSpace: 'nowrap' }}>{this.state.item?.name ?? 'Не указано'}</Typography>
+                </Grid>
+
+                <Grid display="flex" flexDirection="row" mb={2}>
+                  <Typography sx={{fontWeight: 'bold', whiteSpace: 'nowrap', marginRight: 2}}>Текущая должность:</Typography>
+                  <Typography sx={{ whiteSpace: 'nowrap' }}>{this.state.item?.app_name ?? 'Не указана'}</Typography>
+                </Grid>
+
+                <Grid display="flex" flexDirection="row" mb={2}>
+                  <Typography sx={{fontWeight: 'bold', whiteSpace: 'nowrap', marginRight: 2}}>Общий стаж:</Typography>
+                  <Typography sx={{ whiteSpace: 'nowrap' }}>{this.state.item?.exp ?? 'Не указано'}</Typography>
+                </Grid>
+
+                <Grid display="flex" flexDirection="row" mb={2}>
+                  <Typography sx={{fontWeight: 'bold', whiteSpace: 'nowrap', marginRight: 2}}>Текущая организация:</Typography>
+                  <Typography sx={{ whiteSpace: 'nowrap' }}>{this.state.item?.point ?? 'Не указано'}</Typography>
+                </Grid>
+
+                <Grid display="flex" flexDirection="row" mb={2}>
+                  <Typography sx={{fontWeight: 'bold', whiteSpace: 'nowrap', marginRight: 2}}>Телефон:</Typography>
+                  <Typography sx={{ whiteSpace: 'nowrap' }}>{this.state.item?.login ?? 'Не указано'}</Typography>
+                </Grid>
+
+                <Grid display="flex" flexDirection="row" mb={2}>
+                  <Typography sx={{fontWeight: 'bold', whiteSpace: 'nowrap', marginRight: 2}}>Трудоустроен:</Typography>
+                  <Typography sx={{ whiteSpace: 'nowrap' }}>
+                    {this.state.item ? this.state.item.acc_to_kas == 0 ? 'Неофициально' : 'Официально' : 'Не указано'}
+                  </Typography>
+                </Grid>
+
+                <Grid display="flex" flexDirection={this.state.setEdit ? 'column' : 'row'} mb={2}>
+                  <Typography sx={{fontWeight: 'bold', whiteSpace: 'nowrap', marginRight: 2, marginBottom: 2}}>Дата трудоустройства:</Typography>
+                  {this.state.setEdit ? (
+                    <Grid display="flex" flexDirection="row">
+                      <Grid mr={2}>
+                        <MyDatePickerNew
+                          label="Изменить датy"
+                          value={this.state.item?.date_registration ?? 'Не указана'}
+                          func={this.changeDateRange.bind(this)}
+                        />
+                      </Grid>
+                      <Grid mr={2}>
+                        <Button onClick={this.saveEdit.bind(this)} style={{ cursor: 'pointer' }} color="success" variant="contained">
+                          <CheckIcon />
+                        </Button>
+                      </Grid>
+                      <Grid>
+                        <Button onClick={this.closeEdit.bind(this)} style={{ cursor: 'pointer' }} color="error" variant="contained">
+                          <ClearIcon />
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  ) : (
+                    <Typography sx={{ whiteSpace: 'nowrap', cursor: 'pointer' }} onClick={this.onDoubleClick.bind(this)}>
+                      {this.state.item?.date_registration ?? 'Не указана'}
+                    </Typography>
+                  )}
+                </Grid>
+              </Grid>
             </Grid>
+          </DialogContent>
 
-            <Grid item xs={12} sm={6} display="flex" flexDirection="column">
-              <Grid display="flex" flexDirection="row" mb={2}>
-                <Typography sx={{fontWeight: 'bold', whiteSpace: 'nowrap', marginRight: 2}}>ФИО:</Typography>
-                <Typography sx={{ whiteSpace: 'nowrap' }}>{this.state.item?.name ?? 'Не указано'}</Typography>
-              </Grid>
-
-              <Grid display="flex" flexDirection="row" mb={2}>
-                <Typography sx={{fontWeight: 'bold', whiteSpace: 'nowrap', marginRight: 2}}>Текущая должность:</Typography>
-                <Typography sx={{ whiteSpace: 'nowrap' }}>{this.state.item?.app_name ?? 'Не указана'}</Typography>
-              </Grid>
-
-              <Grid display="flex" flexDirection="row" mb={2}>
-                 <Typography sx={{fontWeight: 'bold', whiteSpace: 'nowrap', marginRight: 2}}>Общий стаж:</Typography>
-                 <Typography sx={{ whiteSpace: 'nowrap' }}>{this.state.item?.exp ?? 'Не указано'}</Typography>
-              </Grid>
-
-              <Grid display="flex" flexDirection="row" mb={2}>
-                <Typography sx={{fontWeight: 'bold', whiteSpace: 'nowrap', marginRight: 2}}>Текущая организация:</Typography>
-                <Typography sx={{ whiteSpace: 'nowrap' }}>{this.state.item?.point ?? 'Не указано'}</Typography>
-              </Grid>
-
-              <Grid display="flex" flexDirection="row">
-                <Typography sx={{fontWeight: 'bold', whiteSpace: 'nowrap', marginRight: 2}}>Телефон:</Typography>
-                <Typography sx={{ whiteSpace: 'nowrap' }}>{this.state.item?.login ?? 'Не указано'}</Typography>
-              </Grid>
-            </Grid>
-          </Grid>
-        </DialogContent>
-
-        <DialogActions>
-          <Button style={{ color: '#DC143C' }}onClick={this.onClose.bind(this)}>
-            Закрыть
-          </Button>
-        </DialogActions>
-      </Dialog>
+          <DialogActions>
+            <Button style={{ color: '#DC143C' }} onClick={this.onClose.bind(this)}>
+              Закрыть
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </>
     );
   }
 }
@@ -147,6 +286,7 @@ class Experience_ extends React.Component {
 
       stat: null,
       users: null,
+      stat_of: null,
 
       modalDialog: false,
       user: null,
@@ -232,7 +372,9 @@ class Experience_ extends React.Component {
   changeCity(event) {
     const data = JSON.parse(JSON.stringify(this.state.pointsCopy));
 
-    const points = data.filter((point) => event.target.value === -1 ? point : point.city_id === event.target.value);
+    const points = data.filter((point) =>
+      event.target.value === -1 ? point : point.city_id === event.target.value
+    );
 
     this.setState({
       city: event.target.value,
@@ -264,11 +406,11 @@ class Experience_ extends React.Component {
       point_id: point,
     };
 
-    let { stat, users } = await this.getData('get_info', data);
+    let { stat, users, stat_of } = await this.getData('get_info', data);
 
     users.sort((a, b) => new Date(a.date_registration) - new Date(b.date_registration));
 
-    this.setState({ stat, users });
+    this.setState({ stat, users, stat_of });
   }
 
   async openModal(user_id) {
@@ -281,6 +423,27 @@ class Experience_ extends React.Component {
     let { user } = await this.getData('get_user_info', data);
 
     this.setState({ modalDialog: true, user });
+  }
+
+  async saveEdit(date_registration, user_id) {
+    const data = {
+      user_id,
+      date_registration,
+    };
+
+    let { st } = await this.getData('save_date_registration', data);
+
+    if (st) {
+      this.setState({
+        openAlert: true,
+        err_status: true,
+        err_text: 'Изменения сохранены!',
+      });
+    }
+
+    setTimeout(() => {
+      this.getInfo();
+    }, 300);
   }
 
   render() {
@@ -302,6 +465,7 @@ class Experience_ extends React.Component {
           onClose={() => this.setState({ modalDialog: false })}
           user={this.state.user}
           fullScreen={this.state.fullScreen}
+          saveEdit={this.saveEdit.bind(this)}
         />
 
         <Grid item xs={12} mb={3}>
@@ -330,25 +494,29 @@ class Experience_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={2}>
-            <Button variant="contained" onClick={this.getInfo.bind(this)} sx={{ whiteSpace: 'nowrap' }}>
+            <Button
+              variant="contained"
+              onClick={this.getInfo.bind(this)}
+              sx={{ whiteSpace: 'nowrap' }}
+            >
               Обновить данные
             </Button>
           </Grid>
         </Grid>
 
-        {/* статистика */}
-        {!this.state.stat ? null : (
-          <Grid container spacing={3} mt={3} mb={5}>
+        <Grid container spacing={3} mt={3} mb={5}>
+          {/* статистика */}
+          {!this.state.stat ? null : (
             <Grid item xs={12} sm={4}>
               <TableContainer>
                 <Table>
                   <TableBody>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 700 }} >Статистические данные</TableCell>
+                      <TableCell sx={{ fontWeight: 700 }}>Статистические данные</TableCell>
                     </TableRow>
                     {this.state.stat.map((stat, key) => (
                       <TableRow key={key}>
-                        <TableCell >
+                        <TableCell>
                           {stat.days === '0' ? 'Стаж менее года' : `${formatter.format(stat.days)} стажа`} - {stat.count} сотрудника(-ов)
                         </TableCell>
                       </TableRow>
@@ -357,9 +525,30 @@ class Experience_ extends React.Component {
                 </Table>
               </TableContainer>
             </Grid>
-          </Grid>
-        )}
-        
+          )}
+
+          {/* официально трудоустроенных */}
+          {!this.state.stat_of ? null : (
+            <Grid item xs={12} sm={4}>
+              <TableContainer>
+                <Table>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 700 }}>Трудоустроено</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Официально: {this.state.stat_of.true_count} сотрудника(-ов) / {this.state.stat_of.true_perc} % от числа сотрудников</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Неофициально: {this.state.stat_of.false_count} сотрудника(-ов) / {this.state.stat_of.false_perc} % от числа сотрудников</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          )}
+        </Grid>
+
         {/* таблица */}
         {!this.state.users ? null : (
           <Grid container>
@@ -368,24 +557,24 @@ class Experience_ extends React.Component {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell style={{ width: '5%' }} >#</TableCell>
-                      <TableCell style={{ width: '35%' }} >ФИО</TableCell>
-                      <TableCell style={{ width: '20%' }} >Дата устройства на работу</TableCell>
-                      <TableCell style={{ width: '20%' }} >Текущая организация</TableCell>
-                      <TableCell style={{ width: '20%' }} >Общий стаж год/месяц</TableCell>
+                      <TableCell style={{ width: '5%' }}>#</TableCell>
+                      <TableCell style={{ width: '35%' }}>ФИО</TableCell>
+                      <TableCell style={{ width: '20%' }}>Дата устройства на работу</TableCell>
+                      <TableCell style={{ width: '20%' }}>Текущая организация</TableCell>
+                      <TableCell style={{ width: '20%' }}>Общий стаж год/месяц</TableCell>
                     </TableRow>
                   </TableHead>
 
                   <TableBody>
                     {this.state.users.map((item, i) => (
                       <TableRow key={i}>
-                        <TableCell >{i + 1}</TableCell>
-                        <TableCell  onClick={this.openModal.bind(this, item.id)} style={{ cursor: 'pointer', fontWeight: 700 }}>
+                        <TableCell>{i + 1}</TableCell>
+                        <TableCell onClick={this.openModal.bind(this, item.id)} style={{ cursor: 'pointer', fontWeight: 700 }}>
                           {item.name}
                         </TableCell>
-                        <TableCell >{item.date_registration}</TableCell>
-                        <TableCell >{item.point}</TableCell>
-                        <TableCell >{item.exp}</TableCell>
+                        <TableCell>{item.date_registration}</TableCell>
+                        <TableCell>{item.point}</TableCell>
+                        <TableCell>{item.exp}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
