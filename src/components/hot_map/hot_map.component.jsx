@@ -49,6 +49,8 @@ export class HotMap extends React.Component {
 
       statAllCount: '',
       statTrueCount: '',
+      statTrueAllSumm: '',
+      statTrueAvgSumm: '',
 
       is_new: 0,
 
@@ -130,6 +132,8 @@ export class HotMap extends React.Component {
        this.setState({
         statAllCount: '',
         statTrueCount: '',
+        statTrueAllSumm: '',
+        statTrueAvgSumm: '',
       })
     }
 
@@ -340,6 +344,8 @@ export class HotMap extends React.Component {
     this.setState({
       statAllCount: res.all_count,
       statTrueCount: res.true + ' ( ' + res.true_percent + '% ) ',
+      statTrueAllSumm: res.price,
+      statTrueAvgSumm: res.avg_price,
     })
 
     console.log( res )
@@ -476,6 +482,8 @@ export class HotMap extends React.Component {
             <Grid container spacing={3}>
               <Grid item xs={6}>
                 <Typography>Заказов в зоне: {this.state.statTrueCount}</Typography>
+                <Typography>Сумма заказов в зоне: {this.state.statTrueAllSumm}</Typography>
+                <Typography>Средний чек в зоне: {this.state.statTrueAvgSumm}</Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography>Всего заказов в городе: {this.state.statAllCount}</Typography>
