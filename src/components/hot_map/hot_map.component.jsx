@@ -49,6 +49,9 @@ export class HotMap extends React.Component {
 
       statAllCount: '',
       statTrueCount: '',
+      statTrueAllSumm: '',
+      statTrueAvgSumm: '',
+      is_chooseZone: false,
 
       is_new: 0,
 
@@ -130,6 +133,8 @@ export class HotMap extends React.Component {
        this.setState({
         statAllCount: '',
         statTrueCount: '',
+        statTrueAllSumm: '',
+        statTrueAvgSumm: '',
       })
     }
 
@@ -144,6 +149,7 @@ export class HotMap extends React.Component {
       time_start: this.state.time_start,
       time_end: this.state.time_end,
       is_new: this.state.is_new,
+      is_chooseZone: false
     };
     
     let res = await this.getData('get_orders', data);
@@ -320,9 +326,11 @@ export class HotMap extends React.Component {
   async getCount(){
     var new_this_zone = [];
 		
-    this.map.geoObjects.each(function (geoObject) {
-			new_this_zone = new_this_zone.concat( geoObject.geometry.getCoordinates() );
-		});
+    if( this.state.is_chooseZone === true ){
+      this.map.geoObjects.each(function (geoObject) {
+        new_this_zone = new_this_zone.concat( geoObject.geometry.getCoordinates() );
+      });
+    }
 
     let data = {
       city_id: this.state.city_id,
@@ -340,6 +348,8 @@ export class HotMap extends React.Component {
     this.setState({
       statAllCount: res.all_count,
       statTrueCount: res.true + ' ( ' + res.true_percent + '% ) ',
+      statTrueAllSumm: res.price,
+      statTrueAvgSumm: res.avg_price,
     })
 
     console.log( res )
@@ -413,16 +423,28 @@ export class HotMap extends React.Component {
 
   changeColorPolygon(event) {
 
-    event.get('target').options.set({strokeColor: 'rgb(255, 255, 0)'})
+    if( this.state.is_chooseZone == false ){
+      event.get('target').options.set({strokeColor: 'rgb(255, 255, 0)'})
 
-    const result = ymaps.geoQuery(this.map.geoObjects).search('options.strokeColor = "rgb(255, 255, 0)"')
+      const result = ymaps.geoQuery(this.map.geoObjects).search('options.strokeColor = "rgb(255, 255, 0)"')
 
-    if(result._objects.length > 1) {
-      result.setOptions('strokeColor', 'rgb(187, 0, 37)')
-    }
+      if(result._objects.length > 1) {
+        result.setOptions('strokeColor', 'rgb(187, 0, 37)')
+      }
 
-    if(result) {
-      this.map.geoObjects.add(result._objects[0]);
+      if(result) {
+        this.map.geoObjects.add(result._objects[0]);
+      }
+
+      this.setState({
+        is_chooseZone: true
+      })
+    }else{
+      ymaps.geoQuery(this.map.geoObjects).setOptions('strokeColor', 'rgb(187, 0, 37)')
+
+      this.setState({
+        is_chooseZone: false
+      })
     }
 
   }
@@ -476,6 +498,8 @@ export class HotMap extends React.Component {
             <Grid container spacing={3}>
               <Grid item xs={6}>
                 <Typography>Заказов в зоне: {this.state.statTrueCount}</Typography>
+                <Typography>Сумма заказов в зоне: {this.state.statTrueAllSumm}</Typography>
+                <Typography>Средний чек в зоне: {this.state.statTrueAvgSumm}</Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography>Всего заказов в городе: {this.state.statAllCount}</Typography>
