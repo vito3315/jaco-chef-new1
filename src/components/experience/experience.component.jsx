@@ -372,9 +372,7 @@ class Experience_ extends React.Component {
   changeCity(event) {
     const data = JSON.parse(JSON.stringify(this.state.pointsCopy));
 
-    const points = data.filter((point) =>
-      event.target.value === -1 ? point : point.city_id === event.target.value
-    );
+    const points = data.filter((point) => event.target.value === -1 ? point : point.city_id === event.target.value);
 
     this.setState({
       city: event.target.value,
@@ -383,10 +381,41 @@ class Experience_ extends React.Component {
     });
   }
 
-  changePoint(data, event, value) {
-    this.setState({
-      [data]: value,
-    });
+  changePoint(event, point) {
+
+    const pointName = event.target.innerText;
+
+    if(!point.length) {
+      this.setState({ point });
+      
+      return;
+    }
+
+    if(pointName === 'Все точки') {
+      const pointFilter = point.filter(value => value.id === -1);
+
+      this.setState({ point: pointFilter });
+
+      return;
+    }
+
+    if(pointName === 'Офис') {
+      const pointFilter = point.filter(value => value.id === -2);
+
+      this.setState({ point: pointFilter });
+
+      return;
+    }
+
+    if(point[0].id === -1 || point[0].id === -2) {
+      const pointFilter = point.filter(value => value.id === point[0].id);
+
+      this.setState({ point: pointFilter });
+
+      return;
+    }
+
+    this.setState({ point });
   }
 
   async getInfo() {
@@ -489,7 +518,7 @@ class Experience_ extends React.Component {
               multiple={true}
               data={this.state.points}
               value={this.state.point}
-              func={this.changePoint.bind(this, 'point')}
+              func={this.changePoint.bind(this)}
             />
           </Grid>
 
