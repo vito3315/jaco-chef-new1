@@ -460,13 +460,19 @@ class Experience_ extends React.Component {
       date_registration,
     };
 
-    let { st } = await this.getData('save_date_registration', data);
+    let { st, text } = await this.getData('save_date_registration', data);
 
-    if (st) {
+    if(st){
       this.setState({
         openAlert: true,
         err_status: true,
         err_text: 'Изменения сохранены!',
+      });
+    }else{
+      this.setState({
+        openAlert: true,
+        err_status: false,
+        err_text: text,
       });
     }
 
