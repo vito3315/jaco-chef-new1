@@ -187,7 +187,7 @@ class CatWork_ extends React.Component {
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
-                  <TextEditor id="EditorEdit" text={this.state.showCat.text} />
+                  <TextEditor id="EditorEdit" value={this.state.showCat.text} />
                 </Grid>
                 
               </Grid>
@@ -213,7 +213,7 @@ class CatWork_ extends React.Component {
               </Grid>
 
               <Grid item xs={12} sm={12}>
-                <TextEditor id="EditorNew" text={''} />
+                <TextEditor id="EditorNew" value={''} />
               </Grid>
               
             </Grid>
