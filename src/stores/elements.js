@@ -495,7 +495,7 @@ export class TextEditor extends React.PureComponent {
   render(){
     return (
       <Editor
-        apiKey='qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc'
+        apiKey='r0ihgs4ukfpmudzw7aexxgb88tnx5jw26h1xx9x6409ji3gx'
         value={this.props.value}
         onEditorChange={this.props.func}
         init={{
