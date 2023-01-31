@@ -120,7 +120,7 @@ class OrderPost2_ extends React.Component {
 class OrderPost2Manual_ListItem extends React.Component {
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.item?.count !== this.props.item?.count || nextProps.item?.rec_item_id !== this.props.item?.rec_item_id || nextProps.item?.rec_vendor_id !== this.props.item?.rec_vendor_id
+    return nextProps.item?.count !== this.props.item?.count || nextProps.item?.rec_vendor_id !== this.props.item?.rec_vendor_id || this.props.item?.choose_item_id !== nextProps.item?.choose_item_id || this.props.item?.choose_vendor_id !== nextProps.item?.choose_vendor_id
   }
 
   render(){
@@ -133,7 +133,7 @@ class OrderPost2Manual_ListItem extends React.Component {
             <MySelect
               is_none={false}
               data={item.items}
-              value={item.rec_item_id}
+              value={item.choose_item_id}
               func={(event) => changeSelectItem(event, 'item', item.id, 0)}
             />
           )}
@@ -143,25 +143,25 @@ class OrderPost2Manual_ListItem extends React.Component {
         <TableCell>{item.rec_pq} {item.ei_name}</TableCell>
         <TableCell style={{ minWidth: '100px' }}>
           <MyTextInput
-            value={item?.count ? item.count !== 0 ? parseFloat(item.count) / parseFloat(item.rec_pq) : '' : ''}
+            value={item?.count ?? ''}
             func={(event) => changeCountItem(event, item.id)}
           />
         </TableCell>
         <TableCell align="center">
-          {item?.count ? item.count : 0} {item?.count ? item.count !== 0 ? item.ei_name : null : null}
+          {item?.all_count ?? 0 } {item.ei_name}
         </TableCell>
         <TableCell>
           {item.items.map((it, key_it) =>
-            it.id === item.rec_item_id ? it.vendors.length > 1 ? (
-                <React.Fragment key={key_it}>
-                  <MySelect
-                    is_none={false}
-                    data={it.vendors}
-                    value={item.rec_vendor_id}
-                    func={(event) => changeSelectItem(event, 'vendor', item.id, item.rec_item_id)}
-                  />
-                </React.Fragment>
-              ) : it.vendors[0].name : null
+            it.id === item.choose_item_id ? it.vendors.length > 1 ? (
+              <React.Fragment key={key_it}>
+                <MySelect
+                  is_none={false}
+                  data={it.vendors}
+                  value={item.choose_vendor_id}
+                  func={(event) => changeSelectItem(event, 'vendor', item.id, item.choose_item_id)}
+                />
+              </React.Fragment>
+            ) : it.vendors[0].name : null
           )}
         </TableCell>
       </TableRow>
@@ -414,7 +414,37 @@ class OrderPost2Manual_ extends React.Component {
       cat.items.forEach((item) => {
         item.items.forEach((it) => {
           all_items.push({ name: it.name });
+        });
+      });
+    });
 
+    // console.log(res);
+
+    this.setState({
+      cats: this.checkColorRec(res.cats),
+      all_items,
+    });
+  }
+
+  checkColorRec(cats){
+    cats.forEach((cat) => {
+      cat.items.forEach((item) => {
+        item.items.forEach((it) => {
+          
+          it.color = null;
+          
+          it.vendors.forEach((vendor) => {
+            vendor.color = null;
+          });
+
+        });
+      });
+    });
+
+    cats.forEach((cat) => {
+      cat.items.forEach((item) => {
+        item.items.forEach((it) => {
+          
           if (item.rec_item_id === it.id) {
             it.color = '#388e3c';
           }
@@ -424,16 +454,12 @@ class OrderPost2Manual_ extends React.Component {
               vendor.color = '#388e3c';
             }
           });
+
         });
       });
     });
 
-    // console.log(res);
-
-    this.setState({
-      cats: res.cats,
-      all_items,
-    });
+    return cats;
   }
 
   changeSelectItem(event, type, id, item_id) {
@@ -444,11 +470,13 @@ class OrderPost2Manual_ extends React.Component {
         cat.items.forEach((item) => {
           if (item.id === id) {
             const itemNew = item.items.find((it) => it.id === event.target.value);
-            item.rec_item_id = itemNew.id;
-            item.rec_item_name = itemNew.name;
-            item.rec_vendor_id = itemNew.vendors[0].id;
-            item.rec_vendor_name = itemNew.vendors[0].name;
-            item.count = 0;
+
+            item.choose_item_id = itemNew.id;
+
+            //item.rec_item_id = itemNew.id;
+            //item.rec_item_name = itemNew.name;
+            //item.rec_vendor_id = itemNew.vendors[0].id;
+            //item.rec_vendor_name = itemNew.vendors[0].name;
           }
         });
       });
@@ -459,15 +487,17 @@ class OrderPost2Manual_ extends React.Component {
         cat.items.forEach((item) => {
           if (item.id === id) {
             const itemNew = item.items.find((it) => it.id === item_id).vendors.find((vendor) => vendor.id === event.target.value);
-            item.rec_vendor_id = itemNew.id;
-            item.rec_vendor_name = itemNew.name;
+            item.choose_vendor_id = itemNew.id;
+
+            //item.rec_vendor_id = itemNew.id;
+            //item.rec_vendor_name = itemNew.name;
           }
         });
       });
     }
 
     this.setState({
-      cats,
+      cats: this.checkColorRec(cats),
     });
   }
 
@@ -477,7 +507,8 @@ class OrderPost2Manual_ extends React.Component {
     cats.forEach((cat) => {
       cat.items.forEach((item) => {
         if (item.id === id) {
-          item.count = parseFloat(item.rec_pq) * parseFloat(event.target.value);
+          item.all_count = parseFloat(item.rec_pq) * parseFloat(event.target.value);
+          item.count = parseFloat(event.target.value);
         }
       });
     });
@@ -493,6 +524,14 @@ class OrderPost2Manual_ extends React.Component {
     const point_id = this.state.point;
 
     const items = cats.reduce((items, cat) => items = [...items, ...cat.items], []);
+
+    //choose_item_id
+    //choose_vendor_id
+    //rec_pq
+    //all_count
+    //count
+    //percent
+    //price - установить при проверке new_items_price
 
     const data = {
       items,
