@@ -340,6 +340,7 @@ export class HotMap extends React.Component {
       date_end: this.state.date_end,
       time_start: this.state.time_start,
       time_end: this.state.time_end,
+      is_pick_order: this.state.is_pick_order,
       is_new: this.state.is_new,
       
       zone: new_this_zone[ new_this_zone.length - 1 ]
