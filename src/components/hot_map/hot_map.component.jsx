@@ -54,6 +54,7 @@ export class HotMap extends React.Component {
       is_chooseZone: false,
 
       is_new: 0,
+      is_pick_order: 0,
 
       isDrawing: true,
 
@@ -149,6 +150,7 @@ export class HotMap extends React.Component {
       time_start: this.state.time_start,
       time_end: this.state.time_end,
       is_new: this.state.is_new,
+      is_pick_order: this.state.is_pick_order,
       is_chooseZone: false
     };
     
@@ -365,10 +367,22 @@ export class HotMap extends React.Component {
 
     let data = '';
 
-    if( type == 'is_new' ){
+    if( type == 'is_new' || type == 'is_pick_order' ){
       data = event.target.checked == true ? 1 : 0;
     }else{
       data = event.target.value;
+    }
+
+    if( type == 'is_new' && data == 1 ){
+      this.setState({
+        is_pick_order: 0
+      })
+    }
+
+    if( type == 'is_pick_order' && data == 1 ){
+      this.setState({
+        is_new: 0
+      })
     }
 
     this.setState({
@@ -483,6 +497,12 @@ export class HotMap extends React.Component {
           <Grid item xs={12} sm={3}>
             <MyTimePicker label="Время до" value={this.state.time_end} func={ this.changeData.bind(this, 'time_end') } />
           </Grid>
+
+
+          <Grid item xs={12}>
+            <MyCheckBox value={ this.state.is_pick_order == 1 ? true : false } func={ this.changeData.bind(this, 'is_pick_order') } label='Адреса, где был самовывоз' />
+          </Grid>
+
 
           <Grid item xs={12} sm={6}>
             <Button variant="contained" onClick={this.getCount.bind(this)}>Подсчитать количество</Button>
