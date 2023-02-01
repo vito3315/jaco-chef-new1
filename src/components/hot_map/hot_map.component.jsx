@@ -167,10 +167,12 @@ export class HotMap extends React.Component {
     var new_data = [];
 				
     all_points.map(function(item){
-      new_data.push([
-        parseFloat(item[0]),
-        parseFloat(item[1])
-      ])
+      if( item && item[0] && item[1] ){
+        new_data.push([
+          parseFloat(item[0]),
+          parseFloat(item[1])
+        ])
+      }
     })
 
     
@@ -501,7 +503,7 @@ export class HotMap extends React.Component {
 
 
           <Grid item xs={12}>
-            <label>Показываются домашние адреса клиентов, кто хотя бы раз сделал заказ на самовывоз и в заданный период доставку, домашним считается тот адрес, где больше всего доставок</label>
+            <label>Показываются домашние адреса клиентов, кто хотя бы раз сделал заказ на доставку и в заданный период самовывоз, домашним считается тот адрес, где больше всего доставок за все время в городе</label>
             <MyCheckBox value={ this.state.is_pick_order == 1 ? true : false } func={ this.changeData.bind(this, 'is_pick_order') } label='Домашние адреса' />
           </Grid>
           
