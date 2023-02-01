@@ -501,10 +501,11 @@ export class HotMap extends React.Component {
 
 
           <Grid item xs={12}>
-            <MyCheckBox value={ this.state.is_pick_order == 1 ? true : false } func={ this.changeData.bind(this, 'is_pick_order') } label='Адреса, где был самовывоз' />
+            <label>Показываются домашние адреса клиентов, кто хотя бы раз сделал заказ на самовывоз и в заданный период доставку, домашним считается тот адрес, где больше всего доставок</label>
+            <MyCheckBox value={ this.state.is_pick_order == 1 ? true : false } func={ this.changeData.bind(this, 'is_pick_order') } label='Домашние адреса' />
           </Grid>
-
-
+          
+          
           <Grid item xs={12} sm={6}>
             <Button variant="contained" onClick={this.getCount.bind(this)}>Подсчитать количество</Button>
           </Grid>
