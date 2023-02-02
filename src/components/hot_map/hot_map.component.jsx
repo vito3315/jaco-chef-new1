@@ -279,12 +279,12 @@ export class HotMap extends React.Component {
 
      
       ymaps.modules.require(['Heatmap'], (Heatmap) => {
-        var heatmap = new Heatmap(new_data, {
+        this.heatmap = new Heatmap(new_data, {
           gradient: gradients[0],
           radius: radiuses[1],
           opacity: opacities[2]
         });
-        heatmap.setMap(this.map);
+        this.heatmap.setMap(this.map);
       });
       
 
