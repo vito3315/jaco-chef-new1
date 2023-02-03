@@ -54,6 +54,7 @@ export class HotMap extends React.Component {
       is_chooseZone: false,
 
       is_new: 0,
+      is_pick_order: 0,
 
       isDrawing: true,
 
@@ -149,6 +150,7 @@ export class HotMap extends React.Component {
       time_start: this.state.time_start,
       time_end: this.state.time_end,
       is_new: this.state.is_new,
+      is_pick_order: this.state.is_pick_order,
       is_chooseZone: false
     };
     
@@ -165,10 +167,12 @@ export class HotMap extends React.Component {
     var new_data = [];
 				
     all_points.map(function(item){
-      new_data.push([
-        parseFloat(item[0]),
-        parseFloat(item[1])
-      ])
+      if( item && item[0] && item[1] ){
+        new_data.push([
+          parseFloat(item[0]),
+          parseFloat(item[1])
+        ])
+      }
     })
 
     
@@ -275,12 +279,12 @@ export class HotMap extends React.Component {
 
      
       ymaps.modules.require(['Heatmap'], (Heatmap) => {
-        var heatmap = new Heatmap(new_data, {
+        this.heatmap = new Heatmap(new_data, {
           gradient: gradients[0],
           radius: radiuses[1],
           opacity: opacities[2]
         });
-        heatmap.setMap(this.map);
+        this.heatmap.setMap(this.map);
       });
       
 
@@ -338,6 +342,7 @@ export class HotMap extends React.Component {
       date_end: this.state.date_end,
       time_start: this.state.time_start,
       time_end: this.state.time_end,
+      is_pick_order: this.state.is_pick_order,
       is_new: this.state.is_new,
       
       zone: new_this_zone[ new_this_zone.length - 1 ]
@@ -365,10 +370,22 @@ export class HotMap extends React.Component {
 
     let data = '';
 
-    if( type == 'is_new' ){
+    if( type == 'is_new' || type == 'is_pick_order' ){
       data = event.target.checked == true ? 1 : 0;
     }else{
       data = event.target.value;
+    }
+
+    if( type == 'is_new' && data == 1 ){
+      this.setState({
+        is_pick_order: 0
+      })
+    }
+
+    if( type == 'is_pick_order' && data == 1 ){
+      this.setState({
+        is_new: 0
+      })
     }
 
     this.setState({
@@ -484,6 +501,13 @@ export class HotMap extends React.Component {
             <MyTimePicker label="Время до" value={this.state.time_end} func={ this.changeData.bind(this, 'time_end') } />
           </Grid>
 
+
+          <Grid item xs={12}>
+            <label>Показываются домашние адреса клиентов, кто хотя бы раз сделал заказ на доставку и в заданный период самовывоз, домашним считается тот адрес, где больше всего доставок за все время в городе</label>
+            <MyCheckBox value={ this.state.is_pick_order == 1 ? true : false } func={ this.changeData.bind(this, 'is_pick_order') } label='Домашние адреса' />
+          </Grid>
+          
+          
           <Grid item xs={12} sm={6}>
             <Button variant="contained" onClick={this.getCount.bind(this)}>Подсчитать количество</Button>
           </Grid>
