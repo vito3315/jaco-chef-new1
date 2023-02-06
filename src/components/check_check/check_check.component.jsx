@@ -85,7 +85,7 @@ class CheckCheckTable extends React.Component {
               <TableCell>#</TableCell>
               <TableCell>Номер заказа</TableCell>
               <TableCell>Точка</TableCell>
-              <TableCell>Тип заказа</TableCell>
+              <TableCell>Тип чека</TableCell>
               <TableCell>Номер кассы</TableCell>
               <TableCell>Сумма заказа</TableCell>
               <TableCell>Дата/Время заказа</TableCell>
@@ -104,7 +104,7 @@ class CheckCheckTable extends React.Component {
                   /> 
                 </TableCell>
                 <TableCell>{item.addr}</TableCell>
-                <TableCell>{item.type}</TableCell>
+                <TableCell>{item.type_check_text}</TableCell>
                 <TableCell>{item.kassa}</TableCell>
                 <TableCell>{item.sum}</TableCell>
                 <TableCell>{item.date} {item.time}</TableCell>
@@ -376,12 +376,12 @@ class CheckCheck_ extends React.Component {
     console.log('modal_data', data)
     console.log('row_numb', row_numb)
     console.log('point_id', point_id)
-    let res = await this.getData('find_order', data);
+    let res = await this.getData('get_order_not_found', data);
 
     console.log('res', res)
     this.setState({
       modalOrder: true,
-      orders    : res.orders,
+      orders    : res,
       row_numb : row_numb,
     });
   }
