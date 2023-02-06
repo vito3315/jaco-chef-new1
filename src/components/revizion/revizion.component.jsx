@@ -499,8 +499,6 @@ class RevizionNew_List extends React.Component {
                   <Typography style={{ width: '60%' }}>{item.name}</Typography>
                   <Typography style={{ width: '40%' }}>{item.value == 0 ? '' : item.value} {item.value == 0 ? '' : item.ei_name}</Typography>
                 </AccordionSummary>
-
-                {/* Заготовки */}
                 <AccordionDetails>
                   <Grid item sm={5}>
                     <MyTextInput
@@ -658,7 +656,7 @@ class RevizionNew_ extends React.Component {
       point_id: this.state.point,
     };
 
-    let res = await this.getData('get_data_for_new_rev', data);
+    const res = await this.getData('get_data_for_new_rev', data);
 
     this.setState({
       items: res.items,
@@ -778,12 +776,53 @@ class RevizionNew_ extends React.Component {
 
   // получение данных ревизии
   async saveRev() {
-    let data = {
-      point_id: this.state.point,
-      item: this.state.items,
-      pf: this.state.pf,
+
+    this.setState({
+      modalDialog: false,
+    });
+
+    const point_id = this.state.point;
+
+    const items_rev = this.state.items;
+
+    const pf = this.state.pf;
+
+    const allItems = [...pf, ...items_rev];
+
+    const items = allItems.reduce((items, cat) => {
+      cat = { item_id: cat.id, type: cat.type, value: cat.value };
+
+      return (items = [...items, ...[cat]]);
+    }, []);
+
+    const data = {
+      point_id,
+      items,
     };
-    console.log('saveRev ', data);
+    
+    // console.log('saveRev ', data);
+
+    const res = await this.getData('save_new', data);
+
+    if(res.st) {
+      this.setState({
+        openAlert: true,
+        err_status: true,
+        err_text: 'Ревизия успешно сохранена!',
+      });
+
+      setTimeout(() => {
+        this.getDataRev();
+      }, 300);
+
+    } else {
+      this.setState({
+        openAlert: true,
+        err_status: false,
+        err_text: 'Данные ревизии не сохранены!',
+      });
+    }
+    
   }
 
   render() {
@@ -887,7 +926,7 @@ class RevizionNew_ extends React.Component {
             <Button autoFocus onClick={() => this.setState({ modalDialog: false })}>
               Отмена
             </Button>
-            <Button>Сохранить</Button>
+            <Button onClick={this.saveRev.bind(this)}>Сохранить</Button>
           </DialogActions>
         </Dialog>
       </>
