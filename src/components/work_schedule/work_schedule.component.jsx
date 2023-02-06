@@ -389,7 +389,12 @@ class WorkSchedule_Table extends React.Component {
                     onClick={ this.props.kind == 'manager' ? () => {} : this.props.pricePerHour.bind(this, item.data) }
                   >{item.data.price_p_h}</TableCell>
 
-                  <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.dop_bonus : ' - '}</TableCell>
+                  <TableCell 
+                    style={{ textAlign: 'center', cursor: 'pointer' }}
+                    onClick={this.props.changeDopBonusUser.bind(this, item)}>
+                    {parseInt(item.data.check_period) == 1 ? item.data.dop_bonus : ' - '}
+                  </TableCell>
+                  
                   <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.h_price : ' - '}</TableCell>
                   <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.err_price : ' - '}</TableCell>
                   <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.my_bonus : ' - '}</TableCell>
@@ -683,7 +688,13 @@ class WorkSchedule_Table_without_functions extends React.Component {
                         {item.data.price_p_h}
                       </TableCell>
 
-                      <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.dop_bonus : ' - '}</TableCell>
+                      <TableCell 
+                        style={{ textAlign: 'center', сursor: 'pointer' }} 
+                        // onClick={this.props.changeDopBonusUser.bind(this, item)}
+                        >
+                        {parseInt(item.data.check_period) == 1 ? item.data.dop_bonus : ' - '}
+                      </TableCell>
+
                       <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.h_price : ' - '}</TableCell>
                       <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.err_price : ' - '}</TableCell>
                       <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.check_period) == 1 ? item.data.my_bonus : ' - '}</TableCell>
@@ -929,6 +940,9 @@ class WorkSchedule_ extends React.Component {
       mainMenuDopBonus: false,
       mainMenuZP: false,
       mainMenuPoints: false,
+
+      mainMenuDopBonusUser: false,
+      userDopBonus: null,
 
       show_zp_one: 0,
       show_zp_two: 0,
@@ -1473,6 +1487,13 @@ class WorkSchedule_ extends React.Component {
     });
   }
 
+  changeDopBonusUser(item) {
+    this.setState({
+      mainMenuDopBonusUser: true,
+      userDopBonus: item,
+    });
+  }
+
   checkDopBonus(type) {
     if (confirm('Точно ?')) {
       this.dop_bonus(type);
@@ -1480,20 +1501,44 @@ class WorkSchedule_ extends React.Component {
   }
 
   async dop_bonus(type) {
-    let data = {
-      date: this.state.mounth,
-      part: this.state.tabTable,
-      point_id: this.state.point,
-      type: type,
-    };
 
-    let res = await this.getData('save_dop_bonus', data);
+    let res;
 
-    // console.log( res );
+    if(type === 3) {
+
+      const user = this.state.userDopBonus;
+
+      const data = {
+        user_id: user.data.id,
+        smena_id: user.data.smena_id,
+        app_id: user.data.app_id,
+        part: this.state.tabTable,
+        data: this.state.mounth,
+        point_id: this.state.point,
+      };
+  
+      res = await this.getData('del_dop_bonus_user', data);
+
+      // console.log( res );
+
+    } else {
+
+      let data = {
+        date: this.state.mounth,
+        part: this.state.tabTable,
+        point_id: this.state.point,
+        type: type,
+      };
+  
+      res = await this.getData('save_dop_bonus', data);
+  
+      // console.log( res );
+    }
 
     if (res['st'] == true) {
       this.setState({
         mainMenuDopBonus: false,
+        mainMenuDopBonusUser: false,
 
         operAlert: true,
         err_status: res.st,
@@ -2244,6 +2289,43 @@ class WorkSchedule_ extends React.Component {
                 onClick={this.checkDopBonus.bind(this, 2)}
               />
             </ListItem>
+          </List>
+        </Dialog>
+        
+        {/* Лишение бонуса конкретного сотрудника */}
+        <Dialog
+          onClose={() => { this.setState({ mainMenuDopBonusUser: false }); }}
+          open={this.state.mainMenuDopBonusUser}
+        >
+          <DialogTitle>
+            Командный бонус {this.state.mounth}- 
+            {parseInt(this.state.tabTable) == 0 ? '01' : '16'}{' '}
+            {this.state.userDopBonus?.data.user_name ?? ''}
+          </DialogTitle>
+
+          <List sx={{ pt: 0 }}>
+            <ListItemButton>
+              <ListItemAvatar>
+                <Avatar style={{ backgroundColor: 'green' }}>
+                  <CloseIcon style={{ color: '#fff' }} />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={'Отмена'}
+                onClick={() => this.setState({ mainMenuDopBonusUser: false })}
+              />
+            </ListItemButton>
+            <ListItemButton>
+              <ListItemAvatar>
+                <Avatar style={{ backgroundColor: 'red' }}>
+                  <CheckIcon style={{ color: '#fff' }} />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={'Лишить'}
+                onClick={this.checkDopBonus.bind(this, 3)}
+              />
+            </ListItemButton>
           </List>
         </Dialog>
 
@@ -3041,6 +3123,7 @@ class WorkSchedule_ extends React.Component {
                     lv_cafe={this.state.lv_cafe}
                     changeLVDir={this.changeLVDir.bind(this)}
                     changeDopBonus={this.changeDopBonus.bind(this)}
+                    changeDopBonusUser={this.changeDopBonusUser.bind(this)}
                     openM={this.openM.bind(this)}
                     openH={this.openHMini.bind(this)}
                     openZP={this.openZP.bind(this)}
@@ -3062,6 +3145,7 @@ class WorkSchedule_ extends React.Component {
                     lv_cafe={this.state.lv_cafe}
                     changeLVDir={this.changeLVDir.bind(this)}
                     changeDopBonus={this.changeDopBonus.bind(this)}
+                    changeDopBonusUser={this.changeDopBonusUser.bind(this)}
                     openM={this.openM.bind(this)}
                     openH={this.openH.bind(this)}
                     openZP={this.openZP.bind(this)}
@@ -3087,6 +3171,7 @@ class WorkSchedule_ extends React.Component {
                     lv_cafe={this.state.lv_cafe}
                     changeLVDir={this.changeLVDir.bind(this)}
                     changeDopBonus={this.changeDopBonus.bind(this)}
+                    changeDopBonusUser={this.changeDopBonusUser.bind(this)}
                     openM={this.openM.bind(this)}
                     openH={this.openHMini.bind(this)}
                     openZP={this.openZP.bind(this)}
@@ -3108,6 +3193,7 @@ class WorkSchedule_ extends React.Component {
                     lv_cafe={this.state.lv_cafe}
                     changeLVDir={this.changeLVDir.bind(this)}
                     changeDopBonus={this.changeDopBonus.bind(this)}
+                    changeDopBonusUser={this.changeDopBonusUser.bind(this)}
                     openM={this.openM.bind(this)}
                     openH={this.openH.bind(this)}
                     openZP={this.openZP.bind(this)}
