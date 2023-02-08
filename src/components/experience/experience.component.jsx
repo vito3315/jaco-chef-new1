@@ -290,6 +290,7 @@ class Experience_ extends React.Component {
 
       modalDialog: false,
       user: null,
+      fullScreen: false,
 
       openAlert: false,
       err_status: true,
