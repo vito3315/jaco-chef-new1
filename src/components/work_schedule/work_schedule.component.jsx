@@ -391,7 +391,7 @@ class WorkSchedule_Table extends React.Component {
 
                   <TableCell 
                     style={{ textAlign: 'center', cursor: 'pointer' }}
-                    onClick={this.props.changeDopBonusUser.bind(this, item)}>
+                    onClick={ this.props.kind == 'manager' ? () => {} : this.props.changeDopBonusUser.bind(this, item)}>
                     {parseInt(item.data.check_period) == 1 ? item.data.dop_bonus : ' - '}
                   </TableCell>
                   
