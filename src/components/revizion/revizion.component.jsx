@@ -376,6 +376,80 @@ class Revizion_ extends React.Component {
   }
 }
 
+class RevizionNew_List_Item extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    //console.log( nextProps.item, this.props.item )
+    return JSON.stringify(nextProps.item) !== JSON.stringify(this.props.item);
+  }
+
+  render() {
+    console.log( 'RevizionNew_List_Item render' )
+    const { item, it, i, saveData, clearData } = this.props;
+
+    return (
+      <React.Fragment>
+        <Grid container spacing={3} style={{ paddingTop: 20, paddingBottom: 20 }}>
+          <Grid item xs={12} sm={5}>
+            <MySelect
+              data={item.size}
+              value={it.need_pq}
+              func={(event) => saveData(event, 'item', item.id, 'need_pq', i)}
+              label="Объем упаковки"
+            />
+          </Grid>
+          <Grid item xs={i === 0 ? 12 : 9} sm={5}>
+            <MyTextInput
+              value={it.value === 0 ? '' : it.value}
+              func={(event) => saveData(event, 'item', item.id, 'value', i)}
+              label="Количество"
+            />
+          </Grid>
+          {i === 0 ? null : (
+            <Grid item xs={3} sm={1}>
+              <Button variant="contained" onClick={() => clearData(item.id, i)}>
+                <CloseIcon />
+              </Button>
+            </Grid>
+          )}
+        </Grid>
+        {item.counts[item.counts.length - 1] === it ? null : <Divider />}
+      </React.Fragment>
+    )
+  }
+}
+
+class RevizionNew_List_accordion extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    //console.log( nextProps.item, this.props.item )
+    return JSON.stringify(nextProps.item) !== JSON.stringify(this.props.item) || nextProps.saveEdit !== this.props.saveEdit;
+  }
+
+  render() {
+    console.log( 'RevizionNew_List_accordion1111 render' )
+    const { saveEdit, item, saveData, clearData, copyData } = this.props;
+
+    return (
+      <Accordion>
+        <AccordionSummary style={{ backgroundColor: saveEdit && !item.value ? '#ffc107' : null }} expandIcon={<ExpandMoreIcon />}>
+          <Typography style={{ width: '60%' }}>{item.name}</Typography>
+          <Typography style={{ width: '40%' }}>{!item.value ? '' : item.value} {!item.value ? '' : item.ei_name}</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          {item.counts.map((it, i) => (
+            <RevizionNew_List_Item key={i} item={item} it={it} saveData={saveData} clearData={clearData} i={i} />
+          ))}
+
+          <Grid item xs={12} sm={6}>
+            <Button variant="contained" onClick={() => copyData(item.id)}>
+              Дублировать
+            </Button>
+          </Grid>
+        </AccordionDetails>
+      </Accordion>
+    )
+  }
+}
+
 // Новая ревизия Список
 class RevizionNew_List extends React.Component {
   constructor(props) {
@@ -443,49 +517,7 @@ class RevizionNew_List extends React.Component {
         <div style={ this.props.chooseTab == 0 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
           {this.state.items.map((item, key) =>
             parseInt(item.is_show) === 0 ? null : (
-              <Accordion key={key}>
-                <AccordionSummary style={{ backgroundColor: this.props.saveEdit && !item.value ? '#ffc107' : null }} expandIcon={<ExpandMoreIcon />}>
-                  <Typography style={{ width: '60%' }}>{item.name}</Typography>
-                  <Typography style={{ width: '40%' }}>{!item.value ? '' : item.value} {!item.value ? '' : item.ei_name}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  {item.counts.map((it, i) => (
-                    <React.Fragment key={i}>
-                      <Grid container spacing={3} style={{ paddingTop: 20, paddingBottom: 20 }}>
-                        <Grid item xs={12} sm={5}>
-                          <MySelect
-                            data={item.size}
-                            value={it.need_pq}
-                            func={(event) => this.props.saveData(event, 'item', item.id, 'need_pq', i)}
-                            label="Объем упаковки"
-                          />
-                        </Grid>
-                        <Grid item xs={i === 0 ? 12 : 9} sm={5}>
-                          <MyTextInput
-                            value={it.value === 0 ? '' : it.value}
-                            func={(event) => this.props.saveData(event, 'item', item.id, 'value', i)}
-                            label="Количество"
-                          />
-                        </Grid>
-                        {i === 0 ? null : (
-                          <Grid item xs={3} sm={1}>
-                            <Button variant="contained" onClick={() => this.props.clearData(item.id, i)}>
-                              <CloseIcon />
-                            </Button>
-                          </Grid>
-                        )}
-                      </Grid>
-                      {item.counts[item.counts.length - 1] === it ? null : <Divider />}
-                    </React.Fragment>
-                  ))}
-
-                  <Grid item xs={12} sm={6}>
-                    <Button variant="contained" onClick={() => this.props.copyData(item.id)}>
-                      Дублировать
-                    </Button>
-                  </Grid>
-                </AccordionDetails>
-              </Accordion>
+              <RevizionNew_List_accordion key={key} item={item} saveEdit={this.props.saveEdit} saveData={this.props.saveData} clearData={this.props.clearData} copyData={this.props.copyData} />
             )
           )}
         </div>
