@@ -50,7 +50,20 @@ import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 
 import { MySelect, MyTextInput, MyAutocomplite2 } from '../../stores/elements';
 
-const queryString = require('query-string');
+import { evaluate } from 'mathjs';
+import queryString from 'query-string';
+
+function formatDate(date) {
+  var d = new Date(date),
+    month = '' + (d.getMonth() + 1),
+    day = '' + d.getDate(),
+    year = d.getFullYear();
+
+  if (month.length < 2) month = '0' + month;
+  if (day.length < 2) day = '0' + day;
+
+  return [year, month, day].join('-');
+}
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -245,13 +258,9 @@ class Revizion_ extends React.Component {
 
     const pfCopy = JSON.parse(JSON.stringify(this.state.pfCopy));
 
-    const items = itemsCopy.filter((value) =>
-      search ? value.name === search : value
-    );
+    const items = itemsCopy.filter((value) => search ? value.name === search : value);
 
-    const pf = pfCopy.filter((value) =>
-      search ? value.name === search : value
-    );
+    const pf = pfCopy.filter((value) => search ? value.name === search : value);
 
     this.setState({
       search,
@@ -376,15 +385,52 @@ class Revizion_ extends React.Component {
   }
 }
 
-class RevizionNew_List_Item extends React.Component {
+// строка аккордион из списка Заготовок
+class RevizionNew_List_Pf_accordion extends React.Component {
   shouldComponentUpdate(nextProps) {
-    //console.log( nextProps.item, this.props.item )
+    return (
+      JSON.stringify(nextProps.item) !== JSON.stringify(this.props.item) ||
+      nextProps.saveEdit !== this.props.saveEdit
+    );
+  }
+
+  render() {
+    // console.log( 'RevizionNew_List_Pf_accordion render' )
+    const { saveEdit, item, saveData, math } = this.props;
+
+    return (
+      <Accordion>
+        <AccordionSummary
+          style={{ backgroundColor: saveEdit && !item.value && item.value !== 0 ? '#ffc107' : null }}
+          expandIcon={<ExpandMoreIcon />}
+        >
+          <Typography style={{ width: '60%' }}>{item.name}</Typography>
+          <Typography style={{ width: '40%' }}>{item.value} {item.value === '' ? '' : item.ei_name}</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Grid item sm={5}>
+            <MyTextInput
+              value={item.value}
+              func={(event) => saveData(event, 'pf', item.id, 'value', 0)}
+              label="Количество"
+              enter={(event) => event.key === 'Enter' ? math(event, 'pf', item.id, 'value', 0) : null}
+            />
+          </Grid>
+        </AccordionDetails>
+      </Accordion>
+    );
+  }
+}
+
+// строка из списка Товаров с объемом и количеством Товара
+class RevizionNew_List_Item_Row extends React.Component {
+  shouldComponentUpdate(nextProps) {
     return JSON.stringify(nextProps.item) !== JSON.stringify(this.props.item);
   }
 
   render() {
-    console.log( 'RevizionNew_List_Item render' )
-    const { item, it, i, saveData, clearData } = this.props;
+    // console.log( 'RevizionNew_List_Item_Row render' )
+    const { item, it, i, saveData, clearData, math } = this.props;
 
     return (
       <React.Fragment>
@@ -399,9 +445,10 @@ class RevizionNew_List_Item extends React.Component {
           </Grid>
           <Grid item xs={i === 0 ? 12 : 9} sm={5}>
             <MyTextInput
-              value={it.value === 0 ? '' : it.value}
+              value={it.value}
               func={(event) => saveData(event, 'item', item.id, 'value', i)}
               label="Количество"
+              enter={(event) => event.key === 'Enter' ? math(event, 'item', item.id, 'value', i) : null }
             />
           </Grid>
           {i === 0 ? null : (
@@ -412,31 +459,45 @@ class RevizionNew_List_Item extends React.Component {
             </Grid>
           )}
         </Grid>
-        {item.counts[item.counts.length - 1] === it ? null : <Divider />}
+        {item.counts.at(-1) === it ? null : <Divider />}
       </React.Fragment>
-    )
+    );
   }
 }
 
-class RevizionNew_List_accordion extends React.Component {
+// строка аккордион из списка Товаров
+class RevizionNew_List_Item_accordion extends React.Component {
   shouldComponentUpdate(nextProps) {
-    //console.log( nextProps.item, this.props.item )
-    return JSON.stringify(nextProps.item) !== JSON.stringify(this.props.item) || nextProps.saveEdit !== this.props.saveEdit;
+    return (
+      JSON.stringify(nextProps.item) !== JSON.stringify(this.props.item) ||
+      nextProps.saveEdit !== this.props.saveEdit
+    );
   }
 
   render() {
-    console.log( 'RevizionNew_List_accordion1111 render' )
-    const { saveEdit, item, saveData, clearData, copyData } = this.props;
+    // console.log( 'RevizionNew_List_Item_accordion render' )
+    const { saveEdit, item, saveData, clearData, copyData, math } = this.props;
 
     return (
       <Accordion>
-        <AccordionSummary style={{ backgroundColor: saveEdit && !item.value ? '#ffc107' : null }} expandIcon={<ExpandMoreIcon />}>
+        <AccordionSummary
+          style={{ backgroundColor: saveEdit && !item.value && item.value !== 0 ? '#ffc107' : null }}
+          expandIcon={<ExpandMoreIcon />}
+        >
           <Typography style={{ width: '60%' }}>{item.name}</Typography>
-          <Typography style={{ width: '40%' }}>{!item.value ? '' : item.value} {!item.value ? '' : item.ei_name}</Typography>
+          <Typography style={{ width: '40%' }}>{item.value} {item.value === '' ? '' : item.ei_name}</Typography>
         </AccordionSummary>
         <AccordionDetails>
           {item.counts.map((it, i) => (
-            <RevizionNew_List_Item key={i} item={item} it={it} saveData={saveData} clearData={clearData} i={i} />
+            <RevizionNew_List_Item_Row
+              key={i}
+              item={item}
+              it={it}
+              saveData={saveData}
+              clearData={clearData}
+              i={i}
+              math={math}
+            />
           ))}
 
           <Grid item xs={12} sm={6}>
@@ -446,7 +507,7 @@ class RevizionNew_List_accordion extends React.Component {
           </Grid>
         </AccordionDetails>
       </Accordion>
-    )
+    );
   }
 }
 
@@ -482,6 +543,7 @@ class RevizionNew_List extends React.Component {
         const pf = pfCopy.filter((item) => item.storages.find((storages) => id ? storages.storage_id === id : storages));
 
         return { items, pf };
+
       } else {
         return {
           items: JSON.parse(JSON.stringify(nextProps.items)),
@@ -494,7 +556,6 @@ class RevizionNew_List extends React.Component {
 
   // сортировка по месту хранения
   sortItem(id) {
-
     const itemsCopy = this.state.items;
 
     const pfCopy = this.state.pf;
@@ -509,15 +570,23 @@ class RevizionNew_List extends React.Component {
   }
 
   render() {
-    console.log('RevizionNew_List render');
+    // console.log('RevizionNew_List render');
 
     return (
       <>
         {/* Товары */}
-        <div style={ this.props.chooseTab == 0 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
+        <div style={this.props.chooseTab == 0 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
           {this.state.items.map((item, key) =>
             parseInt(item.is_show) === 0 ? null : (
-              <RevizionNew_List_accordion key={key} item={item} saveEdit={this.props.saveEdit} saveData={this.props.saveData} clearData={this.props.clearData} copyData={this.props.copyData} />
+              <RevizionNew_List_Item_accordion
+                key={key}
+                item={item}
+                saveEdit={this.props.saveEdit}
+                saveData={this.props.saveData}
+                clearData={this.props.clearData}
+                copyData={this.props.copyData}
+                math={this.props.math}
+              />
             )
           )}
         </div>
@@ -526,21 +595,13 @@ class RevizionNew_List extends React.Component {
         <div style={this.props.chooseTab == 1 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
           {this.state.pf.map((item, key) =>
             parseInt(item.is_show) === 0 ? null : (
-              <Accordion key={key}>
-                <AccordionSummary style={{ backgroundColor: this.props.saveEdit && item.value == 0 ? '#ffc107' : null }} expandIcon={<ExpandMoreIcon />}>
-                  <Typography style={{ width: '60%' }}>{item.name}</Typography>
-                  <Typography style={{ width: '40%' }}>{item.value == 0 ? '' : item.value} {item.value == 0 ? '' : item.ei_name}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Grid item sm={5}>
-                    <MyTextInput
-                      value={item.value == 0 ? '' : item.value}
-                      func={(event) => this.props.saveData(event, 'pf', item.id, 'value', 0)}
-                      label="Количество"
-                    />
-                  </Grid>
-                </AccordionDetails>
-              </Accordion>
+              <RevizionNew_List_Pf_accordion
+                key={key}
+                item={item}
+                saveEdit={this.props.saveEdit}
+                saveData={this.props.saveData}
+                math={this.props.math}
+              />
             )
           )}
         </div>
@@ -580,8 +641,7 @@ class RevizionNew_ extends React.Component {
       points: [],
       point: '0',
 
-      revList: [],
-      chooseRev: '',
+      revData: null,
 
       storages: [],
       items: [],
@@ -589,7 +649,8 @@ class RevizionNew_ extends React.Component {
 
       chooseTab: 0,
       modalDialog: false,
-      text: '',
+      title: '',
+      content: '',
       saveEdit: false,
       open: false,
 
@@ -626,14 +687,26 @@ class RevizionNew_ extends React.Component {
   changePoint(event) {
     const data = event.target.value;
 
-    this.setState({
-      point: data,
-      saveEdit: false,
-    });
+    if (data) {
+      this.setState({
+        revData: null,
+        point: data,
+        saveEdit: false,
+      });
 
-    setTimeout(() => {
-      this.getDataRev();
-    }, 300);
+      setTimeout(() => {
+        this.getLocalStorage();
+      }, 300);
+
+    } else {
+      this.setState({
+        revData: null,
+        point: data,
+        storages: [],
+        items: [],
+        pf: [],
+      });
+    }
   }
 
   // метод получения данных
@@ -684,19 +757,54 @@ class RevizionNew_ extends React.Component {
   async getDataRev() {
     this.handleResize();
 
+    this.setState({
+      modalDialog: false,
+    });
+
+    const point_id = this.state.point;
+
+    const revData = this.state.revData;
+
     const data = {
-      point_id: this.state.point,
+      point_id,
     };
 
     const res = await this.getData('get_data_for_new_rev', data);
 
+    if (revData) {
+      res.items.forEach((item) => {
+        revData.items.forEach((it) => {
+          if (it.id === item.id && it.type === item.type) {
+            item.value = it.value;
+            item.counts = it.counts;
+          }
+        });
+      });
+
+      res.pf.forEach((item) => {
+        revData.items.forEach((it) => {
+          if (it.id === item.id && it.type === item.type) {
+            item.value = it.value;
+          }
+        });
+      });
+    }
+
     this.setState({
+      revData,
       items: res.items,
       pf: res.pf,
       storages: res.storages,
       itemsCopy: res.items,
       pfCopy: res.pf,
     });
+  }
+
+  // получение общего количества данных из выражения в инпуте
+  math(event, type, id, data, index) {
+    const result = String(evaluate(event.target.value));
+
+    this.saveData(result, type, id, data, index);
   }
 
   // предварительное сохранение
@@ -708,15 +816,26 @@ class RevizionNew_ extends React.Component {
 
       items.forEach((item) => {
         if (item.id === id) {
-          item.counts[index][data] = event.target.value;
+          item.counts[index][data] = event.target?.value ?? event;
 
           let allVal = 0;
 
           item.counts.forEach((it) => {
-            allVal += parseFloat(it.need_pq) * parseFloat(it.value);
+            if (it.value.includes('=')) {
+              it.value = evaluate(it.value.replaceAll('=', ''));
+              allVal += Number(it.need_pq) * Number(it.value);
+            } else {
+              allVal += Number(it.need_pq) * Number(it.value);
+            }
           });
 
-          item.value = allVal;
+          if (isNaN(allVal)) {
+            item.value = 0;
+          } else {
+            item.value = allVal;
+          }
+
+          this.setLocalStorage(item.id, item.value, item.type, item.counts);
         }
       });
 
@@ -730,7 +849,15 @@ class RevizionNew_ extends React.Component {
 
       pf.forEach((pf) => {
         if (pf.id === id) {
-          pf[data] = event.target.value;
+          const value = event.target?.value ?? event;
+
+          if (value.includes('=')) {
+            pf[data] = evaluate(value.replaceAll('=', ''));
+          } else {
+            pf[data] = value;
+          }
+
+          this.setLocalStorage(pf.id, pf.value, pf.type);
         }
       });
 
@@ -740,31 +867,104 @@ class RevizionNew_ extends React.Component {
     }
   }
 
+  // сохранить заполненные, но не сохраненные данные ревизии в localStorage
+  setLocalStorage(id, value, type, counts) {
+    const point = this.state.point;
+
+    let data = this.state.revData;
+
+    if (data) {
+
+      data.items = data.items.map((item) => {
+          if (item.id === id && item.type === type) {
+            item.value = value;
+            counts ? (item.counts = counts) : null;
+          }
+          return item;
+        });
+
+      data.items = data.items.find((item) => item.id === id && item.type === type) ? data.items : [...data.items,...[{type, id, value, counts}]]
+
+    } else {
+      data = {
+        date: formatDate(new Date()),
+        items: [],
+      };
+
+      data.items.push({ type, id, value, counts });
+
+    }
+
+    this.setState({
+      revData: data,
+    });
+
+    localStorage.setItem(`revizionDataPoint-${point}`, JSON.stringify(data));
+
+  }
+
+  // получения данных по точке из localStorage
+  getLocalStorage() {
+    const point = this.state.point;
+
+    const revData = JSON.parse(localStorage.getItem(`revizionDataPoint-${point}`));
+
+    if (revData?.date === formatDate(new Date())) {
+      this.setState({
+        revData,
+        modalDialog: true,
+        title: 'В памяти есть данные по Ревизии!',
+        content: 'Восстановить данные?',
+        storages: [],
+        items: [],
+        pf: [],
+      });
+
+    } else {
+      localStorage.removeItem(`revizionDataPoint-${point}`);
+
+      setTimeout(() => {
+        this.notRestoreData();
+      }, 300);
+    }
+  }
+
+  // не восстановливать данные Ревизии
+  notRestoreData() {
+    this.setState({
+      revData: null,
+    });
+
+    setTimeout(() => {
+      this.getDataRev();
+    }, 300);
+  }
+
   // проверка полей, отображения модального окна
   checkData() {
-    console.log('checkData');
     const items = this.state.items;
     const pf = this.state.pf;
 
     // проверка заполнения полей товаров, скрываем не заполненные
     items.forEach((item) => {
-      if (item.value) {
+      if (item.value || item.value === 0) {
         item.is_show = 0;
       }
     });
 
     pf.forEach((item) => {
-      if (item.value != 0) {
+      if (item.value || item.value === 0) {
         item.is_show = 0;
       }
     });
 
     this.setState({
-      saveEdit: true,
-      items,
       pf,
+      items,
+      saveEdit: true,
       modalDialog: true,
-      text: 'Не заполненные позиции выделены цветом!',
+      title: 'Не все данные заполнены!',
+      content: 'Не заполненные позиции выделены цветом!',
     });
   }
 
@@ -794,10 +994,12 @@ class RevizionNew_ extends React.Component {
         let allVal = 0;
 
         item.counts.forEach((it) => {
-          allVal += parseFloat(it.need_pq) * parseFloat(it.value);
+          allVal += Number(it.need_pq) * Number(it.value);
         });
 
         item.value = allVal;
+
+        this.setLocalStorage(item.id, item.value, item.type, item.counts);
       }
     });
 
@@ -808,7 +1010,6 @@ class RevizionNew_ extends React.Component {
 
   // получение данных ревизии
   async saveRev() {
-
     this.setState({
       modalDialog: false,
     });
@@ -822,7 +1023,12 @@ class RevizionNew_ extends React.Component {
     const allItems = [...pf, ...items_rev];
 
     const items = allItems.reduce((items, cat) => {
-      cat = { item_id: cat.id, type: cat.type, value: cat.value };
+      cat = {
+        item_id: cat.id,
+        type: cat.type,
+        value: cat.value,
+        counts: cat?.counts ?? 0,
+      };
 
       return (items = [...items, ...[cat]]);
     }, []);
@@ -831,12 +1037,10 @@ class RevizionNew_ extends React.Component {
       point_id,
       items,
     };
-    
-    // console.log('saveRev ', data);
 
     const res = await this.getData('save_new', data);
 
-    if(res.st) {
+    if (res.st) {
       this.setState({
         openAlert: true,
         err_status: true,
@@ -844,9 +1048,8 @@ class RevizionNew_ extends React.Component {
       });
 
       setTimeout(() => {
-        this.getDataRev();
+        this.getLocalStorage();
       }, 300);
-
     } else {
       this.setState({
         openAlert: true,
@@ -854,7 +1057,6 @@ class RevizionNew_ extends React.Component {
         err_text: 'Данные ревизии не сохранены!',
       });
     }
-    
   }
 
   render() {
@@ -908,6 +1110,7 @@ class RevizionNew_ extends React.Component {
               onClose={() => this.setState({ open: false })}
               onOpen={() => this.setState({ open: true })}
               storages={this.state.storages}
+              math={this.math.bind(this)}
             />
           </Grid>
         </Grid>
@@ -952,13 +1155,25 @@ class RevizionNew_ extends React.Component {
           open={this.state.modalDialog}
           onClose={() => this.setState({ modalDialog: false })}
         >
-          <DialogTitle align="center" sx={{ fontWeight: 'bold' }}>Не все данные заполнены!</DialogTitle>
-          <DialogContent align="center" sx={{ fontWeight: 'bold' }}>{this.state.text}</DialogContent>
+          <DialogTitle align="center" sx={{ fontWeight: 'bold' }}>
+            {this.state.title}
+          </DialogTitle>
+          <DialogContent align="center" sx={{ fontWeight: 'bold' }}>
+            {this.state.content}
+          </DialogContent>
           <DialogActions>
-            <Button autoFocus onClick={() => this.setState({ modalDialog: false })}>
-              Отмена
-            </Button>
-            <Button onClick={this.saveRev.bind(this)}>Сохранить</Button>
+            {this.state.saveEdit ? (
+              <Button onClick={() => this.setState({ modalDialog: false })}>
+                Закрыть
+              </Button>
+            ) : (
+              <>
+                <Button onClick={this.notRestoreData.bind(this)}>Нет</Button>
+                <Button style={{ color: '#00a550' }} onClick={this.getDataRev.bind(this)}>
+                  Восстановить
+                </Button>
+              </>
+            )}
           </DialogActions>
         </Dialog>
       </>
