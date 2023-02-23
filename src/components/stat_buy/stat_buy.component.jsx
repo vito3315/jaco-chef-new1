@@ -2,10 +2,6 @@ import React from 'react';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import CheckIcon from '@mui/icons-material/Check';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -14,25 +10,26 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableContainer from '@mui/material/TableContainer';
 
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
+import Box from '@mui/material/Box';
+import Tab from '@mui/material/Tab';
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
 
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import {
-  MyDatePickerNew,
+  MyAlert,
   MySelect,
   MyAutocomplite,
-  MyTimePicker,
-  MyCheckBox,
-  MyTextInput,
-  MyAlert
+  MyDatePickerNew,
 } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
+import moment from 'moment';
+
+moment.locale('ru');
 
 function formatDate(date) {
   var d = new Date(date),
@@ -44,6 +41,72 @@ function formatDate(date) {
   if (day.length < 2) day = '0' + day;
 
   return [year, month, day].join('-');
+}
+
+class Stat_buy_Table extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    return (
+      nextProps.ItemTab !== this.props.ItemTab ||
+      nextProps.getDataCell !== this.props.getDataCell
+    );
+  }
+
+  render() {
+    console.log('render Table');
+    const { ItemTab, getDataCell, catsData, unic_date } = this.props;
+    return (
+      <>
+        {!catsData.length ? null : (
+          <TabPanel value={ItemTab} style={{ padding: '24px 0' }}>
+            <TableContainer sx={{ maxHeight: { xs: 'none', sm: 1000 } }}>
+              <Table stickyHeader size="small">
+                <TableHead style={{ position: 'sticky', top: 0, zIndex: 7 }}>
+                  <TableRow>
+                    <TableCell sx={{ zIndex: 30, minWidth: 150 }}>Категория</TableCell>
+                    {ItemTab === '1' ? <TableCell sx={{ zIndex: 20 }}>Ед измерения</TableCell> : null}
+                    {unic_date.map((item, key) => (
+                      <TableCell key={key} sx={{textTransform: 'capitalize', zIndex: 7, minWidth: 150}}>
+                        {moment(item.date).format('MMMM YYYY')}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {catsData.map((item, key) => (
+                    <React.Fragment key={key}>
+                      <TableRow>
+                        <TableCell style={{position: 'sticky', display: 'flex', backgroundColor: '#ADD8E6'}}>
+                          {item.name}
+                        </TableCell>
+                        <TableCell style={{ backgroundColor: '#ADD8E6' }} colSpan={`${ItemTab === '1' ? 2 + unic_date.length : 1 + unic_date.length}`}></TableCell>
+                      </TableRow>
+
+                      {item.cats.map((category, key_cat) => (
+                        <React.Fragment key={key_cat}>
+                          <TableRow hover sx={{'& td': {backgroundColor: '#ADD8E6', borderRight: 'none'}}}>
+                            <TableCell>{category.name}</TableCell>
+                            <TableCell style={{ backgroundColor: '#ADD8E6' }} colSpan={`${ItemTab === '1' ? 2 + unic_date.length : 1 + unic_date.length}`}></TableCell>
+                          </TableRow>
+
+                          {category.items.map((item, k) => (
+                            <TableRow key={k} hover>
+                              <TableCell variant="head" style={{ minWidth: 150 }}>{item.name}</TableCell>
+                              {ItemTab === '1' ? <TableCell>{item.ei_name}</TableCell> : null}
+                              {unic_date.map((data, key) => getDataCell(item.id, data.date, key))}
+                            </TableRow>
+                          ))}
+                        </React.Fragment>
+                      ))}
+                    </React.Fragment>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </TabPanel>
+        )}
+      </>
+    );
+  }
 }
 
 class Stat_buy_ extends React.Component {
@@ -58,35 +121,36 @@ class Stat_buy_ extends React.Component {
       points: [],
       point: [],
 
+      cats: [],
+      cat: '',
+
+      catsData: [],
+      unic_date: [],
+      items: [],
+
       date_start: formatDate(new Date()),
       date_end: formatDate(new Date()),
+
+      ItemTab: '1',
+
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
   async componentDidMount() {
     const data = await this.getData('get_all');
 
-    // console.log(data);
-
     this.setState({
+      cats: data.cats,
+      cat: data.cats[0].id,
       points: data.points,
+
       module_name: data.module_info.name,
     });
 
     document.title = data.module_info.name;
-  }
-
-  handleResize() {
-
-    if (window.innerWidth < 601) {
-          this.setState({
-            fullScreen: true,
-          });
-        } else {
-          this.setState({
-            fullScreen: false,
-          });
-        }
   }
 
   getData = (method, data = {}) => {
@@ -132,6 +196,12 @@ class Stat_buy_ extends React.Component {
       });
   };
 
+  changeCat(data, event) {
+    this.setState({
+      [data]: event.target.value,
+    });
+  }
+
   changePoint(data, event, value) {
     this.setState({
       [data]: value,
@@ -144,42 +214,105 @@ class Stat_buy_ extends React.Component {
     });
   }
 
-  async changePoint(event) {
+  changeTab(event, value) {
+    this.setState({
+      ItemTab: value,
+    });
+  }
+
+  async getItems() {
+    const points = this.state.point;
+
+    if (!points.length) {
+      this.setState({
+        openAlert: true,
+        err_status: false,
+        err_text: 'Выберите точку!',
+      });
+
+      return;
+    }
+    
     const data = {
-      point_id: event.target.value,
+      cat: {
+        id: this.state.cat,
+      },
+      points,
       date_start: this.state.date_start,
       date_end: this.state.date_end,
     };
 
-    const res = await this.getData('get_data', data);
+
+    const res = await this.getData('get_items', data);
+
+    if (!res.counts.unic_date.length || !res.counts.unic_date.length) {
+      this.setState({
+        openAlert: true,
+        err_status: false,
+        err_text: 'Данные за указанный период отсутствуют!',
+      });
+
+      return;
+    }
+
+    res.counts.unic_date.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     this.setState({
-      point: event.target.value,
-      all_list: res.all_list,
-      ret_list: res.ret_list,
+      catsData: res.cats,
+      unic_date: res.counts.unic_date,
+      items: res.counts.items,
     });
   }
 
+  getDataCell(id, date, key) {
+    const items = this.state.items;
+
+    const ItemTab = this.state.ItemTab;
+
+    let item = items.find((item) => item.item_id === id && item.date === date);
+
+    item = ItemTab === '1' ? item?.count ?? null : ItemTab === '2' ? item?.price ?? null : item?.avg_price ?? null;
+
+    return item ? <TableCell key={key}>{item}</TableCell> : <TableCell key={key}></TableCell>;
+  }
 
   render() {
+    console.log('render');
     return (
       <>
         <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
 
-        <Grid container spacing={3}>
+        <MyAlert
+          isOpen={this.state.openAlert}
+          onClose={() => this.setState({ openAlert: false })}
+          status={this.state.err_status}
+          text={this.state.err_text}
+        />
+
+        <Grid container spacing={3} mb={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
 
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={6}>
             <MyAutocomplite
               label="Точки"
               multiple={true}
               data={this.state.points}
               value={this.state.point}
               func={this.changePoint.bind(this, 'point')}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <MySelect
+              label="Категория"
+              is_none={false}
+              data={this.state.cats}
+              value={this.state.cat}
+              func={this.changeCat.bind(this, 'cat')}
             />
           </Grid>
 
@@ -200,20 +333,29 @@ class Stat_buy_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={3}>
-            <Button 
-            // onClick={this.getItems.bind(this)} 
-            variant="contained">
+            <Button onClick={this.getItems.bind(this)} variant="contained">
               Обновить
             </Button>
           </Grid>
+        </Grid>
 
-          {/* <Grid item xs={12} sm={12}>
-            <Fines_err_Table
-              all_list={this.state.all_list}
-              ret_list={this.state.ret_list}
-              openModal={this.openModal.bind(this)}
+        <Grid item xs={12} sm={12}>
+          <TabContext value={this.state.ItemTab}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <TabList onChange={this.changeTab.bind(this)} variant="fullWidth">
+                <Tab label="Количество" value="1" />
+                <Tab label="Сумма" value="2" />
+                <Tab label="Средняя цена" value="3" />
+              </TabList>
+            </Box>
+
+            <Stat_buy_Table
+              ItemTab={this.state.ItemTab}
+              unic_date={this.state.unic_date}
+              catsData={this.state.catsData}
+              getDataCell={this.getDataCell.bind(this)}
             />
-          </Grid> */}
+          </TabContext>
         </Grid>
       </>
     );

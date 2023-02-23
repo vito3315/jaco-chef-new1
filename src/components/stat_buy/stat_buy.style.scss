@@ -1,15 +1,12 @@
-.button {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  margin: 17px;
+th:first-child,
+tr:first-child,
+td:first-child {
+  position: -webkit-sticky;
+  position: sticky;
+  left: 0;
+  border-right: none;
 }
 
-.choose_user {
-  border: 10px #bb0025 solid;
-}
-
-.img_modal {
-  max-width: 300px!important;
-  max-height: 300px!important;
+td, th {
+  border-right: solid 1px #e5e5e5;
 }
