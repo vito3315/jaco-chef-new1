@@ -676,6 +676,12 @@ class RevizionNew_ extends React.Component {
     });
 
     document.title = data.module_info.name;
+
+    if( data.point_list.length == 1 ){
+      setTimeout(() => {
+        this.getLocalStorage();
+      }, 300);
+    }
   }
 
   // получение размера экрана
