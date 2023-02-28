@@ -113,6 +113,7 @@ class Revizion_ extends React.Component {
       items: [],
       pf: [],
       all_items_list: [],
+      all_for_search: [],
 
       itemsCopy: [],
       pfCopy: [],
@@ -249,6 +250,7 @@ class Revizion_ extends React.Component {
       items: res.item,
       itemsCopy: res.item,
       all_items_list: res.all,
+      all_for_search: res.all_for_search
     });
   }
 
@@ -297,7 +299,7 @@ class Revizion_ extends React.Component {
               label="Поиск"
               freeSolo={true}
               multiple={false}
-              data={this.state.all_items_list}
+              data={this.state.all_for_search}
               value={this.state.search}
               func={this.search.bind(this)}
               onBlur={this.search.bind(this)}
