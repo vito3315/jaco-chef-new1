@@ -48,7 +48,7 @@ import ListItemText from '@mui/material/ListItemText';
 
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 
-import { MySelect, MyTextInput, MyAutocomplite2 } from '../../stores/elements';
+import { MySelect, MyTextInput, MyAutocomplite2, MyAlert } from '../../stores/elements';
 
 import { evaluate } from 'mathjs';
 import queryString from 'query-string';
@@ -184,7 +184,7 @@ class Revizion_ extends React.Component {
 
   // смена точки
   changePoint(event) {
-    let data = event.target.value;
+    const data = event.target.value;
 
     this.setState({
       point: data,
@@ -198,7 +198,7 @@ class Revizion_ extends React.Component {
 
   // смена ревизии
   changeRev(event) {
-    let data = event.target.value;
+    const data = event.target.value;
 
     this.setState({
       chooseRev: data,
@@ -212,11 +212,11 @@ class Revizion_ extends React.Component {
 
   // получение списка ревизий
   async getRevList() {
-    let data = {
+    const data = {
       point_id: this.state.point,
     };
 
-    let res = await this.getData('get_rev_list', data);
+    const res = await this.getData('get_rev_list', data);
 
     res.length = 10;
 
@@ -234,18 +234,20 @@ class Revizion_ extends React.Component {
 
   // получение данных ревизии
   async getDataRev() {
-    let data = {
+    const data = {
       point_id: this.state.point,
       rev_id: this.state.chooseRev,
     };
 
-    let res = await this.getData('get_data_rev', data);
+    const res = await this.getData('get_data_rev', data);
+
+    const pf = [...res.pf, ...res.rec];
 
     this.setState({
+      pf,
+      pfCopy: pf,
       items: res.item,
-      pf: res.pf,
       itemsCopy: res.item,
-      pfCopy: res.pf,
       all_items_list: res.all,
     });
   }
@@ -254,13 +256,13 @@ class Revizion_ extends React.Component {
   search(event, value) {
     const search = event.target.value ? event.target.value : value ? value : '';
 
-    const itemsCopy = JSON.parse(JSON.stringify(this.state.itemsCopy));
+    const itemsCopy = structuredClone(this.state.itemsCopy);
 
-    const pfCopy = JSON.parse(JSON.stringify(this.state.pfCopy));
+    const pfCopy = structuredClone(this.state.pfCopy);
 
-    const items = itemsCopy.filter((value) => search ? value.name === search : value);
+    const items = itemsCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
 
-    const pf = pfCopy.filter((value) => search ? value.name === search : value);
+    const pf = pfCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
 
     this.setState({
       search,
@@ -411,9 +413,9 @@ class RevizionNew_List_Pf_accordion extends React.Component {
           <Grid item sm={5}>
             <MyTextInput
               value={item.value}
-              func={(event) => saveData(event, 'pf', item.id, 'value', 0)}
+              func={(event) => saveData(event, 'pf', item.id, 'value', item.type)}
               label="Количество"
-              enter={(event) => event.key === 'Enter' ? math(event, 'pf', item.id, 'value', 0) : null}
+              enter={(event) => event.key === 'Enter' ? math(event, 'pf', item.id, 'value', item.type) : null}
             />
           </Grid>
         </AccordionDetails>
@@ -655,6 +657,10 @@ class RevizionNew_ extends React.Component {
       open: false,
 
       fullScreen: false,
+
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
@@ -771,6 +777,8 @@ class RevizionNew_ extends React.Component {
 
     const res = await this.getData('get_data_for_new_rev', data);
 
+    console.log(res);
+
     if (revData) {
       res.items.forEach((item) => {
         revData.items.forEach((it) => {
@@ -788,12 +796,22 @@ class RevizionNew_ extends React.Component {
           }
         });
       });
+
+      res.rec.forEach((item) => {
+        revData.items.forEach((it) => {
+          if (it.id === item.id && it.type === item.type) {
+            item.value = it.value;
+          }
+        });
+      });
     }
+
+    const pf = [...res.pf, ...res.rec];
 
     this.setState({
       revData,
+      pf,
       items: res.items,
-      pf: res.pf,
       storages: res.storages,
       itemsCopy: res.items,
       pfCopy: res.pf,
@@ -848,7 +866,7 @@ class RevizionNew_ extends React.Component {
       const pf = this.state.pf;
 
       pf.forEach((pf) => {
-        if (pf.id === id) {
+        if (pf.id === id && pf.type === index) {
           const value = event.target?.value ?? event;
 
           if (value.includes('=')) {
@@ -1066,10 +1084,17 @@ class RevizionNew_ extends React.Component {
           <CircularProgress color="inherit" />
         </Backdrop>
 
+        <MyAlert 
+          isOpen={this.state.openAlert} 
+          onClose={() => this.setState({ openAlert: false }) } 
+          status={this.state.err_status} 
+          text={this.state.err_text} />
+           
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
             <h1>Новая ревизия</h1>
           </Grid>
+          
 
           <Grid item xs={12} sm={6}>
             <MySelect
