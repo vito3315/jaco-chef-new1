@@ -293,8 +293,10 @@ class ListFakeUsers_ extends React.Component {
       date_end_true: '',
       date_start_false: '',
       date_end_false: '',
-      count_orders: 0,
-      max_summ: 0,
+      count_orders_min: '',
+      count_orders_max: '',
+      max_summ: '',
+      min_summ: '',
       is_show_claim: 0,
       is_show_claim_last: 0,
       is_show_marketing: 0,
@@ -387,8 +389,10 @@ class ListFakeUsers_ extends React.Component {
       date_end_true: this.state.date_end_true,
       date_start_false: this.state.date_start_false,
       date_end_false: this.state.date_end_false,
-      count_orders: this.state.count_orders,
+      count_orders_min: this.state.count_orders_min,
+      count_orders_max: this.state.count_orders_max,
       max_summ: this.state.max_summ,
+      min_summ: this.state.min_summ,
       items: this.state.item,
       is_show_claim: this.state.is_show_claim,
       is_show_claim_last: this.state.is_show_claim_last,
@@ -589,19 +593,18 @@ class ListFakeUsers_ extends React.Component {
         <Grid container spacing={3} justifyContent="center" mb={3}>
           <Grid item xs={12} sm={3}>
             <MyTextInput
-              label="Количество заказов"
-              value={this.state.count_orders}
+              label="Количество заказов от"
+              value={this.state.count_orders_min}
               type="number"
-              func={this.changeNumber.bind(this, 'count_orders')}
+              func={this.changeNumber.bind(this, 'count_orders_min')}
             />
           </Grid>
-
           <Grid item xs={12} sm={3}>
             <MyTextInput
-              label="От суммы"
-              value={this.state.max_summ}
+              label="Количество заказов до"
+              value={this.state.count_orders_max}
               type="number"
-              func={this.changeNumber.bind(this, 'max_summ')}
+              func={this.changeNumber.bind(this, 'count_orders_max')}
             />
           </Grid>
 
@@ -610,6 +613,34 @@ class ListFakeUsers_ extends React.Component {
               label="Была оформлена ошибка на последний заказ"
               value={parseInt(this.state.is_show_claim_last) == 1 ? true : false}
               func={this.changeItemChecked.bind(this, 'is_show_claim_last')}
+            />
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={3} justifyContent="center" mb={3}>
+          <Grid item xs={12} sm={3}>
+            <MyTextInput
+              label="От суммы"
+              value={this.state.min_summ}
+              type="number"
+              func={this.changeNumber.bind(this, 'min_summ')}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={3}>
+            <MyTextInput
+              label="До суммы"
+              value={this.state.max_summ}
+              type="number"
+              func={this.changeNumber.bind(this, 'max_summ')}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={3}>
+            <MyCheckBox
+              label="Подписка на рекламную рассылку"
+              value={parseInt(this.state.is_show_marketing) == 1 ? true : false}
+              func={this.changeItemChecked.bind(this, 'is_show_marketing')}
             />
           </Grid>
         </Grid>
@@ -635,13 +666,7 @@ class ListFakeUsers_ extends React.Component {
             />
           </Grid>
 
-          <Grid item xs={12} sm={3}>
-            <MyCheckBox
-              label="Подписка на рекламную рассылку"
-              value={parseInt(this.state.is_show_marketing) == 1 ? true : false}
-              func={this.changeItemChecked.bind(this, 'is_show_marketing')}
-            />
-          </Grid>
+          <Grid item xs={12} sm={3}></Grid>
         </Grid>
 
         {!this.state.users.length ? null : (
