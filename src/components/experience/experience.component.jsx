@@ -21,6 +21,12 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableContainer from '@mui/material/TableContainer';
 
+import Box from '@mui/material/Box';
+import Tab from '@mui/material/Tab';
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
+
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -61,6 +67,9 @@ class Experience_Modal extends React.Component {
       pressCount: 0,
       data: '',
 
+      ItemTab: '1',
+      listData: null,
+
       openAlert: false,
       err_status: true,
       err_text: '',
@@ -78,18 +87,40 @@ class Experience_Modal extends React.Component {
       this.setState({
         item: this.props.user,
         data: this.props.user.date_registration,
+        listData: structuredClone(this.props.listData),
       });
     }
   }
 
-  changeDateRange(val) {
-    const item = this.state.item;
-
-    item.date_registration = val ? formatDate(val) : '';
-
+  changeTab(event, value) {
     this.setState({
-      item,
+      ItemTab: value,
     });
+  }
+
+  changeDateRange(data, type, val) {
+
+    const value = val ? formatDate(val) : '';
+
+    if(data === 'list') {
+      const listData = this.state.listData;
+
+      listData.forEach(item => item.type === type ? item.date = value : item);
+
+      this.setState({
+        listData,
+      });
+      
+    } else {
+      const item = this.state.item;
+
+      item.date_registration = value;
+  
+      this.setState({
+        item,
+      });
+    }
+
   }
 
   onDoubleClick() {
@@ -142,11 +173,31 @@ class Experience_Modal extends React.Component {
     });
   }
 
+  saveHealthBook() {
+    const listData = this.state.listData;
+
+    const user = this.state.item;
+
+    const data = {
+      user_id: user.id,
+    }
+
+    listData.forEach(item => data[item.type] = item.date)
+
+    this.props.saveHealthBook(data);
+
+    this.onClose();
+
+  }
+
   onClose() {
     this.setState({
       item: null,
       setEdit: false,
       data: '',
+
+      ItemTab: '1',
+      listData: null,
 
       openAlert: false,
       err_status: true,
@@ -185,6 +236,16 @@ class Experience_Modal extends React.Component {
           </DialogTitle>
 
           <DialogContent style={{ paddingTop: 10, paddingBottom: 10 }}>
+          <TabContext value={this.state.ItemTab}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <TabList onChange={this.changeTab.bind(this)} variant="fullWidth">
+                <Tab label="Информация" value="1" />
+                <Tab label="Мед книжка" value="2" />
+              </TabList>
+            </Box>
+            
+            {/* Информация */}
+            <TabPanel value={'1'} style={{ padding: '24px 0' }}>
             <Grid container spacing={3}>
               <Grid item xs={12} sm={4} display="flex" justifyContent="center">
                 {this.state.item ? this.state.item.photo ? (
@@ -232,8 +293,8 @@ class Experience_Modal extends React.Component {
                       <Grid mr={2}>
                         <MyDatePickerNew
                           label="Изменить датy"
-                          value={this.state.item?.date_registration ?? 'Не указана'}
-                          func={this.changeDateRange.bind(this)}
+                          value={this.state.item?.date_registration ?? ''}
+                          func={this.changeDateRange.bind(this, 'registration', 0)}
                         />
                       </Grid>
                       <Grid mr={2}>
@@ -255,12 +316,42 @@ class Experience_Modal extends React.Component {
                 </Grid>
               </Grid>
             </Grid>
-          </DialogContent>
+            </TabPanel>
+            
+            {/* мед книжка */}
+            <TabPanel value={'2'} style={{ padding: '24px 0' }}>
+            <TableContainer>
+              <Table size="small">
+                <TableBody>
+                {!this.state.listData ? null : (
+                  this.state.listData.map((item, key) => (
+                   <TableRow key={key}>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>
+                      <MyDatePickerNew
+                        label="Дата"
+                        value={item?.date ?? ''}
+                        func={this.changeDateRange.bind(this, 'list', item.type)}
+                      />
+                    </TableCell>
+                  </TableRow>
+                )))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </TabPanel>
+        </TabContext>
+        </DialogContent>
 
           <DialogActions>
-            <Button style={{ color: '#DC143C' }} onClick={this.onClose.bind(this)}>
-              Закрыть
-            </Button>
+            {this.state.ItemTab === '1' ?
+              <Button color="error" onClick={this.onClose.bind(this)}>
+                Закрыть
+              </Button> :
+              <Button color="success" onClick={this.saveHealthBook.bind(this)}>
+                Coxранить
+              </Button>
+            }
           </DialogActions>
         </Dialog>
       </>
@@ -295,6 +386,19 @@ class Experience_ extends React.Component {
       openAlert: false,
       err_status: true,
       err_text: '',
+
+      listData: [
+        {type: 'type_1', date: '', name: 'Гепатит А'},
+        {type: 'type_2', date: '', name: 'Отоларинголог'},
+        {type: 'type_3', date: '', name: 'Патогенный стафилококк'},
+        {type: 'type_4', date: '', name: 'Стоматолог'},
+        {type: 'type_5', date: '', name: 'Терапевт'},
+        {type: 'type_6', date: '', name: 'Мед. осмотр'},
+        {type: 'type_7', date: '', name: 'Флюорография'},
+        {type: 'type_8', date: '', name: 'Бак. анализ'},
+        {type: 'type_9', date: '', name: 'Яйц. глист'},
+        {type: 'type_10', date: '', name: 'Санитарный минимум'},
+      ]
     };
   }
 
@@ -482,6 +586,29 @@ class Experience_ extends React.Component {
     }, 300);
   }
 
+  async saveHealthBook (data) {
+
+    let { st, text } = await this.getData('save_health_book', data);
+
+    if(st){
+      this.setState({
+        openAlert: true,
+        err_status: true,
+        err_text: 'Изменения сохранены!',
+      });
+    }else{
+      this.setState({
+        openAlert: true,
+        err_status: false,
+        err_text: text,
+      });
+    }
+
+    setTimeout(() => {
+      this.getInfo();
+    }, 300);
+  }
+
   render() {
     return (
       <>
@@ -502,6 +629,8 @@ class Experience_ extends React.Component {
           user={this.state.user}
           fullScreen={this.state.fullScreen}
           saveEdit={this.saveEdit.bind(this)}
+          saveHealthBook={this.saveHealthBook.bind(this)}
+          listData={this.state.listData}
         />
 
         <Grid item xs={12} mb={3}>
