@@ -789,10 +789,11 @@ class Experience_ extends React.Component {
                   <TableHead>
                     <TableRow>
                       <TableCell style={{ width: '5%' }}>#</TableCell>
-                      <TableCell style={{ width: '35%' }}>ФИО</TableCell>
+                      <TableCell style={{ width: '25%' }}>ФИО</TableCell>
                       <TableCell style={{ width: '20%' }}>Дата устройства на работу</TableCell>
                       <TableCell style={{ width: '20%' }}>Текущая организация</TableCell>
                       <TableCell style={{ width: '20%' }}>Общий стаж год/месяц</TableCell>
+                      <TableCell style={{ width: '10%' }}>Статус мед. книжки</TableCell>
                     </TableRow>
                   </TableHead>
 
@@ -804,6 +805,7 @@ class Experience_ extends React.Component {
                         <TableCell>{item.date_registration}</TableCell>
                         <TableCell>{item.point}</TableCell>
                         <TableCell>{item.exp}</TableCell>
+                        <TableCell style={{ background: parseInt(item.type) == 1 ? '#fff' : parseInt(item.type) == 2 ? '#ffcc00' : '#c03', color: parseInt(item.type) == 1 ? '#000' : parseInt(item.type) == 2 ? '#000' : '#fff' }}>{item?.status}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
