@@ -228,7 +228,7 @@ class ListFakeUsers_Modal extends React.Component {
                             {this.props.fullScreen ? `Тип: ${item.xy === '' ? 'Самовывоз' : 'Доставка'}` : item.xy === '' ? 'Самовывоз' : 'Доставка'}
                           </Typography>
 
-                          <Typography style={{ width: '15%', overflow: 'hidden' }} sx={{ noWrap: { sm: true, xs: false }, whiteSpace: { xs: 'nowrap' } }}>
+                          <Typography style={{ width: '15%', overflow: 'hidden' }}>
                             {item.order_desc != '' ? item.order_desc : ''}
                           </Typography>
 
