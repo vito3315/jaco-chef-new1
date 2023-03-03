@@ -133,6 +133,8 @@ class Stat_buy_ extends React.Component {
 
       ItemTab: '1',
 
+      url: null,
+
       openAlert: false,
       err_status: true,
       err_text: '',
@@ -258,6 +260,7 @@ class Stat_buy_ extends React.Component {
     res.counts.unic_date.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     this.setState({
+      url: res.url,
       catsData: res.cats,
       unic_date: res.counts.unic_date,
       items: res.counts.items,
@@ -274,6 +277,14 @@ class Stat_buy_ extends React.Component {
     item = ItemTab === '1' ? item?.count ?? null : ItemTab === '2' ? item?.price ?? null : item?.avg_price ?? null;
 
     return item ? <TableCell key={key}>{item}</TableCell> : <TableCell key={key}></TableCell>;
+  }
+
+  onDownload() {
+    const url = this.state.url;
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.click();
   }
 
   render() {
@@ -332,11 +343,18 @@ class Stat_buy_ extends React.Component {
             />
           </Grid>
 
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={2}>
             <Button onClick={this.getItems.bind(this)} variant="contained">
               Обновить
             </Button>
           </Grid>
+
+          <Grid item xs={12} sm={2}>
+            <Button color="success" variant="contained" onClick={this.onDownload.bind(this)} disabled={!this.state.url}>
+              Скачать
+            </Button>
+          </Grid>
+
         </Grid>
 
         <Grid item xs={12} sm={12}>
