@@ -975,14 +975,14 @@ class RevizionNew_ extends React.Component {
 
     // проверка заполнения полей товаров, скрываем не заполненные
     items.forEach((item) => {
-      if (item.value || item.value === 0) {
+      if (!item.value || item.value === 0) {
         item.is_show = 0;
         is_err = true;
       }
     });
 
     pf.forEach((item) => {
-      if (item.value || item.value === 0) {
+      if (!item.value || item.value === 0) {
         item.is_show = 0;
         is_err = true;
       }
