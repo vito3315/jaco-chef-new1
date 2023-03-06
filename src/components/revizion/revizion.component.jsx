@@ -974,7 +974,7 @@ class RevizionNew_ extends React.Component {
     let is_err = false;
 
     // проверка заполнения полей товаров, скрываем не заполненные
-    items.forEach((item) => {
+    /*items.forEach((item) => {
       if (!item.value || item.value === 0) {
         item.is_show = 0;
         is_err = true;
@@ -986,9 +986,9 @@ class RevizionNew_ extends React.Component {
         item.is_show = 0;
         is_err = true;
       }
-    });
+    });*/
 
-    if( is_err ){
+    /*if( is_err ){
       this.setState({
         pf,
         items,
@@ -997,9 +997,9 @@ class RevizionNew_ extends React.Component {
         title: 'Не все данные заполнены!',
         content: 'Не заполненные позиции выделены цветом!',
       });
-    }else{
+    }else{*/
       this.saveRev();
-    }
+    //}
   }
 
   // копируем
