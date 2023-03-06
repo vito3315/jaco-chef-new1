@@ -80,7 +80,7 @@ class Experience_Modal extends React.Component {
     }
 
     if (this.props.user !== prevProps.user) {
-      const listData = structuredClone(this.props.listData);
+      const listData = [...this.props.listData];
 
       listData.forEach((item) => {
         if (item.start && item.end) {
@@ -594,35 +594,41 @@ class Experience_ extends React.Component {
   }
 
   async openModal(user_id, ItemTab) {
-    this.handleResize();
+    try {
+      this.handleResize();
 
-    const listData = structuredClone(this.state.listData);
+      const listData = [...this.state.listData];
 
-    const data = {
-      user_id,
-    };
+      const data = {
+        user_id,
+      };
 
-    const res = await this.getData('get_user_info', data);
+      console.log( listData )
 
-    listData.forEach((item) => {
-      for (const key in res.health_book) {
-        if (Number(key.split('_')[1]) === Number(item.type.split('_')[1])) {
-          if (key.includes('start')) {
-            item.start = res.health_book[key];
-          }
-          if (key.includes('end')) {
-            item.end = res.health_book[key];
+      const res = await this.getData('get_user_info', data);
+
+      listData.forEach((item) => {
+        for (const key in res.health_book) {
+          if (Number(key.split('_')[1]) === Number(item.type.split('_')[1])) {
+            if (key.includes('start')) {
+              item.start = res.health_book[key];
+            }
+            if (key.includes('end')) {
+              item.end = res.health_book[key];
+            }
           }
         }
-      }
-    });
+      });
 
-    this.setState({
-      ItemTab,
-      listData,
-      modalDialog: true,
-      user: res.user,
-    });
+      this.setState({
+        ItemTab,
+        listData,
+        modalDialog: true,
+        user: res.user,
+      });
+    } catch (err) {
+      alert(err.message)
+    }
   }
 
   async saveEdit(date_registration, user_id) {
