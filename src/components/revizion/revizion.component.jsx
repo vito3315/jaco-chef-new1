@@ -971,27 +971,35 @@ class RevizionNew_ extends React.Component {
     const items = this.state.items;
     const pf = this.state.pf;
 
+    let is_err = false;
+
     // проверка заполнения полей товаров, скрываем не заполненные
     items.forEach((item) => {
       if (item.value || item.value === 0) {
         item.is_show = 0;
+        is_err = true;
       }
     });
 
     pf.forEach((item) => {
       if (item.value || item.value === 0) {
         item.is_show = 0;
+        is_err = true;
       }
     });
 
-    this.setState({
-      pf,
-      items,
-      saveEdit: true,
-      modalDialog: true,
-      title: 'Не все данные заполнены!',
-      content: 'Не заполненные позиции выделены цветом!',
-    });
+    if( is_err ){
+      this.setState({
+        pf,
+        items,
+        saveEdit: true,
+        modalDialog: true,
+        title: 'Не все данные заполнены!',
+        content: 'Не заполненные позиции выделены цветом!',
+      });
+    }else{
+      this.saveRev();
+    }
   }
 
   // копируем
