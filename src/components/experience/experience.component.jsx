@@ -82,6 +82,8 @@ class Experience_Modal extends React.Component {
     if (this.props.user !== prevProps.user) {
       const listData = [...this.props.listData];
 
+      console.log( 'new listData', listData )
+
       listData.forEach((item) => {
         if (item.start && item.end) {
           const start = moment(item.start);
@@ -368,7 +370,7 @@ class Experience_Modal extends React.Component {
                             <TableRow key={key}>
                               <TableCell style={{ width: '33%' }}>{item.name}</TableCell>
                               <TableCell style={{ width: '34%' }}>
-                                {item?.change ? item.start : (
+                                {item.change == 'not' ? item.start : (
                                   <MyDatePickerNew
                                     label="Дата"
                                     value={item?.start ?? ''}
@@ -604,10 +606,15 @@ class Experience_ extends React.Component {
       };
 
       console.log( listData )
+      
 
       const res = await this.getData('get_user_info', data);
 
+      console.log( res.health_book )
+
       listData.forEach((item) => {
+        item.change = '';
+
         for (const key in res.health_book) {
           if (Number(key.split('_')[1]) === Number(item.type.split('_')[1])) {
             if (key.includes('start')) {
