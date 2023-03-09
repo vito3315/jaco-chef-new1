@@ -9,13 +9,6 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Divider from '@mui/material/Divider';
-
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -49,7 +42,7 @@ import ListItemText from '@mui/material/ListItemText';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import InputAdornment from '@mui/material/InputAdornment';
 
-import { MySelect, MyTextInput, MyAutocomplite2, MyAlert } from '../../stores/elements';
+import {MySelect, MyTextInput, MyAutocomplite2, MyAlert} from '../../stores/elements';
 
 import { evaluate } from 'mathjs';
 import queryString from 'query-string';
@@ -419,19 +412,19 @@ class RevizionNew_Table_Row_Pf extends React.Component {
 }
 
 // строка из списка Товаров с объемом и количеством Товара
-class RevizionNew_List_Item_Row extends React.Component {
+class RevizionNew_Table_Row_Item extends React.Component {
   shouldComponentUpdate(nextProps) {
     return JSON.stringify(nextProps.item) !== JSON.stringify(this.props.item);
   }
 
   render() {
-    // console.log( 'RevizionNew_List_Item_Row render' )
+    // console.log( 'RevizionNew_Table_Row_Item render' )
     const { index, item, it, i, saveData, clearData, math } = this.props;
 
     return (
-      <React.Fragment>
-        <Grid container spacing={3} style={{ paddingTop: 20, paddingBottom: 20 }}>
-          <Grid item xs={12} sm={5}>
+      <TableRow>
+        <TableCell style={{ borderBottom: item.counts.at(-1) === it ? 'none' : '1px groove #757575' }}>
+          <Grid item xs={12} sm={12}>
             <MySelect
               label="Объем упаковки"
               data={item.size}
@@ -439,7 +432,9 @@ class RevizionNew_List_Item_Row extends React.Component {
               func={(event) => saveData(event, 'item', item.id, 'need_pq', i)}
             />
           </Grid>
-          <Grid item xs={i === 0 ? 12 : 9} sm={5}>
+        </TableCell>
+        <TableCell colSpan={i === 0 ? 2 : 0} style={{ borderBottom: item.counts.at(-1) === it ? 'none' : '1px groove #757575' }}>
+          <Grid item xs={12} sm={12}>
             <MyTextInput
               label="Количество"
               id={item.id}
@@ -449,56 +444,63 @@ class RevizionNew_List_Item_Row extends React.Component {
               enter={(event) => document.activeElement && event.key === 'Enter' ? math(event, 'item', item.id, 'value', i) : null}
             />
           </Grid>
-          {i === 0 ? null : (
-            <Grid item xs={3} sm={1}>
+        </TableCell>
+        {i === 0 ? null : (
+          <TableCell style={{ borderBottom: item.counts.at(-1) === it ? 'none' : '1px groove #757575' }}>
+            <Grid item xs={12} sm={12}>
               <Button variant="contained" onClick={() => clearData(item.id, i)}>
                 <CloseIcon />
               </Button>
             </Grid>
-          )}
-        </Grid>
-        {item.counts.at(-1) === it ? null : <Divider />}
-      </React.Fragment>
+          </TableCell>
+        )}
+      </TableRow>
     );
   }
 }
 
-// строка аккордион из списка Товаров
-class RevizionNew_List_Item_accordion extends React.Component {
+// строка Таблицы из списка Товаров
+class RevizionNew_Table_Item extends React.Component {
   shouldComponentUpdate(nextProps) {
     return JSON.stringify(nextProps.item) !== JSON.stringify(this.props.item);
   }
 
   render() {
-    // console.log( 'RevizionNew_List_Item_accordion render' )
-    const { expandedAccordion, index, item, saveData, clearData, copyData, math } = this.props;
+    // console.log( 'RevizionNew_Table_Item render' )
+    const { index, item, saveData, clearData, copyData, math } = this.props;
     return (
-      <Accordion expanded={item.expanded}>
-        <AccordionSummary expandIcon={<ExpandMoreIcon onClick={() => expandedAccordion(item.id)} />}>
-          <Typography style={{ width: '60%' }}>{item.name}</Typography>
-          <Typography style={{ width: '40%' }}>{item.value} {item.value === '' ? '' : item.ei_name}</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {item.counts.map((it, i) => (
-            <RevizionNew_List_Item_Row
-              key={i}
-              i={i}
-              it={it}
-              item={item}
-              index={index}
-              saveData={saveData}
-              clearData={clearData}
-              math={math}
-            />
-          ))}
-
-          <Grid item xs={12} sm={6}>
-            <Button variant="contained" onClick={() => copyData(item.id)}>
-              Дублировать
-            </Button>
-          </Grid>
-        </AccordionDetails>
-      </Accordion>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ width: { xs: '60%', sm: '50%' }, minWidth: '200px' }}>{item.name}</TableCell>
+              <TableCell sx={{ width: { xs: '38%', sm: '45%' }, minWidth: '150px' }}>{item.value} {item.value === '' ? '' : item.ei_name}</TableCell>
+              <TableCell sx={{ width: { xs: '2%', sm: '5%' } }}></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {item.counts.map((it, i) => (
+              <RevizionNew_Table_Row_Item
+                key={i}
+                i={i}
+                it={it}
+                item={item}
+                index={index}
+                saveData={saveData}
+                clearData={clearData}
+                math={math}
+              />
+            ))}
+            <TableRow>
+              <TableCell colSpan={3} style={{ borderBottom: 'none', borderTop: 'none' }}>
+                <Button variant="contained" onClick={() => copyData(item.id)}>
+                  Дублировать
+                </Button>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
     );
   }
 }
@@ -565,10 +567,10 @@ class RevizionNew_List extends React.Component {
     return (
       <>
         {/* Товары */}
-        <div style={this.props.chooseTab == 0 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
+        <div style={ this.props.chooseTab == 0 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
           {this.state.items.map((item, key) =>
             parseInt(item.is_show) === 0 ? null : (
-              <RevizionNew_List_Item_accordion
+              <RevizionNew_Table_Item
                 key={key}
                 index={key + 1}
                 item={item}
@@ -576,7 +578,6 @@ class RevizionNew_List extends React.Component {
                 clearData={this.props.clearData}
                 copyData={this.props.copyData}
                 math={this.props.math}
-                expandedAccordion={this.props.expandedAccordion}
               />
             )
           )}
@@ -812,10 +813,6 @@ class RevizionNew_ extends React.Component {
       });
     }
 
-    res.items.forEach((item) => {
-      item.expanded = false;
-    });
-
     const pf = [...res.pf, ...res.rec];
 
     this.setState({
@@ -825,21 +822,6 @@ class RevizionNew_ extends React.Component {
       storages: res.storages,
       itemsCopy: res.items,
       pfCopy: res.pf,
-    });
-  }
-
-  // открытие/закрытие аккордиона в списке Товаров
-  expandedAccordion(id) {
-    const items = this.state.items;
-
-    items.forEach((item) => {
-      if (item.id === id) {
-        item.expanded = !item.expanded;
-      }
-    });
-
-    this.setState({
-      items,
     });
   }
 
@@ -860,22 +842,7 @@ class RevizionNew_ extends React.Component {
     if (type === 'item') {
       const nextInput = [...document.querySelectorAll('input:not([tabindex = "-1"])')];
       const index = nextInput.indexOf(document.activeElement) + 1;
-
-      const items = this.state.items;
-
-      items.forEach((item) => {
-        if (item.id === nextInput[index].id) {
-          item.expanded = true;
-        }
-      });
-
-      this.setState({
-        items,
-      });
-
-      setTimeout(() => {
-        nextInput[index].focus();
-      }, 300);
+      nextInput[index].focus();
     }
   }
 
@@ -1155,7 +1122,6 @@ class RevizionNew_ extends React.Component {
               onOpen={() => this.setState({ open: true })}
               storages={this.state.storages}
               math={this.math.bind(this)}
-              expandedAccordion={this.expandedAccordion.bind(this)}
             />
           </Grid>
         </Grid>
