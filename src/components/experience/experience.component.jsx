@@ -82,7 +82,7 @@ class Experience_Modal extends React.Component {
     if (this.props.user !== prevProps.user) {
       const listData = [...this.props.listData];
 
-      console.log( 'new listData', listData )
+      // console.log( 'new listData', listData )
 
       listData.forEach((item) => {
         if (item.start && item.end) {
@@ -360,7 +360,7 @@ class Experience_Modal extends React.Component {
                     <TableHead>
                       <TableRow>
                         <TableCell style={{ width: '33%' }}>Название</TableCell>
-                        <TableCell style={{ width: '34%' }}>Дата прохождения</TableCell>
+                        <TableCell style={{ width: '34%', minWidth: '150px' }}>Дата прохождения</TableCell>
                         <TableCell style={{ width: '33%' }}>Дата окончания</TableCell>
                       </TableRow>
                     </TableHead>
@@ -368,8 +368,8 @@ class Experience_Modal extends React.Component {
                       {!this.state.listData ? null :
                           this.state.listData.map((item, key) => (
                             <TableRow key={key}>
-                              <TableCell style={{ width: '33%' }}>{item.name}</TableCell>
-                              <TableCell style={{ width: '34%' }}>
+                              <TableCell >{item.name}</TableCell>
+                              <TableCell >
                                 {item.change == 'not' ? item.start : (
                                   <MyDatePickerNew
                                     label="Дата"
@@ -378,7 +378,7 @@ class Experience_Modal extends React.Component {
                                   />
                                 )}
                               </TableCell>
-                              <TableCell style={{ width: '33%' }}>{item.end}</TableCell>
+                              <TableCell >{item.end}</TableCell>
                             </TableRow>
                           ))}
                     </TableBody>
@@ -414,11 +414,11 @@ class Experience_ extends React.Component {
       is_load: false,
 
       cities: [],
-      city: -1,
+      city: '',
 
       points: [],
       pointsCopy: [],
-      point: [{ id: -1, name: 'Все точки', city_id: -1 }],
+      point: [],
 
       stat: null,
       users: null,
@@ -452,7 +452,17 @@ class Experience_ extends React.Component {
   async componentDidMount() {
     const data = await this.getData('get_all');
 
+    let city = this.state.city;
+
+    let point = this.state.point;
+
+    city = data.cities.length === 1 ? data.cities[0].id : data.cities.find(city => city.id === -1).id ?? data.cities[0].id;
+
+    point = data.cities.length === 1 ? [...point, ...data.points] : [...point, ...[data.points.find(point => point.id === -1)] ?? [data.points[0]]];
+
     this.setState({
+      city,
+      point,
       points: data.points,
       pointsCopy: data.points,
       cities: data.cities,
@@ -573,7 +583,7 @@ class Experience_ extends React.Component {
 
   async getInfo() {
     const point = this.state.point;
-
+    
     if (!point.length) {
       this.setState({
         openAlert: true,
@@ -599,18 +609,13 @@ class Experience_ extends React.Component {
     try {
       this.handleResize();
 
-      const listData = [...this.state.listData];
+      const listData = this.state.listData;
 
       const data = {
         user_id,
       };
 
-      console.log( listData )
-      
-
       const res = await this.getData('get_user_info', data);
-
-      console.log( res.health_book )
 
       listData.forEach((item) => {
         item.change = '';
