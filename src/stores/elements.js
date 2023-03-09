@@ -275,6 +275,8 @@ export class MyTextInput extends React.PureComponent {
         type={ this.props.type ? this.props.type : this.state.type }
         style={{ width: '100%' }}
         onKeyUp={this.props.enter}
+        InputProps={this.props.inputAdornment}
+        inputProps={this.props.tabindex}
       />
     )
   }
