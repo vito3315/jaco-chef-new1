@@ -42,7 +42,7 @@ import ListItemText from '@mui/material/ListItemText';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import InputAdornment from '@mui/material/InputAdornment';
 
-import {MySelect, MyTextInput, MyAutocomplite2, MyAlert} from '../../stores/elements';
+import { MySelect, MyTextInput, MyAutocomplite2, MyAlert } from '../../stores/elements';
 
 import { evaluate } from 'mathjs';
 import queryString from 'query-string';
@@ -403,7 +403,7 @@ class RevizionNew_Table_Row_Pf extends React.Component {
             value={item.value}
             func={(event) => saveData(event, 'pf', item.id, 'value', item.type)}
             enter={(event) => document.activeElement && event.key === 'Enter' ? math(event, 'pf', item.id, 'value', item.type) : null}
-            inputAdornment={{endAdornment: (<InputAdornment position="end">{item.ei_name}</InputAdornment>)}}
+            inputAdornment={{ endAdornment: (<InputAdornment position="end">{item.ei_name}</InputAdornment>)}}
           />
         </TableCell>
       </TableRow>
@@ -423,7 +423,7 @@ class RevizionNew_Table_Row_Item extends React.Component {
 
     return (
       <TableRow>
-        <TableCell style={{ borderBottom: item.counts.at(-1) === it ? 'none' : '1px groove #757575' }}>
+        <TableCell style={{ borderBottom: 'none', borderTop: 'none' }}>
           <Grid item xs={12} sm={12}>
             <MySelect
               label="Объем упаковки"
@@ -433,7 +433,7 @@ class RevizionNew_Table_Row_Item extends React.Component {
             />
           </Grid>
         </TableCell>
-        <TableCell colSpan={i === 0 ? 2 : 0} style={{ borderBottom: item.counts.at(-1) === it ? 'none' : '1px groove #757575' }}>
+        <TableCell colSpan={i === 0 ? 2 : 0} style={{ borderBottom: 'none', borderTop: 'none' }}>
           <Grid item xs={12} sm={12}>
             <MyTextInput
               label="Количество"
@@ -446,7 +446,7 @@ class RevizionNew_Table_Row_Item extends React.Component {
           </Grid>
         </TableCell>
         {i === 0 ? null : (
-          <TableCell style={{ borderBottom: item.counts.at(-1) === it ? 'none' : '1px groove #757575' }}>
+          <TableCell style={{ borderBottom: 'none', borderTop: 'none' }}>
             <Grid item xs={12} sm={12}>
               <Button variant="contained" onClick={() => clearData(item.id, i)}>
                 <CloseIcon />
@@ -469,44 +469,42 @@ class RevizionNew_Table_Item extends React.Component {
     // console.log( 'RevizionNew_Table_Item render' )
     const { index, item, saveData, clearData, copyData, math } = this.props;
     return (
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ width: { xs: '60%', sm: '50%' }, minWidth: '200px' }}>{item.name}</TableCell>
-              <TableCell sx={{ width: { xs: '38%', sm: '45%' }, minWidth: '150px' }}>{item.value} {item.value === '' ? '' : item.ei_name}</TableCell>
-              <TableCell sx={{ width: { xs: '2%', sm: '5%' } }}></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {item.counts.map((it, i) => (
-              <RevizionNew_Table_Row_Item
-                key={i}
-                i={i}
-                it={it}
-                item={item}
-                index={index}
-                saveData={saveData}
-                clearData={clearData}
-                math={math}
-              />
-            ))}
-            <TableRow>
-              <TableCell colSpan={3} style={{ borderBottom: 'none', borderTop: 'none' }}>
-                <Button variant="contained" onClick={() => copyData(item.id)}>
-                  Дублировать
-                </Button>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell sx={{ width: { xs: '60%', sm: '50%' }, minWidth: '200px' }}>{item.name}</TableCell>
+            <TableCell sx={{ width: { xs: '38%', sm: '45%' }, minWidth: '150px' }}>{item.value} {item.value === '' ? '' : item.ei_name}</TableCell>
+            <TableCell sx={{ width: { xs: '2%', sm: '5%' } }}></TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {item.counts.map((it, i) => (
+            <RevizionNew_Table_Row_Item
+              key={i}
+              i={i}
+              it={it}
+              item={item}
+              index={index}
+              saveData={saveData}
+              clearData={clearData}
+              math={math}
+            />
+          ))}
+          <TableRow>
+            <TableCell colSpan={3} style={{ borderTop: 'none', borderBottom: '1px groove #e6e6e6' }}>
+              <Button variant="contained" onClick={() => copyData(item.id)}>
+                Дублировать
+              </Button>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
     );
   }
 }
 
-// Новая ревизия Список
-class RevizionNew_List extends React.Component {
+// Новая ревизия Таблица
+class RevizionNew_Table extends React.Component {
   constructor(props) {
     super(props);
 
@@ -567,26 +565,28 @@ class RevizionNew_List extends React.Component {
     return (
       <>
         {/* Товары */}
-        <div style={ this.props.chooseTab == 0 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
-          {this.state.items.map((item, key) =>
-            parseInt(item.is_show) === 0 ? null : (
-              <RevizionNew_Table_Item
-                key={key}
-                index={key + 1}
-                item={item}
-                saveData={this.props.saveData}
-                clearData={this.props.clearData}
-                copyData={this.props.copyData}
-                math={this.props.math}
-              />
-            )
-          )}
+        <div style={this.props.chooseTab == 0 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
+          <TableContainer component={Paper}>
+            {this.state.items.map((item, key) =>
+              parseInt(item.is_show) === 0 ? null : (
+                <RevizionNew_Table_Item
+                  key={key}
+                  index={key + 1}
+                  item={item}
+                  saveData={this.props.saveData}
+                  clearData={this.props.clearData}
+                  copyData={this.props.copyData}
+                  math={this.props.math}
+                />
+              )
+            )}
+          </TableContainer>
         </div>
 
         {/* Заготовки */}
         <div style={this.props.chooseTab == 1 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
-          {!this.state.pf.length ? null : (
-            <TableContainer component={Paper}>
+          <TableContainer component={Paper}>
+            {!this.state.pf.length ? null : (
               <Table>
                 <TableHead>
                   <TableRow>
@@ -608,8 +608,8 @@ class RevizionNew_List extends React.Component {
                   )}
                 </TableBody>
               </Table>
-            </TableContainer>
-          )}
+            )}
+          </TableContainer>
         </div>
 
         {/* Боковая панель с выбором мест хранения */}
@@ -942,7 +942,9 @@ class RevizionNew_ extends React.Component {
   getLocalStorage() {
     const point = this.state.point;
 
-    const revData = JSON.parse(localStorage.getItem(`revizionDataPoint-${point}`));
+    const revData = JSON.parse(
+      localStorage.getItem(`revizionDataPoint-${point}`)
+    );
 
     if (revData?.date === formatDate(new Date())) {
       this.setState({
@@ -1110,7 +1112,7 @@ class RevizionNew_ extends React.Component {
               <Tab label="Заготовки" {...a11yProps(1)} />
             </Tabs>
 
-            <RevizionNew_List
+            <RevizionNew_Table
               chooseTab={this.state.chooseTab}
               items={this.state.items}
               pf={this.state.pf}
