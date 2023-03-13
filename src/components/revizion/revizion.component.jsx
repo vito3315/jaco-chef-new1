@@ -47,6 +47,7 @@ import { MySelect, MyTextInput, MyAutocomplite2, MyAlert } from '../../stores/el
 import { evaluate } from 'mathjs';
 import queryString from 'query-string';
 
+
 function formatDate(date) {
   var d = new Date(date),
     month = '' + (d.getMonth() + 1),
