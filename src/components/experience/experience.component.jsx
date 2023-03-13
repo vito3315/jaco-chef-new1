@@ -370,13 +370,11 @@ class Experience_Modal extends React.Component {
                             <TableRow key={key}>
                               <TableCell >{item.name}</TableCell>
                               <TableCell >
-                                {item.change == 'not' ? item.start : (
-                                  <MyDatePickerNew
-                                    label="Дата"
-                                    value={item?.start ?? ''}
-                                    func={this.changeDateRange.bind(this, 'list', item.type)}
-                                  />
-                                )}
+                                <MyDatePickerNew
+                                  label="Дата"
+                                  value={item?.start ?? ''}
+                                  func={this.changeDateRange.bind(this, 'list', item.type)}
+                                />
                               </TableCell>
                               <TableCell >{item.end}</TableCell>
                             </TableRow>
@@ -677,7 +675,7 @@ class Experience_ extends React.Component {
     let { st, text } = await this.getData('save_health_book', data);
 
     if (st) {
-      this.openModal(user.id, '2');
+      //this.openModal(user.id, '2');
 
       setTimeout(() => {
         this.getInfo();
