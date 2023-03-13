@@ -38,8 +38,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 
-const queryString = require('query-string');
-
+import queryString from 'query-string';
 
 const Home = React.lazy(() => import("../home"));
 const Auth = React.lazy(() => import("../auth"));

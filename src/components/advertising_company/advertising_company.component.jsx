@@ -23,7 +23,7 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import { MyTextInput, MyDatePickerNew, MySelect, MyAutocomplite, MyCheckBox } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 function formatDate(date) {
     var d = new Date(date),

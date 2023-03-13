@@ -63,7 +63,7 @@ import {
 } from '../../stores/elements';
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 function SimpleDialog(props) {
   const { onClose, selectedValue, open } = props;

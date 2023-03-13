@@ -29,7 +29,7 @@ import {
   MyAlert,
 } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class CafeDirEdit_Modal extends React.Component {
   constructor(props) {

@@ -23,7 +23,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { MyTextInput, MyCheckBox } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class Fines_Table_Сameras extends React.Component {
   shouldComponentUpdate(nextProps) {

@@ -14,7 +14,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { MyDatePickerNew, MyTextInput, MyAutocomplite } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 function formatDate(date) {
   var d = new Date(date),

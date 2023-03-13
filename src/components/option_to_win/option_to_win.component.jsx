@@ -23,7 +23,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { MyTextInput, MyAutocomplite, MyCheckBox } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class OptionToWin_Modal extends React.Component {
   constructor(props) {

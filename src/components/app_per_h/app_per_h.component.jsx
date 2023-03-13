@@ -15,7 +15,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { MyTextInput, MySelect, MyAlert } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class AppPerH_ extends React.Component {
   constructor(props) {

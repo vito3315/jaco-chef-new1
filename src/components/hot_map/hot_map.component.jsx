@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 
 import { MySelect, MyDatePickerNew, MyTimePicker, MyCheckBox } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 function formatDate(date) {
   var d = new Date(date),

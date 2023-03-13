@@ -46,7 +46,7 @@ import Dropzone from "dropzone";
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class TableStages extends React.Component{
   render (){

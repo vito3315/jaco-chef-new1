@@ -15,7 +15,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { MyAutocomplite, MySelect } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class TenderCell extends React.Component {
   // shouldComponentUpdate(nextProps){

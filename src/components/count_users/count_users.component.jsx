@@ -33,7 +33,7 @@ import {
   MyTextInput,
 } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 function formatDate(date) {
   var d = new Date(date),

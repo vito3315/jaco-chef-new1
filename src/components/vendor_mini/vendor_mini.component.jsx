@@ -25,7 +25,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class VendorMini_ extends React.Component {
   constructor(props) {

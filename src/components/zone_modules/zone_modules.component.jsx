@@ -25,7 +25,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { MySelect, MyTextInput, MyCheckBox, MyAlert } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class ZoneModules_Modal extends React.Component {
   map = null;

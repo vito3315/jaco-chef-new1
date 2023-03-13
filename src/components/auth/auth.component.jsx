@@ -14,7 +14,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class Auth_ extends React.Component {
     constructor(props) {

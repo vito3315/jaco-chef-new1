@@ -28,7 +28,7 @@ import {
   MyAutocomplite,
 } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 function App() {
   const editorRef = useRef(null);

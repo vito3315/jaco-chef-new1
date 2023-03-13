@@ -20,7 +20,7 @@ import TableRow from '@mui/material/TableRow';
 
 import { MyTextInput, MySelect } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class AppWorkPoint_ extends React.Component {
   constructor(props) {

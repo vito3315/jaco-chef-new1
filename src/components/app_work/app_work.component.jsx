@@ -31,7 +31,7 @@ import {
   MyAutocomplite,
 } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class AppWorkTable extends React.Component {
   shouldComponentUpdate(nextProps) {

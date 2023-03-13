@@ -38,7 +38,7 @@ import {
   MyAutocomplite,
 } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class OrderPostRec_Modal extends React.Component {
   constructor(props) {

@@ -14,9 +14,9 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-import { MyTextInput, MySelect, MyAutocomplite, MyDaterange, MyCheckBox, MyDatePickerNew } from '../../stores/elements';
+import { MyTextInput, MySelect, MyAutocomplite, MyCheckBox, MyDatePickerNew } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 function formatDate(date) {
   var d = new Date(date),

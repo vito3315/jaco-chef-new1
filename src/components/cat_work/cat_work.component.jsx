@@ -16,7 +16,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 import { MyTextInput, TextEditor } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class CatWork_ extends React.Component {
   constructor(props) {

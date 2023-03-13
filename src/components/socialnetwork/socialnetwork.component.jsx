@@ -9,7 +9,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { MySelect, MyTextInput } from '../../stores/elements';
 
 import axios from 'axios';
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class SocialNetwork_ extends React.Component {
   constructor(props) {
@@ -135,12 +135,12 @@ class SocialNetwork_ extends React.Component {
       ok: this.state.dataInfo.ok,
       tg: this.state.dataInfo.tg,
       fb: this.state.dataInfo.fb,
-      file1: this.state.file ? this.state.file.name : ''
+      file1: ''
     };
 
     let res = await this.getData('save_data', data);
     
-    if( this.state.file ){
+    /*if( this.state.file ){
       setTimeout( () => {
         this.setState({
           is_load: true
@@ -170,7 +170,7 @@ class SocialNetwork_ extends React.Component {
         .catch(function (error) {
           console.log(error);
         });
-    }
+    }*/
   }
 
   handleFileInput(event){
@@ -219,10 +219,6 @@ class SocialNetwork_ extends React.Component {
                   <MyTextInput label="Facebook" value={this.state.dataInfo ? this.state.dataInfo.fb : ''} func={this.changeData.bind(this, 'fb')} />
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
-                  <MyTextInput type="file" label="" func={this.handleFileInput.bind(this)} />
-                </Grid>
-                
                 <Grid item xs={12} sm={6}>
                   <Button variant="contained" onClick={this.saveData.bind(this)}>Обновить данные</Button>
                 </Grid>

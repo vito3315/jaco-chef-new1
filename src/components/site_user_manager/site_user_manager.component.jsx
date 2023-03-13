@@ -24,7 +24,7 @@ import { MySelect, MyCheckBox, MyAutocomplite, MyTextInput, MyDatePickerNew } fr
 
 import Dropzone from "dropzone";
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 function formatDate(date) {
     var d = new Date(date),

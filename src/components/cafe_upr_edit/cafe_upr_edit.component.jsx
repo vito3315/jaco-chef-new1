@@ -31,7 +31,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { MyTextInput, MyDatePickerNew, MyTimePicker, MySelect, MyAutocomplite2, MyCheckBox } from '../../stores/elements';
 //import { alertTitleClasses } from '@mui/material';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 
 

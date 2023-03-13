@@ -34,7 +34,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { MySelect, MyCheckBox, MyTimePicker } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class Events_ extends React.Component {
   constructor(props) {

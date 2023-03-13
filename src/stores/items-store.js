@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx';
 import moment from "moment-timezone";
 import config from './config';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 import { configure } from "mobx"
 

@@ -22,7 +22,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { MySelect, MyAlert, MyTextInput, MyAutocomplite } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class VendorItemPrice_ extends React.Component {
   constructor(props) {

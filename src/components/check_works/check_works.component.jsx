@@ -47,7 +47,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 
 import { MySelect, MyDatePickerNew, MyTextInput, MyAlert } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 function formatDate(date) {
   var d = new Date(date),

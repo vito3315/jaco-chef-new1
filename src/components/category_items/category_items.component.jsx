@@ -27,7 +27,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { MySelect, MyAutocomplite } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class ModalCategoryItems extends React.Component {
   constructor(props) {

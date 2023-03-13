@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class Home_ extends React.Component {
   constructor(props) {

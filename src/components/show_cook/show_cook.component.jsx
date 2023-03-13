@@ -8,11 +8,6 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-
 import Paper from '@mui/material/Paper';
 
 import PropTypes from 'prop-types';
@@ -28,19 +23,13 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
-import InboxIcon from '@mui/icons-material/Inbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
 
 import Avatar from '@mui/material/Avatar';
 
 import Typography from '@mui/material/Typography';
 
-import { MySelect } from '../../stores/elements';
-
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;

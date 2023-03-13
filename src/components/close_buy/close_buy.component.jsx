@@ -27,7 +27,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { MySelect, MyCheckBox } from '../../stores/elements';
 
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 class CloseBuy_ extends React.Component {
   constructor(props) {
