@@ -608,41 +608,37 @@ class Experience_ extends React.Component {
   }
 
   async openModal(user_id, ItemTab) {
-    try {
-      this.handleResize();
+    this.handleResize();
 
-      const listData = this.state.listData;
+    const listData = this.state.listData;
 
-      const data = {
-        user_id,
-      };
+    const data = {
+      user_id,
+    };
 
-      const res = await this.getData('get_user_info', data);
+    const res = await this.getData('get_user_info', data);
 
-      listData.forEach((item) => {
-        item.change = '';
+    listData.forEach((item) => {
+      item.change = '';
 
-        for (const key in res.health_book) {
-          if (Number(key.split('_')[1]) === Number(item.type.split('_')[1])) {
-            if (key.includes('start')) {
-              item.start = res.health_book[key];
-            }
-            if (key.includes('end')) {
-              item.end = res.health_book[key];
-            }
+      for (const key in res.health_book) {
+        if (Number(key.split('_')[1]) === Number(item.type.split('_')[1])) {
+          if (key.includes('start')) {
+            item.start = res.health_book[key];
+          }
+          if (key.includes('end')) {
+            item.end = res.health_book[key];
           }
         }
-      });
+      }
+    });
 
-      this.setState({
-        ItemTab,
-        listData,
-        modalDialog: true,
-        user: res.user,
-      });
-    } catch (err) {
-      alert(err.message)
-    }
+    this.setState({
+      ItemTab,
+      listData,
+      modalDialog: true,
+      user: res.user,
+    });
   }
 
   async saveEdit(date_registration, user_id) {
