@@ -275,7 +275,11 @@ class Experience_Modal extends React.Component {
                   variant="fullWidth"
                 >
                   <Tab label="Информация" value="1" />
-                  <Tab label="Мед книжка" value="2" />
+                  { parseInt(this.state.item?.is_health_book) == 1 ?
+                    <Tab label="Мед книжка" value="2" />
+                      :
+                    null
+                  }
                 </TabList>
               </Box>
 
@@ -431,7 +435,7 @@ class Experience_ extends React.Component {
       err_text: '',
 
       listData: [
-        { type: 'type_1', name: 'Гепатит А' },
+        { type: 'type_1', name: 'Гепатит В' },
         { type: 'type_2', name: 'Отоларинголог' },
         { type: 'type_3', name: 'Патогенный стафилококк' },
         { type: 'type_4', name: 'Стоматолог' },
@@ -808,7 +812,8 @@ class Experience_ extends React.Component {
                       <TableCell style={{ width: '25%' }}>ФИО</TableCell>
                       <TableCell style={{ width: '20%' }}>Дата устройства на работу</TableCell>
                       <TableCell style={{ width: '20%' }}>Текущая организация</TableCell>
-                      <TableCell style={{ width: '20%' }}>Общий стаж год/месяц</TableCell>
+                      <TableCell style={{ width: '10%' }}>Общий стаж год/месяц</TableCell>
+                      <TableCell style={{ width: '10%' }}>Должность</TableCell>
                       <TableCell style={{ width: '10%' }}>Статус мед. книжки</TableCell>
                     </TableRow>
                   </TableHead>
@@ -821,7 +826,8 @@ class Experience_ extends React.Component {
                         <TableCell>{item.date_registration}</TableCell>
                         <TableCell>{item.point}</TableCell>
                         <TableCell>{item.exp}</TableCell>
-                        <TableCell style={{ background: parseInt(item.type) == 1 ? '#fff' : parseInt(item.type) == 2 ? '#ffcc00' : '#c03', color: parseInt(item.type) == 1 ? '#000' : parseInt(item.type) == 2 ? '#000' : '#fff' }}>{item?.status}</TableCell>
+                        <TableCell>{item.app_name}</TableCell>
+                        <TableCell style={{ background: parseInt(item.type) == 0 ? '#fff' : parseInt(item.type) == 1 ? '#fff' : parseInt(item.type) == 2 ? '#ffcc00' : '#c03', color: parseInt(item.type) == 1 ? '#000' : parseInt(item.type) == 2 ? '#000' : '#fff' }}>{item?.status}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
