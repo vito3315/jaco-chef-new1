@@ -435,7 +435,6 @@ class Experience_ extends React.Component {
       err_text: '',
 
       listData: [
-        { type: 'type_1', name: 'Гепатит В' },
         { type: 'type_2', name: 'Отоларинголог' },
         { type: 'type_3', name: 'Патогенный стафилококк' },
         { type: 'type_4', name: 'Стоматолог' },
