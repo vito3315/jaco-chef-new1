@@ -10,10 +10,6 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 
-import PropTypes from 'prop-types';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -61,35 +57,6 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-    </div>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
-
 // главная страница
 class Revizion_ extends React.Component {
   constructor(props) {
@@ -117,8 +84,6 @@ class Revizion_ extends React.Component {
       pfCopy: [],
       recCopy: [],
       search: '',
-
-      chooseTab: 0,
     };
   }
 
@@ -398,7 +363,36 @@ class Revizion_ extends React.Component {
   }
 }
 
-// строка таблицы списка Заготовок
+// строка Таблицы из списка Рецептов
+class RevizionNew_Table_Row_Rec extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    return JSON.stringify(nextProps.item) !== JSON.stringify(this.props.item);
+  }
+
+  render() {
+    // console.log( 'RevizionNew_Table_Row_Rec render' )
+    const { index, item, saveData, math } = this.props;
+
+    return (
+      <TableRow>
+        <TableCell>{item.name}</TableCell>
+        <TableCell colSpan={2}>
+          <MyTextInput
+            label="Количество"
+            tabindex={{ tabIndex: index }}
+            value={item.value}
+            func={(event) => saveData(event, 'rec', item.id, 'value')}
+            onBlur={(event) => math(event, 'rec', item.id, 'value')}
+            enter={(event) => event.key === 'Enter' ? math(event, 'rec', item.id, 'value') : null}
+            inputAdornment={{endAdornment: (<InputAdornment position="end">{item?.ei_name ?? ''}</InputAdornment>)}}
+          />
+        </TableCell>
+      </TableRow>
+    );
+  }
+}
+
+// строка Таблицы из списка Заготовок
 class RevizionNew_Table_Row_Pf extends React.Component {
   shouldComponentUpdate(nextProps) {
     return JSON.stringify(nextProps.item) !== JSON.stringify(this.props.item);
@@ -411,15 +405,15 @@ class RevizionNew_Table_Row_Pf extends React.Component {
     return (
       <TableRow>
         <TableCell>{item.name}</TableCell>
-        <TableCell>
+        <TableCell colSpan={2}>
           <MyTextInput
             label="Количество"
             tabindex={{ tabIndex: index }}
             value={item.value}
-            func={(event) => saveData(event, 'pf', item.id, 'value', item.type)}
-            onBlur={(event) => math(event, 'pf', item.id, 'value', item.type)}
-            enter={(event) => event.key === 'Enter' ? math(event, 'pf', item.id, 'value', item.type) : null}
-            inputAdornment={{ endAdornment: (<InputAdornment position="end">{item?.ei_name ?? ''}</InputAdornment>)}}
+            func={(event) => saveData(event, 'pf', item.id, 'value')}
+            onBlur={(event) => math(event, 'pf', item.id, 'value')}
+            enter={(event) => event.key === 'Enter' ? math(event, 'pf', item.id, 'value') : null}
+            inputAdornment={{endAdornment: (<InputAdornment position="end">{item?.ei_name ?? ''}</InputAdornment>)}}
           />
         </TableCell>
       </TableRow>
@@ -442,6 +436,7 @@ class RevizionNew_Table_Row_Item extends React.Component {
         <TableCell style={{ borderBottom: 'none', borderTop: 'none' }}>
           <Grid item xs={12} sm={12}>
             <MySelect
+              is_none={false}
               label="Объем упаковки"
               data={item.size}
               value={it.need_pq}
@@ -527,6 +522,7 @@ class RevizionNew_Table extends React.Component {
 
     this.state = {
       items: [],
+      rec: [],
       pf: [],
       id: '',
     };
@@ -535,26 +531,31 @@ class RevizionNew_Table extends React.Component {
   static getDerivedStateFromProps(nextProps, prevState) {
     // console.log(nextProps);
 
-    if (!nextProps.items || !nextProps.pf) {
+    if (!nextProps.items || !nextProps.pf || !nextProps.rec) {
       return null;
     }
 
-    if (nextProps.items !== prevState.items || nextProps.pf !== prevState.pf) {
+    if (nextProps.items !== prevState.items || nextProps.pf !== prevState.pf || nextProps.rec !== prevState.rec) {
       if (prevState.id) {
         const id = prevState.id;
 
         const itemsCopy = JSON.parse(JSON.stringify(nextProps.items));
 
+        const recCopy = JSON.parse(JSON.stringify(nextProps.rec));
+
         const pfCopy = JSON.parse(JSON.stringify(nextProps.pf));
 
         const items = itemsCopy.filter((item) => item.storages.find((storages) => id ? storages.storage_id === id : storages));
 
+        const rec = recCopy.filter((item) => item.storages.find((storages) => id ? storages.storage_id === id : storages));
+
         const pf = pfCopy.filter((item) => item.storages.find((storages) => id ? storages.storage_id === id : storages));
 
-        return { items, pf };
+        return { items, rec, pf };
       } else {
         return {
           items: JSON.parse(JSON.stringify(nextProps.items)),
+          rec: JSON.parse(JSON.stringify(nextProps.rec)),
           pf: JSON.parse(JSON.stringify(nextProps.pf)),
         };
       }
@@ -566,13 +567,17 @@ class RevizionNew_Table extends React.Component {
   sortItem(id) {
     const itemsCopy = this.state.items;
 
+    const recCopy = this.state.rec;
+
     const pfCopy = this.state.pf;
 
     const items = itemsCopy.filter((item) => item.storages.find((storages) => id ? storages.storage_id === id : storages));
 
+    const rec = recCopy.filter((item) => item.storages.find((storages) => id ? storages.storage_id === id : storages));
+
     const pf = pfCopy.filter((item) => item.storages.find((storages) => id ? storages.storage_id === id : storages));
 
-    this.setState({ items, pf, id });
+    this.setState({ items, rec, pf, id });
 
     this.props.onClose();
   }
@@ -582,35 +587,37 @@ class RevizionNew_Table extends React.Component {
     return (
       <>
         {/* Товары */}
-        <div style={this.props.chooseTab == 0 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
-          <TableContainer component={Paper}>
-            <Table>
-              {this.state.items.map((item, key) =>
-                parseInt(item.is_show) === 0 ? null : (
-                  <RevizionNew_Table_Item
-                    key={key}
-                    index={key + 1}
-                    item={item}
-                    saveData={this.props.saveData}
-                    clearData={this.props.clearData}
-                    copyData={this.props.copyData}
-                    math={this.props.math}
-                  />
-                )
-              )}
-            </Table>
-          </TableContainer>
-        </div>
+        <TableContainer component={Paper} style={{ marginBottom: 85 }}>
+          <Table>
+            {!this.state.items.length ? null : (
+              <TableHead>
+                <TableRow style={{ backgroundColor: '#ADD8E6' }}>
+                  <TableCell style={{ width: '50%' }}>Товар</TableCell>
+                  <TableCell colSpan={2} style={{ width: '50%' }}>Количество</TableCell>
+                </TableRow>
+              </TableHead>
+            )}
+            {this.state.items.map((item, key) =>
+              parseInt(item.is_show) === 0 ? null : (
+                <RevizionNew_Table_Item
+                  key={key}
+                  index={key + 1}
+                  item={item}
+                  saveData={this.props.saveData}
+                  clearData={this.props.clearData}
+                  copyData={this.props.copyData}
+                  math={this.props.math}
+                />
+              )
+            )}
 
-        {/* Заготовки */}
-        <div style={this.props.chooseTab == 1 ? { display: 'block', paddingBottom: 10, marginBottom: 75 } : { display: 'none' }}>
-          <TableContainer component={Paper}>
+            {/* Заготовки */}
             {!this.state.pf.length ? null : (
-              <Table>
+              <>
                 <TableHead>
-                  <TableRow>
-                    <TableCell style={{ width: '50%' }}>Наименование</TableCell>
-                    <TableCell style={{ width: '50%' }}>Количество</TableCell>
+                  <TableRow style={{ backgroundColor: '#ADD8E6' }}>
+                    <TableCell style={{ width: '50%' }}>Заготовка</TableCell>
+                    <TableCell colSpan={2} style={{ width: '50%' }}>Количество</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -626,10 +633,35 @@ class RevizionNew_Table extends React.Component {
                     )
                   )}
                 </TableBody>
-              </Table>
+              </>
             )}
-          </TableContainer>
-        </div>
+
+            {/* Рецепты */}
+            {!this.state.rec.length ? null : (
+              <>
+                <TableHead>
+                  <TableRow style={{ backgroundColor: '#ADD8E6' }}>
+                    <TableCell style={{ width: '50%' }}>Рецепт</TableCell>
+                    <TableCell colSpan={2} style={{ width: '50%' }}>Количество</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {this.state.rec.map((item, key) =>
+                    parseInt(item.is_show) === 0 ? null : (
+                      <RevizionNew_Table_Row_Rec
+                        key={key}
+                        index={key + 1}
+                        item={item}
+                        saveData={this.props.saveData}
+                        math={this.props.math}
+                      />
+                    )
+                  )}
+                </TableBody>
+              </>
+            )}
+          </Table>
+        </TableContainer>
 
         {/* Боковая панель с выбором мест хранения */}
         <React.Fragment>
@@ -641,10 +673,7 @@ class RevizionNew_Table extends React.Component {
           >
             <List style={{ width: '100%' }}>
               {this.props.storages.map((item, key) => (
-                <ListItemButton
-                  key={key}
-                  onClick={this.sortItem.bind(this, item.id)}
-                >
+                <ListItemButton key={key} onClick={this.sortItem.bind(this, item.id)}>
                   <ListItemText primary={item.name} />
                 </ListItemButton>
               ))}
@@ -674,16 +703,18 @@ class RevizionNew_ extends React.Component {
       allItems: [],
       search: '',
       itemsCopy: [],
+      recCopy: [],
       pfCopy: [],
 
       storages: [],
       items: [],
+      rec: [],
       pf: [],
 
-      chooseTab: 0,
       modalDialog: false,
       title: '',
       content: '',
+      comment: '',
       open: false,
 
       fullScreen: false,
@@ -744,6 +775,7 @@ class RevizionNew_ extends React.Component {
       point: data,
       storages: [],
       items: [],
+      rec: [],
       pf: [],
       allItems: [],
       save: false,
@@ -804,6 +836,7 @@ class RevizionNew_ extends React.Component {
     this.setState({
       modalDialog: false,
       title: '',
+      comment: '',
       content: '',
     });
 
@@ -846,16 +879,16 @@ class RevizionNew_ extends React.Component {
       });
     }
 
-    const pf = [...res.pf, ...res.rec];
-
     this.setState({
       revData,
-      pf,
+      pf: res.pf,
+      rec: res.rec,
       items: res.items,
       storages: res.storages,
+      pfCopy: res.pf,
+      recCopy: res.rec,
       itemsCopy: res.items,
-      pfCopy: pf,
-      allItems: pf,
+      allItems: res.all_for_search,
     });
   }
 
@@ -870,7 +903,12 @@ class RevizionNew_ extends React.Component {
     if (document.activeElement !== document.body) {
       const nextInput = [...document.querySelectorAll('input:not([tabindex = "-1"]):not([autocomplete])')];
       const index = nextInput.indexOf(document.activeElement) + 1;
-      nextInput[index].focus();
+
+      if (nextInput[index]) {
+        nextInput[index].focus();
+      } else {
+        return;
+      }
     }
   }
 
@@ -915,7 +953,7 @@ class RevizionNew_ extends React.Component {
       const pf = this.state.pf;
 
       pf.forEach((pf) => {
-        if (pf.id === id && pf.type === index) {
+        if (pf.id === id) {
           const value = event.target?.value ?? event;
 
           if (value.includes('=')) {
@@ -930,6 +968,28 @@ class RevizionNew_ extends React.Component {
 
       this.setState({
         pf,
+      });
+    }
+
+    if (type === 'rec') {
+      const rec = this.state.rec;
+
+      rec.forEach((rec) => {
+        if (rec.id === id) {
+          const value = event.target?.value ?? event;
+
+          if (value.includes('=')) {
+            rec[data] = evaluate(value.replaceAll('=', ''));
+          } else {
+            rec[data] = value;
+          }
+
+          this.setLocalStorage(rec.id, rec.value, rec.type);
+        }
+      });
+
+      this.setState({
+        rec,
       });
     }
   }
@@ -982,6 +1042,7 @@ class RevizionNew_ extends React.Component {
         content: 'Восстановить данные?',
         storages: [],
         items: [],
+        rec: [],
         pf: [],
       });
     } else {
@@ -998,6 +1059,7 @@ class RevizionNew_ extends React.Component {
     this.setState({
       revData: null,
       title: '',
+      comment: '',
       content: '',
     });
 
@@ -1058,15 +1120,20 @@ class RevizionNew_ extends React.Component {
 
     const itemsCopy = this.state.itemsCopy;
 
+    const recCopy = this.state.recCopy;
+
     const pfCopy = this.state.pfCopy;
 
     const items = itemsCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
+
+    const rec = recCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
 
     const pf = pfCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
 
     this.setState({
       search,
       items,
+      rec,
       pf,
     });
   }
@@ -1079,9 +1146,11 @@ class RevizionNew_ extends React.Component {
 
     const items_rev = this.state.items;
 
+    const rec = this.state.rec;
+
     const pf = this.state.pf;
 
-    const allItems = [...pf, ...items_rev];
+    const allItems = [...pf, ...items_rev, ...rec];
 
     const items = allItems.reduce((items, cat) => {
       cat = {
@@ -1107,7 +1176,8 @@ class RevizionNew_ extends React.Component {
     if (res.count_err > 0) {
       this.setState({
         modalDialog: true,
-        title: 'Для продолжения надо исправить количество в позициях',
+        title: 'Уточнение данных',
+        comment: 'Для продолжения надо исправить количество в позициях',
         pf_list: res.pf_list,
       });
     } else {
@@ -1115,7 +1185,8 @@ class RevizionNew_ extends React.Component {
 
       this.setState({
         modalDialog: true,
-        title: 'Цифра показывает сумму всех позиций, а не каждую в отдельности (товар / заготовка / рецепт)',
+        title: 'Уточнение данных',
+        comment: 'Цифра показывает сумму всех позиций, а не каждую в отдельности (товар / заготовка / рецепт)',
         pf_list,
         save: true,
         data,
@@ -1128,13 +1199,12 @@ class RevizionNew_ extends React.Component {
     this.setState({
       modalDialog: false,
       title: '',
+      comment: '',
       save: false,
       pf_list: null,
     });
 
     const data = this.state.data;
-
-    // console.log(data);
 
     const res = await this.getData('save_new', data);
 
@@ -1175,7 +1245,11 @@ class RevizionNew_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={12}>
-            <Button variant="contained" onClick={this.checkData.bind(this)} disabled={!this.state.point || this.state.point === '0' ? true : false}>
+            <Button
+              variant="contained"
+              onClick={this.checkData.bind(this)}
+              disabled={!this.state.point || this.state.point === '0' ? true : false}
+            >
               Сохранить
             </Button>
           </Grid>
@@ -1201,21 +1275,10 @@ class RevizionNew_ extends React.Component {
             />
           </Grid>
 
-          <Grid item xs={12} sm={12} id="revTable">
-            <Tabs
-              value={this.state.chooseTab}
-              onChange={(item, key) => this.setState({ chooseTab: key })}
-              textColor="primary"
-              indicatorColor="primary"
-              centered
-            >
-              <Tab label="Товары" {...a11yProps(0)} />
-              <Tab label="Заготовки" {...a11yProps(1)} />
-            </Tabs>
-
+          <Grid item xs={12} sm={12}>
             <RevizionNew_Table
-              chooseTab={this.state.chooseTab}
               items={this.state.items}
+              rec={this.state.rec}
               pf={this.state.pf}
               saveData={this.saveData.bind(this)}
               clearData={this.clearData.bind(this)}
@@ -1268,7 +1331,7 @@ class RevizionNew_ extends React.Component {
         <Dialog
           maxWidth={this.state.pf_list ? 'lg' : 'sm'}
           open={this.state.modalDialog}
-          onClose={() => this.setState({modalDialog: false, title: '', save: false})}
+          onClose={() => this.setState({modalDialog: false, title: '', comment: '', save: false})}
           fullScreen={this.state.fullScreen}
           fullWidth={true}
           aria-labelledby="alert-dialog-title"
@@ -1277,11 +1340,12 @@ class RevizionNew_ extends React.Component {
           <DialogTitle className={this.state.fullScreen ? 'button' : null}>
             <Typography align={this.state.pf_list ? 'left' : 'center'} sx={{ fontWeight: 'bold' }}>{this.state.title}</Typography>
             {this.state.fullScreen ? (
-              <IconButton onClick={() => this.setState({modalDialog: false, title: '', save: false})} style={{ cursor: 'pointer' }}>
+              <IconButton onClick={() => this.setState({modalDialog: false, title: '', comment: '', save: false})} style={{ cursor: 'pointer' }}>
                 <CloseIcon />
               </IconButton>
             ) : null}
           </DialogTitle>
+          {this.state.comment ? <DialogTitle>{this.state.comment}</DialogTitle> : null}
           <DialogContent align="center" sx={{ fontWeight: this.state.pf_list ? null : 'bold' }}>
             {this.state.pf_list ? (
               <TableContainer component={Paper}>
@@ -1309,10 +1373,8 @@ class RevizionNew_ extends React.Component {
           <DialogActions>
             {this.state.pf_list ? (
               <>
-                <Button onClick={() => this.setState({modalDialog: false, title: '', save: false})}>{this.state.save ? 'Отмена' : 'Закрыть'}</Button>
-                {this.state.save ? (
-                  <Button color="success" onClick={this.saveRev.bind(this)}>Сохранить</Button>
-                ) : null}
+                <Button onClick={() => this.setState({modalDialog: false, title: '', comment: '', save: false})}>{this.state.save ? 'Отмена' : 'Закрыть'}</Button>
+                {this.state.save ? <Button color="success" onClick={this.saveRev.bind(this)}>Сохранить</Button> : null}
               </>
             ) : (
               <>
