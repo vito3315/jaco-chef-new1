@@ -40,6 +40,9 @@ import ListItemText from '@mui/material/ListItemText';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import InputAdornment from '@mui/material/InputAdornment';
 
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+
 import { MySelect, MyTextInput, MyAutocomplite2, MyAlert } from '../../stores/elements';
 
 import { evaluate } from 'mathjs';
@@ -1110,25 +1113,50 @@ class RevizionNew_ extends React.Component {
 
   // поиск
   search(event, value) {
+
     const point = this.state.point;
 
     if (!point) {
       return;
     }
 
-    const search = event.target.value ? event.target.value : value ? value : '';
+    let search = event.target.value ? event.target.value : value ? value : '';
 
-    const itemsCopy = this.state.itemsCopy;
+    let items = this.state.itemsCopy;
 
-    const recCopy = this.state.recCopy;
+    let rec = this.state.recCopy;
 
-    const pfCopy = this.state.pfCopy;
+    let pf = this.state.pfCopy;
 
-    const items = itemsCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
+    if(!search) {
+      this.setState({
+        search,
+        items,
+        rec,
+        pf,
+      });
 
-    const rec = recCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
+      return;
+    }
 
-    const pf = pfCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
+    if(typeof search === 'string') {
+
+      items = items.filter((value) => search ? value.name.toLowerCase().includes(search.toLowerCase()) : value);
+  
+      rec = rec.filter((value) => search ? value.name.toLowerCase().includes(search.toLowerCase()) : value);
+  
+      pf = pf.filter((value) => search ? value.name.toLowerCase().includes(search.toLowerCase()) : value);
+
+      search = { name: search };
+      
+    } else {
+  
+      items = items.filter((value) => search ? value.name.toLowerCase() === search.name.toLowerCase() : value);
+  
+      rec = rec.filter((value) => search ? value.name.toLowerCase() === search.name.toLowerCase() : value);
+  
+      pf = pf.filter((value) => search ? value.name.toLowerCase() === search.name.toLowerCase() : value);
+    }
 
     this.setState({
       search,
@@ -1264,14 +1292,22 @@ class RevizionNew_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <MyAutocomplite2
-              label="Поиск"
+            <Autocomplete
               freeSolo={true}
-              multiple={false}
-              data={this.state.allItems}
+              size="small"
+              disableCloseOnSelect={true}
+              options={this.state.allItems}
+              getOptionLabel={(option) => option?.name ?? ''}
               value={this.state.search}
-              func={this.search.bind(this)}
+              onChange={this.search.bind(this)}
               onBlur={this.search.bind(this)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={'Поиск'}
+                  onChange={(event) => this.search(event)}
+                />
+              )}
             />
           </Grid>
 
