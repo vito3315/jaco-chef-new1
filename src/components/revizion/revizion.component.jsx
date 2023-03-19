@@ -378,17 +378,21 @@ class RevizionNew_Table_Row_Rec extends React.Component {
 
     return (
       <TableRow>
-        <TableCell>{item.name}</TableCell>
-        <TableCell colSpan={2}>
-          <MyTextInput
-            label="Количество"
-            tabindex={{ tabIndex: index }}
-            value={item.value}
-            func={(event) => saveData(event, 'rec', item.id, 'value')}
-            onBlur={(event) => math(event, 'rec', item.id, 'value')}
-            enter={(event) => event.key === 'Enter' ? math(event, 'rec', item.id, 'value') : null}
-            inputAdornment={{endAdornment: (<InputAdornment position="end">{item?.ei_name ?? ''}</InputAdornment>)}}
-          />
+        <TableCell>
+          <Grid container spacing={2}>
+            <Grid item xs={5} sx={{wordWrap: 'break-word'}}>{item.name}</Grid>
+            <Grid item xs={7}>
+              <MyTextInput
+                label="Количество"
+                tabindex={{ tabIndex: index }}
+                value={item.value}
+                func={(event) => saveData(event, 'rec', item.id, 'value')}
+                onBlur={(event) => math(event, 'rec', item.id, 'value')}
+                enter={(event) => event.key === 'Enter' ? math(event, 'rec', item.id, 'value') : null}
+                inputAdornment={{endAdornment: (<InputAdornment position="end">{item?.ei_name ?? ''}</InputAdornment>)}}
+              />
+            </Grid>
+          </Grid>
         </TableCell>
       </TableRow>
     );
@@ -407,17 +411,21 @@ class RevizionNew_Table_Row_Pf extends React.Component {
 
     return (
       <TableRow>
-        <TableCell>{item.name}</TableCell>
-        <TableCell colSpan={2}>
-          <MyTextInput
-            label="Количество"
-            tabindex={{ tabIndex: index }}
-            value={item.value}
-            func={(event) => saveData(event, 'pf', item.id, 'value')}
-            onBlur={(event) => math(event, 'pf', item.id, 'value')}
-            enter={(event) => event.key === 'Enter' ? math(event, 'pf', item.id, 'value') : null}
-            inputAdornment={{endAdornment: (<InputAdornment position="end">{item?.ei_name ?? ''}</InputAdornment>)}}
-          />
+        <TableCell>
+          <Grid container spacing={2}>
+            <Grid item xs={5} sx={{wordWrap: 'break-word'}}>{item.name}</Grid>
+            <Grid item xs={7}>
+              <MyTextInput
+                label="Количество"
+                tabindex={{ tabIndex: index }}
+                value={item.value}
+                func={(event) => saveData(event, 'pf', item.id, 'value')}
+                onBlur={(event) => math(event, 'pf', item.id, 'value')}
+                enter={(event) => event.key === 'Enter' ? math(event, 'pf', item.id, 'value') : null}
+                inputAdornment={{endAdornment: (<InputAdornment position="end">{item?.ei_name ?? ''}</InputAdornment>)}}
+              />
+            </Grid>
+          </Grid>
         </TableCell>
       </TableRow>
     );
@@ -432,13 +440,13 @@ class RevizionNew_Table_Row_Item extends React.Component {
 
   render() {
     // console.log( 'RevizionNew_Table_Row_Item render' )
-    const { index, item, it, i, saveData, clearData, math } = this.props;
+    const { index, item, it, i, saveData, clearData, math, fullScreen } = this.props;
 
     return (
       <TableRow>
         <TableCell style={{ borderBottom: 'none', borderTop: 'none' }}>
-          <Grid container spacing={3}>
-            <Grid item xs={4}>
+          <Grid container spacing={2}>
+            <Grid item xs={4} sm={4}>
               <MySelect
                 is_none={false}
                 label="Объем упаковки"
@@ -448,21 +456,22 @@ class RevizionNew_Table_Row_Item extends React.Component {
               />
             </Grid>
           
-            <Grid item xs={ i === 0 ? 8 : 6 }>
+            <Grid item xs={i === 0 ? 8 : 5} sm={i === 0 ? 8 : 7}>
               <MyTextInput
-                label="Количество"
+                label={fullScreen ? i === 0 ? "Количество" : "Кол-во" : "Количество"}
                 id={item.id}
                 value={it.value}
                 tabindex={{ tabIndex: index }}
                 func={(event) => saveData(event, 'item', item.id, 'value', i)}
                 onBlur={(event) => math(event, 'item', item.id, 'value', i)}
                 enter={(event) => event.key === 'Enter' ? math(event, 'item', item.id, 'value', i) : null}
+                inputAdornment={{endAdornment: (<InputAdornment position="end">{item?.ei_name ?? ''}</InputAdornment>)}}
               />
             </Grid>
         
             {i === 0 ? null : (
             
-                <Grid item xs={2}>
+                <Grid item xs={1} sm={1}>
                   <Button variant="contained" onClick={() => clearData(item.id, i)}>
                     <CloseIcon />
                   </Button>
@@ -484,13 +493,12 @@ class RevizionNew_Table_Item extends React.Component {
 
   render() {
     // console.log( 'RevizionNew_Table_Item render' )
-    const { index, item, saveData, clearData, copyData, math } = this.props;
+    const { index, item, saveData, clearData, copyData, math, fullScreen } = this.props;
     return (
       <>
         <TableHead>
           <TableRow>
             <TableCell>{item.name} {item.value} {item.value === '' ? '' : item.ei_name}</TableCell>
-            
           </TableRow>
         </TableHead>
         <TableBody>
@@ -504,6 +512,7 @@ class RevizionNew_Table_Item extends React.Component {
               saveData={saveData}
               clearData={clearData}
               math={math}
+              fullScreen={fullScreen}
             />
           ))}
           <TableRow>
@@ -589,62 +598,12 @@ class RevizionNew_Table extends React.Component {
   render() {
     // console.log('RevizionNew_List render');
 
-    /*
-      {Заготовки }
-      {!this.state.pf.length ? null : (
-        <>
-          <TableHead>
-            <TableRow style={{ backgroundColor: '#ADD8E6' }}>
-              <TableCell>Заготовка / Количество</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {this.state.pf.map((item, key) =>
-              parseInt(item.is_show) === 0 ? null : (
-                <RevizionNew_Table_Row_Pf
-                  key={key}
-                  index={key + 1}
-                  item={item}
-                  saveData={this.props.saveData}
-                  math={this.props.math}
-                />
-              )
-            )}
-          </TableBody>
-        </>
-      )}
-
-      {Рецепты }
-      {!this.state.rec.length ? null : (
-        <>
-          <TableHead>
-            <TableRow style={{ backgroundColor: '#ADD8E6' }}>
-              <TableCell>Рецепт / Количество</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {this.state.rec.map((item, key) =>
-              parseInt(item.is_show) === 0 ? null : (
-                <RevizionNew_Table_Row_Rec
-                  key={key}
-                  index={key + 1}
-                  item={item}
-                  saveData={this.props.saveData}
-                  math={this.props.math}
-                />
-              )
-            )}
-          </TableBody>
-        </>
-      )}
-    */
-
-
     return (
       <>
         {/* Товары */}
         <TableContainer component={Paper} style={{ marginBottom: 85 }}>
           <Table>
+            {/* Товары */}
             {!this.state.items.length ? null : (
               <TableHead>
                 <TableRow style={{ backgroundColor: '#ADD8E6' }}>
@@ -653,7 +612,6 @@ class RevizionNew_Table extends React.Component {
               </TableHead>
             )}
             {this.state.items.map((item, key) =>
-              parseInt(item.is_show) === 0 ? null : (
                 <RevizionNew_Table_Item
                   key={key}
                   index={key + 1}
@@ -662,11 +620,53 @@ class RevizionNew_Table extends React.Component {
                   clearData={this.props.clearData}
                   copyData={this.props.copyData}
                   math={this.props.math}
+                  fullScreen={this.props.fullScreen}
                 />
-              )
             )}
 
-            
+            {/* Заготовки */}
+            {!this.state.pf.length ? null : (
+              <>
+                <TableHead>
+                  <TableRow style={{ backgroundColor: '#ADD8E6' }}>
+                    <TableCell>Заготовка / Количество</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {this.state.pf.map((item, key) => 
+                    <RevizionNew_Table_Row_Pf
+                      key={key}
+                      index={key + 1}
+                      item={item}
+                      saveData={this.props.saveData}
+                      math={this.props.math}
+                    />
+                  )}
+                </TableBody>
+              </>
+            )}
+
+            {/* Рецепты */}
+            {!this.state.rec.length ? null : (
+              <>
+                <TableHead>
+                  <TableRow style={{ backgroundColor: '#ADD8E6' }}>
+                    <TableCell>Рецепт / Количество</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {this.state.rec.map((item, key) =>
+                    <RevizionNew_Table_Row_Rec
+                      key={key}
+                      index={key + 1}
+                      item={item}
+                      saveData={this.props.saveData}
+                      math={this.props.math}
+                    />
+                  )}
+                </TableBody>
+              </>
+      )}
           </Table>
         </TableContainer>
 
@@ -1328,6 +1328,7 @@ class RevizionNew_ extends React.Component {
               onOpen={() => this.setState({ open: true })}
               storages={this.state.storages}
               math={this.math.bind(this)}
+              fullScreen={this.state.fullScreen}
             />
           </Grid>
         </Grid>
