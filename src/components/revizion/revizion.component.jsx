@@ -380,8 +380,8 @@ class RevizionNew_Table_Row_Rec extends React.Component {
       <TableRow>
         <TableCell>
           <Grid container spacing={2}>
-            <Grid item xs={5} sx={{wordWrap: 'break-word'}}>{item.name}</Grid>
-            <Grid item xs={7}>
+            <Grid item xs={5} sm={4} sx={{wordWrap: 'break-word'}}>{item.name}</Grid>
+            <Grid item xs={7} sm={8}>
               <MyTextInput
                 label="Количество"
                 tabindex={{ tabIndex: index }}
@@ -413,8 +413,8 @@ class RevizionNew_Table_Row_Pf extends React.Component {
       <TableRow>
         <TableCell>
           <Grid container spacing={2}>
-            <Grid item xs={5} sx={{wordWrap: 'break-word'}}>{item.name}</Grid>
-            <Grid item xs={7}>
+            <Grid item xs={5} sm={4} sx={{wordWrap: 'break-word'}}>{item.name}</Grid>
+            <Grid item xs={7} sm={8}>
               <MyTextInput
                 label="Количество"
                 tabindex={{ tabIndex: index }}
@@ -498,7 +498,16 @@ class RevizionNew_Table_Item extends React.Component {
       <>
         <TableHead>
           <TableRow>
-            <TableCell>{item.name} {item.value} {item.value === '' ? '' : item.ei_name}</TableCell>
+            {fullScreen ?
+              <TableCell>{item.name} {item.value} {item.value === '' ? '' : item.ei_name}</TableCell>
+              :
+              <TableCell>
+                <Grid container spacing={2}>
+                  <Grid item xs={4} sm={4}>{item.name}</Grid>
+                  <Grid item xs={8} sm={8}>{item.value} {item.value === '' ? '' : item.ei_name}</Grid>
+                </Grid>
+              </TableCell>
+            }
           </TableRow>
         </TableHead>
         <TableBody>
@@ -607,7 +616,12 @@ class RevizionNew_Table extends React.Component {
             {!this.state.items.length ? null : (
               <TableHead>
                 <TableRow style={{ backgroundColor: '#ADD8E6' }}>
-                  <TableCell>Товар / Количество</TableCell>
+                  <TableCell>
+                    <Grid container spacing={2}>
+                      <Grid item xs={4} sm={4}>Товар</Grid>
+                      <Grid item xs={8} sm={8}>Количество</Grid>
+                    </Grid>
+                  </TableCell>
                 </TableRow>
               </TableHead>
             )}
@@ -629,7 +643,12 @@ class RevizionNew_Table extends React.Component {
               <>
                 <TableHead>
                   <TableRow style={{ backgroundColor: '#ADD8E6' }}>
-                    <TableCell>Заготовка / Количество</TableCell>
+                    <TableCell>
+                      <Grid container spacing={2}>
+                        <Grid item xs={5} sm={4}>Заготовка</Grid>
+                        <Grid item xs={7} sm={8}>Количество</Grid>
+                      </Grid>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -651,7 +670,12 @@ class RevizionNew_Table extends React.Component {
               <>
                 <TableHead>
                   <TableRow style={{ backgroundColor: '#ADD8E6' }}>
-                    <TableCell>Рецепт / Количество</TableCell>
+                    <TableCell>
+                      <Grid container spacing={2}>
+                        <Grid item xs={5} sm={4}>Рецепт</Grid>
+                        <Grid item xs={7} sm={8}>Количество</Grid>
+                      </Grid>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -903,6 +927,12 @@ class RevizionNew_ extends React.Component {
   math(event, type, id, data, i) {
     // console.log(event, type, id, data, i);
 
+    const regexp = /^[a-zа-яё,._\-/=!?]+$/gi;
+
+    if(regexp.test(event.target.value)) {
+      return;
+    }
+
     const result = String(evaluate(event.target.value) ?? '');
 
     this.saveData(result, type, id, data, i);
@@ -1145,21 +1175,21 @@ class RevizionNew_ extends React.Component {
 
     if(typeof search === 'string') {
 
-      items = items.filter((value) => search ? value.name.toLowerCase().includes(search.toLowerCase()) : value);
+      items = items.filter((value) => value.name.toLowerCase().includes(search.toLowerCase()));
   
-      rec = rec.filter((value) => search ? value.name.toLowerCase().includes(search.toLowerCase()) : value);
+      rec = rec.filter((value) => value.name.toLowerCase().includes(search.toLowerCase()));
   
-      pf = pf.filter((value) => search ? value.name.toLowerCase().includes(search.toLowerCase()) : value);
+      pf = pf.filter((value) => value.name.toLowerCase().includes(search.toLowerCase()));
 
       search = { name: search };
       
     } else {
   
-      items = items.filter((value) => search ? value.name.toLowerCase() === search.name.toLowerCase() : value);
+      items = items.filter((value) => value.name.toLowerCase() === search.name.toLowerCase());
   
-      rec = rec.filter((value) => search ? value.name.toLowerCase() === search.name.toLowerCase() : value);
+      rec = rec.filter((value) => value.name.toLowerCase() === search.name.toLowerCase());
   
-      pf = pf.filter((value) => search ? value.name.toLowerCase() === search.name.toLowerCase() : value);
+      pf = pf.filter((value) => value.name.toLowerCase() === search.name.toLowerCase());
     }
 
     this.setState({
