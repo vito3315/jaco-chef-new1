@@ -437,38 +437,40 @@ class RevizionNew_Table_Row_Item extends React.Component {
     return (
       <TableRow>
         <TableCell style={{ borderBottom: 'none', borderTop: 'none' }}>
-          <Grid item xs={12} sm={12}>
-            <MySelect
-              is_none={false}
-              label="Объем упаковки"
-              data={item.size}
-              value={it.need_pq}
-              func={(event) => saveData(event, 'item', item.id, 'need_pq', i)}
-            />
-          </Grid>
-        </TableCell>
-        <TableCell colSpan={i === 0 ? 2 : 0} style={{ borderBottom: 'none', borderTop: 'none' }}>
-          <Grid item xs={12} sm={12}>
-            <MyTextInput
-              label="Количество"
-              id={item.id}
-              value={it.value}
-              tabindex={{ tabIndex: index }}
-              func={(event) => saveData(event, 'item', item.id, 'value', i)}
-              onBlur={(event) => math(event, 'item', item.id, 'value', i)}
-              enter={(event) => event.key === 'Enter' ? math(event, 'item', item.id, 'value', i) : null}
-            />
-          </Grid>
-        </TableCell>
-        {i === 0 ? null : (
-          <TableCell style={{ borderBottom: 'none', borderTop: 'none' }}>
-            <Grid item xs={12} sm={12}>
-              <Button variant="contained" onClick={() => clearData(item.id, i)}>
-                <CloseIcon />
-              </Button>
+          <Grid container spacing={3}>
+            <Grid item xs={4}>
+              <MySelect
+                is_none={false}
+                label="Объем упаковки"
+                data={item.size}
+                value={it.need_pq}
+                func={(event) => saveData(event, 'item', item.id, 'need_pq', i)}
+              />
             </Grid>
-          </TableCell>
-        )}
+          
+            <Grid item xs={ i === 0 ? 8 : 6 }>
+              <MyTextInput
+                label="Количество"
+                id={item.id}
+                value={it.value}
+                tabindex={{ tabIndex: index }}
+                func={(event) => saveData(event, 'item', item.id, 'value', i)}
+                onBlur={(event) => math(event, 'item', item.id, 'value', i)}
+                enter={(event) => event.key === 'Enter' ? math(event, 'item', item.id, 'value', i) : null}
+              />
+            </Grid>
+        
+            {i === 0 ? null : (
+            
+                <Grid item xs={2}>
+                  <Button variant="contained" onClick={() => clearData(item.id, i)}>
+                    <CloseIcon />
+                  </Button>
+                </Grid>
+            
+            )}
+          </Grid>
+        </TableCell>
       </TableRow>
     );
   }
@@ -487,9 +489,8 @@ class RevizionNew_Table_Item extends React.Component {
       <>
         <TableHead>
           <TableRow>
-            <TableCell sx={{ width: { xs: '60%', sm: '50%' }, minWidth: '200px' }}>{item.name}</TableCell>
-            <TableCell sx={{ width: { xs: '38%', sm: '45%' }, minWidth: '150px' }}>{item.value} {item.value === '' ? '' : item.ei_name}</TableCell>
-            <TableCell sx={{ width: { xs: '2%', sm: '5%' } }}></TableCell>
+            <TableCell>{item.name} {item.value} {item.value === '' ? '' : item.ei_name}</TableCell>
+            
           </TableRow>
         </TableHead>
         <TableBody>
@@ -506,7 +507,7 @@ class RevizionNew_Table_Item extends React.Component {
             />
           ))}
           <TableRow>
-            <TableCell colSpan={3} style={{ borderTop: 'none', borderBottom: '1px groove #e6e6e6' }}>
+            <TableCell style={{ borderTop: 'none', borderBottom: '1px groove #e6e6e6' }}>
               <Button variant="contained" onClick={() => copyData(item.id)}>
                 Дублировать
               </Button>
@@ -587,6 +588,58 @@ class RevizionNew_Table extends React.Component {
 
   render() {
     // console.log('RevizionNew_List render');
+
+    /*
+      {Заготовки }
+      {!this.state.pf.length ? null : (
+        <>
+          <TableHead>
+            <TableRow style={{ backgroundColor: '#ADD8E6' }}>
+              <TableCell>Заготовка / Количество</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {this.state.pf.map((item, key) =>
+              parseInt(item.is_show) === 0 ? null : (
+                <RevizionNew_Table_Row_Pf
+                  key={key}
+                  index={key + 1}
+                  item={item}
+                  saveData={this.props.saveData}
+                  math={this.props.math}
+                />
+              )
+            )}
+          </TableBody>
+        </>
+      )}
+
+      {Рецепты }
+      {!this.state.rec.length ? null : (
+        <>
+          <TableHead>
+            <TableRow style={{ backgroundColor: '#ADD8E6' }}>
+              <TableCell>Рецепт / Количество</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {this.state.rec.map((item, key) =>
+              parseInt(item.is_show) === 0 ? null : (
+                <RevizionNew_Table_Row_Rec
+                  key={key}
+                  index={key + 1}
+                  item={item}
+                  saveData={this.props.saveData}
+                  math={this.props.math}
+                />
+              )
+            )}
+          </TableBody>
+        </>
+      )}
+    */
+
+
     return (
       <>
         {/* Товары */}
@@ -595,8 +648,7 @@ class RevizionNew_Table extends React.Component {
             {!this.state.items.length ? null : (
               <TableHead>
                 <TableRow style={{ backgroundColor: '#ADD8E6' }}>
-                  <TableCell style={{ width: '50%' }}>Товар</TableCell>
-                  <TableCell colSpan={2} style={{ width: '50%' }}>Количество</TableCell>
+                  <TableCell>Товар / Количество</TableCell>
                 </TableRow>
               </TableHead>
             )}
@@ -614,55 +666,7 @@ class RevizionNew_Table extends React.Component {
               )
             )}
 
-            {/* Заготовки */}
-            {!this.state.pf.length ? null : (
-              <>
-                <TableHead>
-                  <TableRow style={{ backgroundColor: '#ADD8E6' }}>
-                    <TableCell style={{ width: '50%' }}>Заготовка</TableCell>
-                    <TableCell colSpan={2} style={{ width: '50%' }}>Количество</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {this.state.pf.map((item, key) =>
-                    parseInt(item.is_show) === 0 ? null : (
-                      <RevizionNew_Table_Row_Pf
-                        key={key}
-                        index={key + 1}
-                        item={item}
-                        saveData={this.props.saveData}
-                        math={this.props.math}
-                      />
-                    )
-                  )}
-                </TableBody>
-              </>
-            )}
-
-            {/* Рецепты */}
-            {!this.state.rec.length ? null : (
-              <>
-                <TableHead>
-                  <TableRow style={{ backgroundColor: '#ADD8E6' }}>
-                    <TableCell style={{ width: '50%' }}>Рецепт</TableCell>
-                    <TableCell colSpan={2} style={{ width: '50%' }}>Количество</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {this.state.rec.map((item, key) =>
-                    parseInt(item.is_show) === 0 ? null : (
-                      <RevizionNew_Table_Row_Rec
-                        key={key}
-                        index={key + 1}
-                        item={item}
-                        saveData={this.props.saveData}
-                        math={this.props.math}
-                      />
-                    )
-                  )}
-                </TableBody>
-              </>
-            )}
+            
           </Table>
         </TableContainer>
 
