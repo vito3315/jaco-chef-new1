@@ -4,6 +4,9 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -114,9 +117,17 @@ class SkladItemsModule_Modal_Edit extends React.Component {
         onClose={this.onClose.bind(this)}
         fullWidth={true}
         maxWidth={'sm'}
+        fullScreen={this.props.fullScreen}
       >
-        <DialogTitle>
+        <DialogTitle className="button">
           <Typography>{this.props.itemName} изменить:</Typography>
+          {this.props.fullScreen ? (
+            <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
+              <CloseIcon />
+            </IconButton>
+          ) : null}
+        </DialogTitle>
+        <DialogTitle>
           <Typography>- Активность</Typography>
           <Typography>- Ревизию</Typography>
           <Typography>- Цену</Typography>
@@ -232,12 +243,17 @@ class SkladItemsModule_Modal extends React.Component {
       fullWidth={true}
       maxWidth={'md'}
       onClose={this.onClose.bind(this)}
+      fullScreen={this.props.fullScreen}
     >
-      <DialogTitle>
-        {this.props.method}
-        {' '}
-        {this.props.itemName ? this.props.itemName : ''}
+      <DialogTitle className="button">
+        <Typography>{this.props.method}{this.props.itemName ? `: ${this.props.itemName}` : ''}</Typography>
+        {this.props.fullScreen ? (
+          <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
+            <CloseIcon />
+          </IconButton>
+        ) : null}
       </DialogTitle>
+    
       <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
         
         <Grid container spacing={3}>
@@ -434,7 +450,9 @@ class SkladItemsModule_ extends React.Component {
       handle_price: '',
       is_show: '',
       id: '',
-      type: 0
+      type: 0,
+
+      fullScreen: false,
     };
   }
 
@@ -502,6 +520,19 @@ class SkladItemsModule_ extends React.Component {
       });
   };
 
+  handleResize() {
+
+    if (window.innerWidth < 601) {
+          this.setState({
+            fullScreen: true,
+          });
+        } else {
+          this.setState({
+            fullScreen: false,
+          });
+        }
+  }
+
   async changeCity(event) {
     let data = {
       city: event.target.value,
@@ -528,6 +559,7 @@ class SkladItemsModule_ extends React.Component {
   }
 
   async showEditItem(id, method) {
+    this.handleResize();
 
     let data = {
       item_id: id,
@@ -661,6 +693,7 @@ class SkladItemsModule_ extends React.Component {
   }
 
   openModalItemEdit(id, type, name, show_in_rev, handle_price, is_show) {
+    this.handleResize();
 
     this.setState({
       modalDialogEdit: true,
@@ -674,6 +707,8 @@ class SkladItemsModule_ extends React.Component {
   }
 
   async openModalItemNew(method) {
+    this.handleResize();
+
     let res = await this.getData('get_all_for_new');
 
     this.setState({
@@ -797,6 +832,7 @@ class SkladItemsModule_ extends React.Component {
           method={this.state.method}
           event={this.state.itemEdit}
           itemName={this.state.itemName}
+          fullScreen={this.state.fullScreen}
         />
 
         <SkladItemsModule_Modal_Edit
@@ -811,6 +847,7 @@ class SkladItemsModule_ extends React.Component {
           is_show={this.state.is_show}
           handle_price={this.state.handle_price}
           changeTableItem={this.changeTableItem.bind(this)}
+          fullScreen={this.state.fullScreen}
         />
 
         <Grid container spacing={3}>
@@ -828,9 +865,7 @@ class SkladItemsModule_ extends React.Component {
             <MyTextInput
               label="Поиск"
               value={this.state.searchItem}
-              func={(event) => {
-                this.setState({ searchItem: event.target.value });
-              }}
+              func={(event) => {this.setState({ searchItem: event.target.value })}}
               onBlur={this.search.bind(this)}
             />
           </Grid>

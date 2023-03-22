@@ -262,11 +262,15 @@ class PolufabricatModule_ extends React.Component {
       err_text: '',
 
       type: 0,
+
+      searchItem: '',
     };
   }
 
   async componentDidMount() {
     const data = await this.getData('get_all');
+
+    // console.log(data)
 
     this.setState({
       module_name: data.module_info.name,
@@ -462,6 +466,19 @@ class PolufabricatModule_ extends React.Component {
     });
   }
 
+  async search() {
+    const data = {
+      item: this.state.searchItem,
+    };
+
+    const res = await this.getData('get_all_search', data);
+
+    this.setState({
+      cats: res.items,
+      freeItems: res.items_free,
+    });
+  }
+
   render() {
     return (
       <>
@@ -491,10 +508,19 @@ class PolufabricatModule_ extends React.Component {
             <h1>{this.state.module_name}</h1>
           </Grid>
 
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={3}>
             <Button onClick={this.openModal.bind(this, 'newItem', 'Новая заготовка')} variant="contained">
               Добавить заготовку
             </Button>
+          </Grid>
+
+          <Grid item xs={12} sm={3}>
+            <MyTextInput
+              label="Поиск"
+              value={this.state.searchItem}
+              func={(event) => {this.setState({ searchItem: event.target.value })}}
+              onBlur={this.search.bind(this)}
+            />
           </Grid>
 
           <Grid item xs={12} style={{ paddingBottom: '10px' }}>
