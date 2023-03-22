@@ -1206,11 +1206,11 @@ class RevizionNew_ extends React.Component {
 
     const point_id = this.state.point;
 
-    const items_rev = this.state.items;
+    const items_rev = this.state.itemsCopy;
 
-    const rec = this.state.rec;
+    const rec = this.state.recCopy;
 
-    const pf = this.state.pf;
+    const pf = this.state.pfCopy;
 
     const allItems = [...pf, ...items_rev, ...rec];
 
