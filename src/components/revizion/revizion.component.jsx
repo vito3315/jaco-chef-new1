@@ -1154,7 +1154,7 @@ class RevizionNew_ extends React.Component {
       return;
     }
 
-    let search = event.target.value ? event.target.value : value ? value : '';
+    let search = event?.target?.value ? event.target.value : value ? value : '';
 
     let items = this.state.itemsCopy;
 
@@ -1284,6 +1284,7 @@ class RevizionNew_ extends React.Component {
         err_status: false,
         err_text: res.text,
       });
+      this.search(null, res.item_name);
     }
   }
 
