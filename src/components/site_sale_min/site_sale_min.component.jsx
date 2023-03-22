@@ -721,7 +721,7 @@ class SiteSaleMin_new_ extends React.Component {
 		if( parseInt(this.state.where_order) == 2 ){
 			//точка
 			if( parseInt(this.state.point) != 0 ){
-        let point_name = this.state.points.find( (item) => parseInt(item.id) == parseInt(this.state.point) )['name'];
+        let point_name = this.state.points.find( (item) => parseInt(item.id) == parseInt(this.state.point) )?.name;
         
 				dop_text = ' в г. '+point_name;
 			}
