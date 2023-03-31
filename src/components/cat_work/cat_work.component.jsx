@@ -114,7 +114,7 @@ class CatWork_ extends React.Component {
     let data = {
       cat_id: this.state.showCat.id,
       name: this.state.nameCat,
-      text: document.getElementById('EditorEdit').value
+      text: this.state.showCat.text
     };
 
     let res = await this.getData('save_edit', data);
@@ -128,7 +128,7 @@ class CatWork_ extends React.Component {
         nameCat: '' 
       })
 
-      document.getElementById('EditorEdit').value = '';
+      //document.getElementById('EditorEdit').value = '';
 
       res = await this.getData('get_all');
     
@@ -165,6 +165,16 @@ class CatWork_ extends React.Component {
     }
   }
 
+  changeText(data){
+    let showCat = this.state.showCat;
+
+    showCat.text = data
+
+    this.setState({
+      showCat: showCat
+    })
+  }
+
   render(){
     return (
       <>
@@ -187,7 +197,7 @@ class CatWork_ extends React.Component {
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
-                  <TextEditor id="EditorEdit" value={this.state.showCat.text} />
+                  <TextEditor id="EditorEdit" value={this.state.showCat.text} func={ this.changeText.bind(this) } />
                 </Grid>
                 
               </Grid>
