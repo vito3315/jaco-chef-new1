@@ -212,7 +212,7 @@ class HeaderItem extends React.Component {
                 style={{ textAlign: 'center', cursor: 'pointer' }}
                 onClick={ this.props.kind == 'manager' || this.props.kind == 'dir' ? () => {} : this.props.changeLVDir}
               >
-                Ур. дира: {this.props.lv_dir}
+                Ур. дира: {this.props.lv_dir_new}
               </TableCell>
             </>
           )}
@@ -322,6 +322,8 @@ class WorkSchedule_Table extends React.Component {
                     kind={this.props.kind}
                     show_zp={this.props.show_zp}
                     lv_dir={this.props.lv_dir}
+                    add_lv={this.props.add_lv}
+                    lv_dir_new={this.props.lv_dir_new}
                     lv_cafe={this.props.lv_cafe}
                     dataKey={key}
                     days={this.props.number.days}
@@ -640,7 +642,9 @@ class WorkSchedule_Table_without_functions extends React.Component {
                   kind={this.props.kind}
                   show_zp={this.props.show_zp}
                   lv_dir={this.props.lv_dir}
+                  add_lv={this.props.add_lv}
                   lv_cafe={this.props.lv_cafe}
+                  lv_dir_new={this.props.lv_dir_new}
                   dataKey={key}
                   days={this.props.number.days}
                   item={item}
@@ -958,6 +962,8 @@ class WorkSchedule_ extends React.Component {
 
       lv_cafe: 0,
       lv_dir: 0,
+      add_lv: 0,
+      lv_dir_new: 0,
       arr_dir_lv: [],
 
       arrTimeAdd: [],
@@ -1024,6 +1030,10 @@ class WorkSchedule_ extends React.Component {
     document.title = res.module_info.name;
 
     let arr_dir_lv = [];
+
+    for (let i = -20; i <= 0; i++) {
+      arr_dir_lv.push(i);
+    }
 
     for (let i = 1; i <= 20; i++) {
       arr_dir_lv.push(i);
@@ -1117,6 +1127,8 @@ class WorkSchedule_ extends React.Component {
 
       lv_cafe: res.lv_cafe,
       lv_dir: res.lv_dir,
+      add_lv: res.add_lv,
+      lv_dir_new: res.lv_dir_new,
 
       errOrdersOneOrders: res.err.one.orders,
       errOrdersTwoOrders: res.err.two.orders,
@@ -2233,7 +2245,7 @@ class WorkSchedule_ extends React.Component {
           onClose={() => { this.setState({ mainMenuLVDIR: false }); }}
           open={this.state.mainMenuLVDIR}
         >
-          <DialogTitle>Уровень директора {this.state.mounth}</DialogTitle>
+          <DialogTitle>Изменение уровня дирекора {this.state.mounth}</DialogTitle>
 
           <List style={{ overflow: 'scroll' }}>
             {this.state.arr_dir_lv.map((item, key) => (
@@ -2241,7 +2253,7 @@ class WorkSchedule_ extends React.Component {
                 key={key}
                 button
                 style={
-                  parseFloat(this.state.lv_dir) == parseFloat(item)
+                  parseFloat(this.state.add_lv) == parseFloat(item)
                     ? { backgroundColor: 'green', color: '#fff' }
                     : {}
                 }
@@ -3121,6 +3133,8 @@ class WorkSchedule_ extends React.Component {
                     show_zp={this.state.show_zp_one}
                     kind={this.state.kind}
                     lv_dir={this.state.lv_dir}
+                    add_lv={this.state.add_lv}
+                    lv_dir_new={this.state.lv_dir_new}
                     lv_cafe={this.state.lv_cafe}
                     changeLVDir={this.changeLVDir.bind(this)}
                     changeDopBonus={this.changeDopBonus.bind(this)}
@@ -3143,6 +3157,8 @@ class WorkSchedule_ extends React.Component {
                     show_zp={this.state.show_zp_one}
                     kind={this.state.kind}
                     lv_dir={this.state.lv_dir}
+                    add_lv={this.state.add_lv}
+                    lv_dir_new={this.state.lv_dir_new}
                     lv_cafe={this.state.lv_cafe}
                     changeLVDir={this.changeLVDir.bind(this)}
                     changeDopBonus={this.changeDopBonus.bind(this)}
@@ -3169,6 +3185,8 @@ class WorkSchedule_ extends React.Component {
                     show_zp={this.state.show_zp_two}
                     kind={this.state.kind}
                     lv_dir={this.state.lv_dir}
+                    add_lv={this.state.add_lv}
+                    lv_dir_new={this.state.lv_dir_new}
                     lv_cafe={this.state.lv_cafe}
                     changeLVDir={this.changeLVDir.bind(this)}
                     changeDopBonus={this.changeDopBonus.bind(this)}
@@ -3191,6 +3209,8 @@ class WorkSchedule_ extends React.Component {
                     show_zp={this.state.show_zp_two}
                     kind={this.state.kind}
                     lv_dir={this.state.lv_dir}
+                    add_lv={this.state.add_lv}
+                    lv_dir_new={this.state.lv_dir_new}
                     lv_cafe={this.state.lv_cafe}
                     changeLVDir={this.changeLVDir.bind(this)}
                     changeDopBonus={this.changeDopBonus.bind(this)}
