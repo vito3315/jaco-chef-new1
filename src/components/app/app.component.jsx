@@ -54,7 +54,7 @@ const VendorItemPrice = React.lazy(() => import("../vendor_item_price"));
 const Tender = React.lazy(() => import("../tender"));
 const WorkSchedule = React.lazy(() => import("../work_schedule"));
 
-import { Revizion, RevizionNew } from '../revizion';
+import { Revizion, RevizionNew, RevizionEdit } from '../revizion';
 import { OrderPost2, OrderPost2New, OrderPost2Manual } from '../order_post_2';
 import { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat, SiteSale2_StatList, SiteSale2_AnaliticList } from '../site_sale_2';
 
@@ -363,6 +363,7 @@ export function App () {
                   <Route path={'/tender'} exact={ true } element={ <Tender /> } />
                   <Route path={'/revizion'} exact={ true } element={ <Revizion /> } />
                   <Route path={'/revizion/new'} exact={ true } element={ <RevizionNew /> } />
+                  <Route path={'/revizion/edit'} exact={ true } element={ <RevizionEdit /> } />
                   <Route path={'/work_schedule'} exact={ true } element={ <WorkSchedule /> } />
                   <Route path={'/site_sale_2'} exact={ true } element={ <SiteSale2 /> } />
                   <Route path={'/site_sale_2/new'} exact={ true } element={ <SiteSale2_New /> } />
