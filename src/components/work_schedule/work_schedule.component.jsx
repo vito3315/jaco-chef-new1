@@ -838,7 +838,8 @@ class WorkSchedule_ extends React.Component {
 
       addUsers: [],
       mainMenuAddUsers: false,
-      mainMenuAddUsersNumber: false,
+      mainMenuAddUsersWeek: false,
+      mainMenuAddUsersMounth: false,
     };
   }
 
@@ -1867,7 +1868,7 @@ class WorkSchedule_ extends React.Component {
     });
   }
 
-  async saveFastTime(type) {
+  async saveFastTimeWeek(type) {
     const data = {
       type,
       date: this.state.mounth,
@@ -1880,7 +1881,39 @@ class WorkSchedule_ extends React.Component {
 
     if (res.st) {
       this.setState({
-        mainMenuAddUsersNumber: false,
+        mainMenuAddUsersWeek: false,
+        addUsers: [],
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+
+      setTimeout(() => {
+        this.updateData();
+      }, 300);
+    } else {
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+    }
+  }
+
+  async saveFastTimeMounth(type) {
+    const data = {
+      type,
+      date: this.state.mounth,
+      users: this.state.addUsers,
+    };
+
+    const res = await this.getData('save_fastTime_arr_mounth', data);
+
+    // console.log( res );
+
+    if (res.st) {
+      this.setState({
+        mainMenuAddUsersMounth: false,
         addUsers: [],
         operAlert: true,
         err_status: res.st,
@@ -1913,42 +1946,82 @@ class WorkSchedule_ extends React.Component {
           text={this.state.err_text}
         />
 
-        <Dialog onClose={() => this.setState({ mainMenuAddUsersNumber: false })} open={this.state.mainMenuAddUsersNumber}>
+         <Dialog onClose={() => this.setState({ mainMenuAddUsersMounth: false })} open={this.state.mainMenuAddUsersMounth}>
           <List sx={{ pt: 0 }}>
-            <ListItemButton onClick={this.saveFastTime.bind(this, this.state.tabTable === 0 ? 1 : 16)}>
+            <ListItemButton onClick={this.saveFastTimeMounth.bind(this, this.state.tabTable === 0 ? 1 : 16)}>
               <ListItemAvatar>
                 <Avatar>
                   <LooksOneIcon />
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText primary={this.state.tabTable === 0 ? 'С 1 числа на первые две недели месяца' : 'С 16 числа на вторые две недели месяца'}/>
+              <ListItemText primary={this.state.tabTable === 0 ? 'С 1 числа 2/2 с 10 до 22 на месяц' : 'С 16 числа 2/2 с 10 до 22 на месяц'}/>
             </ListItemButton>
 
-            <ListItemButton onClick={this.saveFastTime.bind(this, this.state.tabTable === 0 ? 2 : 17)}>
+            <ListItemButton onClick={this.saveFastTimeMounth.bind(this, this.state.tabTable === 0 ? 2 : 17)}>
               <ListItemAvatar>
                 <Avatar>
                   <LooksTwoIcon />
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText primary={this.state.tabTable === 0 ? 'С 2 числа на первые две недели месяца' : 'С 17 числа на вторые две недели месяца'}/>
+              <ListItemText primary={this.state.tabTable === 0 ? 'С 2 числа 2/2 с 10 до 22 на месяц' : 'С 17 числа 2/2 с 10 до 22 на месяц'}/>
             </ListItemButton>
 
-            <ListItemButton onClick={this.saveFastTime.bind(this, this.state.tabTable === 0 ? 3 : 18)}>
+            <ListItemButton onClick={this.saveFastTimeMounth.bind(this, this.state.tabTable === 0 ? 3 : 18)}>
               <ListItemAvatar>
                 <Avatar>
                   <Looks3Icon />
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText primary={this.state.tabTable === 0 ? 'С 3 числа на первые две недели месяца' : 'С 18 числа на вторые две недели месяца'}/>
+              <ListItemText primary={this.state.tabTable === 0 ? 'С 3 числа 2/2 с 10 до 22 на месяц' : 'С 18 числа 2/2 с 10 до 22 на месяц'}/>
             </ListItemButton>
 
-            <ListItemButton onClick={this.saveFastTime.bind(this, this.state.tabTable === 0 ? 4 : 19)}>
+            <ListItemButton onClick={this.saveFastTimeMounth.bind(this, this.state.tabTable === 0 ? 4 : 19)}>
               <ListItemAvatar>
                 <Avatar>
                   <Looks4Icon />
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText primary={this.state.tabTable === 0 ? 'С 4 числа на первые две недели месяца' : 'С 19 числа на вторые две недели месяца'}/>
+              <ListItemText primary={this.state.tabTable === 0 ? 'С 4 числа 2/2 с 10 до 22 на месяц' : 'С 19 числа 2/2 с 10 до 22 на месяц'}/>
+            </ListItemButton>
+          </List>
+        </Dialog>
+
+        <Dialog onClose={() => this.setState({ mainMenuAddUsersWeek: false })} open={this.state.mainMenuAddUsersWeek}>
+          <List sx={{ pt: 0 }}>
+            <ListItemButton onClick={this.saveFastTimeWeek.bind(this, this.state.tabTable === 0 ? 1 : 16)}>
+              <ListItemAvatar>
+                <Avatar>
+                  <LooksOneIcon />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary={this.state.tabTable === 0 ? 'С 1 числа 2/2 с 10 до 22 на две недели' : 'С 16 числа 2/2 с 10 до 22 на две недели'}/>
+            </ListItemButton>
+
+            <ListItemButton onClick={this.saveFastTimeWeek.bind(this, this.state.tabTable === 0 ? 2 : 17)}>
+              <ListItemAvatar>
+                <Avatar>
+                  <LooksTwoIcon />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary={this.state.tabTable === 0 ? 'С 2 числа 2/2 с 10 до 22 на две недели' : 'С 17 числа 2/2 с 10 до 22 на две недели'}/>
+            </ListItemButton>
+
+            <ListItemButton onClick={this.saveFastTimeWeek.bind(this, this.state.tabTable === 0 ? 3 : 18)}>
+              <ListItemAvatar>
+                <Avatar>
+                  <Looks3Icon />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary={this.state.tabTable === 0 ? 'С 3 числа 2/2 с 10 до 22 на две недели' : 'С 18 числа 2/2 с 10 до 22 на две недели'}/>
+            </ListItemButton>
+
+            <ListItemButton onClick={this.saveFastTimeWeek.bind(this, this.state.tabTable === 0 ? 4 : 19)}>
+              <ListItemAvatar>
+                <Avatar>
+                  <Looks4Icon />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary={this.state.tabTable === 0 ? 'С 4 числа 2/2 с 10 до 22 на две недели' : 'С 19 числа 2/2 с 10 до 22 на две недели'}/>
             </ListItemButton>
           </List>
         </Dialog>
@@ -1957,7 +2030,7 @@ class WorkSchedule_ extends React.Component {
           <DialogTitle>Выбранные сотрудники {this.state.mounth}</DialogTitle>
 
           <List sx={{ pt: 0 }}>
-            <ListItemButton onClick={() => this.setState({ mainMenuAddUsers: false, mainMenuH: true })}>
+            <ListItemButton onClick={() => this.setState({ mainMenuAddUsers: false, mainMenuAddUsersMounth: true })}>
               <ListItemAvatar>
                 <Avatar>
                   <AccessTimeIcon />
@@ -1966,7 +2039,7 @@ class WorkSchedule_ extends React.Component {
               <ListItemText primary="Сменить часы на месяц" />
             </ListItemButton>
 
-            <ListItemButton onClick={() => this.setState({ mainMenuAddUsers: false, mainMenuAddUsersNumber: true })}>
+            <ListItemButton onClick={() => this.setState({ mainMenuAddUsers: false, mainMenuAddUsersWeek: true })}>
               <ListItemAvatar>
                 <Avatar>
                   <SyncAltIcon />
