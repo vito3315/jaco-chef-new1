@@ -484,7 +484,7 @@ export class MyCheckBox extends React.PureComponent {
               checked={this.props.value}
               onChange={this.props.func}
               color="primary"
-              
+              size={this.props.size ? this.props.size : 'medium'}
             />
           }
           label={this.props.label}

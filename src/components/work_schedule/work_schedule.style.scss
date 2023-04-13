@@ -18,7 +18,7 @@ div.css-19kzrtu {
   padding-right: 0px !important;
 }
 .name_pinning {
-  min-width: 140px!important;
+  min-width: 140px !important;
   width: max-content;
   display: table-cell;
   min-height: 38px;
@@ -38,33 +38,44 @@ div.css-19kzrtu {
   }
 }
 
-.cellErr{
+.cellErr {
   display: flex !important;
   flex-direction: column !important;
 }
 
-.userSmenalist{
+.userSmenalist {
   max-height: 300px;
   overflow: scroll;
 
-  & > div{
+  & > div {
     margin-bottom: 10px;
   }
-  & .Mui-selected:not(.SmenaDelete){
-    background-color: #F9BC23!important;
+  & .Mui-selected:not(.SmenaDelete) {
+    background-color: #f9bc23 !important;
     border-radius: 10px;
-    & span{
-      color: #525252!important;
-      font-weight: 600!important;
+    & span {
+      color: #525252 !important;
+      font-weight: 600 !important;
     }
   }
-  & .Mui-selected.SmenaDelete{
-    background-color: red!important;
+  & .Mui-selected.SmenaDelete {
+    background-color: red !important;
     border-radius: 10px;
-    & span{
-      color: #fff!important;
-      font-weight: 600!important;
+    & span {
+      color: #fff !important;
+      font-weight: 600 !important;
       text-align: center;
+    }
+  }
+}
+
+.checkBox {
+  padding: 0px !important;
+  & label {
+    margin: 0 !important;
+    & span {
+      width: 10px; 
+      padding: 0 
     }
   }
 }
