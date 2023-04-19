@@ -304,7 +304,7 @@ class WorkSchedule_Table extends React.Component {
 
                   {this.props.kind == 'manager' ? null : (
                     <TableCell className="checkBox">
-                      <MyCheckBox style={{ justifyContent: 'center' }} func={this.props.addUser.bind(this, item.data)} size={'small'} />
+                      <MyCheckBox style={{ justifyContent: 'center' }} func={this.props.addUser.bind(this, item.data)} size={'small'} defaultChecked={false} />
                     </TableCell>
                   )}
 
@@ -784,6 +784,7 @@ class WorkSchedule_ extends React.Component {
 
       mainMenu: false,
       mainMenuH: false,
+      mainMenuS: false,
       mainMenuSmena: false,
       show_bonus: false,
       mainMenuPrice: false,
@@ -950,6 +951,13 @@ class WorkSchedule_ extends React.Component {
   }
 
   async updateData() {
+    this.setState({
+      one: null,
+      two: null,
+      test_one: [],
+      test_two: [],
+    })
+
     let data = {
       point_id: this.state.point,
       mounth: this.state.mounth,
@@ -1130,6 +1138,42 @@ class WorkSchedule_ extends React.Component {
       userInfo: userInfo,
       openNewTimeAdd: false,
     });
+  }
+
+  async saveFastTimeWeekOne(type){
+    let data = {
+      type: type,
+      user_id: this.state.chooseUser.id,
+      app_id: this.state.chooseUser.app_id,
+      smena_id: this.state.chooseUser.smena_id,
+      date: this.state.mounth,
+    };
+
+    let res = await this.getData('save_fastTimeWeekOne', data);
+
+    // console.log( res );
+
+    if (res['st'] == true) {
+      this.setState({
+        mainMenu: false,
+        mainMenuS: false,
+        mainMenuSmena: false,
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+
+      setTimeout(() => {
+        this.updateData();
+      }, 300);
+    } else {
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+    }
   }
 
   async fastTime(type) {
@@ -1946,42 +1990,42 @@ class WorkSchedule_ extends React.Component {
           text={this.state.err_text}
         />
 
-         <Dialog onClose={() => this.setState({ mainMenuAddUsersMounth: false })} open={this.state.mainMenuAddUsersMounth}>
+        <Dialog onClose={() => this.setState({ mainMenuAddUsersMounth: false })} open={this.state.mainMenuAddUsersMounth}>
           <List sx={{ pt: 0 }}>
-            <ListItemButton onClick={this.saveFastTimeMounth.bind(this, this.state.tabTable === 0 ? 1 : 16)}>
+            <ListItemButton onClick={this.saveFastTimeMounth.bind(this, 1)}>
               <ListItemAvatar>
                 <Avatar>
                   <LooksOneIcon />
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText primary={this.state.tabTable === 0 ? 'С 1 числа 2/2 с 10 до 22 на месяц' : 'С 16 числа 2/2 с 10 до 22 на месяц'}/>
+              <ListItemText primary={'С 1 числа 2/2 с 10 до 22 на месяц'}/>
             </ListItemButton>
 
-            <ListItemButton onClick={this.saveFastTimeMounth.bind(this, this.state.tabTable === 0 ? 2 : 17)}>
+            <ListItemButton onClick={this.saveFastTimeMounth.bind(this, 2)}>
               <ListItemAvatar>
                 <Avatar>
                   <LooksTwoIcon />
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText primary={this.state.tabTable === 0 ? 'С 2 числа 2/2 с 10 до 22 на месяц' : 'С 17 числа 2/2 с 10 до 22 на месяц'}/>
+              <ListItemText primary={'С 2 числа 2/2 с 10 до 22 на месяц'}/>
             </ListItemButton>
 
-            <ListItemButton onClick={this.saveFastTimeMounth.bind(this, this.state.tabTable === 0 ? 3 : 18)}>
+            <ListItemButton onClick={this.saveFastTimeMounth.bind(this, 3)}>
               <ListItemAvatar>
                 <Avatar>
                   <Looks3Icon />
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText primary={this.state.tabTable === 0 ? 'С 3 числа 2/2 с 10 до 22 на месяц' : 'С 18 числа 2/2 с 10 до 22 на месяц'}/>
+              <ListItemText primary={'С 3 числа 2/2 с 10 до 22 на месяц'}/>
             </ListItemButton>
 
-            <ListItemButton onClick={this.saveFastTimeMounth.bind(this, this.state.tabTable === 0 ? 4 : 19)}>
+            <ListItemButton onClick={this.saveFastTimeMounth.bind(this, 4)}>
               <ListItemAvatar>
                 <Avatar>
                   <Looks4Icon />
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText primary={this.state.tabTable === 0 ? 'С 4 числа 2/2 с 10 до 22 на месяц' : 'С 19 числа 2/2 с 10 до 22 на месяц'}/>
+              <ListItemText primary={'С 4 числа 2/2 с 10 до 22 на месяц'}/>
             </ListItemButton>
           </List>
         </Dialog>
@@ -2050,6 +2094,53 @@ class WorkSchedule_ extends React.Component {
           </List>
         </Dialog>
 
+        <Dialog onClose={() => this.setState({ mainMenuS: false })} open={this.state.mainMenuS}>
+          {!this.state.chooseUser ? null : (
+            <DialogTitle>
+              {this.state.chooseUser.full_app_name}{' '}
+              {this.state.chooseUser.user_name} {this.state.mounth}
+            </DialogTitle>
+          )}
+          
+          <List sx={{ pt: 0 }}>
+            <ListItemButton onClick={this.saveFastTimeWeekOne.bind(this, this.state.tabTable === 0 ? 1 : 16)}>
+              <ListItemAvatar>
+                <Avatar>
+                  <LooksOneIcon />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary={this.state.tabTable === 0 ? 'С 1 числа 2/2 с 10 до 22 на две недели' : 'С 16 числа 2/2 с 10 до 22 на две недели'}/>
+            </ListItemButton>
+
+            <ListItemButton onClick={this.saveFastTimeWeekOne.bind(this, this.state.tabTable === 0 ? 2 : 17)}>
+              <ListItemAvatar>
+                <Avatar>
+                  <LooksTwoIcon />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary={this.state.tabTable === 0 ? 'С 2 числа 2/2 с 10 до 22 на две недели' : 'С 17 числа 2/2 с 10 до 22 на две недели'}/>
+            </ListItemButton>
+
+            <ListItemButton onClick={this.saveFastTimeWeekOne.bind(this, this.state.tabTable === 0 ? 3 : 18)}>
+              <ListItemAvatar>
+                <Avatar>
+                  <Looks3Icon />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary={this.state.tabTable === 0 ? 'С 3 числа 2/2 с 10 до 22 на две недели' : 'С 18 числа 2/2 с 10 до 22 на две недели'}/>
+            </ListItemButton>
+
+            <ListItemButton onClick={this.saveFastTimeWeekOne.bind(this, this.state.tabTable === 0 ? 4 : 19)}>
+              <ListItemAvatar>
+                <Avatar>
+                  <Looks4Icon />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary={this.state.tabTable === 0 ? 'С 4 числа 2/2 с 10 до 22 на две недели' : 'С 19 числа 2/2 с 10 до 22 на две недели'}/>
+            </ListItemButton>
+          </List>
+        </Dialog>
+
         <Dialog onClose={() => this.setState({ mainMenu: false })} open={this.state.mainMenu}>
           {!this.state.chooseUser ? null : (
             <DialogTitle>
@@ -2066,6 +2157,15 @@ class WorkSchedule_ extends React.Component {
                 </Avatar>
               </ListItemAvatar>
               <ListItemText primary="Сменить часы на месяц" />
+            </ListItemButton>
+
+            <ListItemButton onClick={() => this.setState({ mainMenu: false, mainMenuS: true })}>
+              <ListItemAvatar>
+                <Avatar>
+                  <AccessTimeIcon />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary="Сменить часы на 2 недели" />
             </ListItemButton>
 
             <ListItemButton
@@ -2109,7 +2209,7 @@ class WorkSchedule_ extends React.Component {
                   <LooksTwoIcon />
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText primary="Со 2 числа 2/2 с 10 до 22 на месяц" />
+              <ListItemText primary="С 2 числа 2/2 с 10 до 22 на месяц" />
             </ListItemButton>
             <ListItemButton onClick={this.fastTime.bind(this, 3)}>
               <ListItemAvatar>
@@ -2796,7 +2896,10 @@ class WorkSchedule_ extends React.Component {
                 value={this.state.tabTable}
                 onChange={(event, data) => {
                   localStorage.setItem('tabTable', data);
-                  this.setState({ tabTable: data });
+                  this.setState({ 
+                    tabTable: data,
+                    addUsers: []
+                  });
                 }}
                 centered
               >
@@ -2826,6 +2929,11 @@ class WorkSchedule_ extends React.Component {
                     openZP={this.openZP.bind(this)}
                     mix={this.mix.bind(this)}
                     pricePerHour={this.pricePerHour.bind(this)}
+
+                    addSmena={this.addSmena.bind(this)}
+                    editSmena={this.editSmena.bind(this)}
+                    addUser={this.addUser.bind(this)}
+                    openAddUser={() => this.setState({ mainMenuAddUsers: true })}
                   />
                 )}
               </TabPanel>
@@ -2850,6 +2958,7 @@ class WorkSchedule_ extends React.Component {
                     openZP={this.openZP.bind(this)}
                     mix={this.mix.bind(this)}
                     pricePerHour={this.pricePerHour.bind(this)}
+
                     addSmena={this.addSmena.bind(this)}
                     editSmena={this.editSmena.bind(this)}
                     addUser={this.addUser.bind(this)}
@@ -2880,6 +2989,11 @@ class WorkSchedule_ extends React.Component {
                     openZP={this.openZP.bind(this)}
                     mix={this.mix.bind(this)}
                     pricePerHour={this.pricePerHour.bind(this)}
+
+                    addSmena={this.addSmena.bind(this)}
+                    editSmena={this.editSmena.bind(this)}
+                    addUser={this.addUser.bind(this)}
+                    openAddUser={() => this.setState({ mainMenuAddUsers: true })}
                   />
                 )}
               </TabPanel>
