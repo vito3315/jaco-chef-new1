@@ -158,7 +158,7 @@ class HeaderItem extends React.Component {
           <TableCell style={{ minWidth: 140, minHeight: 38 }}>Ур. кафе: {this.props.lv_cafe}</TableCell>
           <TableCell style={{ minWidth: 165, minHeight: 38 }}>Число месяца</TableCell>
 
-          {this.props.kind == 'manager' ? null : (
+          {this.props.kind == 'manager' || this.props.kind == 'other' ? null : (
             <TableCell style={{ textAlign: 'center' }}>
               <SyncAltIcon style={{ cursor: 'pointer', display: 'block', margin: 'auto' }} onClick={this.props.openAddUser.bind(this)}/>
             </TableCell>
@@ -542,6 +542,7 @@ class WorkSchedule_Table_without_functions extends React.Component {
                   dataKey={key}
                   days={this.props.number.days}
                   item={item}
+                  openAddUser={this.props.openAddUser.bind(this)}
                 />
               ) : (
                 <TableRow key={key}>
@@ -2101,7 +2102,7 @@ class WorkSchedule_ extends React.Component {
               {this.state.chooseUser.user_name} {this.state.mounth}
             </DialogTitle>
           )}
-          
+
           <List sx={{ pt: 0 }}>
             <ListItemButton onClick={this.saveFastTimeWeekOne.bind(this, this.state.tabTable === 0 ? 1 : 16)}>
               <ListItemAvatar>
