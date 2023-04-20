@@ -164,7 +164,7 @@ class HeaderItem extends React.Component {
             </TableCell>
           )}
 
-          {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
+          {this.props.kind == 'manager' || this.props.kind == 'other' ? null : <TableCell />}
 
           {this.props.days.map((item, key) => (
             <TableCell className="min_block" style={{ backgroundColor: item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс' ? '#ffe9bd' : '#fff' }} key={key}>
@@ -203,8 +203,8 @@ class HeaderItem extends React.Component {
           <TableCell style={{ minWidth: 140, minHeight: 38 }}>Сотрудник</TableCell>
           <TableCell style={{ minWidth: 165, minHeight: 38 }}>Должность</TableCell>
 
-          {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
-          {this.props.kind == 'manager' ? null : <TableCell></TableCell>}
+          {this.props.kind == 'manager' || this.props.kind == 'other' ? null : <TableCell></TableCell>}
+          {this.props.kind == 'manager' || this.props.kind == 'other' ? null : <TableCell></TableCell>}
 
           {this.props.days.map((item, key) => (
             <TableCell className="min_block" style={{ backgroundColor: item.day == 'Пт' || item.day == 'Сб' || item.day == 'Вс' ? '#ffe9bd' : '#fff'}} key={key}>
@@ -554,7 +554,7 @@ class WorkSchedule_Table_without_functions extends React.Component {
 
                   <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
 
-                  {this.props.kind == 'manager' ? null : <TableCell style={{ textAlign: 'center' }} />}
+                  {this.props.kind == 'manager' || this.props.kind == 'other' ? null : <TableCell style={{ textAlign: 'center' }} />}
 
                   {item.data.dates.map((date, date_k) => (
                     <TableCell onClick={this.props.openH.bind(this, item.data, date.date)}
