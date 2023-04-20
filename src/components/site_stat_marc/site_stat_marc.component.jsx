@@ -1776,12 +1776,14 @@ class SiteStatMarc_ extends React.Component {
               <h2 style={{ textAlign: 'center' }}>Ушедшие клиенты</h2>
               <h5 style={{ textAlign: 'center' }}>ушли - заказывали за 90 дней до указанного периода и больше не заказывали</h5>
               <h5 style={{ textAlign: 'center' }}>вернулись - не заказывали 90 дней до указанного периода, сделали заказ в указанный период</h5>
+              <h5 style={{ textAlign: 'center' }}>вернулись и продолжают заказывать - не заказывали 90 дней до указанного периода, сделали заказ в указанный период и были заказы с окончания периода по вчерашний день</h5>
               <TableContainer component={Paper}>
                 <Table>
                   <TableHead>
                     <TableRow>
                       <TableCell style={{ textAlign: 'center' }}>Ушли</TableCell>
                       <TableCell style={{ textAlign: 'center' }}>Вернулись</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>Вернулись и продолжают заказывать</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -1789,6 +1791,7 @@ class SiteStatMarc_ extends React.Component {
                     <TableRow>
                       <TableCell style={{ textAlign: 'center' }}>{this.state.fakeUsers.lost_users ? this.state.fakeUsers.lost_users : 0}</TableCell>
                       <TableCell style={{ textAlign: 'center' }}>{this.state.fakeUsers.ret_users ? this.state.fakeUsers.ret_users : 0}</TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>{this.state.fakeUsers.ret_users_more ? this.state.fakeUsers.ret_users_more : 0}</TableCell>
                     </TableRow>
 
                     
