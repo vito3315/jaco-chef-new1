@@ -54,7 +54,7 @@ import SendIcon from '@mui/icons-material/Send';
 import TimeToLeaveIcon from '@mui/icons-material/TimeToLeave';
 import InfoIcon from '@mui/icons-material/Info';
 
-import { MySelect, MyTextInput, MyTimePicker, MyDatePickerGraph, formatDate, MyAlert, MyCheckBox } from '../../stores/elements';
+import { MySelect, MyTextInput, MyTimePicker, MyDatePickerGraph, formatDate, MyAlert, MyCheckBox, MyAutocomplite2 } from '../../stores/elements';
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 
 import queryString from 'query-string';
@@ -842,6 +842,12 @@ class WorkSchedule_ extends React.Component {
       mainMenuAddUsers: false,
       mainMenuAddUsersWeek: false,
       mainMenuAddUsersMounth: false,
+
+      dataType: [
+        {id: 1, name: 'Выходной'},
+        {id: 2, name: 'Здоров'},
+        {id: 3, name: 'Больничный лист'},
+      ]
     };
   }
 
@@ -1083,6 +1089,9 @@ class WorkSchedule_ extends React.Component {
   }
 
   async saveDayHourse() {
+
+    //let dataType = this.state.dataType.find( el => parseInt(el.id) == parseInt(this.state.userInfo.dataType) );
+
     let data = {
       date: this.state.userInfo.date,
       user_id: this.state.userInfo.user_id,
@@ -1091,6 +1100,10 @@ class WorkSchedule_ extends React.Component {
       hours: this.state.userInfo.hours,
       new_app: this.state.userInfo.new_app,
       mentor_id: this.state.userInfo.mentor_id,
+
+      user_temp: this.state.userInfo.user_temp,
+      type_healf: this.state.userInfo.type_healf,
+
       point_id: this.state.point,
     };
 
@@ -2406,114 +2419,167 @@ class WorkSchedule_ extends React.Component {
               {this.state.userInfo.user.app_name + ' ' + this.state.userInfo.user.user_name + ' ' + this.state.userInfo.date}
             </DialogTitle>
             <DialogContent>
-              <Typography style={{ marginBottom: 10 }}>
-                {'Нагрузка: ' + this.state.userInfo.user.my_load_h + ' / Средняя нагрузка: ' + this.state.userInfo.user.all_load_h}
-              </Typography>
+              <Grid container spacing={3}>
 
-              {!this.state.show_bonus ? null : (
-                <Typography style={{ marginBottom: 10 }}>{'Бонус: ' + this.state.userInfo.user.bonus}</Typography>
-              )}
+                <Grid item xs={12} sm={12}>
+                  <Typography style={{ marginBottom: 10 }}>
+                    {'Нагрузка: ' + this.state.userInfo.user.my_load_h + ' / Средняя нагрузка: ' + this.state.userInfo.user.all_load_h}
+                  </Typography>
+                </Grid>
 
-              {this.state.otherAppList.length == 0 ? null : (
-                <MySelect
-                  data={this.state.otherAppList}
-                  value={this.state.userInfo.new_app}
-                  func={(event) => {
-                    let userInfo = this.state.userInfo;
-                    userInfo.new_app = event.target.value;
-                    this.setState({ userInfo: userInfo });
-                  }}
-                  label="Кем работает"
-                />
-              )}
+                {!this.state.show_bonus ? null : (
+                  <Grid item xs={12} sm={12}>
+                    <Typography style={{ marginBottom: 10 }}>{'Бонус: ' + this.state.userInfo.user.bonus}</Typography>
+                  </Grid>
+                )}
 
-              {this.state.userInfo.mentor_list.length == 0 ? null : (
-                <MySelect
-                  data={this.state.userInfo.mentor_list}
-                  value={this.state.userInfo.mentor_id}
-                  func={(event) => {
-                    let userInfo = this.state.userInfo;
-                    userInfo.mentor_id = event.target.value;
-                    this.setState({ userInfo: userInfo });
-                  }}
-                  label="Наставник"
-                />
-              )}
-
-              <Accordion
-                style={{ marginTop: 20 }}
-                expanded={this.state.openNewTimeAdd}
-                onChange={() => this.setState({ openNewTimeAdd: !this.state.openNewTimeAdd })}
-              >
-                <AccordionSummary expandIcon={<AddIcon />}>
-                  <AccessTimeIcon style={{ marginRight: 10 }} />
-                  <Typography>Добавить время</Typography>
-                </AccordionSummary>
-                <AccordionDetails style={{ display: 'flex', flexDirection: 'row' }}>
-                  <MyTimePicker
-                    value={this.state.newTimeStart}
-                    func={(event) => this.setState({ newTimeStart: event.target.value })}
-                    label="Время начала работы"
-                  />
-                  <Typography width={'3%'}></Typography>
-                  <MyTimePicker
-                    value={this.state.newTimeEnd}
-                    func={(event) => this.setState({ newTimeEnd: event.target.value })}
-                    label="Время окончания работы"
-                  />
-                  <Typography width={'3%'}></Typography>
-                  <Button style={{ minWidth: '12%', backgroundColor: 'red', color: '#fff', cursor: 'pointer' }} onClick={this.addTime.bind(this)}>
-                    Добавить
-                  </Button>
-
-                  {/* <AddIcon style={{ minWidth: 50, minHeight: 38, cursor: 'pointer' }} onClick={ this.addTime.bind(this) } /> */}
-                </AccordionDetails>
-              </Accordion>
-
-              {this.state.userInfo.hours.map((item, key) => (
-                <Accordion key={key}>
-                  <AccordionSummary expandIcon={<CloseIcon onClick={this.delTime.bind(this, key)} />}>
-                    <AccessTimeIcon style={{ marginRight: 10 }} />
-                    <Typography>{item.time_start + ' - ' + item.time_end}</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails style={{ display: 'flex', flexDirection: 'row' }}>
-                    <MyTimePicker
-                      value={item.time_start}
-                      func={this.changeHourse.bind(this, 'time_start', key)}
-                      label="Время начала работы"
+                {this.state.otherAppList.length == 0 ? null : (
+                  <Grid item xs={12} sm={12}>
+                    <MySelect
+                      data={this.state.otherAppList}
+                      value={this.state.userInfo.new_app}
+                      func={(event) => {
+                        let userInfo = this.state.userInfo;
+                        userInfo.new_app = event.target.value;
+                        this.setState({ userInfo: userInfo });
+                      }}
+                      label="Кем работает"
                     />
-                    <Typography width={'3%'}></Typography>
-                    <MyTimePicker
-                      value={item.time_end}
-                      func={this.changeHourse.bind(this, 'time_end', key)}
-                      label="Время окончания работы"
-                    />
-                  </AccordionDetails>
-                </Accordion>
-              ))}
+                  </Grid>
+                )}
 
-              {!this.state.userInfo.hist.length ? null : (
-                <Accordion style={{ marginTop: 50 }} disabled>
-                  <AccordionSummary>
-                    <Typography>История</Typography>
-                  </AccordionSummary>
-                </Accordion>
-              )}
-              {this.state.userInfo.hist.map((item, key) => (
-                <Accordion key={key}>
-                  <AccordionSummary>
-                    <Typography>{item.date + ' - ' + item.user_name}</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails style={{ display: 'flex', flexDirection: 'column' }}>
-                    {item.items.map((it, k) => (
-                      <Typography key={k}>
-                        {it.time_start + ' - ' + it.time_end}{' '}
-                        {it.app_name == '' ? '' : ' - ' + it.app_name}{' '}
-                      </Typography>
-                    ))}
-                  </AccordionDetails>
-                </Accordion>
-              ))}
+                {this.state.userInfo.mentor_list.length == 0 ? null : (
+                  <Grid item xs={12} sm={12}>
+                    <MySelect
+                      data={this.state.userInfo.mentor_list}
+                      value={this.state.userInfo.mentor_id}
+                      func={(event) => {
+                        let userInfo = this.state.userInfo;
+                        userInfo.mentor_id = event.target.value;
+                        this.setState({ userInfo: userInfo });
+                      }}
+                      label="Наставник"
+                    />
+                  </Grid>
+                )}
+
+                <Grid item xs={12} sm={6}>
+                  <MyAutocomplite2
+                    data={ [ {id: 1, name: '36,6'} ] }
+                    value={this.state.userInfo.user_temp}
+                    freeSolo={true}
+                    func={(event, data) => {
+                      console.log( event, data )
+
+                      let userInfo = this.state.userInfo;
+                      userInfo.user_temp = data;
+                      this.setState({ userInfo: userInfo });
+                    }}
+                    onBlur={(event, data) => {
+                      console.log( event.target.value, data )
+
+                      let userInfo = this.state.userInfo;
+                      userInfo.user_temp = event.target.value;
+                      this.setState({ userInfo: userInfo });
+                    }}
+                    label="Температура"
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <MySelect
+                    data={this.state.dataType}
+                    value={this.state.userInfo.type_healf}
+                    func={(event) => {
+                      let userInfo = this.state.userInfo;
+                      userInfo.type_healf = event.target.value;
+                      this.setState({ userInfo: userInfo });
+                    }}
+                    label="Здоровье"
+                    is_none={false}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={12}>
+                  <Accordion
+                    style={{ marginTop: 20 }}
+                    expanded={this.state.openNewTimeAdd}
+                    onChange={() => this.setState({ openNewTimeAdd: !this.state.openNewTimeAdd })}
+                  >
+                    <AccordionSummary expandIcon={<AddIcon />}>
+                      <AccessTimeIcon style={{ marginRight: 10 }} />
+                      <Typography>Добавить время</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails style={{ display: 'flex', flexDirection: 'row' }}>
+                      <MyTimePicker
+                        value={this.state.newTimeStart}
+                        func={(event) => this.setState({ newTimeStart: event.target.value })}
+                        label="Время начала работы"
+                      />
+                      <Typography width={'3%'}></Typography>
+                      <MyTimePicker
+                        value={this.state.newTimeEnd}
+                        func={(event) => this.setState({ newTimeEnd: event.target.value })}
+                        label="Время окончания работы"
+                      />
+                      <Typography width={'3%'}></Typography>
+                      <Button style={{ minWidth: '12%', backgroundColor: 'red', color: '#fff', cursor: 'pointer' }} onClick={this.addTime.bind(this)}>
+                        Добавить
+                      </Button>
+
+                      {/* <AddIcon style={{ minWidth: 50, minHeight: 38, cursor: 'pointer' }} onClick={ this.addTime.bind(this) } /> */}
+                    </AccordionDetails>
+                  </Accordion>
+
+                  {this.state.userInfo.hours.map((item, key) => (
+                    <Accordion key={key}>
+                      <AccordionSummary expandIcon={<CloseIcon onClick={this.delTime.bind(this, key)} />}>
+                        <AccessTimeIcon style={{ marginRight: 10 }} />
+                        <Typography>{item.time_start + ' - ' + item.time_end}</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails style={{ display: 'flex', flexDirection: 'row' }}>
+                        <MyTimePicker
+                          value={item.time_start}
+                          func={this.changeHourse.bind(this, 'time_start', key)}
+                          label="Время начала работы"
+                        />
+                        <Typography width={'3%'}></Typography>
+                        <MyTimePicker
+                          value={item.time_end}
+                          func={this.changeHourse.bind(this, 'time_end', key)}
+                          label="Время окончания работы"
+                        />
+                      </AccordionDetails>
+                    </Accordion>
+                  ))}
+                </Grid>
+
+                <Grid item xs={12} sm={12}>
+                  {!this.state.userInfo.hist.length ? null : (
+                    <Accordion style={{ marginTop: 50 }} disabled>
+                      <AccordionSummary>
+                        <Typography>История</Typography>
+                      </AccordionSummary>
+                    </Accordion>
+                  )}
+                  {this.state.userInfo.hist.map((item, key) => (
+                    <Accordion key={key}>
+                      <AccordionSummary>
+                        <Typography>{item.date + ' - ' + item.user_name}</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails style={{ display: 'flex', flexDirection: 'column' }}>
+                        {item.items.map((it, k) => (
+                          <Typography key={k}>
+                            {it.time_start + ' - ' + it.time_end}{' '}
+                            {it.app_name == '' ? '' : ' - ' + it.app_name}{' '}
+                          </Typography>
+                        ))}
+                      </AccordionDetails>
+                    </Accordion>
+                  ))}
+                </Grid>
+
+              </Grid>
             </DialogContent>
             <DialogActions style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
               <Button style={{ backgroundColor: 'green', color: '#fff' }} onClick={this.saveDayHourse.bind(this)}>Сохранить</Button>

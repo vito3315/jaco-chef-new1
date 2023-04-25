@@ -11,8 +11,11 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 
-import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
+
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+
+const filter = createFilterOptions();
 
 import ruLocale from "date-fns/locale/ru";
 
@@ -204,6 +207,27 @@ export class MyAutocomplite2 extends React.PureComponent {
           //filterSelectedOptions
           multiple={ this.props.multiple && this.props.multiple === true ? true : false }
           isOptionEqualToValue={(option, value) => option.id === value.id}
+
+          filterOptions={(options, params) => {
+            const filtered = filter(options, params);
+    
+            console.log( 'params', params )
+            console.log( 'filtered', filtered )
+
+            const { inputValue } = params;
+            // Suggest the creation of a new value
+            const isExisting = options.some((option) => inputValue === option.name);
+            if (inputValue !== '' && !isExisting) {
+              filtered.push(
+                inputValue
+              );
+            }
+    
+            console.log( 'new filtered', filtered )
+
+            return filtered;
+          }}
+
           renderInput={(params) => (
             <TextField
               {...params}
