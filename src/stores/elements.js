@@ -403,6 +403,7 @@ export class MyDatePickerNew extends React.PureComponent {
           multiple={true}
           mask="____-__-__"
           inputFormat="yyyy-MM-dd"
+          minDate={ this.props.minDate ? this.props.minDate : null }
           label={this.props.label}
           value={formatDate(this.props.value)}
           onChange={this.props.func}

@@ -54,7 +54,7 @@ import SendIcon from '@mui/icons-material/Send';
 import TimeToLeaveIcon from '@mui/icons-material/TimeToLeave';
 import InfoIcon from '@mui/icons-material/Info';
 
-import { MySelect, MyTextInput, MyTimePicker, MyDatePickerGraph, formatDate, MyAlert, MyCheckBox, MyAutocomplite2 } from '../../stores/elements';
+import { MySelect, MyTextInput, MyTimePicker, MyDatePickerGraph, formatDate, MyAlert, MyCheckBox, MyAutocomplite2, MyDatePickerNew } from '../../stores/elements';
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 
 import queryString from 'query-string';
@@ -847,7 +847,11 @@ class WorkSchedule_ extends React.Component {
         {id: 1, name: 'Выходной'},
         {id: 2, name: 'Здоров'},
         {id: 3, name: 'Больничный лист'},
-      ]
+      ],
+
+      isOpenHJ: false,
+      date_start: formatDate(new Date()),
+      date_end: formatDate(new Date()),
     };
   }
 
@@ -1990,6 +1994,29 @@ class WorkSchedule_ extends React.Component {
     }
   }
 
+  changeDateRange(data, event) {
+    this.setState({
+      [data]: event ? formatDate(event) : '',
+    });
+  }
+
+  async downloadHJ(){
+    let data = {
+      date_start: this.state.date_start,
+      date_end: this.state.date_end,
+      point_id: this.state.point,
+    };
+
+    const res =  await this.getData('downloadHJ', data);
+
+    // правка 26.12 скачивания файла в один клик
+    if( res.url){
+      const link = document.createElement('a');
+      link.href = res.url;
+      link.click();
+    }
+  }
+
   render() {
     return (
       <>
@@ -2926,6 +2953,41 @@ class WorkSchedule_ extends React.Component {
           </DialogActions>
         </Dialog>
 
+        <Dialog
+          open={this.state.isOpenHJ}
+          onClose={() => this.setState({ isOpenHJ: false })}
+          scroll="paper"
+          fullWidth={true}
+          maxWidth={'md'}
+          id={'OpenModalM'}
+        >
+          <DialogTitle>Журнал здоровья</DialogTitle>
+          <DialogContent>
+            <Grid container spacing={3} style={{ marginTop: 2 }}>
+              <Grid item xs={12} sm={6}>
+                <MyDatePickerNew
+                  label="Дата от"
+                  value={this.state.date_start}
+                  func={this.changeDateRange.bind(this, 'date_start')}
+                  minDate={"2023-05-01"}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <MyDatePickerNew
+                  label="Дата до"
+                  value={this.state.date_end}
+                  func={this.changeDateRange.bind(this, 'date_end')}
+                  minDate={"2023-05-01"}
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Button style={{ backgroundColor: 'green', color: '#fff' }} onClick={this.downloadHJ.bind(this)}>Скачать</Button>
+            <Button style={{ backgroundColor: 'red', color: '#fff' }} onClick={() => this.setState({ isOpenHJ: false })}>Отмена</Button>
+          </DialogActions>
+        </Dialog>
+
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
@@ -2954,6 +3016,12 @@ class WorkSchedule_ extends React.Component {
           <Grid item xs={12} sm={6}>
             <Button variant="contained" onClick={this.updateData.bind(this)}>
               Обновить данные
+            </Button>
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <Button variant="contained" onClick={ () => { this.setState({ isOpenHJ: true }) } }>
+              Журнал здоровья
             </Button>
           </Grid>
 
