@@ -241,7 +241,6 @@ class Reg_ extends React.Component {
                                         variant="outlined"
                                         margin="normal"
                                         size="small"
-                                        required
                                         fullWidth
                                         id="phone"
                                         label="Номер телефона"
@@ -260,7 +259,6 @@ class Reg_ extends React.Component {
                                         variant="outlined"
                                         margin="normal"
                                         size="small"
-                                        required
                                         fullWidth
                                         id="code"
                                         label="Код из смс"
@@ -278,7 +276,6 @@ class Reg_ extends React.Component {
                                         variant="outlined"
                                         margin="normal"
                                         size="small"
-                                        required
                                         fullWidth
                                         name="password"
                                         label="Пароль"
