@@ -53,6 +53,18 @@ export function formatDate(date) {
   return [year, month, day].join('-');
 }
 
+export function formatDateMin(date) {
+  var d = new Date(date),
+      month = '' + (d.getMonth() + 1),
+      year = d.getFullYear();
+
+  if (month.length < 2) 
+      month = '0' + month;
+  
+
+  return [year, month].join('-');
+}
+
 /*export class MyDaterange extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -406,6 +418,34 @@ export class MyDatePickerNew extends React.PureComponent {
           minDate={ this.props.minDate ? this.props.minDate : null }
           label={this.props.label}
           value={formatDate(this.props.value)}
+          onChange={this.props.func}
+          onBlur={this.props.onBlur ? this.props.onBlur : null}
+          renderInput={(params) => <TextField variant="outlined" size={'small'} color='primary' style={{ width: '100%' }} {...params} />}
+        />
+      </LocalizationProvider>
+    )
+  }
+}
+
+export class MyDatePickerNewViews extends React.PureComponent {
+  constructor(props) {
+    super(props);
+        
+    this.state = {
+    };
+  }
+  
+  render(){
+    return (
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ruLocale}>
+        <DatePicker
+          multiple={true}
+          mask="____-__"
+          inputFormat="yyyy-MM"
+          minDate={ this.props.minDate ? this.props.minDate : null }
+          label={this.props.label}
+          value={formatDateMin(this.props.value)}
+          views={this.props.views}
           onChange={this.props.func}
           onBlur={this.props.onBlur ? this.props.onBlur : null}
           renderInput={(params) => <TextField variant="outlined" size={'small'} color='primary' style={{ width: '100%' }} {...params} />}
