@@ -1,0 +1,39 @@
+
+.abv{
+    
+    height: 100%;
+    //background-image: url("https://jacochef.ru/src/img/test/cofw_3n4w_210426.jpg");
+    position: relative;
+    & > img.fon{
+        width: 100%;
+    }
+    & > img.bus{
+        width: 800px;
+        position: absolute;
+        left: 300px;
+        bottom: 100px;
+    }
+    & > div{
+        width: calc(215px * 3);
+        position: absolute;
+        left: 350px;
+        bottom: 200px;
+        & .roulette-pro-wrapper{
+            & ul > li{
+                //padding-left: 20px;
+                //padding-right: 20px;
+            }
+        }
+        & .START{
+            position: absolute;
+            left: 40%;
+            bottom: -188px;
+            background-color: red;
+            border: 1px solid red;
+            border-radius: 40px;
+            padding: 10px 50px;
+            font-size: 3rem;
+        }
+    }
+    
+}
