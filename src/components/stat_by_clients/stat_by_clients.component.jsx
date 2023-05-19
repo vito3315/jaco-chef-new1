@@ -2,16 +2,10 @@ import React from 'react';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import CheckIcon from '@mui/icons-material/Check';
 
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -23,11 +17,67 @@ import TableRow from '@mui/material/TableRow';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, formatDateMin, MyDatePickerNewViews, MyAlert } from '../../stores/elements';
+import { formatDateMin, MyDatePickerNewViews } from '../../stores/elements';
 
 import queryString from 'query-string';
 
+var am5locales_ru_RU = {
+  Jan: 'Янв',
+  January: 'Янв',
+  Feb: 'Фев',
+  February: 'Фев',
+  Mar: 'Мар',
+  March: 'Мар',
+  Apr: 'Апр',
+  April: 'Апр',
+  May: 'Май',
+  Jun: 'Июн',
+  June: 'Июн',
+  Jul: 'Июл',
+  July: 'Июл',
+  Aug: 'Авг',
+  August: 'Авг',
+  Sep: 'Сен',
+  September: 'Сен',
+  Oct: 'Окт',
+  October: 'Окт',
+  Nov: 'Ноя',
+  November: 'Ноя',
+  Dec: 'Дек',
+  December: 'Дек',
+};
+
+class StatByClients_Modal extends React.Component {
+  render() {
+    return (
+      <Dialog
+        open={this.props.open}
+        onClose={this.props.onClose.bind(this)}
+        fullScreen={this.props.fullScreen}
+        fullWidth
+        maxWidth="calc(95% - 32px)"
+      >
+        <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+          <Grid item xs={12}>
+            <h2 style={{ textAlign: 'center' }}>
+              Итого {this.props.city}: {this.props.name}
+            </h2>
+            <div id={this.props.id} style={{ width: '100%', height: '500px' }}/>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button color="primary" onClick={this.props.onClose.bind(this)}>
+            Закрыть
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+}
+
 class StatByClients_ extends React.Component {
+  chartnewusers = null;
+
   constructor(props) {
     super(props);
 
@@ -36,17 +86,18 @@ class StatByClients_ extends React.Component {
       module_name: '',
       is_load: false,
 
-      openAlert: false,
-      err_status: true,
-      err_text: '',
-
       dataPoints: [],
       dataCities: [],
       all_data: [],
       dataDates: [],
 
       date_start: '',
-      date_end: ''
+      date_end: '',
+
+      modalDialog: false,
+      fullScreen: false,
+      id: null,
+      name: '',
     };
   }
 
@@ -101,61 +152,17 @@ class StatByClients_ extends React.Component {
       .catch((err) => {
         console.log(err);
       });
-  }
+  };
 
-  async changeCity(event) {
-    const data = {
-      city_id: event.target.value,
-    };
-
-    const res = await this.getData('get_zones', data);
-
-    this.setState({
-      zones: res.zones,
-      city: event.target.value,
-    });
-  }
-
-  async save(item) {
-    let res;
-
-    if (this.state.mark === 'newZone') {
-      const data = {
-        point_id: item.point_id,
-        name: item.zone_name,
-        sum_div: item.sum_div,
-        sum_div_driver: item.sum_div_driver,
-        free_drive: item.free_drive,
-        new_zone: item.new_zone,
-      };
-
-      res = await this.getData('save_new', data);
-    }
-
-    if (this.state.mark === 'editZone') {
-      const data = {
-        point_id: item.point_id,
-        name: item.zone_name,
-        sum_div: item.sum_div,
-        sum_div_driver: item.sum_div_driver,
-        free_drive: item.free_drive,
-        new_zone: item.new_zone,
-        zone_id: item.id,
-      };
-
-      res = await this.getData('save_edit', data);
-    }
-
-    if(!res.st) {
+  handleResize() {
+    if (window.innerWidth < 601) {
       this.setState({
-        openAlert: true,
-        err_status: res.st,
-        err_text: res.text,
+        fullScreen: true,
       });
     } else {
-      setTimeout( () => {
-        this.update();
-      }, 300)
+      this.setState({
+        fullScreen: false,
+      });
     }
   }
 
@@ -165,25 +172,255 @@ class StatByClients_ extends React.Component {
     const data = {
       city_id: city_id,
       date_start: this.state.date_start,
-      date_end: this.state.date_end
+      date_end: this.state.date_end,
     };
 
     const res = await this.getData('get_data', data);
-
-    console.log(res)
 
     this.setState({
       dataPoints: res.points,
       dataCities: res.cities,
       all_data: res.all_data,
       dataDates: res.date_list,
-    })
+    });
   }
 
-  changeDateRange(type, data){
+  changeDateRange(type, data) {
     this.setState({
-      [type]: formatDateMin(data)
-    })
+      [type]: formatDateMin(data),
+    });
+  }
+
+  openGraphModal(id, city, data) {
+    this.handleResize();
+
+    let myData;
+
+    const allData = this.state.all_data;
+
+    if (id === 'newUsers') {
+      if (data) {
+        myData = data.reduce((newData, item) => {
+          newData.push({ date: item.new_date, count: item.new_users });
+          return newData;
+        }, []);
+      } else {
+        myData = allData.reduce((newData, item) => {
+          newData.push({ date: item.new_date, count: item.new_users });
+          return newData;
+        }, []);
+      }
+
+      this.setState({
+        name: 'Новые клиенты по месяцам',
+      });
+    }
+
+    if (id === 'orders') {
+      if (data) {
+        myData = data.reduce((newData, item) => {
+          newData.push({ date: item.new_date, count: item.count });
+          return newData;
+        }, []);
+      } else {
+        myData = allData.reduce((newData, item) => {
+          newData.push({ date: item.new_date, count: item.count });
+          return newData;
+        }, []);
+      }
+
+      this.setState({
+        name: 'Количество заказов по месяцам',
+      });
+    }
+
+    if (id === 'avgSumm') {
+      if (data) {
+        myData = data.reduce((newData, item) => {
+          newData.push({ date: item.new_date, count: item.avg_summ });
+          return newData;
+        }, []);
+      } else {
+        myData = allData.reduce((newData, item) => {
+          newData.push({ date: item.new_date, count: item.avg_summ });
+          return newData;
+        }, []);
+      }
+
+      this.setState({
+        name: 'Средний чек по месяцам',
+      });
+    }
+
+    if (id === 'lostUsers') {
+      if (data) {
+        myData = data.reduce((newData, item) => {
+          newData.push({
+            date: item.new_date,
+            count: item.lost_users.lost_users,
+          });
+          return newData;
+        }, []);
+      } else {
+        myData = allData.reduce((newData, item) => {
+          newData.push({
+            date: item.new_date,
+            count: item.lost_users.lost_users,
+          });
+          return newData;
+        }, []);
+      }
+
+      this.setState({
+        name: 'Ушедшие клиенты по месяцам',
+      });
+    }
+
+    if (id === 'returnUsers') {
+      if (data) {
+        myData = data.reduce((newData, item) => {
+          newData.push({
+            date: item.new_date,
+            count: item.lost_users.return_users,
+          });
+          return newData;
+        }, []);
+      } else {
+        myData = allData.reduce((newData, item) => {
+          newData.push({
+            date: item.new_date,
+            count: item.lost_users.return_users,
+          });
+          return newData;
+        }, []);
+      }
+
+      this.setState({
+        name: 'Вернувшиеся клиенты по месяцам',
+      });
+    }
+
+    this.setState({
+      modalDialog: true,
+      city,
+      id,
+    });
+
+    setTimeout(() => {
+      this.renderGraph(myData, id);
+    }, 300);
+  }
+
+  renderGraph(MyData, id) {
+    if (this.chartnewusers) {
+      this.chartnewusers.dispose();
+    }
+
+    var root = am5.Root.new(id);
+    this.chartnewusers = root;
+
+    root.locale = am5locales_ru_RU;
+
+    root.setThemes([am5themes_Animated.new(root)]);
+
+    var chart = root.container.children.push(
+      am5xy.XYChart.new(root, {
+        panY: false,
+        wheelY: 'zoomX',
+        layout: root.verticalLayout,
+      })
+    );
+
+    var data = [];
+
+    MyData.map((item) => {
+      let date = item.date.split('-');
+
+      data.push({
+        date: new Date(date[0], parseInt(date[1]) - 1, 1).getTime(),
+        value: parseInt(item.count),
+      });
+    });
+
+    // Create Y-axis
+    var yAxis = chart.yAxes.push(
+      am5xy.ValueAxis.new(root, {
+        extraTooltipPrecision: 1,
+        renderer: am5xy.AxisRendererY.new(root, {}),
+      })
+    );
+
+    // Create X-Axis
+    let xAxis = chart.xAxes.push(
+      am5xy.DateAxis.new(root, {
+        baseInterval: { timeUnit: 'month', count: 1 },
+        startLocation: 0.5,
+        endLocation: 0.5,
+        renderer: am5xy.AxisRendererX.new(root, {
+          minGridDistance: 30,
+        }),
+      })
+    );
+
+    xAxis.get('dateFormats')['day'] = 'MM/dd';
+    xAxis.get('periodChangeDateFormats')['day'] = 'MM/dd';
+    xAxis.get('dateFormats')['month'] = 'MMMM';
+
+    // Create series правка 1 Новые клиенты по месяцам
+    function createSeries(name, field, data) {
+      var series = chart.series.push(
+        am5xy.SmoothedXLineSeries.new(root, {
+          name: name,
+          xAxis: xAxis,
+          yAxis: yAxis,
+          valueYField: field,
+          valueXField: 'date',
+          tooltip: am5.Tooltip.new(root, {}),
+          maskBullets: false,
+        })
+      );
+
+      // правка radius: 5->3
+      series.bullets.push(function () {
+        return am5.Bullet.new(root, {
+          sprite: am5.Circle.new(root, {
+            radius: 2,
+            fill: series.get('fill'),
+          }),
+        });
+      });
+
+      series.strokes.template.set('strokeWidth', 3);
+      series
+        .get('tooltip')
+        .label.set('text', '[bold]{name}[/]\n{valueX.formatDate()}: {valueY}');
+      series.data.setAll(data);
+    }
+
+    createSeries('Всего', 'value', data);
+
+    // Add cursor
+    chart.set(
+      'cursor',
+      am5xy.XYCursor.new(root, {
+        behavior: 'zoomXY',
+        xAxis: xAxis,
+      })
+    );
+
+    xAxis.set(
+      'tooltip',
+      am5.Tooltip.new(root, {
+        themeTags: ['axis'],
+      })
+    );
+
+    yAxis.set(
+      'tooltip',
+      am5.Tooltip.new(root, {
+        themeTags: ['axis'],
+      })
+    );
   }
 
   render() {
@@ -193,18 +430,20 @@ class StatByClients_ extends React.Component {
           <CircularProgress color="inherit" />
         </Backdrop>
 
-        <MyAlert 
-          isOpen={this.state.openAlert} 
-          onClose={() => this.setState({ openAlert: false }) } 
-          status={this.state.err_status} 
-          text={this.state.err_text} />
+        <StatByClients_Modal
+          onClose={() => this.setState({ modalDialog: false })}
+          fullScreen={this.state.fullScreen}
+          open={this.state.modalDialog}
+          city={this.state.city}
+          name={this.state.name}
+          id={this.state.id}
+        />
 
         <Grid container spacing={3} mb={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
 
-         
           <Grid item xs={12} sm={6}>
             <MyDatePickerNewViews
               label="Дата от"
@@ -221,7 +460,6 @@ class StatByClients_ extends React.Component {
               func={this.changeDateRange.bind(this, 'date_end')}
             />
           </Grid>
-            
 
           <Grid item xs={12} sm={3}>
             <Button onClick={this.update.bind(this)} variant="contained">
@@ -230,235 +468,246 @@ class StatByClients_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={12}>
-            <TableContainer>
-              <Table size={'small'}>
-                <TableHead>
+            <TableContainer sx={{ maxHeight: { xs: 'none', sm: 1000 } }}>
+              <Table stickyHeader size="small">
+                <TableHead style={{ position: 'sticky', top: 0, zIndex: 7 }}>
                   <TableRow>
-                    <TableCell>Точка</TableCell>
-                    <TableCell></TableCell>
-
-                    { this.state.dataDates.map( (item, key) =>
-                      <TableCell key={key} style={{ textAlign: 'center' }}>{item.new_date}</TableCell>
-                    ) }
-
-                    <TableCell style={{ borderLeft: '1px solid #e5e5e5' }}>Итого</TableCell>
+                    <TableCell sx={{ zIndex: 30, minWidth: 200, left: 0 }}>Точка</TableCell>
+                    <TableCell sx={{ zIndex: 30, left: 200 }}></TableCell>
+                    {this.state.dataDates.map((item, key) => <TableCell key={key} style={{ textAlign: 'center', minWidth: 100 }}>{item.new_date}</TableCell>)}
+                    <TableCell style={{ borderLeft: '1px solid #e5e5e5', minWidth: 100 }}>Итого</TableCell>
                   </TableRow>
                 </TableHead>
 
                 <TableBody>
-                  
-                  { this.state.dataCities.map( (city, c_key) =>
+                  {this.state.dataCities.map((city, c_key) => (
                     <React.Fragment key={c_key}>
-                      {city.points.map( (item, key) =>
+                      {city.points.map((item, key) => (
                         <React.Fragment key={key}>
+
                           <TableRow>
-                            <TableCell rowSpan={5}>{item.name}</TableCell>
-                            <TableCell>Новые клиенты</TableCell>
-                            { this.state.dataDates.map( (it, kk) =>
-                              item.stat.map( (st, k) => 
-                                it.new_date == st.new_date ?
+                            <TableCell variant="head" style={{minWidth: 200, position: 'sticky', left: 0, border: 'none'}}></TableCell>
+                            <TableCell variant="head" style={{minWidth: 250, position: 'sticky', left: 200}}>Новые клиенты</TableCell>
+                            {this.state.dataDates.map(it =>
+                              item.stat.map((st, k) =>
+                                it.new_date == st.new_date ? (
                                   <TableCell key={k} style={{ textAlign: 'center' }}>{st.new_users}</TableCell>
-                                    :
-                                  null
+                                ) : null
                               )
-                            ) }
+                            )}
                             <TableCell style={{ borderLeft: '1px solid #e5e5e5' }}>{item.svod.new_users}</TableCell>
                           </TableRow>
 
                           <TableRow>
-                            <TableCell>Количество заказов</TableCell>
-                            { this.state.dataDates.map( (it, kk) =>
-                              item.stat.map( (st, k) => 
-                                it.new_date == st.new_date ?
+                            <TableCell variant="head" style={{minWidth: 200, position: 'sticky', left: 0, border: 'none'}}></TableCell>
+                            <TableCell variant="head" style={{minWidth: 250, position: 'sticky', left: 200}}>Количество заказов</TableCell>
+                            {this.state.dataDates.map(it =>
+                              item.stat.map((st, k) =>
+                                it.new_date == st.new_date ? (
                                   <TableCell key={k} style={{ textAlign: 'center' }}>{st.count}</TableCell>
-                                    :
-                                  null
+                                ) : null
                               )
-                            ) }
+                            )}
                             <TableCell style={{ borderLeft: '1px solid #e5e5e5' }}>{item.svod.count}</TableCell>
                           </TableRow>
+
                           <TableRow>
-                            <TableCell>Средний чек</TableCell>
-                            { this.state.dataDates.map( (it, kk) =>
-                              item.stat.map( (st, k) => 
-                                it.new_date == st.new_date ?
+                            <TableCell variant="head" style={{minWidth: 200, position: 'sticky', left: 0, border: 'none'}}>{item.name}</TableCell>
+                            <TableCell variant="head" style={{minWidth: 250, position: 'sticky', left: 200}}>Средний чек</TableCell>
+                            {this.state.dataDates.map((it, kk) =>
+                              item.stat.map((st, k) =>
+                                it.new_date == st.new_date ? (
                                   <TableCell key={k} style={{ textAlign: 'center' }}>{st.avg_summ}</TableCell>
-                                    :
-                                  null
+                                ) : null
                               )
-                            ) }
+                            )}
                             <TableCell style={{ borderLeft: '1px solid #e5e5e5' }}>{item.svod.avg_summ}</TableCell>
                           </TableRow>
 
                           <TableRow>
-                            <TableCell>Ушедшие клиенты</TableCell>
-                            { this.state.dataDates.map( (it, kk) =>
-                              item.stat.map( (st, k) => 
-                                it.new_date == st.new_date ?
+                            <TableCell variant="head" style={{minWidth: 200, position: 'sticky', left: 0, border: 'none'}}></TableCell>
+                            <TableCell variant="head" style={{minWidth: 250, position: 'sticky', left: 200}}>Ушедшие клиенты</TableCell>
+                            {this.state.dataDates.map((it, kk) =>
+                              item.stat.map((st, k) =>
+                                it.new_date == st.new_date ? (
                                   <TableCell key={k} style={{ textAlign: 'center' }}>{st.lost_users.lost_users}</TableCell>
-                                    :
-                                  null
+                                ) : null
                               )
-                            ) }
+                            )}
                             <TableCell style={{ borderLeft: '1px solid #e5e5e5' }}>{item.svod.lost_users}</TableCell>
                           </TableRow>
+
                           <TableRow style={{ borderBottom: '10px solid #e5e5e5' }}>
-                            <TableCell>Вернувшиеся клиенты</TableCell>
-                            { this.state.dataDates.map( (it, kk) =>
-                              item.stat.map( (st, k) => 
-                                it.new_date == st.new_date ?
+                            <TableCell variant="head" style={{minWidth: 200, position: 'sticky', left: 0}}></TableCell>
+                            <TableCell variant="head" style={{minWidth: 250, position: 'sticky', left: 200}}>Вернувшиеся клиенты</TableCell>
+                            {this.state.dataDates.map((it, kk) =>
+                              item.stat.map((st, k) =>
+                                it.new_date == st.new_date ? (
                                   <TableCell key={k} style={{ textAlign: 'center' }}>{st.lost_users.return_users}</TableCell>
-                                    :
-                                  null
+                                ) : null
                               )
-                            ) }
-                            <TableCell style={{ borderLeft: '1px solid #e5e5e5' }}>{item.svod.return_users}</TableCell>
+                            )}
+                            <TableCell style={{ borderLeft: '1px solid #e5e5e5', position: 'sticky', left: 0 }}>{item.svod.return_users}</TableCell>
                           </TableRow>
-
-
-                          
                         </React.Fragment>
-                      )}
+                      ))}
 
                       <React.Fragment>
-                        <TableRow>
-                          <TableCell rowSpan={5}>Итого {city.name}</TableCell>
-                          <TableCell>Новые клиенты</TableCell>
-                          { this.state.dataDates.map( (it, kk) =>
-                            city.data.map( (st, k) => 
-                              it.new_date == st.new_date ?
+                        <TableRow sx={{ cursor: 'pointer', '& td': { '&:hover': { color: '#c03' } } }}
+                          onClick={this.openGraphModal.bind(this, 'newUsers', city.name, city.data)}
+                        >
+                          <TableCell variant="head" style={{minWidth: 200, position: 'sticky', left: 0, border: 'none'}}></TableCell>
+                          <TableCell variant="head" style={{minWidth: 250, position: 'sticky', left: 200}}>Новые клиенты</TableCell>
+                          {this.state.dataDates.map((it, kk) =>
+                            city.data.map((st, k) =>
+                              it.new_date == st.new_date ? (
                                 <TableCell key={k} style={{ textAlign: 'center' }}>{st.new_users}</TableCell>
-                                  :
-                                null
+                              ) : null
                             )
-                          ) }
-                          
+                          )}
                         </TableRow>
-
-                        <TableRow>
-                          <TableCell>Количество заказов</TableCell>
-                          { this.state.dataDates.map( (it, kk) =>
-                            city.data.map( (st, k) => 
-                              it.new_date == st.new_date ?
+                        
+                        <TableRow sx={{ cursor: 'pointer', '& td': { '&:hover': { color: '#c03' } } }}
+                          onClick={this.openGraphModal.bind(this, 'orders', city.name, city.data)}
+                        >
+                          <TableCell variant="head" style={{minWidth: 200, position: 'sticky', left: 0, border: 'none'}}></TableCell>
+                          <TableCell variant="head" style={{minWidth: 250, position: 'sticky', left: 200}}>Количество заказов</TableCell>
+                          {this.state.dataDates.map((it, kk) =>
+                            city.data.map((st, k) =>
+                              it.new_date == st.new_date ? (
                                 <TableCell key={k} style={{ textAlign: 'center' }}>{st.count}</TableCell>
-                                  :
-                                null
+                              ) : null
                             )
-                          ) }
-                          
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>Средний чек</TableCell>
-                          { this.state.dataDates.map( (it, kk) =>
-                            city.data.map( (st, k) => 
-                              it.new_date == st.new_date ?
-                                <TableCell key={k} style={{ textAlign: 'center' }}>{st.avg_summ}</TableCell>
-                                  :
-                                null
-                            )
-                          ) }
-                          
+                          )}
                         </TableRow>
 
                         <TableRow>
-                          <TableCell>Ушедшие клиенты</TableCell>
-                          { this.state.dataDates.map( (it, kk) =>
-                            city.data.map( (st, k) => 
-                              it.new_date == st.new_date ?
-                                <TableCell key={k} style={{ textAlign: 'center' }}>{st.lost_users.lost_users}</TableCell>
-                                  :
-                                null
+                          <TableCell variant="head" style={{minWidth: 200, position: 'sticky', left: 0, border: 'none'}}>Итого {city.name}</TableCell>
+                          <TableCell variant="head" style={{minWidth: 250, position: 'sticky', left: 200, cursor: 'pointer', '&:hover': { color: '#c03' } }}
+                            onClick={this.openGraphModal.bind(this, 'avgSumm', city.name, city.data)}>Средний чек</TableCell>
+                          {this.state.dataDates.map((it, kk) =>
+                            city.data.map((st, k) =>
+                              it.new_date == st.new_date ? (
+                                <TableCell onClick={this.openGraphModal.bind(this, 'avgSumm', city.name, city.data)}
+                                  style={{minWidth: 250, position: 'sticky', left: 200, textAlign: 'center', cursor: 'pointer', '&:hover': { color: '#c03' } }}
+                                  key={k}
+                                >
+                                  {st.avg_summ}
+                                </TableCell>
+                              ) : null
                             )
-                          ) }
-                          
+                          )}
                         </TableRow>
-                        <TableRow style={{ borderBottom: '10px solid #e5e5e5' }}>
-                          <TableCell>Вернувшиеся клиенты</TableCell>
-                          { this.state.dataDates.map( (it, kk) =>
-                            city.data.map( (st, k) => 
-                              it.new_date == st.new_date ?
-                                <TableCell key={k} style={{ textAlign: 'center' }}>{st.lost_users.return_users}</TableCell>
-                                  :
-                                null
+                       
+                        <TableRow sx={{ cursor: 'pointer', '& td': { '&:hover': { color: '#c03' } } }}
+                          onClick={this.openGraphModal.bind(this, 'lostUsers', city.name, city.data)}
+                        >
+                          <TableCell variant="head" style={{minWidth: 200, position: 'sticky', left: 0, border: 'none'}}></TableCell>
+                          <TableCell variant="head" style={{minWidth: 250, position: 'sticky', left: 200}}>Ушедшие клиенты</TableCell>
+                          {this.state.dataDates.map((it, kk) =>
+                            city.data.map((st, k) =>
+                              it.new_date == st.new_date ? (
+                                <TableCell key={k} style={{ textAlign: 'center' }}>{st.lost_users.lost_users}</TableCell>
+                              ) : null
                             )
-                          ) }
-                          
+                          )}
+                        </TableRow>
+
+                        <TableRow sx={{ borderBottom: '10px solid #e5e5e5', cursor: 'pointer', '& td': { '&:hover': { color: '#c03' } } }}
+                          onClick={this.openGraphModal.bind(this, 'returnUsers', city.name, city.data)}
+                        >
+                          <TableCell variant="head" style={{minWidth: 200, position: 'sticky', left: 0}}></TableCell>
+                          <TableCell variant="head" style={{minWidth: 250, position: 'sticky', left: 200}}>Вернувшиеся клиенты</TableCell>
+                          {this.state.dataDates.map((it, kk) =>
+                            city.data.map((st, k) =>
+                              it.new_date == st.new_date ? (
+                                <TableCell key={k} style={{ textAlign: 'center' }}>{st.lost_users.return_users}</TableCell>
+                              ) : null
+                            )
+                          )}
                         </TableRow>
                       </React.Fragment>
 
-                      <TableRow style={{ borderBottom: '10px solid #e5e5e5', height: 100 }} />
-                          
+                      <TableCell colSpan={this.state.dataDates.length + 3} style={{borderBottom: '10px solid #e5e5e5', height: 100}}></TableCell>
                     </React.Fragment>
-                  )}
+                  ))}
 
-                      <React.Fragment>
-                        <TableRow>
-                          <TableCell rowSpan={5}>Итого в сети</TableCell>
-                          <TableCell>Новые клиенты</TableCell>
-                          { this.state.dataDates.map( (it, kk) =>
-                            this.state.all_data.map( (st, k) => 
-                              it.new_date == st.new_date ?
-                                <TableCell key={k} style={{ textAlign: 'center' }}>{st.new_users}</TableCell>
-                                  :
-                                null
-                            )
-                          ) }
-                          
-                        </TableRow>
+                  <React.Fragment>
+                    <TableRow>
+                      <TableCell rowSpan={6} variant="head" style={{ minWidth: 200, position: 'sticky', left: 0 }}>Итого в сети</TableCell>
+                      <TableCell variant="head" sx={{cursor: this.state.dataDates.length ? 'pointer' : null, '&:hover': {color: this.state.dataDates.length ? '#c03' : null},
+                          minWidth: 250, position: 'sticky', left: 200}}
+                          onClick={this.state.dataDates.length ? this.openGraphModal.bind(this, 'newUsers', 'в сети', null) : null}
+                      >Новые клиенты</TableCell>
 
-                        <TableRow>
-                          <TableCell>Количество заказов</TableCell>
-                          { this.state.dataDates.map( (it, kk) =>
-                            this.state.all_data.map( (st, k) => 
-                              it.new_date == st.new_date ?
-                                <TableCell key={k} style={{ textAlign: 'center' }}>{st.count}</TableCell>
-                                  :
-                                null
-                            )
-                          ) }
-                          
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>Средний чек</TableCell>
-                          { this.state.dataDates.map( (it, kk) =>
-                            this.state.all_data.map( (st, k) => 
-                              it.new_date == st.new_date ?
-                                <TableCell key={k} style={{ textAlign: 'center' }}>{st.avg_summ}</TableCell>
-                                  :
-                                null
-                            )
-                          ) }
-                          
-                        </TableRow>
+                      {this.state.dataDates.map((it, kk) =>
+                        this.state.all_data.map((st, k) =>
+                          it.new_date == st.new_date ? (
+                            <TableCell key={k} sx={{cursor: this.state.dataDates.length ? 'pointer' : null,
+                                '&:hover': {color: this.state.dataDates.length ? '#c03' : null },
+                                minWidth: 250, position: 'sticky', left: 200, textAlign: 'center'}}
+                                onClick={this.state.dataDates.length ? this.openGraphModal.bind(this, 'newUsers', 'в сети', null) : null}
+                            >
+                              {st.new_users}
+                            </TableCell>
+                          ) : null
+                        )
+                      )}
+                    </TableRow>
 
-                        <TableRow>
-                          <TableCell>Ушедшие клиенты</TableCell>
-                          { this.state.dataDates.map( (it, kk) =>
-                            this.state.all_data.map( (st, k) => 
-                              it.new_date == st.new_date ?
-                                <TableCell key={k} style={{ textAlign: 'center' }}>{st.lost_users.lost_users}</TableCell>
-                                  :
-                                null
-                            )
-                          ) }
-                          
-                        </TableRow>
-                        <TableRow style={{ borderBottom: '10px solid #e5e5e5' }}>
-                          <TableCell>Вернувшиеся клиенты</TableCell>
-                          { this.state.dataDates.map( (it, kk) =>
-                            this.state.all_data.map( (st, k) => 
-                              it.new_date == st.new_date ?
-                                <TableCell key={k} style={{ textAlign: 'center' }}>{st.lost_users.return_users}</TableCell>
-                                  :
-                                null
-                            )
-                          ) }
-                          
-                        </TableRow>
-                      </React.Fragment>
+                    <TableRow sx={{cursor: this.state.dataDates.length ? 'pointer' : null, '& td': { '&:hover': { color: this.state.dataDates.length ? '#c03' : null} }}}
+                      onClick={this.state.dataDates.length ? this.openGraphModal.bind(this, 'orders', 'в сети', null) : null}
+                    >
+                      <TableCell variant="head" style={{ minWidth: 250, position: 'sticky', left: 200 }}>Количество заказов</TableCell>
+                      {this.state.dataDates.map((it, kk) =>
+                        this.state.all_data.map((st, k) =>
+                          it.new_date == st.new_date ? (
+                            <TableCell key={k} style={{ textAlign: 'center' }}>{st.count}</TableCell>
+                          ) : null
+                        )
+                      )}
+                    </TableRow>
+                   
+                    <TableRow sx={{cursor: this.state.dataDates.length ? 'pointer' : null, '& td': { '&:hover': { color: this.state.dataDates.length ? '#c03' : null} }}}
+                      onClick={this.state.dataDates.length ? this.openGraphModal.bind(this, 'avgSumm', 'в сети', null) : null}
+                    >
+                      <TableCell variant="head" style={{ minWidth: 250, position: 'sticky', left: 200 }}>Средний чек</TableCell>
+                      {this.state.dataDates.map((it, kk) =>
+                        this.state.all_data.map((st, k) =>
+                          it.new_date == st.new_date ? (
+                            <TableCell key={k} style={{ textAlign: 'center' }}>{st.avg_summ}</TableCell>
+                          ) : null
+                        )
+                      )}
+                    </TableRow>
+                 
+                    <TableRow sx={{cursor: this.state.dataDates.length ? 'pointer' : null, '& td': { '&:hover': { color: this.state.dataDates.length ? '#c03' : null} }}}
+                      onClick={this.state.dataDates.length ? this.openGraphModal.bind(this, 'lostUsers', 'в сети', null) : null}
+                    >
+                      <TableCell variant="head" style={{ minWidth: 250, position: 'sticky', left: 200 }}>Ушедшие клиенты</TableCell>
+                      {this.state.dataDates.map((it, kk) =>
+                        this.state.all_data.map((st, k) =>
+                          it.new_date == st.new_date ? (
+                            <TableCell key={k} style={{ textAlign: 'center' }}>{st.lost_users.lost_users}</TableCell>
+                          ) : null
+                        )
+                      )}
+                    </TableRow>
+                    
+                    <TableRow sx={{cursor: this.state.dataDates.length ? 'pointer' : null, '& td': { '&:hover': { color: this.state.dataDates.length ? '#c03' : null} }}}
+                      onClick={this.state.dataDates.length ? this.openGraphModal.bind(this, 'returnUsers', 'в сети', null) : null}
+                    >
+                      <TableCell variant="head" style={{ minWidth: 250, position: 'sticky', left: 200 }}>Вернувшиеся клиенты</TableCell>
+                      {this.state.dataDates.map((it, kk) =>
+                        this.state.all_data.map((st, k) =>
+                          it.new_date == st.new_date ? (
+                            <TableCell key={k} style={{ textAlign: 'center' }}>{st.lost_users.return_users}</TableCell>
+                          ) : null
+                        )
+                      )}
+                    </TableRow>
 
-                      
-
+                  </React.Fragment>
                 </TableBody>
               </Table>
             </TableContainer>
@@ -472,4 +721,3 @@ class StatByClients_ extends React.Component {
 export function StatByClients() {
   return <StatByClients_ />;
 }
-
