@@ -43,7 +43,7 @@ class TabletRepair_Modal extends React.Component {
     if (this.props.tablets !== prevProps.tablets) {
       const { tablets } = this.props;
 
-      this.setState({ tablet: tablets ? tablets[0].id : '' });
+      //this.setState({ tablet: tablets ? tablets[0].id : '' });
     }
   }
 
@@ -175,6 +175,7 @@ class TabletRepair_Modal extends React.Component {
                 <Grid item xs={12} sm={12}>
                   <MyTextInput
                     label="Стоимость"
+                    type={'number'}
                     value={this.state.number}
                     func={this.changeItem.bind(this, 'number')}
                   />
@@ -430,7 +431,7 @@ class TabletRepair_ extends React.Component {
       this.setState({
         openAlert: true,
         err_status: false,
-        err_text: text,
+        err_text: res.text,
       });
     }
   }
