@@ -917,12 +917,13 @@ class Fines_err_Table extends React.Component {
               <TableCell>Фото</TableCell>
               <TableCell>Обжалована</TableCell>
               <TableCell>Изменина сумма</TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
 
           <TableBody>
             {this.props.ret_list.map((item, i) => (
-              <TableRow key={i} style={{ cursor: 'pointer', backgroundColor: '#926eae', color: '#fff', fontWeight: 300 }}
+              <TableRow key={i} style={{ cursor: 'pointer', backgroundColor: parseInt(item.is_delete) == 1 ? 'red' : '#926eae', color: '#fff', fontWeight: 300 }}
                 onClick={this.props.openModal.bind(this, 'item', 'Ошибка сотрудника', item.id)}
               >
                 <TableCell>{item.find_user_name}</TableCell>
@@ -940,11 +941,12 @@ class Fines_err_Table extends React.Component {
 
                 <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.change_win) == 1 ? <CheckIcon /> : null }</TableCell>
                 <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.change_sum) == 1 ? <CheckIcon /> : null }</TableCell>
+                <TableCell>{item.answer}</TableCell>
               </TableRow>
             ))}
             {this.props.all_list.map((item, i) => (
               <TableRow key={i}
-                style={{ cursor: 'pointer', backgroundColor: item.user_name == null ? '#926eae' : '#6ab04c', color: '#fff', fontWeight: 300 }}
+                style={{ cursor: 'pointer', backgroundColor: parseInt(item.is_delete) == 1 ? 'red' : item.user_name == null ? '#926eae' : '#6ab04c', color: '#fff', fontWeight: 300 }}
                 onClick={this.props.openModal.bind(this, 'item', 'Ошибка сотрудника', item.id)}
               >
                 <TableCell>{item.find_user_name}</TableCell>
@@ -962,6 +964,7 @@ class Fines_err_Table extends React.Component {
 
                 <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.change_win) == 1 ? <CheckIcon /> : null }</TableCell>
                 <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.change_sum) == 1 ? <CheckIcon /> : null }</TableCell>
+                <TableCell>{item.answer}</TableCell>
               </TableRow>
             ))}
           </TableBody>

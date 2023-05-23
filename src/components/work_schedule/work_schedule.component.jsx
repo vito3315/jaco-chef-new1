@@ -3178,7 +3178,7 @@ class WorkSchedule_ extends React.Component {
               {parseInt(this.state.tabTable) == 0 ? (
                 <TableBody>
                   {this.state.errOrdersOneOrders.map((item, key) => (
-                    <TableRow key={key} onClick={this.showErrOrder.bind(this, item.id, item.row_id)}>
+                    <TableRow key={key} onClick={this.showErrOrder.bind(this, item.id, item.row_id)} style={{ backgroundColor: parseInt(item.is_delete) == 1 ? 'red' : '#fff' }}>
                       <TableCell>{item.order_id}</TableCell>
                       <TableCell>{item.date_time_order}</TableCell>
                       <TableCell>{item.err_name}</TableCell>
@@ -3194,7 +3194,7 @@ class WorkSchedule_ extends React.Component {
               ) : (
                 <TableBody>
                   {this.state.errOrdersTwoOrders.map((item, key) => (
-                    <TableRow key={key} onClick={this.showErrOrder.bind(this, item.id, item.row_id)}>
+                    <TableRow key={key} onClick={this.showErrOrder.bind(this, item.id, item.row_id)} style={{ backgroundColor: parseInt(item.is_delete) == 1 ? 'red' : '#fff' }}>
                       <TableCell>{item.order_id}</TableCell>
                       <TableCell>{item.date_time_order}</TableCell>
                       <TableCell>{item.err_name}</TableCell>
@@ -3235,7 +3235,7 @@ class WorkSchedule_ extends React.Component {
               {parseInt(this.state.tabTable) == 0 ? (
                 <TableBody>
                   {this.state.errOrdersOneCam.map((item, key) => (
-                    <TableRow key={key} onClick={this.showErrCam.bind(this, item.id)}>
+                    <TableRow key={key} onClick={this.showErrCam.bind(this, item.id)} style={{ backgroundColor: parseInt(item.is_delete) == 1 ? 'red' : '#fff' }}>
                       <TableCell>{key + 1}</TableCell>
                       <TableCell>{item.date_time_fine}</TableCell>
                       <TableCell>{item.fine_name}</TableCell>
@@ -3249,7 +3249,7 @@ class WorkSchedule_ extends React.Component {
               ) : (
                 <TableBody>
                   {this.state.errOrdersTwoCam.map((item, key) => (
-                    <TableRow key={key} onClick={this.showErrCam.bind(this, item.id)}>
+                    <TableRow key={key} onClick={this.showErrCam.bind(this, item.id)} style={{ backgroundColor: parseInt(item.is_delete) == 1 ? 'red' : '#fff' }}>
                       <TableCell>{key + 1}</TableCell>
                       <TableCell>{item.date_time_fine}</TableCell>
                       <TableCell>{item.fine_name}</TableCell>

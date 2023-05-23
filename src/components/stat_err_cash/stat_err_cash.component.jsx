@@ -32,7 +32,7 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
 import ModalImage from "react-modal-image";
 
-import { MySelect, MyDatePickerNew, MyAlert } from '../../stores/elements';
+import { MySelect, MyDatePickerNew, MyAlert, MyTextInput } from '../../stores/elements';
 
 import queryString from 'query-string';
 
@@ -56,11 +56,13 @@ class StatErrCash_Modal extends React.Component {
       item: null,
 
       confirmDialog: false,
+      confirmDialogDel: false,
       percent: 0,
 
       openAlert: false,
       err_status: true,
       err_text: '',
+      answer: ''
     };
   }
 
@@ -82,6 +84,14 @@ class StatErrCash_Modal extends React.Component {
     this.setState({
       confirmDialog: true,
       percent,
+      answer: ''
+    });
+  }
+
+  openConfirmDel(){
+    this.setState({
+      confirmDialogDel: true,
+      answer: ''
     });
   }
 
@@ -102,6 +112,7 @@ class StatErrCash_Modal extends React.Component {
         user_id: item.user_id,
         row_id: item.row_id,
         err_id: item.err_id,
+        answer: this.state.answer
       };
 
       const res = await this.props.getData('clear_order', data);
@@ -124,6 +135,61 @@ class StatErrCash_Modal extends React.Component {
         point_id: item.point_id,
         type,
         err_id: item.id,
+        answer: this.state.answer
+      };
+
+      const res = await this.props.getData('clear_cam', data);
+
+      if (res.st) {
+        this.onClose();
+        this.props.update();
+      } else {
+        this.setState({
+          openAlert: true,
+          err_status: res.st,
+          err_text: res.text,
+        });
+      }
+    }
+  }
+
+  async delItem() {
+    const item = this.state.item;
+
+    this.setState({
+      confirmDialogDel: false,
+    });
+
+    if (this.props.mark === 'errOrder') {
+      const data = {
+        date: item.date_time_order,
+        point_id: item.point_id,
+        user_id: item.user_id,
+        row_id: item.row_id,
+        err_id: item.err_id,
+        answer: this.state.answer
+      };
+
+      const res = await this.props.getData('clear_order', data);
+
+      if (res.st) {
+        this.onClose();
+        this.props.update();
+      } else {
+        this.setState({
+          openAlert: true,
+          err_status: res.st,
+          err_text: res.text,
+        });
+      }
+    }
+
+    if (this.props.mark === 'errCam') {
+      const data = {
+        date: item.date,
+        point_id: item.point_id,
+        err_id: item.id,
+        answer: this.state.answer
       };
 
       const res = await this.props.getData('clear_cam', data);
@@ -147,6 +213,7 @@ class StatErrCash_Modal extends React.Component {
       percent: 0,
       err_status: true,
       err_text: '',
+      answer: ''
     });
 
     this.props.onClose();
@@ -169,13 +236,47 @@ class StatErrCash_Modal extends React.Component {
         >
           <DialogTitle>Подтвердите действие</DialogTitle>
           <DialogContent align="center" sx={{ fontWeight: 'bold' }}>
-            Уменьшить штраф на {this.state.percent}% ?
+            <p style={{ marginBottom: 20 }}>Уменьшить штраф на {this.state.percent}% ?</p>
+
+            <MyTextInput
+              label="Причина"
+              value={this.state.answer}
+              multiline={true}
+              maxRows={5}
+              func={ event => { this.setState({ answer: event.target.value }) } }
+            />
           </DialogContent>
           <DialogActions>
             <Button autoFocus onClick={() => this.setState({ confirmDialog: false }) }>
               Отмена
             </Button>
-            <Button onClick={this.clearItem.bind(this)}>Ok</Button>
+            <Button onClick={this.clearItem.bind(this)}>Снять</Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          sx={{ '& .MuiDialog-paper': { width: '80%', maxHeight: 435 } }}
+          maxWidth="xs"
+          open={this.state.confirmDialogDel}
+          onClose={() => this.setState({ confirmDialogDel: false })}
+        >
+          <DialogTitle>Подтвердите действие</DialogTitle>
+          <DialogContent align="center" sx={{ fontWeight: 'bold' }}>
+            <p style={{ marginBottom: 20 }}>Удалить штраф ?</p>
+
+            <MyTextInput
+              label="Причина"
+              value={this.state.answer}
+              multiline={true}
+              maxRows={5}
+              func={ event => { this.setState({ answer: event.target.value }) } }
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button autoFocus onClick={() => this.setState({ confirmDialogDel: false }) }>
+              Отмена
+            </Button>
+            <Button onClick={this.delItem.bind(this)}>Снять</Button>
           </DialogActions>
         </Dialog>
 
@@ -298,8 +399,11 @@ class StatErrCash_Modal extends React.Component {
                 <Grid mb={5}>
                   <Button variant="contained" onClick={this.openConfirm.bind(this, '50')} style={{ minWidth: '130px' }}>Снять 50%</Button>
                 </Grid>
-                <Grid>
+                <Grid mb={5}>
                   <Button variant="contained" onClick={this.openConfirm.bind(this, '100')} style={{ minWidth: '130px' }}>Снять 100%</Button>
+                </Grid>
+                <Grid>
+                  <Button variant="contained" onClick={this.openConfirmDel.bind(this)} style={{ minWidth: '130px' }}>Удалить</Button>
                 </Grid>
               </Grid>
             </Grid>
@@ -682,6 +786,7 @@ class StatErrCash_ extends React.Component {
                     <TableCell align="center">Фото</TableCell>
                     <TableCell align="center">Обжалована</TableCell>
                     <TableCell align="center">Изменина сумма</TableCell>
+                    <TableCell align="center"></TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell colSpan={6} sx={{ fontWeight: 'bold' }}>Кол-во не обработанных ошибок: {this.state.all_data_new_stat}</TableCell>
@@ -690,7 +795,7 @@ class StatErrCash_ extends React.Component {
 
                 <TableBody>
                   {this.state.all_data_new.map((item, key) => (
-                    <TableRow key={key} hover style={{ cursor: 'pointer' }} onClick={this.openModal.bind(this, 'errCam', 'Ошибка', item)}>
+                    <TableRow key={key} hover style={{ cursor: 'pointer', backgroundColor: parseInt(item.is_delete) == 1 ? 'red' : '#fff' }} onClick={this.openModal.bind(this, 'errCam', 'Ошибка', item)}>
                       <TableCell align="center">{item.user_name}</TableCell>
                       <TableCell align="center">{item.date_close}</TableCell>
                       <TableCell align="center">{item.date} {item.time}</TableCell>
@@ -704,6 +809,7 @@ class StatErrCash_ extends React.Component {
 
                       <TableCell align="center">{ parseInt(item.change_win) == 1 ? <CheckIcon /> : null }</TableCell>
                       <TableCell align="center">{ parseInt(item.change_sum) == 1 ? <CheckIcon /> : null }</TableCell>
+                      <TableCell align="center">{item.answer}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -721,20 +827,21 @@ class StatErrCash_ extends React.Component {
                         <TableCell colSpan={8} sx={{ fontWeight: 'bold' }}>Все данные (заказы)</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell style={{ width: '10%' }} align="center">Сотрудник</TableCell>
-                        <TableCell style={{ width: '10%' }} align="center">Номер заказа</TableCell>
-                        <TableCell style={{ width: '10%' }} align="center">Дата заказа</TableCell>
-                        <TableCell style={{ width: '20%' }} align="center">Позиция</TableCell>
-                        <TableCell style={{ width: '20%' }} align="center">Ошибка</TableCell>
-                        <TableCell style={{ width: '5%' }} align="center">Довоз</TableCell>
-                        <TableCell style={{ width: '15%' }} align="center">Сумма ошибки</TableCell>
-                        <TableCell style={{ width: '10%' }} align="center">Фото</TableCell>
+                        <TableCell align="center">Сотрудник</TableCell>
+                        <TableCell align="center">Номер заказа</TableCell>
+                        <TableCell align="center">Дата заказа</TableCell>
+                        <TableCell align="center">Позиция</TableCell>
+                        <TableCell align="center">Ошибка</TableCell>
+                        <TableCell align="center">Довоз</TableCell>
+                        <TableCell align="center">Сумма ошибки</TableCell>
+                        <TableCell align="center">Фото</TableCell>
+                        <TableCell align="center"></TableCell>
                       </TableRow>
                     </TableHead>
 
                     <TableBody>
                       {this.state.all_data.map((item, key) => (
-                        <TableRow key={key} hover style={{ cursor: 'pointer' }} onClick={this.openModal.bind(this, 'errOrder', 'Ошибка по заказу', item)}>
+                        <TableRow key={key} hover style={{ cursor: 'pointer', backgroundColor: parseInt(item.is_delete) == 1 ? 'red' : '#fff' }} onClick={this.openModal.bind(this, 'errOrder', 'Ошибка по заказу', item)}>
                           <TableCell align="center">{item.full_user_name}</TableCell>
                           <TableCell align="center">{item.order_id}</TableCell>
                           <TableCell align="center">{item.date_time_order}</TableCell>
@@ -747,6 +854,7 @@ class StatErrCash_ extends React.Component {
                               <img src={'https://jacochef.ru/src/img/err_orders/uploads/' + item.imgs[0]} style={{ maxWidth: 100, maxHeight: 100 }}/>
                             )}
                           </TableCell>
+                          <TableCell align="center">{item.answer}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
