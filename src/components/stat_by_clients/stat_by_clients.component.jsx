@@ -468,8 +468,8 @@ class StatByClients_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={12}>
-            <TableContainer sx={{ maxHeight: { xs: 'none', sm: 1000 } }}>
-              <Table stickyHeader size="small">
+            <TableContainer sx={{ maxHeight: { xs: 'none', sm: 600 } }}>
+              <Table stickyHeader size="small" style={{ borderCollapse: 'collapse' }}>
                 <TableHead style={{ position: 'sticky', top: 0, zIndex: 7 }}>
                   <TableRow>
                     <TableCell sx={{ zIndex: 30, minWidth: 200, left: 0 }}>Точка</TableCell>
@@ -537,7 +537,7 @@ class StatByClients_ extends React.Component {
                             <TableCell style={{ borderLeft: '1px solid #e5e5e5' }}>{item.svod.lost_users}</TableCell>
                           </TableRow>
 
-                          <TableRow style={{ borderBottom: '10px solid #e5e5e5' }}>
+                          <TableRow sx={{ borderBottom: '10px solid #e5e5e5' }}>
                             <TableCell variant="head" style={{minWidth: 200, position: 'sticky', left: 0}}></TableCell>
                             <TableCell variant="head" style={{minWidth: 250, position: 'sticky', left: 200}}>Вернувшиеся клиенты</TableCell>
                             {this.state.dataDates.map((it, kk) =>
@@ -621,7 +621,7 @@ class StatByClients_ extends React.Component {
                           {this.state.dataDates.map((it, kk) =>
                             city.data.map((st, k) =>
                               it.new_date == st.new_date ? (
-                                <TableCell key={k} style={{ textAlign: 'center' }}>{st.lost_users.return_users}</TableCell>
+                                <TableCell key={k} style={{ textAlign: 'center' }} >{st.lost_users.return_users}</TableCell>
                               ) : null
                             )
                           )}
