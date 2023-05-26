@@ -107,6 +107,9 @@ const StatByClients = React.lazy(() => import("../stat_by_clients"));
 const Test = React.lazy(() => import("../test"));
 const TabletRepair = React.lazy(() => import("../tablet_repair"));
 
+const Journal_of_work_of_bactericidal_lamps = React.lazy(() => import("../journal_of_work_of_bactericidal_lamps"));
+
+
 import { SiteSaleMin, SiteSaleMin_New, SiteSaleMin_Edit, SiteSaleMin_StatList } from '../site_sale_min';
 
 const theme = createTheme({
@@ -432,6 +435,8 @@ export function App () {
                   <Route path={'/stat_by_clients'} exact={ true } element={ <StatByClients /> } />
                   <Route path={'/test'} exact={ true } element={ <Test /> } />
                   <Route path={'/tablet_repair'} exact={ true } element={ <TabletRepair /> } />
+
+                  <Route path={'/journal_of_work_of_bactericidal_lamps'} exact={ true } element={ <Journal_of_work_of_bactericidal_lamps /> } />
 
                   <Route
                     component={ () =>

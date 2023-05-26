@@ -170,7 +170,7 @@ class StatErrCash_Modal extends React.Component {
         answer: this.state.answer
       };
 
-      const res = await this.props.getData('clear_order', data);
+      const res = await this.props.getData('del_order', data);
 
       if (res.st) {
         this.onClose();
@@ -192,7 +192,7 @@ class StatErrCash_Modal extends React.Component {
         answer: this.state.answer
       };
 
-      const res = await this.props.getData('clear_cam', data);
+      const res = await this.props.getData('del_cam', data);
 
       if (res.st) {
         this.onClose();
