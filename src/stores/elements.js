@@ -418,6 +418,7 @@ export class MyDatePickerNew extends React.PureComponent {
           minDate={ this.props.minDate ? this.props.minDate : null }
           label={this.props.label}
           value={formatDate(this.props.value)}
+          disabled={ this.props.disabled || this.props.disabled === true ? true : false }
           onChange={this.props.func}
           onBlur={this.props.onBlur ? this.props.onBlur : null}
           renderInput={(params) => <TextField variant="outlined" size={'small'} color='primary' style={{ width: '100%' }} {...params} />}

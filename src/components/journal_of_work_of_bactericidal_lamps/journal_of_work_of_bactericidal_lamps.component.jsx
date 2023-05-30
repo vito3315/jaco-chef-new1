@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -22,29 +22,21 @@ import TableRow from '@mui/material/TableRow';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import {MyAlert, MySelect, MyTextInput, MyDatePickerNew, formatDate} from '../../stores/elements';
+import {MyAlert, MySelect, MyTextInput, MyDatePickerNew, MyTimePicker, formatDate} from '../../stores/elements';
 
 import queryString from 'query-string';
 
-class Lamps_Modal extends React.Component {
+class Lamps_Modal_Add extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      date: formatDate(new Date()),
-      number: '',
-      imei: '',
-      name: '',
-      tablet: '',
+      active_id: this.props.lampEdit?.id ?? '',
+      number: this.props.lampEdit?.number ?? '',
+      name: this.props.lampEdit?.name ?? '',
+      resource: this.props.lampEdit?.resource ?? '',
+      place: this.props.lampEdit?.place ?? '',
     };
-  }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.tablets !== prevProps.tablets) {
-      const { tablets } = this.props;
-
-      //this.setState({ tablet: tablets ? tablets[0].id : '' });
-    }
   }
 
   changeItem(data, event) {
@@ -53,44 +45,27 @@ class Lamps_Modal extends React.Component {
     });
   }
 
-  changeDateRange(data, event) {
-    this.setState({
-      [data]: event ? formatDate(event) : '',
-    });
-  }
-
   add() {
-    const type = this.props.type;
-
-    let data;
-
-    if (type === 'addTablet') {
-      data = {
-        number: this.state.number,
-        imei: this.state.imei,
-        model: this.state.name,
-        buy_date: this.state.date,
-      };
-    } else {
-      data = {
-        name_repair: this.state.name,
-        price: this.state.number,
-        date: this.state.date,
-        tablet_id: this.state.tablet,
-      };
-    }
+    const data = {
+      id: this.state.active_id,
+      number: this.state.number,
+      name: this.state.name,
+      resource: this.state.resource,
+      place: this.state.place,
+    };
+    
 
     this.props.add(data);
 
-    this.onClose();
+    //this.onClose();
   }
 
   onClose() {
     this.setState({
       number: '',
-      imei: '',
       name: '',
-      tablet: '',
+      resource: '',
+      place: '',
     });
 
     this.props.onClose();
@@ -106,16 +81,6 @@ class Lamps_Modal extends React.Component {
         maxWidth="md"
       >
         <DialogTitle className="button">
-          <div>
-            <Typography>Точка:{' '}<span style={{ fontWeight: 'bold' }}>{this.props.pointModal}</span></Typography>
-            {this.props.type === 'tablet' ? (
-              <>
-                <Typography mt={1}>Наименование планшета:{' '}<span style={{ fontWeight: 'bold' }}>{this.props.tablet.tablet.model}</span></Typography>
-                <Typography mt={1}>Порядковый номер планшета:{' '}<span style={{ fontWeight: 'bold' }}>{this.props.tablet.tablet.number}</span></Typography>
-              </>
-            ) : null}
-          </div>
-
           <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
             <CloseIcon />
           </IconButton>
@@ -141,14 +106,123 @@ class Lamps_Modal extends React.Component {
               <MyTextInput
                 label="Ресурс (часов)"
                 value={this.state.resource}
+                type={'number'}
                 func={this.changeItem.bind(this, 'resource')}
               />
             </Grid>
             <Grid item xs={12} sm={12}>
-              <MyDatePickerNew
+              <MyTextInput
                 label="Где размещена"
                 value={this.state.place}
-                func={this.changeDateRange.bind(this, 'place')}
+                func={this.changeItem.bind(this, 'place')}
+              />
+            </Grid>
+              
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" onClick={this.add.bind(this)}>Сохранить</Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+}
+
+class Lamps_Modal_Add_Active extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      active_id: this.props.itemEdit?.id ?? '',
+      lamp_id: this.props.itemEdit?.lamp_id ?? '',
+      date: formatDate(this.props.itemEdit?.date ?? new Date()),
+      time_start: this.props.itemEdit?.time_start ?? '',
+      time_end: this.props.itemEdit?.time_end ?? '',
+    };
+  }
+
+  changeItem(data, event) {
+    this.setState({
+      [data]: event.target.value,
+    });
+  }
+
+  add() {
+    const data = {
+      id: this.state.active_id,
+      lamp_id: this.state.lamp_id,
+      date: this.state.date,
+      time_start: this.state.time_start,
+      time_end: this.state.time_end,
+    };
+    
+    this.props.add(data);
+  }
+
+  onClose() {
+    this.setState({
+      number: '',
+      name: '',
+      resource: '',
+      place: '',
+    });
+
+    this.props.onClose();
+  }
+
+  changeDateRange(data, event) {
+    this.setState({
+      [data]: event ? formatDate(event) : '',
+    });
+  }
+
+  render() {
+    return (
+      <Dialog
+        open={this.props.open}
+        onClose={this.onClose.bind(this)}
+        fullScreen={this.props.fullScreen}
+        fullWidth
+        maxWidth="md"
+      >
+        <DialogTitle className="button">
+          <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
+          <Grid container spacing={3}>
+           
+            <Grid item xs={12} sm={12}>
+              <MySelect
+                is_none={false}
+                disabled={ this.state.active_id == '' ? false : true }
+                data={this.props.lampList}
+                value={this.state.lamp_id}
+                func={this.changeItem.bind(this, 'lamp_id')}
+                label="Лампа"
+              />
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <MyDatePickerNew
+                label="Дата активации"
+                disabled={ this.state.active_id == '' ? false : true }
+                value={this.state.date}
+                func={this.changeDateRange.bind(this, 'date')}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <MyTimePicker
+                value={this.state.time_start}
+                func={this.changeItem.bind(this, 'time_start')}
+                label="Время начала работы"
+              />
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <MyTimePicker
+                value={this.state.time_end}
+                func={this.changeItem.bind(this, 'time_end')}
+                label="Время окончания работы"
               />
             </Grid>
               
@@ -187,6 +261,15 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
       openAlert: false,
       err_status: true,
       err_text: '',
+
+
+
+      modalAddLamp: false,
+      modalAddActiveLamp: false,
+      lampList: [],
+      lampListActive: [],
+      itemEdit: null,
+      lampEdit: null
     };
   }
 
@@ -202,7 +285,7 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
     document.title = data.module_info.name;
 
     setTimeout(() => {
-      this.getTablets();
+      this.getLamps();
     }, 100);
   }
 
@@ -273,18 +356,18 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
     }, 50);
   }
 
-  async getTablets() {
+  async getLamps() {
     const point_id = this.state.point;
 
     const data = {
       point_id,
     };
 
-    const res = await this.getData('get_tablets', data);
+    const res = await this.getData('get_lamps', data);
 
     this.setState({
-      tabletsActive: res.active,
-      tabletsNonActive: res.non_active,
+      lampList: res.list,
+      lampListActive: res.active_lamp,
     });
   }
 
@@ -339,27 +422,21 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
   }
 
   async add(data) {
-    let res;
-
-    const type = this.state.type;
-
     data.point_id = this.state.point;
 
-    if (type === 'addTablet') {
-      res = await this.getData('add_tablet', data);
-    } else {
-      res = await this.getData('add_repair', data);
-    }
-
+    const res = await this.getData('add_lamp', data);
+    
     if (res.st) {
       this.setState({
         openAlert: true,
         err_status: true,
-        err_text: 'Успешно добавлен!',
+        err_text: 'Успешно сохранено!',
+
+        modalAddLamp: false
       });
 
       setTimeout(() => {
-        this.getTablets();
+        this.getLamps();
       }, 300);
     } else {
       this.setState({
@@ -368,6 +445,58 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
         err_text: res.text,
       });
     }
+  }
+
+  async addActive(data) {
+    data.point_id = this.state.point;
+
+    const res = await this.getData('add_lamp_active', data);
+    
+    if (res.st) {
+      this.setState({
+        openAlert: true,
+        err_status: true,
+        err_text: 'Успешно сохранено!',
+
+        modalAddActiveLamp: false
+      });
+
+      setTimeout(() => {
+        this.getLamps();
+      }, 300);
+    } else {
+      this.setState({
+        openAlert: true,
+        err_status: false,
+        err_text: res.text,
+      });
+    }
+  }
+
+  openModalAddLamp(){
+    this.setState({
+      modalAddLamp: true
+    })
+  }
+
+  openModalAddActiveLamp(){
+    this.setState({
+      modalAddActiveLamp: true
+    })
+  }
+
+  editActiveLamp(item){
+    this.setState({
+      modalAddActiveLamp: true,
+      itemEdit: item
+    })
+  }
+
+  editLamp(item){
+    this.setState({
+      modalAddLamp: true,
+      lampEdit: item
+    })
   }
 
   render() {
@@ -384,16 +513,26 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
           text={this.state.err_text}
         />
 
-        <Lamps_Modal
-          type={this.state.type}
-          open={this.state.modalDialog}
-          tablets={this.state.tablets}
-          pointModal={this.state.pointModal}
-          tablet={this.state.tablet}
-          add={this.add.bind(this)}
-          onClose={() => this.setState({ modalDialog: false })}
-          fullScreen={this.state.fullScreen}
-        />
+        { this.state.modalAddLamp === false ? false :
+          <Lamps_Modal_Add
+            open={this.state.modalAddLamp}
+            add={this.add.bind(this)}
+            onClose={() => this.setState({ modalAddLamp: false, lampEdit: null })}
+            fullScreen={this.state.fullScreen}
+            lampEdit={this.state.lampEdit}
+          />
+        }
+
+        { this.state.modalAddActiveLamp === false ? false :
+          <Lamps_Modal_Add_Active
+            open={this.state.modalAddActiveLamp}
+            add={this.addActive.bind(this)}
+            onClose={() => this.setState({ modalAddActiveLamp: false, itemEdit: null })}
+            fullScreen={this.state.fullScreen}
+            lampList={this.state.lampList}
+            itemEdit={this.state.itemEdit}
+          />
+        }
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
@@ -411,62 +550,70 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <Button variant="contained" onClick={this.getTablets.bind(this)}>
+            <Button variant="contained" onClick={this.getLamps.bind(this)}>
               Обновить данные
             </Button>
           </Grid>
           <Grid item xs={12} sm={2}>
-            <Button variant="contained" style={{ whiteSpace: 'nowrap' }} onClick={this.openModal.bind(this, 'addTablet')}>
+            <Button variant="contained" onClick={this.openModalAddLamp.bind(this)}>
               Добавить лампу
             </Button>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <Button variant="contained" onClick={this.openModal.bind(this, 'addRepair')}>
+            <Button variant="contained" onClick={this.openModalAddActiveLamp.bind(this)}>
               Добавить активацию
             </Button>
           </Grid>
 
           <Grid item xs={12} sm={12} mt={3} mb={5}>
             <TableContainer>
-              <Table>
+              <Table style={{whiteSpace: 'nowrap'}}>
                 <TableHead>
                   <TableRow>
                     <TableCell rowSpan={5}>Дата проверки</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell colSpan={3}>Размещение:</TableCell>
-
-                    <TableCell colSpan={3}>Размещение:</TableCell>
+                    {this.state.lampList.map( (item, key) =>
+                      <TableCell key={key} colSpan={3} style={{ textAlign: 'center' }}>Размещение: {item.place}</TableCell>
+                    )}
                   </TableRow>
                   <TableRow>
-                    <TableCell colSpan={3}>Модель:</TableCell>
+                    {this.state.lampList.map( (item, key) =>
+                      <TableCell key={key} colSpan={3} style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.editLamp.bind(this, item)}>Модель: {item.name}</TableCell>
+                    )}
 
-                    <TableCell colSpan={3}>Модель:</TableCell>
+                    <TableCell rowSpan={5}>Подпись менеджера смены</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell colSpan={3}>Ресурс лампы</TableCell>
-
-                    <TableCell colSpan={3}>Ресурс лампы</TableCell>
+                    {this.state.lampList.map( (item, key) =>
+                      <TableCell key={key} colSpan={3} style={{ textAlign: 'center' }}>Ресурс лампы: {item.resource}</TableCell>
+                    )}
                   </TableRow>
                   <TableRow>
-                    <TableCell>Включение</TableCell>
-                    <TableCell>Выключение</TableCell>
-                    <TableCell>Время работы</TableCell>
-
-                    <TableCell>Включение</TableCell>
-                    <TableCell>Выключение</TableCell>
-                    <TableCell>Время работы</TableCell>
+                    {this.state.lampList.map( (item, key) =>
+                      <Fragment key={key}>
+                        <TableCell style={{ textAlign: 'center' }}>Включение</TableCell>
+                        <TableCell style={{ textAlign: 'center' }}>Выключение</TableCell>
+                        <TableCell style={{ textAlign: 'center' }}>Время работы</TableCell>
+                      </Fragment>
+                    )}
                   </TableRow>
-
+                  
                 </TableHead>
                 <TableBody>
-                  {this.state.tabletsActive.map((item, key) => (
-                    <TableRow key={key} style={{ cursor: 'pointer' }} hover onClick={this.openModal.bind(this, 'tablet', item.id)}>
-                      <TableCell>{item.number}</TableCell>
-                      <TableCell>{item.model}</TableCell>
-                      <TableCell>{item.imei}</TableCell>
-                      <TableCell>{item.buy_date}</TableCell>
-                      <TableCell>{item.repairs.summ ?? 0}</TableCell>
+                  {this.state.lampListActive.map((item, key) => (
+                    <TableRow key={key} style={{ cursor: 'pointer' }} hover>
+                      <TableCell>{item.date}</TableCell>
+                        
+                        {item.lamps.map( (lamp, k) =>
+                          <Fragment key={k}>
+                            <TableCell style={{ textAlign: 'center' }} onClick={ lamp.id == '' ? () => {} : this.editActiveLamp.bind(this, lamp)}>{lamp.time_start}</TableCell>
+                            <TableCell style={{ textAlign: 'center' }} onClick={ lamp.id == '' ? () => {} : this.editActiveLamp.bind(this, lamp)}>{lamp.time_end}</TableCell>
+                            <TableCell style={{ textAlign: 'center' }} onClick={ lamp.id == '' ? () => {} : this.editActiveLamp.bind(this, lamp)}>{lamp.diff}</TableCell>
+                          </Fragment>
+                        ) }
+
+                      <TableCell>{item.manager}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
