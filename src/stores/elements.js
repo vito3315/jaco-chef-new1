@@ -23,6 +23,8 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+
 //import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
 
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
@@ -51,6 +53,30 @@ export function formatDate(date) {
       day = '0' + day;
 
   return [year, month, day].join('-');
+}
+
+export function formatDateMax(date) {
+  var d = new Date(date),
+      month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear(),
+      
+      hour = d.getHours(),
+      min = d.getMinutes();
+
+  console.log( d, date, hour, min )
+
+  if (month.length < 2) 
+      month = '0' + month;
+  if (day.length < 2) 
+      day = '0' + day;
+
+  if (hour.length < 2) 
+    hour = '0' + hour;
+  if (min.length < 2) 
+    min = '0' + min;
+
+  return ([year, month, day].join('-')) + ' ' + ([hour, min].join(':'));
 }
 
 export function formatDateMin(date) {
@@ -418,6 +444,34 @@ export class MyDatePickerNew extends React.PureComponent {
           minDate={ this.props.minDate ? this.props.minDate : null }
           label={this.props.label}
           value={formatDate(this.props.value)}
+          disabled={ this.props.disabled || this.props.disabled === true ? true : false }
+          onChange={this.props.func}
+          onBlur={this.props.onBlur ? this.props.onBlur : null}
+          renderInput={(params) => <TextField variant="outlined" size={'small'} color='primary' style={{ width: '100%' }} {...params} />}
+        />
+      </LocalizationProvider>
+    )
+  }
+}
+
+export class MyDateTimePickerNew extends React.PureComponent {
+  constructor(props) {
+    super(props);
+        
+    this.state = {
+    };
+  }
+  
+  render(){
+    return (
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ruLocale}>
+        <DateTimePicker
+          multiple={true}
+          mask="____-__-__ __:__"
+          inputFormat="yyyy-MM-dd HH:mm"
+          minDate={ this.props.minDate ? this.props.minDate : null }
+          label={this.props.label}
+          value={formatDateMax(this.props.value)}
           disabled={ this.props.disabled || this.props.disabled === true ? true : false }
           onChange={this.props.func}
           onBlur={this.props.onBlur ? this.props.onBlur : null}

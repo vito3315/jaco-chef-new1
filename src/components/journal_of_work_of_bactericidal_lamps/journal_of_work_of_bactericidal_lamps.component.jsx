@@ -22,7 +22,7 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import {MyAlert, MySelect, MyTextInput, MyDatePickerNew, MyTimePicker, formatDate} from '../../stores/elements';
-import { formatDateMin, MyDatePickerNewViews } from '../../stores/elements';
+import { formatDateMin, MyDatePickerNewViews, MyDateTimePickerNew, formatDateMax } from '../../stores/elements';
 
 import queryString from 'query-string';
 
@@ -135,13 +135,13 @@ class Lamps_Modal_Add_Active extends React.Component {
     this.state = {
       active_id: this.props.itemEdit?.id ?? '',
       lamp_id: this.props.itemEdit?.lamp_id ?? '',
-      date: formatDate(this.props.itemEdit?.date ?? new Date()),
       time_start: this.props.itemEdit?.time_start ?? '',
       time_end: this.props.itemEdit?.time_end ?? '',
     };
   }
 
   changeItem(data, event) {
+
     this.setState({
       [data]: event.target.value,
     });
@@ -171,8 +171,9 @@ class Lamps_Modal_Add_Active extends React.Component {
   }
 
   changeDateRange(data, event) {
+
     this.setState({
-      [data]: event ? formatDate(event) : '',
+      [data]: event ? formatDateMax(event) : '',
     });
   }
 
@@ -203,25 +204,18 @@ class Lamps_Modal_Add_Active extends React.Component {
                 label="Лампа"
               />
             </Grid>
-            <Grid item xs={12} sm={12}>
-              <MyDatePickerNew
-                label="Дата активации"
-                disabled={ this.state.active_id == '' ? false : true }
-                value={this.state.date}
-                func={this.changeDateRange.bind(this, 'date')}
-              />
-            </Grid>
-            <Grid item xs={12} sm={12}>
-              <MyTimePicker
+            
+            <Grid item xs={12} sm={6}>
+              <MyDateTimePickerNew
                 value={this.state.time_start}
-                func={this.changeItem.bind(this, 'time_start')}
+                func={this.changeDateRange.bind(this, 'time_start')}
                 label="Время начала работы"
               />
             </Grid>
-            <Grid item xs={12} sm={12}>
-              <MyTimePicker
+            <Grid item xs={12} sm={6}>
+              <MyDateTimePickerNew
                 value={this.state.time_end}
-                func={this.changeItem.bind(this, 'time_end')}
+                func={this.changeDateRange.bind(this, 'time_end')}
                 label="Время окончания работы"
               />
             </Grid>
@@ -267,8 +261,8 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
       itemEdit: null,
       lampEdit: null,
 
-      date_start: '',
-      date_end: '',
+      date_start: formatDateMin(new Date()),
+      date_end: formatDateMin(new Date()),
     };
   }
 
@@ -598,13 +592,13 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
                     <TableRow key={key} style={{ cursor: 'pointer' }} hover>
                       <TableCell style={{ border: '1px solid #e5e5e5' }}>{item.date}</TableCell>
                         
-                        {item.lamps.map( (lamp, k) =>
-                          <Fragment key={k}>
-                            <TableCell style={{ textAlign: 'center', color: 'red' }} onClick={ lamp.id == '' ? () => {} : this.editActiveLamp.bind(this, lamp)}>{lamp.time_start}</TableCell>
-                            <TableCell style={{ textAlign: 'center', color: 'red' }} onClick={ lamp.id == '' ? () => {} : this.editActiveLamp.bind(this, lamp)}>{lamp.time_end}</TableCell>
-                            <TableCell style={{ textAlign: 'center', color: 'red', borderRight: '1px solid #e5e5e5' }} onClick={ lamp.id == '' ? () => {} : this.editActiveLamp.bind(this, lamp)}>{lamp.diff}</TableCell>
-                          </Fragment>
-                        ) }
+                      {item.lamps.map( (lamp, k) =>
+                        <Fragment key={k}>
+                          <TableCell style={{ textAlign: 'center', color: 'red' }} onClick={ lamp.id == '' ? () => {} : this.editActiveLamp.bind(this, lamp)}>{lamp.only_time_start}</TableCell>
+                          <TableCell style={{ textAlign: 'center', color: 'red' }} onClick={ lamp.id == '' ? () => {} : this.editActiveLamp.bind(this, lamp)}>{lamp.only_time_end}</TableCell>
+                          <TableCell style={{ textAlign: 'center', color: 'red', borderRight: '1px solid #e5e5e5' }} onClick={ lamp.id == '' ? () => {} : this.editActiveLamp.bind(this, lamp)}>{lamp.diff}</TableCell>
+                        </Fragment>
+                      ) }
 
                       <TableCell style={{ border: '1px solid #e5e5e5' }}>{item.manager}</TableCell>
                     </TableRow>
