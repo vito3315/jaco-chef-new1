@@ -2,7 +2,6 @@ import React, {Fragment} from 'react';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
@@ -23,6 +22,7 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import {MyAlert, MySelect, MyTextInput, MyDatePickerNew, MyTimePicker, formatDate} from '../../stores/elements';
+import { formatDateMin, MyDatePickerNewViews } from '../../stores/elements';
 
 import queryString from 'query-string';
 
@@ -248,14 +248,10 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
       points: [],
       point: '0',
 
-      tabletsActive: [],
-      tabletsNonActive: [],
+      
 
       type: '',
-      tablet: null,
-      tablets: null,
       pointModal: '',
-      modalDialog: false,
       fullScreen: false,
 
       openAlert: false,
@@ -269,7 +265,10 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
       lampList: [],
       lampListActive: [],
       itemEdit: null,
-      lampEdit: null
+      lampEdit: null,
+
+      date_start: '',
+      date_end: '',
     };
   }
 
@@ -352,15 +351,15 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
     });
 
     setTimeout(() => {
-      this.getTablets();
+      this.getLamps();
     }, 50);
   }
 
   async getLamps() {
-    const point_id = this.state.point;
-
     const data = {
-      point_id,
+      point_id: this.state.point,
+      date_start: this.state.date_start,
+      date_end: this.state.date_end,
     };
 
     const res = await this.getData('get_lamps', data);
@@ -369,56 +368,6 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
       lampList: res.list,
       lampListActive: res.active_lamp,
     });
-  }
-
-  async openModal(type, table_id) {
-    this.handleResize();
-
-    const points = this.state.points;
-
-    const point_id = this.state.point;
-
-    const pointModal = points.find((it) => it.id === point_id).name;
-
-    if (type === 'tablet') {
-      const data = {
-        point_id,
-        table_id,
-      };
-
-      const res = await this.getData('get_tablet', data);
-
-      this.setState({
-        type,
-        tablet: res,
-        pointModal,
-        modalDialog: true,
-      });
-    }
-
-    if (type === 'addRepair') {
-      const tablets = this.state.tabletsActive;
-
-      const tabletsData = tablets.reduce((newTablets, item) => {
-        newTablets.push({id: item.id, name: `${item.number} - ${item.model}`});
-        return newTablets;
-      }, []);
-
-      this.setState({
-        type,
-        tablets: tabletsData,
-        pointModal,
-        modalDialog: true,
-      });
-    }
-
-    if (type === 'addTablet') {
-      this.setState({
-        type,
-        pointModal,
-        modalDialog: true,
-      });
-    }
   }
 
   async add(data) {
@@ -499,6 +448,29 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
     })
   }
 
+  async downloadHJ(){
+    let data = {
+      date_start: this.state.date_start,
+      date_end: this.state.date_end,
+      point_id: this.state.point,
+    };
+
+    const res =  await this.getData('downloadHJ', data);
+
+    // правка 26.12 скачивания файла в один клик
+    if( res.url){
+      const link = document.createElement('a');
+      link.href = res.url;
+      link.click();
+    }
+  }
+
+  changeDateRange(type, data) {
+    this.setState({
+      [type]: formatDateMin(data),
+    });
+  }
+
   render() {
     return (
       <>
@@ -540,6 +512,22 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={6}>
+            <MyDatePickerNewViews
+              label="Дата от"
+              views={['month', 'year']}
+              value={this.state.date_start}
+              func={this.changeDateRange.bind(this, 'date_start')}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <MyDatePickerNewViews
+              label="Дата до"
+              views={['month', 'year']}
+              value={this.state.date_end}
+              func={this.changeDateRange.bind(this, 'date_end')}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
             <MySelect
               is_none={false}
               data={this.state.points}
@@ -564,29 +552,34 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
               Добавить активацию
             </Button>
           </Grid>
+          <Grid item xs={12} sm={4}>
+            <Button variant="contained" onClick={this.downloadHJ.bind(this)}>
+              Скачать
+            </Button>
+          </Grid>
 
           <Grid item xs={12} sm={12} mt={3} mb={5}>
             <TableContainer>
               <Table style={{whiteSpace: 'nowrap'}}>
                 <TableHead>
                   <TableRow>
-                    <TableCell rowSpan={5}>Дата проверки</TableCell>
+                    <TableCell rowSpan={5} style={{ border: '1px solid #e5e5e5' }}>Дата проверки</TableCell>
                   </TableRow>
                   <TableRow>
                     {this.state.lampList.map( (item, key) =>
-                      <TableCell key={key} colSpan={3} style={{ textAlign: 'center' }}>Размещение: {item.place}</TableCell>
-                    )}
-                  </TableRow>
-                  <TableRow>
-                    {this.state.lampList.map( (item, key) =>
-                      <TableCell key={key} colSpan={3} style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.editLamp.bind(this, item)}>Модель: {item.name}</TableCell>
+                      <TableCell key={key} colSpan={3} style={{ textAlign: 'center', border: '1px solid #e5e5e5' }}>Размещение: {item.place}</TableCell>
                     )}
 
-                    <TableCell rowSpan={5}>Подпись менеджера смены</TableCell>
+                    <TableCell rowSpan={5} style={{ border: '1px solid #e5e5e5' }}>Подпись менеджера смены</TableCell>
                   </TableRow>
                   <TableRow>
                     {this.state.lampList.map( (item, key) =>
-                      <TableCell key={key} colSpan={3} style={{ textAlign: 'center' }}>Ресурс лампы: {item.resource}</TableCell>
+                      <TableCell key={key} colSpan={3} style={{ textAlign: 'center', cursor: 'pointer', color: 'red', border: '1px solid #e5e5e5' }} onClick={this.editLamp.bind(this, item)}>Модель: {item.name}</TableCell>
+                    )}
+                  </TableRow>
+                  <TableRow>
+                    {this.state.lampList.map( (item, key) =>
+                      <TableCell key={key} colSpan={3} style={{ textAlign: 'center', border: '1px solid #e5e5e5' }}>Ресурс лампы: {item.resource}</TableCell>
                     )}
                   </TableRow>
                   <TableRow>
@@ -594,7 +587,7 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
                       <Fragment key={key}>
                         <TableCell style={{ textAlign: 'center' }}>Включение</TableCell>
                         <TableCell style={{ textAlign: 'center' }}>Выключение</TableCell>
-                        <TableCell style={{ textAlign: 'center' }}>Время работы</TableCell>
+                        <TableCell style={{ textAlign: 'center', borderRight: '1px solid #e5e5e5' }}>Время работы</TableCell>
                       </Fragment>
                     )}
                   </TableRow>
@@ -603,19 +596,33 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
                 <TableBody>
                   {this.state.lampListActive.map((item, key) => (
                     <TableRow key={key} style={{ cursor: 'pointer' }} hover>
-                      <TableCell>{item.date}</TableCell>
+                      <TableCell style={{ border: '1px solid #e5e5e5' }}>{item.date}</TableCell>
                         
                         {item.lamps.map( (lamp, k) =>
                           <Fragment key={k}>
-                            <TableCell style={{ textAlign: 'center' }} onClick={ lamp.id == '' ? () => {} : this.editActiveLamp.bind(this, lamp)}>{lamp.time_start}</TableCell>
-                            <TableCell style={{ textAlign: 'center' }} onClick={ lamp.id == '' ? () => {} : this.editActiveLamp.bind(this, lamp)}>{lamp.time_end}</TableCell>
-                            <TableCell style={{ textAlign: 'center' }} onClick={ lamp.id == '' ? () => {} : this.editActiveLamp.bind(this, lamp)}>{lamp.diff}</TableCell>
+                            <TableCell style={{ textAlign: 'center', color: 'red' }} onClick={ lamp.id == '' ? () => {} : this.editActiveLamp.bind(this, lamp)}>{lamp.time_start}</TableCell>
+                            <TableCell style={{ textAlign: 'center', color: 'red' }} onClick={ lamp.id == '' ? () => {} : this.editActiveLamp.bind(this, lamp)}>{lamp.time_end}</TableCell>
+                            <TableCell style={{ textAlign: 'center', color: 'red', borderRight: '1px solid #e5e5e5' }} onClick={ lamp.id == '' ? () => {} : this.editActiveLamp.bind(this, lamp)}>{lamp.diff}</TableCell>
                           </Fragment>
                         ) }
 
-                      <TableCell>{item.manager}</TableCell>
+                      <TableCell style={{ border: '1px solid #e5e5e5' }}>{item.manager}</TableCell>
                     </TableRow>
                   ))}
+
+                  <TableRow>
+                    <TableCell style={{ border: '1px solid #e5e5e5' }}>Отработано часов</TableCell>
+                      
+                    {this.state.lampList.map( (lamp, k) =>
+                      <Fragment key={k}>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center' }}></TableCell>
+                        <TableCell style={{ textAlign: 'center', borderRight: '1px solid #e5e5e5' }}>{lamp.svod}</TableCell>
+                      </Fragment>
+                    ) }
+
+                    <TableCell style={{ border: '1px solid #e5e5e5' }}></TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
               
