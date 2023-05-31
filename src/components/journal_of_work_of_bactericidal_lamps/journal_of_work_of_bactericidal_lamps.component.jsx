@@ -159,6 +159,16 @@ class Lamps_Modal_Add_Active extends React.Component {
     this.props.add(data);
   }
 
+  changeLamp(){
+    if(confirm('Точно заменить лампу ?')) {
+      const data = {
+        lamp_id: this.state.lamp_id,
+      };
+      
+      this.props.changeLamp(data);
+    }
+  }
+
   onClose() {
     this.setState({
       number: '',
@@ -222,7 +232,8 @@ class Lamps_Modal_Add_Active extends React.Component {
               
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions style={{ justifyContent: 'space-between' }}>
+          <Button variant="contained" onClick={this.changeLamp.bind(this)}>Замена лампы</Button>
           <Button variant="contained" onClick={this.add.bind(this)}>Сохранить</Button>
         </DialogActions>
       </Dialog>
@@ -465,6 +476,32 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
     });
   }
 
+  async changeLamp(data){
+    data.point_id = this.state.point;
+
+    const res = await this.getData('changeLamp', data);
+    
+    if (res.st) {
+      this.setState({
+        openAlert: true,
+        err_status: true,
+        err_text: 'Успешно сохранено!',
+
+        modalAddActiveLamp: false
+      });
+
+      setTimeout(() => {
+        this.getLamps();
+      }, 300);
+    } else {
+      this.setState({
+        openAlert: true,
+        err_status: false,
+        err_text: res.text,
+      });
+    }
+  }
+
   render() {
     return (
       <>
@@ -486,6 +523,7 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
             onClose={() => this.setState({ modalAddLamp: false, lampEdit: null })}
             fullScreen={this.state.fullScreen}
             lampEdit={this.state.lampEdit}
+            changeLamp={this.changeLamp.bind(this)}
           />
         }
 
