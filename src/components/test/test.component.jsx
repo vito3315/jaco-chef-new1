@@ -320,8 +320,8 @@ class Test_ extends React.Component {
           </Grid>
           
           <Grid item xs={12} className={'abv'}>
-            <img className='fon' src='https://jacochef.ru/src/img/test/cofw_3n4w_210426.jpg' />
-            <img className='bus' src='https://jacochef.ru/src/img/test/asdf.png' />
+            <img className='fon' src='https://jacochef.ru/src/img/test/test.gif' />
+            
             <div>
             { this.state.items.length == 0 ? false :
               <TestApp items={this.state.items} />

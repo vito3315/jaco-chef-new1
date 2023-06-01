@@ -16,8 +16,8 @@
     & > div{
         width: calc(215px * 3);
         position: absolute;
-        left: 350px;
-        bottom: 200px;
+        left: 30vw;
+        bottom: 400px;
         & .roulette-pro-wrapper{
             & ul > li{
                 //padding-left: 20px;
@@ -27,7 +27,7 @@
         & .START{
             position: absolute;
             left: 40%;
-            bottom: -188px;
+            bottom: -250px;
             background-color: red;
             border: 1px solid red;
             border-radius: 40px;
