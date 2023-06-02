@@ -39,7 +39,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyTextInput, MyDatePickerNew } from '../../stores/elements';
+import { MySelect, MyCheckBox, MyTextInput, MyDatePickerNew, formatDate } from '../../stores/elements';
 
 import Dropzone from "dropzone";
 
@@ -47,6 +47,8 @@ import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 
 import queryString from 'query-string';
+
+import dayjs from 'dayjs';
 
 class TableStages extends React.Component{
   render (){
@@ -84,20 +86,6 @@ class TableStages extends React.Component{
       </Table>
     )
   }
-}
-
-function formatDate(date) {
-  var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-  if (month.length < 2) 
-      month = '0' + month;
-  if (day.length < 2) 
-      day = '0' + day;
-
-  return [year, month, day].join('-');
 }
 
 class SiteItemsTable extends React.Component {
@@ -148,7 +136,7 @@ class SiteItemsTable extends React.Component {
                         <TableCell onClick={this.props.openItem.bind(this, it, it.date_update ? 'hist' : 'origin', true)}>{it.name}</TableCell>
                         { it.date_update ?
                           <TableCell>
-                            <MyDatePickerNew label="" value={ it.date_update } func={ this.props.changeDateUpdate.bind(this, key, k, it.date_update_id) } />
+                            <MyDatePickerNew label="" value={ dayjs(it.date_update) } func={ this.props.changeDateUpdate.bind(this, key, k, it.date_update_id) } />
                           </TableCell>
                             :
                           <TableCell></TableCell>
@@ -448,7 +436,7 @@ class SiteItems_ extends React.Component {
       ItemTab1 : ItemTab1,
       modalEdit: true,
 
-      date_update: formatDate(res.item.date_start) ?? formatDate(new Date()),
+      date_update: dayjs(res.item.date_start) ?? dayjs(new Date()),
     })
 
     setTimeout( () => {
@@ -893,7 +881,7 @@ class SiteItems_ extends React.Component {
     if( this.myDropzoneNew['files'].length > 0 ){
       let name = this.state.editItem.name,
         id = this.state.editItem.id,
-        date_update = this.state.date_update,
+        date_update = dayjs(this.state.date_update).format('YYYY-MM-DD'),
         hist_id = this.state.editItem.hist_id,
         type = 'new';
 
@@ -967,7 +955,7 @@ class SiteItems_ extends React.Component {
     })
 
     let data = {
-      dateUpdate: this.state.date_update,
+      dateUpdate: dayjs(this.state.date_update).format('YYYY-MM-DD'),
       item: this.state.editItem,
       rec_stage_1: rec_1,
       rec_stage_2: rec_2,
@@ -1037,7 +1025,7 @@ class SiteItems_ extends React.Component {
      })
 
     let data = {
-      dateUpdate: this.state.date_update,
+      dateUpdate: dayjs(this.state.date_update).format('YYYY-MM-DD'),
       item      : this.state.editItem,
       rec_stage_1: rec_1,
       rec_stage_2: rec_2,
@@ -1408,7 +1396,7 @@ class SiteItems_ extends React.Component {
     let value = event;
     let cats = this.state.cats;
     
-    cats[ key_cat ]['items'][ key_item ]['date_update'] = formatDate(value);
+    cats[ key_cat ]['items'][ key_item ]['date_update'] = dayjs(value).format('YYYY-MM-DD');
 
     this.setState({
       cats: cats,
@@ -1417,7 +1405,7 @@ class SiteItems_ extends React.Component {
 
     let data = {
       update_id: update_id,
-      dateUpdate: formatDate(value)
+      dateUpdate: dayjs(value).format('YYYY-MM-DD'),
     };
 
     let res = await this.getData('saveUpdateDate', data);
@@ -1436,7 +1424,7 @@ class SiteItems_ extends React.Component {
     let data = {
       id: item_id,
       update_id: update_id,
-      dateUpdate: formatDate(event)
+      dateUpdate: dayjs(event).format('YYYY-MM-DD'),
     };
 
     console.log( data )
@@ -1461,7 +1449,7 @@ class SiteItems_ extends React.Component {
 
   changeDateRange(data, event){
     this.setState({
-      [data]: formatDate(event)
+      [data]: (event)
     })
   }
 

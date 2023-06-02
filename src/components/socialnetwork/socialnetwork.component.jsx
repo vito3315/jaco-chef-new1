@@ -8,7 +8,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { MySelect, MyTextInput } from '../../stores/elements';
 
-import axios from 'axios';
 import queryString from 'query-string';
 
 class SocialNetwork_ extends React.Component {

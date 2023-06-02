@@ -38,21 +38,12 @@ import {
   MyTextInput,
   MyCheckBox,
   MyAlert,
+  formatDate
 } from '../../stores/elements';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 class SiteAktii_Modal extends React.Component {
   dropzoneOptions = {
@@ -111,7 +102,7 @@ class SiteAktii_Modal extends React.Component {
   changeDateRange(data, event) {
     const item = this.state.item;
 
-    item.akcia[data] = event ? formatDate(event) : '';
+    item.akcia[data] = event ? (event) : '';
 
     this.setState({
       item,
@@ -152,10 +143,14 @@ class SiteAktii_Modal extends React.Component {
     if (!this.click) {
       this.click = true;
 
-      const item = this.state.item;
+      let item = this.state.item;
 
       item.akcia.promo_name = item.akcia.promo;
       item.akcia.items = item.akcia_items;
+
+      item.akcia.start_date = dayjs(item.akcia.start_date).format('YYYY-MM-DD')
+      item.akcia.end_date = dayjs(item.akcia.end_date).format('YYYY-MM-DD')
+      
 
       const data = item.akcia;
 
@@ -222,10 +217,13 @@ class SiteAktii_Modal extends React.Component {
     if (!this.click) {
       this.click = true;
 
-      const item = this.state.item;
+      let item = this.state.item;
 
       item.akcia.promo_name = item.akcia.promo;
       item.akcia.items = item.akcia_items;
+
+      item.akcia.start_date = dayjs(item.akcia.start_date).format('YYYY-MM-DD')
+      item.akcia.end_date = dayjs(item.akcia.end_date).format('YYYY-MM-DD')
 
       const data = item.akcia;
 
@@ -339,7 +337,7 @@ class SiteAktii_Modal extends React.Component {
               <Grid item xs={12} sm={6}>
                 <MyDatePickerNew
                   label="Дата старта"
-                  value={this.state.item ? this.state.item.akcia.start_date : ''}
+                  value={this.state.item ? dayjs(this.state.item.akcia.start_date) : ''}
                   func={this.changeDateRange.bind(this, 'start_date')}
                 />
               </Grid>
@@ -347,7 +345,7 @@ class SiteAktii_Modal extends React.Component {
               <Grid item xs={12} sm={6}>
                 <MyDatePickerNew
                   label="Дата окончания"
-                  value={this.state.item ? this.state.item.akcia.end_date : ''}
+                  value={this.state.item ? dayjs(this.state.item.akcia.end_date) : ''}
                   func={this.changeDateRange.bind(this, 'end_date')}
                 />
               </Grid>

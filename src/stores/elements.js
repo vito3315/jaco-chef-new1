@@ -37,12 +37,17 @@ import MuiAlert from '@mui/material/Alert';
 
 import { Editor } from '@tinymce/tinymce-react';
 
+import dayjs, { Dayjs } from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import 'dayjs/locale/ru';
+
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
 export function formatDate(date) {
-  var d = new Date(date),
+  return dayjs(date)
+  /*var d = new Date(date),
       month = '' + (d.getMonth() + 1),
       day = '' + d.getDate(),
       year = d.getFullYear();
@@ -52,7 +57,7 @@ export function formatDate(date) {
   if (day.length < 2) 
       day = '0' + day;
 
-  return [year, month, day].join('-');
+  return [year, month, day].join('-');*/
 }
 
 export function formatDateMax(date) {
@@ -436,18 +441,22 @@ export class MyDatePickerNew extends React.PureComponent {
   
   render(){
     return (
-      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ruLocale}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
         <DatePicker
           multiple={true}
-          mask="____-__-__"
-          inputFormat="yyyy-MM-dd"
+          //mask="____-__-__"
+          format="YYYY-MM-DD"
           minDate={ this.props.minDate ? this.props.minDate : null }
           label={this.props.label}
-          value={formatDate(this.props.value)}
+          value={(this.props.value)}
           disabled={ this.props.disabled || this.props.disabled === true ? true : false }
           onChange={this.props.func}
           onBlur={this.props.onBlur ? this.props.onBlur : null}
-          renderInput={(params) => <TextField variant="outlined" size={'small'} color='primary' style={{ width: '100%' }} {...params} />}
+          className={'datePicker'}
+          slotProps={{
+            textField: { size: "small" },
+          }}
+          //renderInput={(params) => <TextField variant="outlined" size={'small'} color='primary' style={{ width: '100%' }} {...params} />}
         />
       </LocalizationProvider>
     )
@@ -464,18 +473,23 @@ export class MyDateTimePickerNew extends React.PureComponent {
   
   render(){
     return (
-      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ruLocale}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
         <DateTimePicker
           multiple={true}
+          views={['year', 'month', 'day', 'hours', 'minutes']}
           mask="____-__-__ __:__"
-          inputFormat="yyyy-MM-dd HH:mm"
+          format="YYYY-MM-DD HH:mm"
           minDate={ this.props.minDate ? this.props.minDate : null }
           label={this.props.label}
-          value={formatDateMax(this.props.value)}
+          value={this.props.value}
           disabled={ this.props.disabled || this.props.disabled === true ? true : false }
           onChange={this.props.func}
           onBlur={this.props.onBlur ? this.props.onBlur : null}
-          renderInput={(params) => <TextField variant="outlined" size={'small'} color='primary' style={{ width: '100%' }} {...params} />}
+          className={'datePicker'}
+          slotProps={{
+            textField: { size: "small" },
+          }}
+          //renderInput={(params) => <TextField variant="outlined" size={'small'} color='primary' style={{ width: '100%' }} {...params} />}
         />
       </LocalizationProvider>
     )
@@ -492,18 +506,21 @@ export class MyDatePickerNewViews extends React.PureComponent {
   
   render(){
     return (
-      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ruLocale}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
         <DatePicker
-          multiple={true}
-          mask="____-__"
-          inputFormat="yyyy-MM"
+          className={'datePicker'}
+          //multiple={true}
+          //mask="____-__"
+          //inputFormat="yyyy-MM"
           minDate={ this.props.minDate ? this.props.minDate : null }
           label={this.props.label}
-          value={formatDateMin(this.props.value)}
+          value={dayjs(this.props.value)}
           views={this.props.views}
           onChange={this.props.func}
           onBlur={this.props.onBlur ? this.props.onBlur : null}
-          renderInput={(params) => <TextField variant="outlined" size={'small'} color='primary' style={{ width: '100%' }} {...params} />}
+          size={'small'}
+          style={{ width: '100%' }}
+          //renderInput={(params) => <TextField variant="outlined" size={'small'} color='primary' style={{ width: '100%' }} {...params} />}
         />
       </LocalizationProvider>
     )
@@ -566,7 +583,7 @@ export class MyDatePickerGraph extends React.PureComponent {
 
   render(){
     return (
-      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ruLocale}>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
         <StaticDatePicker
           multiple={true}
           minDate={formatDate(this.state.minDate)}
@@ -575,11 +592,15 @@ export class MyDatePickerGraph extends React.PureComponent {
           label="Week picker"
           
           renderDay={this.props.renderWeekPickerDay}
-          renderInput={(params) => <TextField {...params} />}
-          inputFormat="yyyy-MM-dd"
+          //renderInput={(params) => <TextField {...params} />}
+          //inputFormat="yyyy-MM-dd"
           
+          slotProps={{
+            textField: { size: "small", multiple: true },
+          }}
+
           value={this.state.activeValue}
-          onChange={ () => {} }
+          //onChange={ () => {} }
         />
       </LocalizationProvider>
     )

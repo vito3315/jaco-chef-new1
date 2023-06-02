@@ -25,24 +25,12 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyAutocomplite, MyDatePickerNew } from '../../stores/elements';
+import { MySelect, MyAutocomplite, MyDatePickerNew, formatDate } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-  if (month.length < 2) 
-      month = '0' + month;
-  if (day.length < 2) 
-      day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 class RasByBill_ extends React.Component {
   constructor(props) {
@@ -150,8 +138,8 @@ class RasByBill_ extends React.Component {
       points: this.state.point,
       items: this.state.myItems,
       item_cat: this.state.item_cat,
-      start_date: this.state.date_start,
-      end_date: this.state.date_end,
+      start_date  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      end_date    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
     };
     
     let res = await this.getData('get_this_rev', data);
@@ -177,8 +165,8 @@ class RasByBill_ extends React.Component {
     let data = {
       points: this.state.point,
       items: this.state.myItems,
-      start_date: this.state.date_start,
-      end_date: this.state.date_end,
+      start_date  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      end_date    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
     };
     
     let res = await this.getData('get_this_rev_cat', data);
@@ -203,7 +191,7 @@ class RasByBill_ extends React.Component {
   
   changeDateRange(data, event){
     this.setState({
-      [data]: formatDate(event)
+      [data]: (event)
     })
   }
   

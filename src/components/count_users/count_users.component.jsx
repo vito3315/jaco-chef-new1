@@ -31,21 +31,12 @@ import {
   MyTimePicker,
   MyDatePickerNew,
   MyTextInput,
+  formatDate
 } from '../../stores/elements';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 class CountUsers_Modal extends React.Component {
   constructor(props) {
@@ -53,13 +44,11 @@ class CountUsers_Modal extends React.Component {
 
     this.state = {
       item: [],
-      date_start: '',
+      date_start: formatDate(new Date())
     };
   }
 
   componentDidUpdate(prevProps) {
-    // console.log(this.props);
-
     if (!this.props.event) {
       return;
     }
@@ -125,7 +114,7 @@ class CountUsers_Modal extends React.Component {
   changeDateRange(val) {
     const item = this.state.item;
 
-    item.forEach((el) => (el.date = formatDate(val)));
+    item.forEach((el) => (el.date = dayjs(val).format('YYYY-MM-DD')));
 
     this.setState({
       item,

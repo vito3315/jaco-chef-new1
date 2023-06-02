@@ -18,23 +18,11 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyDatePickerNew } from '../../stores/elements';
+import { MySelect, MyDatePickerNew, formatDate } from '../../stores/elements';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-  if (month.length < 2) 
-      month = '0' + month;
-  if (day.length < 2) 
-      day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 class RasBillAndCook_ extends React.Component {
   click = false;
@@ -120,7 +108,7 @@ class RasBillAndCook_ extends React.Component {
     let data = {
       point_id: this.state.point,
       date_start: this.state.rev,
-      date_end: this.state.date_end,
+      date_end: dayjs(this.state.date_end).format('YYYY-MM-DD'),
     };
     
     let res = await this.getData('show', data);
@@ -158,7 +146,7 @@ class RasBillAndCook_ extends React.Component {
 
   changeDate(data){
     this.setState({
-      date_end: formatDate(data)
+      date_end: (data)
     })
   }
 

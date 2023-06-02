@@ -8,23 +8,11 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import Typography from '@mui/material/Typography';
 
-import { MySelect, MyDatePickerNew, MyTimePicker, MyCheckBox } from '../../stores/elements';
+import { MySelect, MyDatePickerNew, MyTimePicker, MyCheckBox, formatDate } from '../../stores/elements';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-  if (month.length < 2) 
-      month = '0' + month;
-  if (day.length < 2) 
-      day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 export class HotMap extends React.Component {
   map = null;
@@ -42,8 +30,8 @@ export class HotMap extends React.Component {
       cities: [],
       city_id: '',
       
-      date_start: formatDate(new Date()),
-      date_end: formatDate(new Date()),
+      date_start: dayjs(new Date()),
+      date_end: dayjs(new Date()),
       time_start: '00:00',
       time_end: '23:59',
 
@@ -145,8 +133,8 @@ export class HotMap extends React.Component {
 
     let data = {
       city_id: this.state.city_id,
-      date_start: this.state.date_start,
-      date_end: this.state.date_end,
+      date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
       time_start: this.state.time_start,
       time_end: this.state.time_end,
       is_new: this.state.is_new,
@@ -156,8 +144,6 @@ export class HotMap extends React.Component {
     
     let res = await this.getData('get_orders', data);
     
-    console.log( res )
-
     this.getOrders(res.points, res.all_points)
   }
   
@@ -338,8 +324,8 @@ export class HotMap extends React.Component {
 
     let data = {
       city_id: this.state.city_id,
-      date_start: this.state.date_start,
-      date_end: this.state.date_end,
+      date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
       time_start: this.state.time_start,
       time_end: this.state.time_end,
       is_pick_order: this.state.is_pick_order,
@@ -362,7 +348,7 @@ export class HotMap extends React.Component {
 
   changeDateRange(data, event){
     this.setState({
-      [data]: formatDate(event)
+      [data]: (event)
     })
   }
 

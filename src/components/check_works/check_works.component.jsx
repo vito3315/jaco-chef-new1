@@ -45,21 +45,11 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 
-import { MySelect, MyDatePickerNew, MyTextInput, MyAlert } from '../../stores/elements';
+import { MySelect, MyDatePickerNew, MyTextInput, MyAlert, formatDate } from '../../stores/elements';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 class CheckWorks_Confirm extends React.Component {
   constructor(props) {
@@ -484,7 +474,7 @@ class Checkworks_ extends React.Component {
 
   changeDateRange(data, event) {
     this.setState({
-      [data]: event ? formatDate(event) : '',
+      [data]: event ? (event) : '',
     });
   }
 
@@ -527,8 +517,8 @@ class Checkworks_ extends React.Component {
 
     const data = {
       point_id: this.state.point,
-      date_start,
-      date_end,
+      date_start: dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      date_end: dayjs(this.state.date_end).format('YYYY-MM-DD'),
     };
 
     const res = await this.getData('get_data', data);
@@ -702,8 +692,8 @@ class Checkworks_ extends React.Component {
   async update() {
     const data = {
       point_id: this.state.point,
-      date_start: this.state.date_start,
-      date_end: this.state.date_end,
+      date_start: dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      date_end: dayjs(this.state.date_end).format('YYYY-MM-DD'),
     };
 
     const res = await this.getData('get_data', data);

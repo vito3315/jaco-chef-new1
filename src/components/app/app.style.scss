@@ -48,3 +48,9 @@ a{
 .__react_modal_image__icon_menu{
     display: flex!important;
 }
+.datePicker{
+    width: 100%;
+    & div.MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl.MuiInputBase-adornedEnd{
+        height: 40px;
+    }
+}

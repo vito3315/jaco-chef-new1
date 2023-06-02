@@ -13,7 +13,6 @@ import TableRow from '@mui/material/TableRow';
 import TabList from '@mui/lab/TabList';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
-import TabPanel from '@mui/lab/TabPanel';
 
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
@@ -36,19 +35,7 @@ import {
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-  if (month.length < 2) 
-      month = '0' + month;
-  if (day.length < 2) 
-      day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 class ReceptModule_Modal_Container extends React.Component {
   constructor(props) {
@@ -698,7 +685,7 @@ class ReceptModule_ extends React.Component {
 
   async saveNewHist() {
     let data = {
-      date_update: this.state.dateUpdate,
+      date_update: dayjs(this.state.dateUpdate).format('YYYY-MM-DD'),
       rec: this.state.rec,
       pf_list: this.state.pf_list
     };
@@ -728,7 +715,7 @@ class ReceptModule_ extends React.Component {
 
   async saveEditHist(){
     let data = {
-      date_update: this.state.dateUpdate,
+      date_update: dayjs(this.state.dateUpdate).format('YYYY-MM-DD'),
       rec: this.state.rec,
       pf_list: this.state.pf_list
     };
@@ -842,7 +829,7 @@ class ReceptModule_ extends React.Component {
 
   changeDate(data, event){
     this.setState({
-      dateUpdate: formatDate(data)
+      dateUpdate: (data)
     })
   }
 

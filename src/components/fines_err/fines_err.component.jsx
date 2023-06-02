@@ -33,22 +33,13 @@ import {
   MyTimePicker,
   MyCheckBox,
   MyTextInput,
-  MyAlert
+  MyAlert,
+  formatDate
 } from '../../stores/elements';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 class Fines_err_Modal_item extends React.Component {
   constructor(props) {
@@ -546,20 +537,20 @@ class Fines_err_Modal_NewItem extends React.Component {
     const point_id = this.state.point;
 
     if (event !== '' && point_id !== '') {
-      const date = formatDate(event);
+      const date = (event);
 
       this.getUsers(point_id, date);
     }
 
     this.setState({
-      [data]: event ? formatDate(event) : '',
+      [data]: event ? (event) : '',
     });
   }
 
   async getUsers(point_id, date) {
     const data = {
       point_id,
-      date,
+      date: dayjs(date).format('YYYY-MM-DD'),
     };
 
     const res = await this.props.getData('get_users', data);
@@ -648,7 +639,7 @@ class Fines_err_Modal_NewItem extends React.Component {
         fine: fine.id,
         user: user && user.id ? user.id : 0,
         point_id: point,
-        date,
+        date: dayjs(date).format('YYYY-MM-DD'),
         time_err: time,
         no_user: is_active,
         comment: comment,
@@ -1080,15 +1071,15 @@ class Fines_err_ extends React.Component {
 
   changeDateRange(data, event) {
     this.setState({
-      [data]: event ? formatDate(event) : '',
+      [data]: event ? (event) : '',
     });
   }
 
   async changePoint(event) {
     const data = {
       point_id: event.target.value,
-      date_start: this.state.date_start,
-      date_end: this.state.date_end,
+      date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
     };
 
     const res = await this.getData('get_data', data);
@@ -1133,8 +1124,8 @@ class Fines_err_ extends React.Component {
   async getItems() {
     const data = {
       point_id: this.state.point,
-      date_start: this.state.date_start,
-      date_end: this.state.date_end,
+      date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
     };
 
     const res = await this.getData('get_data', data);

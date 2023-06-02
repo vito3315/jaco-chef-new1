@@ -14,7 +14,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
@@ -24,16 +23,11 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-//import Paper from '@mui/material/Paper';
-
 import CloseIcon from '@mui/icons-material/Close';
 
-import { MyTextInput, MyDatePickerNew, MyTimePicker, MySelect, MyAutocomplite2, MyCheckBox } from '../../stores/elements';
-//import { alertTitleClasses } from '@mui/material';
+import { MyTextInput, MyTimePicker, MySelect, MyAutocomplite2, MyCheckBox } from '../../stores/elements';
 
 import queryString from 'query-string';
-
-
 
 function getTime(type) {
 

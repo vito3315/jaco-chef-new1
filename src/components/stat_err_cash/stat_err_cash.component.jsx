@@ -32,21 +32,11 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
 import ModalImage from "react-modal-image";
 
-import { MySelect, MyDatePickerNew, MyAlert, MyTextInput } from '../../stores/elements';
+import { MySelect, MyDatePickerNew, MyAlert, MyTextInput, formatDate } from '../../stores/elements';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 class StatErrCash_Modal extends React.Component {
   constructor(props) {
@@ -524,8 +514,8 @@ class StatErrCash_ extends React.Component {
   async changePoint(event) {
     const point = event.target.value;
 
-    const date_start = this.state.date_start;
-    const date_end = this.state.date_end;
+    const date_start = dayjs(this.state.date_start).format('YYYY-MM-DD')
+    const date_end = dayjs(this.state.date_end).format('YYYY-MM-DD')
 
     this.setState({
       point,
@@ -556,7 +546,7 @@ class StatErrCash_ extends React.Component {
 
   changeDateRange(data, event) {
     this.setState({
-      [data]: event ? formatDate(event) : '',
+      [data]: event ? (event) : '',
     });
   }
 
@@ -585,9 +575,8 @@ class StatErrCash_ extends React.Component {
   async getItems() {
     const point_id = this.state.point;
 
-    const date_start = this.state.date_start;
-
-    const date_end = this.state.date_end;
+    const date_start = dayjs(this.state.date_start).format('YYYY-MM-DD')
+    const date_end = dayjs(this.state.date_end).format('YYYY-MM-DD')
 
     if (!date_start || !date_end) {
       return;

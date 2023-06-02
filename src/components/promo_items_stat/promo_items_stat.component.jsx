@@ -12,23 +12,11 @@ import TableRow from '@mui/material/TableRow';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MyDatePickerNew, MyTextInput, MyAutocomplite } from '../../stores/elements';
+import { MyDatePickerNew, MyTextInput, MyAutocomplite, formatDate } from '../../stores/elements';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-  if (month.length < 2) 
-      month = '0' + month;
-  if (day.length < 2) 
-      day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 class PromoItemsStat_ extends React.Component {
   constructor(props) {
@@ -113,16 +101,13 @@ class PromoItemsStat_ extends React.Component {
   async getStat() {
     let data = {
       choosePoint   : this.state.choosePoint,
-      date_start    : this.state.date_start,
-      date_end      : this.state.date_end,
+      date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
       promoName     : this.state.promoName,
       chooseItem    : this.state.chooseItem,
     };
     
     let res = await this.getData('get_all', data);
-
-    console.log( data )
-    console.log( res )
 
     this.setState({
       stats: res.stats
@@ -137,7 +122,7 @@ class PromoItemsStat_ extends React.Component {
 
   chooseData(data, val, val2){
     this.setState({
-      [data]: data != 'promoName' && data != 'chooseItem' ? formatDate(val) : data == 'chooseItem' ? val2 : val
+      [data]: data != 'promoName' && data != 'chooseItem' ? (val) : data == 'chooseItem' ? val2 : val
     })
   }
 
@@ -169,21 +154,21 @@ class PromoItemsStat_ extends React.Component {
             <h1>{this.state.module_name}</h1>
           </Grid>
           
-          <Grid item xs={12} sm={2}>
+          <Grid item xs={12} sm={4}>
             <MyAutocomplite data={this.state.point_list} value={this.state.choosePoint} func={ this.choosePoint.bind(this) } multiple={true} label='Точка' />
           </Grid>
 
-          <Grid item xs={12} sm={2}>
+          <Grid item xs={12} sm={4}>
             <MyDatePickerNew label={'Дата от'} value={this.state.date_start} func={ this.chooseData.bind(this, 'date_start') } />
           </Grid>
-          <Grid item xs={12} sm={2}>
+          <Grid item xs={12} sm={4}>
             <MyDatePickerNew label={'Дата до'} value={this.state.date_end} func={ this.chooseData.bind(this, 'date_end') } />
           </Grid>
 
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={6}>
             <MyTextInput value={this.state.promoName} func={ this.chooseDataNew.bind(this, 'promoName') } label='Промокод' />
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={6}>
             <MyAutocomplite data={this.state.items_list} value={this.state.chooseItem} func={ this.chooseDataNew.bind(this, 'chooseItem') } multiple={false} label='Товар' />
           </Grid>
           

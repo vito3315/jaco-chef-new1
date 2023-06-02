@@ -34,24 +34,12 @@ import TextField from '@mui/material/TextField';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyDatePickerNew, MyTextInput } from '../../stores/elements';
+import { MySelect, MyDatePickerNew, MyTextInput, formatDate } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-  if (month.length < 2) 
-      month = '0' + month;
-  if (day.length < 2) 
-      day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -228,7 +216,7 @@ class Concenter_ extends React.Component {
   async getOrders(){
     let data = {
       point_id: this.state.point_id,
-      date: this.state.date
+      date: dayjs(this.state.date).format('YYYY-MM-DD'),
     };
     
     let res = await this.getData('get_orders', data);
@@ -397,7 +385,7 @@ class Concenter_ extends React.Component {
     })
     
     this.setState({
-      date: formatDate(val)
+      date: (val)
     })
 
     setTimeout( () => {

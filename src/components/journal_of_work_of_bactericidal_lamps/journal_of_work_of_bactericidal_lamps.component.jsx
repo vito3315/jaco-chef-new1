@@ -21,10 +21,12 @@ import TableRow from '@mui/material/TableRow';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import {MyAlert, MySelect, MyTextInput, MyDatePickerNew, MyTimePicker, formatDate} from '../../stores/elements';
-import { formatDateMin, MyDatePickerNewViews, MyDateTimePickerNew, formatDateMax } from '../../stores/elements';
+import {MyAlert, MySelect, MyTextInput} from '../../stores/elements';
+import { formatDateMin, MyDatePickerNewViews, MyDateTimePickerNew } from '../../stores/elements';
 
 import queryString from 'query-string';
+
+import dayjs from 'dayjs';
 
 class Lamps_Modal_Add extends React.Component {
   constructor(props) {
@@ -135,8 +137,8 @@ class Lamps_Modal_Add_Active extends React.Component {
     this.state = {
       active_id: this.props.itemEdit?.id ?? '',
       lamp_id: this.props.itemEdit?.lamp_id ?? '',
-      time_start: this.props.itemEdit?.time_start ?? '',
-      time_end: this.props.itemEdit?.time_end ?? '',
+      time_start: this.props.itemEdit ? dayjs(this.props.itemEdit.time_start) : '',
+      time_end: this.props.itemEdit ? dayjs(this.props.itemEdit.time_end) : ''
     };
   }
 
@@ -180,10 +182,10 @@ class Lamps_Modal_Add_Active extends React.Component {
     this.props.onClose();
   }
 
-  changeDateRange(data, event) {
+  changeDateRange(data, event, test) {
 
     this.setState({
-      [data]: event ? formatDateMax(event) : '',
+      [data]: event ? event : '',
     });
   }
 
@@ -203,7 +205,7 @@ class Lamps_Modal_Add_Active extends React.Component {
         </DialogTitle>
         <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
           <Grid container spacing={3}>
-           
+            
             <Grid item xs={12} sm={12}>
               <MySelect
                 is_none={false}
@@ -218,14 +220,14 @@ class Lamps_Modal_Add_Active extends React.Component {
             <Grid item xs={12} sm={6}>
               <MyDateTimePickerNew
                 value={this.state.time_start}
-                func={this.changeDateRange.bind(this, 'time_start')}
+                func={ newValue => this.changeDateRange('time_start', newValue)}
                 label="Время начала работы"
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <MyDateTimePickerNew
                 value={this.state.time_end}
-                func={this.changeDateRange.bind(this, 'time_end')}
+                func={ newValue => this.changeDateRange('time_end', newValue)}
                 label="Время окончания работы"
               />
             </Grid>
@@ -472,7 +474,7 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
 
   changeDateRange(type, data) {
     this.setState({
-      [type]: formatDateMin(data),
+      [type]: data,
     });
   }
 

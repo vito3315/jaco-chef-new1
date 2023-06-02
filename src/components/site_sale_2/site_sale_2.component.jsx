@@ -30,11 +30,13 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyTimePicker, MyTextInput, MyAutocomplite, MyDatePickerNew } from '../../stores/elements';
+import { MySelect, MyCheckBox, MyTimePicker, MyTextInput, MyAutocomplite, MyDatePickerNew, formatDate } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 
 import DatePicker from "react-multi-date-picker"
+
+import dayjs from 'dayjs';
 
 class MyDatePicker extends React.PureComponent {
   constructor(props) {
@@ -69,20 +71,6 @@ class MyDatePicker extends React.PureComponent {
 }
 
 import queryString from 'query-string';
-
-function formatDate(date) {
-  var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-  if (month.length < 2) 
-      month = '0' + month;
-  if (day.length < 2) 
-      day = '0' + day;
-
-  return [year, month, day].join('-');
-}
 
 function formatDateDot(date) {
   var d = new Date(date),
@@ -247,9 +235,9 @@ class SiteSale2_new_ extends React.Component {
       price_end: 0,
       date_promo: 1,
       
-      date_start: formatDate(new Date()),
-      date_end: formatDate(new Date()),
-      rangeDate: [formatDate(new Date()), formatDate(new Date())],
+      date_start: formatDate(Date.now()),
+      date_end: formatDate(Date.now()),
+      rangeDate: [formatDate(Date.now()), formatDate(Date.now())],
       time_start: '10:00',
       time_end: '21:30',
       
@@ -314,8 +302,8 @@ class SiteSale2_new_ extends React.Component {
       promo_action_list: data.promo_action_list,
       promo_sale_list: data.promo_sale_list,
       
-      date_start: fullDate,
-      date_end: fullDate,
+      //date_start: fullDate,
+      //date_end: fullDate,
       
       items: data.items,
       cats: data.cats
@@ -397,8 +385,8 @@ class SiteSale2_new_ extends React.Component {
         promo_summ_to: this.state.price_end,
         promo_when: this.state.date_promo,
         
-        date_start: this.state.date_start,
-        date_end: this.state.date_end,
+        date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+        date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
         time_start: this.state.time_start,
         time_end: this.state.time_end,
         
@@ -603,7 +591,7 @@ class SiteSale2_new_ extends React.Component {
   
   changeDateRange(data, event){
     this.setState({
-      [data]: formatDate(event)
+      [data]: (event)
     })
     
     setTimeout( () => {
@@ -1460,11 +1448,11 @@ class SiteSale2_edit_ extends React.Component {
         promo_action_list: res.promo_action_list,
         promo_sale_list: res.promo_sale_list,
         
-        date_start: res.promo.date1,
-        date_end: res.promo.date2,
+        date_start: dayjs(res.promo.date1),
+        date_end: dayjs(res.promo.date2),
         time_start: res.promo.time1,
         time_end: res.promo.time2,
-        rangeDate: [res.promo.date1, res.promo.date2],
+        rangeDate: [dayjs(res.promo.date1), dayjs(res.promo.date2)],
         
         items: res.items,
         cats: res.cats,
@@ -1708,7 +1696,7 @@ class SiteSale2_edit_ extends React.Component {
   
   changeDateRange(data, event){
     this.setState({
-      [data]: formatDate(event)
+      [data]: (event)
     })
     
     setTimeout( () => {
@@ -2583,8 +2571,8 @@ class SiteSale2_StatList_ extends React.Component {
 
   async getUsers(){
     let data = {
-      dateStart: this.state.date_start,
-      dateEnd: this.state.date_end,
+      dateStart  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      dateEnd    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
     }
     
     let res = await this.getData('get_promo_users', data);
@@ -2596,7 +2584,7 @@ class SiteSale2_StatList_ extends React.Component {
   
   changeDateRange(data, event){
     this.setState({
-      [data]: formatDate(event)
+      [data]: (event)
     })
   }
 
@@ -2779,7 +2767,7 @@ class SiteSale2_AnaliticList_ extends React.Component {
 
   changeDateRange(data, event){
     this.setState({
-      [data]: formatDate(event)
+      [data]: (event)
     })
   }
 

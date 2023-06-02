@@ -14,23 +14,11 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-import { MyTextInput, MySelect, MyAutocomplite, MyCheckBox, MyDatePickerNew } from '../../stores/elements';
+import { MyTextInput, MySelect, MyAutocomplite, MyCheckBox, MyDatePickerNew, formatDate } from '../../stores/elements';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-  if (month.length < 2) 
-      month = '0' + month;
-  if (day.length < 2) 
-      day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 class SiteStatMarc_ extends React.Component {
   chartnewusers = null;
@@ -155,8 +143,8 @@ class SiteStatMarc_ extends React.Component {
   async show() {
     let data = {
       points: this.state.choosePoint,
-      dateStart: this.state.date_start,
-      dateEnd: this.state.date_end,
+      dateStart  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      dateEnd    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
       typeShow: this.state.typeShow,
       promoName: this.state.promoName,
       advData: this.state.advData,
@@ -1600,7 +1588,7 @@ class SiteStatMarc_ extends React.Component {
 
   changeDateRange(data, val) {
     this.setState({
-      [data]: formatDate(val)
+      [data]: (val)
     })
   }
 

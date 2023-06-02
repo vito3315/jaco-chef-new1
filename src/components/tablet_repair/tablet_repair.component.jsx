@@ -26,6 +26,8 @@ import {MyAlert, MySelect, MyTextInput, MyDatePickerNew, formatDate} from '../..
 
 import queryString from 'query-string';
 
+import dayjs from 'dayjs';
+
 class TabletRepair_Modal extends React.Component {
   constructor(props) {
     super(props);
@@ -55,7 +57,7 @@ class TabletRepair_Modal extends React.Component {
 
   changeDateRange(data, event) {
     this.setState({
-      [data]: event ? formatDate(event) : '',
+      [data]: event ? (event) : '',
     });
   }
 
@@ -69,13 +71,13 @@ class TabletRepair_Modal extends React.Component {
         number: this.state.number,
         imei: this.state.imei,
         model: this.state.name,
-        buy_date: this.state.date,
+        buy_date: dayjs(this.state.date).format('YYYY-MM-DD'),
       };
     } else {
       data = {
         name_repair: this.state.name,
         price: this.state.number,
-        date: this.state.date,
+        date: dayjs(this.state.date).format('YYYY-MM-DD'),
         tablet_id: this.state.tablet,
       };
     }

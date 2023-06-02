@@ -20,25 +20,13 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyAutocomplite, MyTextInput, MyDatePickerNew } from '../../stores/elements';
+import { MySelect, MyCheckBox, MyAutocomplite, MyTextInput, MyDatePickerNew, formatDate } from '../../stores/elements';
 
 import Dropzone from "dropzone";
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-    var d = new Date(date),
-        month = '' + (d.getMonth() + 1),
-        day = '' + d.getDate(),
-        year = d.getFullYear();
-
-    if (month.length < 2)
-        month = '0' + month;
-    if (day.length < 2)
-        day = '0' + day;
-
-    return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 class SiteUserManagerTable extends React.Component{
     shouldComponentUpdate(nextProps){
@@ -301,7 +289,7 @@ class SiteUserManager_ extends React.Component {
         let vendor = this.state.editUser;
 
         if (data == 'birthday') {
-            vendor.user[data] = formatDate(event);
+            vendor.user[data] = (event);
         } else {
             if (data == 'acc_to_kas') {
                 vendor.user[data] = event.target.checked === true ? 1 : 0;
@@ -433,6 +421,8 @@ class SiteUserManager_ extends React.Component {
             })
         }
 
+        editUser_user.birthday = dayjs(editUser_user.birthday).format('YYYY-MM-DD')
+
         let data = {
             user: editUser_user,
             textDel: this.state.textDel,
@@ -537,6 +527,8 @@ class SiteUserManager_ extends React.Component {
                 this.getUsers();
             })
         }
+
+        editUser_user.birthday = dayjs(editUser_user.birthday).format('YYYY-MM-DD')
 
         let data = {
             user: editUser_user,
@@ -700,7 +692,7 @@ class SiteUserManager_ extends React.Component {
                                                         <MyTextInput label="Номер телефона" value={this.state.editUser.user.login} func={this.changeItem.bind(this, 'login')} />
                                                     </Grid>
                                                     <Grid item xs={12} sm={4}>
-                                                        <MyDatePickerNew label="Дата рождения" value={this.state.editUser.user.birthday} func={this.changeItem.bind(this, 'birthday')} />
+                                                        <MyDatePickerNew label="Дата рождения" value={ dayjs(this.state.editUser.user.birthday) } func={this.changeItem.bind(this, 'birthday')} />
                                                     </Grid>
                                                 </Grid>
                                             </Grid>
@@ -836,7 +828,7 @@ class SiteUserManager_ extends React.Component {
                                                         <MyTextInput label="Номер телефона" value={this.state.editUser.user.login} func={this.changeItem.bind(this, 'login')} />
                                                     </Grid>
                                                     <Grid item xs={12} sm={4}>
-                                                        <MyDatePickerNew label="Дата рождения" value={this.state.editUser.user.birthday} func={this.changeItem.bind(this, 'birthday')} />
+                                                        <MyDatePickerNew label="Дата рождения" value={dayjs(this.state.editUser.user.birthday)} func={this.changeItem.bind(this, 'birthday')} />
                                                     </Grid>
                                                 </Grid>
                                             </Grid>

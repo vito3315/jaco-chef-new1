@@ -35,17 +35,7 @@ import { MySelect, MyAutocomplite, MyAlert, MyDatePickerNew } from '../../stores
 import moment from 'moment';
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 const formatter = new Intl.NumberFormat('ru', {
   style: 'unit',
@@ -111,13 +101,13 @@ class Experience_Modal extends React.Component {
   }
 
   changeDateRange(data, type, val) {
-    const value = val ? formatDate(val) : '';
+    const value = val ? (val) : '';
 
     if (data === 'list') {
       const listData = this.state.listData;
 
       listData.forEach((item) =>
-        item.type === type ? (item.start = value) : item
+        item.type === type ? (item.start = dayjs(value).format('YYYY-MM-DD')) : item
       );
 
       this.setState({
@@ -126,7 +116,7 @@ class Experience_Modal extends React.Component {
     } else {
       const item = this.state.item;
 
-      item.date_registration = value;
+      item.date_registration = dayjs(value).format('YYYY-MM-DD');
 
       this.setState({
         item,
@@ -157,7 +147,7 @@ class Experience_Modal extends React.Component {
   }
 
   saveEdit() {
-    const item = this.state.item;
+    let item = this.state.item;
 
     if (!item.date_registration) {
       this.setState({
@@ -176,6 +166,8 @@ class Experience_Modal extends React.Component {
 
       return;
     }
+
+    item.date_registration = dayjs(item.date_registration).format('YYYY-MM-DD')
 
     this.props.saveEdit(item.date_registration, item.id);
 
@@ -215,7 +207,9 @@ class Experience_Modal extends React.Component {
       }
     });
 
-    this.props.saveHealthBook(data);
+    console.log( data )
+
+    //this.props.saveHealthBook(data);
 
     this.onClose();
   }
@@ -332,7 +326,7 @@ class Experience_Modal extends React.Component {
                         <Grid mr={2}>
                           <MyDatePickerNew
                             label="Изменить датy"
-                            value={this.state.item?.date_registration ?? ''}
+                            value={ dayjs(this.state.item?.date_registration ?? '') }
                             func={this.changeDateRange.bind(this, 'registration', 0)}
                           />
                         </Grid>
@@ -376,11 +370,11 @@ class Experience_Modal extends React.Component {
                               <TableCell >
                                 <MyDatePickerNew
                                   label="Дата"
-                                  value={item?.start ?? ''}
+                                  value={ dayjs(item?.start ?? '') }
                                   func={this.changeDateRange.bind(this, 'list', item.type)}
                                 />
                               </TableCell>
-                              <TableCell >{item.end}</TableCell>
+                              <TableCell>{item.end}</TableCell>
                             </TableRow>
                           ))}
                     </TableBody>

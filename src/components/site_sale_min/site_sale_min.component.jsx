@@ -30,25 +30,13 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyTimePicker, MyTextInput, MyAutocomplite, MyDatePickerNew } from '../../stores/elements';
+import { MySelect, MyCheckBox, MyTimePicker, MyTextInput, MyAutocomplite, MyDatePickerNew, formatDate } from '../../stores/elements';
 import Typography from '@mui/material/Typography';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-  if (month.length < 2) 
-      month = '0' + month;
-  if (day.length < 2) 
-      day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 function formatDateDot(date) {
   var d = new Date(date),
@@ -360,8 +348,8 @@ class SiteSaleMin_new_ extends React.Component {
         promo_summ_to: this.state.price_end,
         promo_when: this.state.date_promo,
         
-        date_start: this.state.date_start,
-        date_end: this.state.date_end,
+        date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+        date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
         time_start: this.state.time_start,
         time_end: this.state.time_end,
         
@@ -524,9 +512,9 @@ class SiteSaleMin_new_ extends React.Component {
       nextDay.setDate(nextDay.getDate() + 14);
       
       this.setState({
-        rangeDate: [formatDate(thisDay), formatDate(nextDay)],
-        date_start: formatDate(thisDay),
-        date_end: formatDate(nextDay),
+        rangeDate: [(thisDay), (nextDay)],
+        date_start: (thisDay),
+        date_end: (nextDay),
         
         time_start: event.target.value == 2 ? '10:00' : '00:00',
         time_end: event.target.value == 2 ? '21:40' : '23:59',
@@ -539,9 +527,9 @@ class SiteSaleMin_new_ extends React.Component {
       nextDay.setDate(nextDay.getDate() + 30);
       
       this.setState({
-        rangeDate: [formatDate(thisDay), formatDate(nextDay)],
-        date_start: formatDate(thisDay),
-        date_end: formatDate(nextDay),
+        rangeDate: [(thisDay), (nextDay)],
+        date_start: (thisDay),
+        date_end: (nextDay),
         
         time_start: event.target.value == 4 ? '10:00' : '00:00',
         time_end: event.target.value == 4 ? '21:40' : '23:59',
@@ -567,7 +555,7 @@ class SiteSaleMin_new_ extends React.Component {
   
   changeDateRange(data, event){
     this.setState({
-      [data]: formatDate(event)
+      [data]: (event)
     })
     
     setTimeout( () => {
@@ -1379,8 +1367,8 @@ class SiteSaleMin_edit_ extends React.Component {
         promo_action_list: res.promo_action_list,
         promo_sale_list: res.promo_sale_list,
         
-        date_start: res.promo.date1,
-        date_end: res.promo.date2,
+        date_start: dayjs(res.promo.date1),
+        date_end: dayjs(res.promo.date2),
         time_start: res.promo.time1,
         time_end: res.promo.time2,
         rangeDate: [res.promo.date1, res.promo.date2],
@@ -1473,8 +1461,8 @@ class SiteSaleMin_edit_ extends React.Component {
         promo_summ_to: this.state.price_end,
         promo_when: this.state.date_promo,
         
-        date_start: this.state.date_start,
-        date_end: this.state.date_end,
+        date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+        date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
         time_start: this.state.time_start,
         time_end: this.state.time_end,
         

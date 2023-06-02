@@ -59,6 +59,8 @@ import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 
 import queryString from 'query-string';
 
+import dayjs from 'dayjs';
+
 function SimpleDialog(props) {
   const { onClose, selectedValue, open } = props;
 
@@ -850,8 +852,8 @@ class WorkSchedule_ extends React.Component {
       ],
 
       isOpenHJ: false,
-      date_start: formatDate(new Date()),
-      date_end: formatDate(new Date()),
+      date_start: dayjs(Date.now()),
+      date_end: dayjs(Date.now()),
     };
   }
 
@@ -1050,6 +1052,8 @@ class WorkSchedule_ extends React.Component {
 
   async openM(item) {
     // console.log(item);
+
+    return ;
 
     let data = {
       smena_id: item.smena_id,
@@ -1996,14 +2000,14 @@ class WorkSchedule_ extends React.Component {
 
   changeDateRange(data, event) {
     this.setState({
-      [data]: event ? formatDate(event) : '',
+      [data]: event ? (event) : '',
     });
   }
 
   async downloadHJ(){
     let data = {
-      date_start: this.state.date_start,
-      date_end: this.state.date_end,
+      date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
       point_id: this.state.point,
     };
 
@@ -2967,17 +2971,17 @@ class WorkSchedule_ extends React.Component {
               <Grid item xs={12} sm={6}>
                 <MyDatePickerNew
                   label="Дата от"
-                  value={this.state.date_start}
+                  value={dayjs(this.state.date_start)}
                   func={this.changeDateRange.bind(this, 'date_start')}
-                  minDate={"2023-05-01"}
+                  minDate={dayjs("2023-05-01")}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <MyDatePickerNew
                   label="Дата до"
-                  value={this.state.date_end}
+                  value={dayjs(this.state.date_end)}
                   func={this.changeDateRange.bind(this, 'date_end')}
-                  minDate={"2023-05-01"}
+                  minDate={dayjs("2023-05-01")}
                 />
               </Grid>
             </Grid>

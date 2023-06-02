@@ -24,24 +24,15 @@ import {
   MySelect,
   MyAutocomplite,
   MyDatePickerNew,
+  formatDate
 } from '../../stores/elements';
 
 import queryString from 'query-string';
 import moment from 'moment';
 
+import dayjs from 'dayjs';
+
 moment.locale('ru');
-
-function formatDate(date) {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
-
-  return [year, month, day].join('-');
-}
 
 class Stat_buy_Table extends React.Component {
   shouldComponentUpdate(nextProps) {
@@ -212,7 +203,7 @@ class Stat_buy_ extends React.Component {
 
   changeDateRange(data, event) {
     this.setState({
-      [data]: event ? formatDate(event) : '',
+      [data]: event ? (event) : '',
     });
   }
 
@@ -240,8 +231,8 @@ class Stat_buy_ extends React.Component {
         id: this.state.cat,
       },
       points,
-      date_start: this.state.date_start,
-      date_end: this.state.date_end,
+      date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
     };
 
 

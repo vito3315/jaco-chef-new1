@@ -33,22 +33,12 @@ import {
   MyAutocomplite,
   MyDatePickerNew,
   MyTextInput,
-  MyAlert
+  MyAlert,
 } from '../../stores/elements';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 class ListFakeUsers_Modal extends React.Component {
   constructor(props) {
@@ -385,10 +375,10 @@ class ListFakeUsers_ extends React.Component {
   async getUsers() {
     const data = {
       point: this.state.point,
-      date_start_true: this.state.date_start_true,
-      date_end_true: this.state.date_end_true,
-      date_start_false: this.state.date_start_false,
-      date_end_false: this.state.date_end_false,
+      date_start_true: dayjs(this.state.date_start_true).format('YYYY-MM-DD'),
+      date_end_true: dayjs(this.state.date_end_true).format('YYYY-MM-DD'),
+      date_start_false: dayjs(this.state.date_start_false).format('YYYY-MM-DD'),
+      date_end_false: dayjs(this.state.date_end_false).format('YYYY-MM-DD'),
       count_orders_min: this.state.count_orders_min,
       count_orders_max: this.state.count_orders_max,
       max_summ: this.state.max_summ,
@@ -432,7 +422,7 @@ class ListFakeUsers_ extends React.Component {
 
   changeDateRange(data, event) {
     this.setState({
-      [data]: event ? formatDate(event) : '',
+      [data]: event ? (event) : '',
     });
   }
 
@@ -459,24 +449,16 @@ class ListFakeUsers_ extends React.Component {
   async openModal(item) {
     this.handleResize();
 
-    const date_start_true = this.state.date_start_true;
-
-    const date_end_true = this.state.date_end_true;
-
     const point = this.state.point;
 
     const data = {
       client_id: item.client_id,
-      date_start_true,
-      date_end_true,
+      date_start_true: dayjs(this.state.date_start_true).format('YYYY-MM-DD'),
+      date_end_true: dayjs(this.state.date_end_true).format('YYYY-MM-DD'),
       point,
     };
 
-    // console.log(data)
-
     const res = await this.getData('get_one', data);
-
-    // console.log(res);
 
     if (res.st) {
       this.setState({

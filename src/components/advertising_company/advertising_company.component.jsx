@@ -21,23 +21,11 @@ import Paper from '@mui/material/Paper';
 
 import CloseIcon from '@mui/icons-material/Close';
 
-import { MyTextInput, MyDatePickerNew, MySelect, MyAutocomplite, MyCheckBox } from '../../stores/elements';
+import { MyTextInput, MyDatePickerNew, MySelect, MyAutocomplite, MyCheckBox, formatDate } from '../../stores/elements';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-    var d = new Date(date),
-        month = '' + (d.getMonth() + 1),
-        day = '' + d.getDate(),
-        year = d.getFullYear();
-
-    if (month.length < 2)
-        month = '0' + month;
-    if (day.length < 2)
-        day = '0' + day;
-
-    return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
     
 class AdvertisingCompany_ extends React.Component {
   constructor(props) {
@@ -155,74 +143,73 @@ class AdvertisingCompany_ extends React.Component {
 
   // сохранение после редактирования
   async save(){
-     let data = {
-        id          : this.state.id,
-        points      : this.state.choosePoint,
-        name        : this.state.name,
-        //rangeDate   : this.state.rangeDate,
-        date_start  : this.state.date_start,
-        date_end    : this.state.date_end,
-        is_active   : this.state.is_active,
-        id          : this.state.id,
-        description : this.state.description,
-        promo       : this.state.promo,
-     };
+    let data = {
+      id          : this.state.id,
+      points      : this.state.choosePoint,
+      name        : this.state.name,
+      //rangeDate   : this.state.rangeDate,
+      date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
+      is_active   : this.state.is_active,
+      id          : this.state.id,
+      description : this.state.description,
+      promo       : this.state.promo,
+    };
 
-      let res = await this.getData('save_edit', data);
+    let res = await this.getData('save_edit', data);
 
-      if (res.st === false) {
-            alert(res.text)
-      } else {
-            this.setState({ 
-                 modalDialog: false, 
-                 // showItem: null, 
-                 name: '',
-                 date_start: formatDate(new Date()),
-                 date_end: formatDate(new Date())
-            })
+    if (res.st === false) {
+      alert(res.text)
+    } else {
+      this.setState({ 
+        modalDialog: false, 
+        // showItem: null, 
+        name: '',
+        date_start: formatDate(new Date()),
+        date_end: formatDate(new Date())
+      })
 
-          res = await this.getData('get_adv_point', { point_id: this.state.point_id } );
+      res = await this.getData('get_adv_point', { point_id: this.state.point_id } );
 
-           // оновляем список 
-          this.setState({
-              adv_actual : res.adv_actual,
-              adv_old    : res.adv_old
-          })
+      this.setState({
+        adv_actual : res.adv_actual,
+        adv_old    : res.adv_old
+      })
 
-      }   
+    }   
   }
      
   async saveNew(){
-      let data = {
-          points        : this.state.choosePoint,
-          name          : this.state.name,
-          date_start    : this.state.date_start,
-          date_end      : this.state.date_end,
-          is_active     : this.state.is_active,
-          description   : this.state.description,
-          promo         : this.state.promo,
-      };
+    let data = {
+      points        : this.state.choosePoint,
+      name          : this.state.name,
+      date_start    : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      date_end      : dayjs(this.state.date_end).format('YYYY-MM-DD'),
+      is_active     : this.state.is_active,
+      description   : this.state.description,
+      promo         : this.state.promo,
+    };
 
     let res = await this.getData('save_new', data);
 
-      if (res.st === false) {
-          alert(res.text)
-      } else {
-          this.setState({ 
-              modalDialogNew: false,
-              name: '',
-              date_start: formatDate(new Date()),
-              date_end: formatDate(new Date())
-          })
+    if (res.st === false) {
+        alert(res.text)
+    } else {
+      this.setState({ 
+        modalDialogNew: false,
+        name: '',
+        date_start: formatDate(new Date()),
+        date_end: formatDate(new Date())
+      })
 
-          res = await this.getData('get_adv_point', {point_id: this.state.point_id} );
-    
-          this.setState({
-              adv_actual : res.adv_actual,
-              adv_old    : res.adv_old,
-          })
-      }
+      res = await this.getData('get_adv_point', {point_id: this.state.point_id} );
+  
+      this.setState({
+        adv_actual : res.adv_actual,
+        adv_old    : res.adv_old,
+      })
     }
+  }
 
   changeChekBox(type, event) {
       this.setState({
@@ -249,42 +236,39 @@ class AdvertisingCompany_ extends React.Component {
 
   // получение спиок рек. компаний по точки
   async getAdvList() {
-      let data = {
-          point_id: this.state.point_id,
-      };
+    let data = {
+        point_id: this.state.point_id,
+    };
+
+    let res = await this.getData('get_adv_point', data);
+
+    this.setState({
+      adv_actual: res.adv_actual,
+      adv_old   : res.adv_old,
+    })
+  }
+
+    // удаление РК
+  async delAdv(id) {
+    let data = {
+      point_id: this.state.point_id,
+    };
+
+    if (confirm('Вы действительно хотите удалить рекламную компанию?')) {
+      
+      let del = await this.getData('delete_adv', {id : id} );
+      if (!del['st']) {
+        alert('При удалении произошла ошибка');
+      }
 
       let res = await this.getData('get_adv_point', data);
 
       this.setState({
-          adv_actual: res.adv_actual,
-          adv_old   : res.adv_old,
+        adv_actual: res.adv_actual,
+        adv_old: res.adv_old,
       })
-    }
-
-    // удаление РК
-    async delAdv(id) {
-        let data = {
-            point_id: this.state.point_id,
-        };
-
-        if (confirm('Вы действительно хотите удалить рекламную компанию?')) {
-           
-
-            let del = await this.getData('delete_adv', {id : id} );
-            if (!del['st']) {
-                alert('При удалении произошла ошибка');
-            }
-
-            let res = await this.getData('get_adv_point', data);
-
-            this.setState({
-                adv_actual: res.adv_actual,
-                adv_old: res.adv_old,
-            })
-
-        } 
-        
-    }
+    }   
+  }
 
   render(){
     return (
@@ -341,7 +325,7 @@ class AdvertisingCompany_ extends React.Component {
 
         <Dialog
           open={this.state.modalDialogNew}
-                onClose={() => { this.setState({ modalDialogNew: false, description: '', name: '', promo: '', choosePoint: [], date_start: formatDate(new Date()), date_end: formatDate(new Date()) }) } }
+          onClose={() => { this.setState({ modalDialogNew: false, description: '', name: '', promo: '', choosePoint: [], date_start: formatDate(new Date()), date_end: formatDate(new Date()) }) } }
         >
           <DialogTitle>Новая акция</DialogTitle>
           <DialogContent style={{ paddingTop: 10 }}>
@@ -417,15 +401,15 @@ class AdvertisingCompany_ extends React.Component {
                         <TableBody>
                         {!this.state.adv_actual ? null :
                            this.state.adv_actual.map((item, key) =>
-                                <TableRow key={key}  >
-                                    <TableCell style={{ textAlign: 'center' }}>{ key + 1 } </TableCell>
-                                    <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.openCat.bind(this, item)} >{ item.name } </TableCell>
-                                    <TableCell style={{ textAlign: 'center' }}>{ item.date_start } </TableCell>
-                                    <TableCell style={{ textAlign: 'center' }}>{ item.date_end } </TableCell>
-                                    <TableCell style={{ textAlign: 'center' }}>{item.choosePoint.map((it, k) => <React.Fragment key={k}> {it.name} </React.Fragment> )}</TableCell>
-                                    <TableCell style={{ textAlign: 'center' }}>{item.promo} </TableCell>
-                                    <TableCell style={{ textAlign: 'center' }}> <CloseIcon onClick={this.delAdv.bind(this, item.id)} /> </TableCell>
-                               </TableRow>
+                              <TableRow key={key}  >
+                                <TableCell style={{ textAlign: 'center' }}>{ key + 1 } </TableCell>
+                                <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.openCat.bind(this, item)} >{ item.name } </TableCell>
+                                <TableCell style={{ textAlign: 'center' }}>{ item.date_start } </TableCell>
+                                <TableCell style={{ textAlign: 'center' }}>{ item.date_end } </TableCell>
+                                <TableCell style={{ textAlign: 'center' }}>{item.choosePoint.map((it, k) => <React.Fragment key={k}> {it.name} </React.Fragment> )}</TableCell>
+                                <TableCell style={{ textAlign: 'center' }}>{item.promo} </TableCell>
+                                <TableCell style={{ textAlign: 'center' }}> <CloseIcon onClick={this.delAdv.bind(this, item.id)} /> </TableCell>
+                              </TableRow>
                          )}
                         </TableBody>
                      </Table>
@@ -435,39 +419,39 @@ class AdvertisingCompany_ extends React.Component {
                 <Grid item xs={12} sm={12}>
                     <Grid container>
                         <Grid item xs={12} sm={12}>
-                            <h2 style={{ textAlign: 'center' }}>Не Актвные</h2>
+                          <h2 style={{ textAlign: 'center' }}>Не Актвные</h2>
                         </Grid>
                         <Grid item xs={12} sm={12}>
-                            <TableContainer component={Paper} style={{ marginTop: 10 }}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell style={{ textAlign: 'center' }}></TableCell>
-                                            <TableCell style={{ textAlign: 'center' }}>Название</TableCell>
-                                            <TableCell style={{ textAlign: 'center' }}>Дата начало</TableCell>
-                                            <TableCell style={{ textAlign: 'center' }}>Дата окончания</TableCell>
-                                            <TableCell style={{ textAlign: 'center' }}>Точки</TableCell>
-                                            <TableCell style={{ textAlign: 'center' }}>Промокод</TableCell>
-                                            <TableCell style={{ textAlign: 'center' }}></TableCell>
-                                        </TableRow>
-                                    </TableHead>
+                          <TableContainer component={Paper} style={{ marginTop: 10 }}>
+                            <Table>
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                                  <TableCell style={{ textAlign: 'center' }}>Название</TableCell>
+                                  <TableCell style={{ textAlign: 'center' }}>Дата начало</TableCell>
+                                  <TableCell style={{ textAlign: 'center' }}>Дата окончания</TableCell>
+                                  <TableCell style={{ textAlign: 'center' }}>Точки</TableCell>
+                                  <TableCell style={{ textAlign: 'center' }}>Промокод</TableCell>
+                                  <TableCell style={{ textAlign: 'center' }}></TableCell>
+                                </TableRow>
+                              </TableHead>
 
-                                    <TableBody>
-                                        {!this.state.adv_old ? null :
-                                            this.state.adv_old.map((item, key) =>
-                                                <TableRow key={key}  >
-                                                    <TableCell style={{ textAlign: 'center' }}>{key + 1} </TableCell>
-                                                    <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.openCat.bind(this, item)} >{item.name} </TableCell>
-                                                    <TableCell style={{ textAlign: 'center' }}>{item.date_start} </TableCell>
-                                                    <TableCell style={{ textAlign: 'center' }}>{item.date_end} </TableCell>
-                                                    <TableCell style={{ textAlign: 'center' }}>{item.choosePoint.map((it, k) => <React.Fragment key={k}> {it.name} </React.Fragment>)}</TableCell>
-                                                    <TableCell style={{ textAlign: 'center' }}>{item.promo} </TableCell>
-                                                    <TableCell style={{ textAlign: 'center' }}> <CloseIcon onClick={this.delAdv.bind(this, item.id)} /> </TableCell>
-                                                </TableRow>
-                                            )}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
+                              <TableBody>
+                                  {!this.state.adv_old ? null :
+                                      this.state.adv_old.map((item, key) =>
+                                          <TableRow key={key}  >
+                                              <TableCell style={{ textAlign: 'center' }}>{key + 1} </TableCell>
+                                              <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} onClick={this.openCat.bind(this, item)} >{item.name} </TableCell>
+                                              <TableCell style={{ textAlign: 'center' }}>{item.date_start} </TableCell>
+                                              <TableCell style={{ textAlign: 'center' }}>{item.date_end} </TableCell>
+                                              <TableCell style={{ textAlign: 'center' }}>{item.choosePoint.map((it, k) => <React.Fragment key={k}> {it.name} </React.Fragment>)}</TableCell>
+                                              <TableCell style={{ textAlign: 'center' }}>{item.promo} </TableCell>
+                                              <TableCell style={{ textAlign: 'center' }}> <CloseIcon onClick={this.delAdv.bind(this, item.id)} /> </TableCell>
+                                          </TableRow>
+                                      )}
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
                         </Grid>
                     </Grid>
                 </Grid>

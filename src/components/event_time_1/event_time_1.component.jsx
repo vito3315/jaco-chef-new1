@@ -35,22 +35,12 @@ import {
   MyAutocomplite2,
   MyTimePicker,
   MyDatePickerNew,
-  MyAlert
+  MyAlert,
 } from '../../stores/elements';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 class EventTime1_Modal extends React.Component {
   constructor(props) {
@@ -110,7 +100,7 @@ class EventTime1_Modal extends React.Component {
   changeDateRange(data, value) {
     const item = this.state.item;
 
-    item[data] = value ? formatDate(value) : '';
+    item[data] = value ? (value) : '';
 
     this.setState({
       item,
@@ -120,7 +110,9 @@ class EventTime1_Modal extends React.Component {
   save() {
     const message = 'Необходимо заполнить все данные!';
 
-    if (this.props.mark === 'newDay' && (!this.state.item.date || !this.state.item.time_start || !this.state.item.time_end || !this.state.item.time_dev)) {
+    let item = this.state.item
+
+    if (this.props.mark === 'newDay' && (!item.date || !item.time_start || !item.time_end || !item.time_dev)) {
       this.setState({
         openAlert: true,
         err_status: res.st,
@@ -131,7 +123,7 @@ class EventTime1_Modal extends React.Component {
     }
 
     if ((this.props.mark === 'newEvent' || this.props.mark === 'editEvent') && 
-    (!this.state.item.time_start || !this.state.item.time_end || !this.state.item.time_dev)) {
+    (!item.time_start || !item.time_end || !item.time_dev)) {
       this.setState({
         openAlert: true,
         err_status: res.st,
@@ -141,7 +133,9 @@ class EventTime1_Modal extends React.Component {
       return;
     }
 
-    this.props.save(this.state.item, this.props.mark);
+    item.date = dayjs(item.date).format('YYYY-MM-DD'),
+
+    this.props.save(item, this.props.mark);
 
     this.onClose();
   }

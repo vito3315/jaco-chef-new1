@@ -20,23 +20,11 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyTextInput, MyDatePickerNew } from '../../stores/elements';
+import { MySelect, MyTextInput, MyDatePickerNew, formatDate } from '../../stores/elements';
 
 import queryString from 'query-string';
 
-function formatDate(date) {
-  var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-  if (month.length < 2) 
-      month = '0' + month;
-  if (day.length < 2) 
-      day = '0' + day;
-
-  return [year, month, day].join('-');
-}
+import dayjs from 'dayjs';
 
 class DriverStat_ extends React.Component {
   click = false;
@@ -140,8 +128,8 @@ class DriverStat_ extends React.Component {
   async updateData(){
     let data = {
       point_id: this.state.point,
-      date_start: this.state.date_start,
-      date_end: this.state.date_end,
+      date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
     };
     
     let res = await this.getData('get_data', data);
@@ -156,7 +144,7 @@ class DriverStat_ extends React.Component {
   
   changeDate(data, event){
     this.setState({
-      [data]: formatDate(event)
+      [data]: (event)
     })
   }
 
@@ -284,8 +272,8 @@ class DriverStat_ extends React.Component {
     let data = {
       point_id: this.state.point,
       driver_id: driver.driver_id,
-      date_start: this.state.date_start,
-      date_end: this.state.date_end,
+      date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
     };
     
     let res = await this.getData('getStatDop', data);
@@ -303,8 +291,8 @@ class DriverStat_ extends React.Component {
     let data = {
       point_id: this.state.point,
       driver_id: driver.driver_id,
-      date_start: this.state.date_start,
-      date_end: this.state.date_end,
+      date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
     };
     
     let res = await this.getData('getStatDopMain', data);
