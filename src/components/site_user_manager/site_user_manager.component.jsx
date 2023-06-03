@@ -528,7 +528,9 @@ class SiteUserManager_ extends React.Component {
             })
         }
 
-        editUser_user.birthday = dayjs(editUser_user.birthday).format('YYYY-MM-DD')
+        editUser_user.user.birthday = dayjs(editUser_user.user.birthday).format('YYYY-MM-DD')
+
+        console.log( editUser_user )
 
         let data = {
             user: editUser_user,
