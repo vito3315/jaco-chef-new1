@@ -153,9 +153,8 @@ class Lamps_Modal_Add_Active extends React.Component {
     const data = {
       id: this.state.active_id,
       lamp_id: this.state.lamp_id,
-      date: this.state.date,
-      time_start: this.state.time_start,
-      time_end: this.state.time_end,
+      time_start: dayjs(this.state.time_start).format('YYYY-MM-DD HH:mm'),
+      time_end: dayjs(this.state.time_end).format('YYYY-MM-DD HH:mm'),
     };
     
     this.props.add(data);
@@ -457,8 +456,8 @@ class Journal_of_work_of_bactericidal_lamps_ extends React.Component {
 
   async downloadHJ(){
     let data = {
-      date_start: this.state.date_start,
-      date_end: this.state.date_end,
+      date_start: dayjs(this.state.date_start).format('YYYY-MM'),
+      date_end: dayjs(this.state.date_end).format('YYYY-MM'),
       point_id: this.state.point,
     };
 
