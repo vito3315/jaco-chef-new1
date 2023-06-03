@@ -209,7 +209,7 @@ class Experience_Modal extends React.Component {
 
     console.log( data )
 
-    //this.props.saveHealthBook(data);
+    this.props.saveHealthBook(data);
 
     this.onClose();
   }
