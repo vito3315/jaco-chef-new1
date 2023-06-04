@@ -14,10 +14,26 @@
         bottom: 100px;
     }
     & > div{
-        width: calc(215px * 3);
+        width: 47vw;
         position: absolute;
         left: 30vw;
-        bottom: 400px;
+        top: 33vh;
+        & .roulette-pro-regular-image-wrapper{
+            width: 10vw!important;
+            height: 10vw!important;
+        }
+        & .roulette-pro-regular-prize-item-wrapper{
+            width: 10vw!important;
+            height: 10vw!important;
+        }
+        & .roulette-pro-regular-prize-item{
+            width: 10vw!important;
+            height: 10vw!important;
+        }
+        & .roulette-pro-regular-prize-item-image{
+            width: 100%;
+            height: 100%;
+        }
         & .roulette-pro-wrapper{
             & ul > li{
                 //padding-left: 20px;
@@ -27,7 +43,7 @@
         & .START{
             position: absolute;
             left: 40%;
-            bottom: -250px;
+            bottom: -350px;
             background-color: red;
             border: 1px solid red;
             border-radius: 40px;

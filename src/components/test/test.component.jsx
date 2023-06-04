@@ -48,14 +48,9 @@ const winPrizeIndex = 1;
 
 const TestApp = ({items}) => {
 
-
-
   function getRandomInt(max) {
     return Math.floor(Math.random() * max);
   }
-
-
-
 
   const [start, setStart] = useState(false);
 
@@ -88,51 +83,6 @@ const TestApp = ({items}) => {
   );
 };
 
-function formatDate(date) {
-  var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-  if (month.length < 2) 
-      month = '0' + month;
-  if (day.length < 2) 
-      day = '0' + day;
-
-  return [year, month, day].join('-');
-}
-
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>{children}</Box>
-      )}
-    </div>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
-
 class Test_ extends React.Component {
   constructor(props) {
     super(props);
@@ -157,33 +107,12 @@ class Test_ extends React.Component {
     console.log( data.items )
 
     data.items.map( (item, key) => {
-      data.items[ key ]['image'] = "https://cdnimg.jacofood.ru/"+item.img_app+"_138x138.jpg";
+      data.items[ key ]['image'] = "https://cdnimg.jacofood.ru/"+item.img_app+"_585x585.jpg";
     } )
 
     document.title = data.module_info.name;
 
-    const prizes = [
-      {
-        image: 'https://i.ibb.co/6Z6Xm9d/good-1.png',
-        id: 1,
-      },
-      {
-        image: 'https://i.ibb.co/T1M05LR/good-2.png',
-        id: 2
-      },
-      {
-        image: 'https://i.ibb.co/Qbm8cNL/good-3.png',
-        id: 3
-      },
-      {
-        image: 'https://i.ibb.co/5Tpfs6W/good-4.png',
-        id: 4
-      },
-      {
-        image: 'https://i.ibb.co/64k8D1c/good-5.png',
-        id: 5
-      },
-    ];
+    
     
     
     
@@ -323,9 +252,9 @@ class Test_ extends React.Component {
             <img className='fon' src='https://jacochef.ru/src/img/test/test.gif' />
             
             <div>
-            { this.state.items.length == 0 ? false :
-              <TestApp items={this.state.items} />
-            }
+              { this.state.items.length == 0 ? false :
+                <TestApp items={this.state.items} />
+              }
             </div>
           </Grid>
 
