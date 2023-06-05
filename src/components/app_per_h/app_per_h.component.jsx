@@ -201,7 +201,7 @@ class AppPerH_ extends React.Component {
 
           <Grid item xs={12} sm={12} mt={5}>
             <span style={{backgroundColor: '#ef5350', color: '#fff', padding: '10px 15px'}}>
-              Данные применяться со следующего периода
+              Данные применяться с текущего периода
             </span>
           </Grid>
 
