@@ -20,6 +20,7 @@ import Dropzone from "dropzone";
 
 import {
   MyTextInput,
+  MySelect
 } from '../../stores/elements';
 
 import queryString from 'query-string';
@@ -348,6 +349,15 @@ class ItemsPr_ extends React.Component {
                     value={this.state.itemsEdit.item.company}
                     func={this.chengeItem.bind(this, 'company')}
                     label="Название компании"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <MySelect
+                    is_none={false}
+                    data={this.state.itemsEdit.city_list}
+                    value={this.state.itemsEdit.item.city_id}
+                    func={this.chengeItem.bind(this, 'city_id')}
+                    label="Город"
                   />
                 </Grid>
 
