@@ -907,14 +907,15 @@ class Checkworks_ extends React.Component {
                       <Table>
                         <TableHead>
                           <TableRow>
-                            <TableCell style={{ width: '20%' }} >Позиция</TableCell>
-                            <TableCell style={{ width: '14%' }} >Время забития</TableCell>
-                            <TableCell style={{ width: '11%' }} >Объем заготовки</TableCell>
-                            <TableCell style={{ width: '11%' }} >Объем отходов</TableCell>
-                            <TableCell style={{ width: '11%' }} >Ед измерения</TableCell>
-                            <TableCell style={{ width: '11%' }} >Сотрудник</TableCell>
-                            <TableCell style={{ width: '11%' }} >Подтвердили</TableCell>
-                            <TableCell style={{ width: '11%', padding: 0 }} >Подтвердивший</TableCell>
+                            <TableCell>Позиция</TableCell>
+                            <TableCell>Время забития</TableCell>
+                            <TableCell>Объем заготовки</TableCell>
+                            <TableCell>Объем отходов</TableCell>
+                            <TableCell>Ед измерения</TableCell>
+                            <TableCell>Сотрудник</TableCell>
+                            <TableCell>Помошник</TableCell>
+                            <TableCell>Подтвердили</TableCell>
+                            <TableCell>Подтвердивший</TableCell>
                           </TableRow>
                         </TableHead>
 
@@ -930,6 +931,7 @@ class Checkworks_ extends React.Component {
                               <TableCell >{item.count_trash}</TableCell>
                               <TableCell >{item.ei_name}</TableCell>
                               <TableCell >{item.user_name}</TableCell>
+                              <TableCell >{item.user_name2}</TableCell>
                               <TableCell >{item.manager_time}</TableCell>
                               <TableCell  style={{ padding: 0 }}>
                                 {item.namager_name || this.state.check_cook ? item.namager_name ?? '' : (
