@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -635,7 +635,42 @@ export class MyCheckBox extends React.PureComponent {
   }
 }
 
-export class TextEditor extends React.PureComponent {
+export function TextEditor(props){
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.target.closest(".tox-tinymce-aux, .moxman-window, .tam-assetmanager-root") !== null) {
+        e.stopImmediatePropagation();
+      }
+    };
+    document.addEventListener("focusin", handler);
+    return () => document.removeEventListener("focusin", handler);
+  }, []);
+
+  return (
+    <Editor
+      apiKey='r0ihgs4ukfpmudzw7aexxgb88tnx5jw26h1xx9x6409ji3gx'
+      value={props.value}
+      onEditorChange={props.func}
+      init={{
+        height: 500,
+        //menubar: false,
+        plugins: [
+          'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+          'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+          'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+        ],
+        toolbar: 'undo redo | blocks | ' +
+          'bold italic forecolor | alignleft aligncenter ' +
+          'alignright alignjustify | bullist numlist outdent indent | ' +
+          'removeformat | link image | code | fullscreen | help',
+        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+      }}
+    />
+  )
+}
+
+export class TextEditor11 extends React.PureComponent {
   render(){
     return (
       <Editor
