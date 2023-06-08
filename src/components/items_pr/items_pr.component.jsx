@@ -44,6 +44,7 @@ class AppWorkTable extends React.Component {
             <TableCell>Наименование</TableCell>
             <TableCell>Компания</TableCell>
             <TableCell>Сертификат</TableCell>
+            <TableCell>Фото</TableCell>
             <TableCell>%</TableCell>
           </TableRow>
         </TableHead>
@@ -59,7 +60,12 @@ class AppWorkTable extends React.Component {
               </TableCell>
               <TableCell>{item.company}</TableCell>
               <TableCell>{item.about}</TableCell>
-              
+              <TableCell>
+              <img 
+                  src={"https://storage.yandexcloud.net/site-other-data/"+item.logo_src+"_512x512.jpg"} 
+                  style={{ width: 100, height: 'auto' }}
+                />
+              </TableCell>
               <TableCell>{item.percent}</TableCell>
             </TableRow>
           ))}
