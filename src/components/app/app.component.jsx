@@ -441,7 +441,7 @@ export function App () {
 
 
                   <Route
-                    component={ () =>
+                    element={ () =>
                       <Status code={404}>
                         <Grid container className="Contact mainContainer MuiGrid-spacing-xs-3" style={{ marginTop: 64 }}>
                           <Grid item xs={12}>
