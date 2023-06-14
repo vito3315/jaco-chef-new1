@@ -104,7 +104,7 @@ const OrderPostRec = React.lazy(() => import("../order_post_rec"));
 const ListFakeUsers = React.lazy(() => import("../list_fake_users"));
 const VendorMini = React.lazy(() => import("../vendor_mini"));
 const StatByClients = React.lazy(() => import("../stat_by_clients"));
-const Test = React.lazy(() => import("../test"));
+//const Test = React.lazy(() => import("../test"));
 const TabletRepair = React.lazy(() => import("../tablet_repair"));
 
 const Journal_of_work_of_bactericidal_lamps = React.lazy(() => import("../journal_of_work_of_bactericidal_lamps"));
@@ -433,7 +433,7 @@ export function App () {
                   <Route path={'/list_fake_users'} exact={ true } element={ <ListFakeUsers /> } />
                   <Route path={'/vendor_mini'} exact={ true } element={ <VendorMini /> } />
                   <Route path={'/stat_by_clients'} exact={ true } element={ <StatByClients /> } />
-                  <Route path={'/test'} exact={ true } element={ <Test /> } />
+                  
                   <Route path={'/tablet_repair'} exact={ true } element={ <TabletRepair /> } />
 
                   <Route path={'/journal_of_work_of_bactericidal_lamps'} exact={ true } element={ <Journal_of_work_of_bactericidal_lamps /> } />
