@@ -17,15 +17,10 @@ import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 
 const filter = createFilterOptions();
 
-import ruLocale from "date-fns/locale/ru";
-
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-
-//import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
 
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
@@ -37,7 +32,7 @@ import MuiAlert from '@mui/material/Alert';
 
 import { Editor } from '@tinymce/tinymce-react';
 
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/ru';
 
@@ -95,39 +90,6 @@ export function formatDateMin(date) {
 
   return [year, month].join('-');
 }
-
-/*export class MyDaterange extends React.PureComponent {
-  constructor(props) {
-    super(props);
-        
-    this.state = {
-    };
-  }
-  
-  render(){
-    return (
-      <LocalizationProvider dateAdapter={AdapterDateFns} locale={ruLocale} size="small">
-        <DateRangePicker
-          
-          allowSameDateSelection={true}
-          showTodayButton={true}
-          startText={this.props.startText}
-          endText={this.props.endText}
-          value={this.props.value}
-          inputFormat="yyyy-MM-dd"
-          mask="____-__-__"
-          onChange={this.props.func}
-          renderInput={(startProps, endProps) => (
-            <React.Fragment>
-              <TextField style={{ width: '100%' }} {...startProps} />
-              <TextField style={{ width: '100%' }} {...endProps} />
-            </React.Fragment>
-          )}
-        />
-      </LocalizationProvider>
-    )
-  }
-}*/
 
 export class MyAutocomplite extends React.PureComponent {
   constructor(props) {
