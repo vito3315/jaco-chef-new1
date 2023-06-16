@@ -68,6 +68,8 @@ class StatErrCash_Modal extends React.Component {
         item: this.props.item,
       });
     }
+
+    console.log(this.props.item)
   }
 
   openConfirm(percent) {
@@ -96,7 +98,7 @@ class StatErrCash_Modal extends React.Component {
 
     if (this.props.mark === 'errOrder') {
       const data = {
-        date: item.date_time_order,
+        date: item.date_close,
         point_id: item.point_id,
         type,
         user_id: item.user_id,
@@ -152,7 +154,7 @@ class StatErrCash_Modal extends React.Component {
 
     if (this.props.mark === 'errOrder') {
       const data = {
-        date: item.date_time_order,
+        date: item.date_close,
         point_id: item.point_id,
         user_id: item.user_id,
         row_id: item.row_id,
