@@ -87,6 +87,13 @@ class TabletRepair_Modal extends React.Component {
     this.onClose();
   }
 
+  close() {
+
+    this.props.closeTablet();
+
+    this.onClose();
+  }
+
   onClose() {
     this.setState({
       number: '',
@@ -219,11 +226,15 @@ class TabletRepair_Modal extends React.Component {
           </Grid>
         </DialogContent>
         <DialogActions>
-          {this.props.type === 'tablet' ? null : (
+          {this.props.type === 'tablet' ? 
+            <Button variant="contained" onClick={this.close.bind(this)}>
+              Снять с обращения
+            </Button>
+          : 
             <Button variant="contained" onClick={this.add.bind(this)}>
               Добавить {this.props.type === 'addTablet' ? 'планшет' : 'ремонт'}
             </Button>
-          )}
+          }
         </DialogActions>
       </Dialog>
     );
@@ -438,6 +449,36 @@ class TabletRepair_ extends React.Component {
     }
   }
 
+  async closeTablet() {
+    const point_id = this.state.point;
+    const tablet_id = this.state.tablet.tablet.id;
+
+    const data = {
+      point_id,
+      tablet_id
+    }
+
+    const res = await this.getData('closeTablet', data);
+
+    if (res.st) {
+      this.setState({
+        openAlert: true,
+        err_status: true,
+        err_text: 'Планшет снят с обращения',
+      });
+
+      setTimeout(() => {
+        this.getTablets();
+      }, 300);
+    } else {
+      this.setState({
+        openAlert: true,
+        err_status: false,
+        err_text: res.text,
+      });
+    }
+  }
+
   render() {
     return (
       <>
@@ -461,6 +502,7 @@ class TabletRepair_ extends React.Component {
           add={this.add.bind(this)}
           onClose={() => this.setState({ modalDialog: false })}
           fullScreen={this.state.fullScreen}
+          closeTablet={this.closeTablet.bind(this)}
         />
 
         <Grid container spacing={3}>

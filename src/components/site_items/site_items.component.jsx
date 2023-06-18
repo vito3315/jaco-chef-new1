@@ -43,6 +43,7 @@ import { MySelect, MyCheckBox, MyTextInput, MyDatePickerNew, formatDate } from '
 
 import Dropzone from "dropzone";
 
+
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 
@@ -437,11 +438,18 @@ class SiteItems_ extends React.Component {
       modalEdit: true,
 
       date_update: dayjs(res.item.date_start) ?? dayjs(new Date()),
+      
     })
 
-    setTimeout( () => {
-      this.myDropzoneNew = new Dropzone("#for_img_edit_new", this.dropzoneOptions);
-    }, 300 )
+    // правка от 18.07.2023
+    // вызывало ошибку в модальном окне Редактирование товара, 
+    // т.к. dropzone уже создан, а при переключении между Tabs создавался еще один экзмемпляр dropzone, который уже есть в модальном окне Редактирование товара
+
+    if(open_first) {
+      setTimeout( () => {
+        this.myDropzoneNew = new Dropzone("#for_img_edit_new", this.dropzoneOptions);
+      }, 300 )
+    }
   }
 
   async openNew(){
@@ -1489,7 +1497,7 @@ class SiteItems_ extends React.Component {
           maxWidth={'md'}
           onClose={ this.closeEdit.bind(this) }
         >
-          <DialogTitle>Редактирвоание товара</DialogTitle>
+          <DialogTitle>Редактирование товара</DialogTitle>
           <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             
             <Grid container spacing={3}>

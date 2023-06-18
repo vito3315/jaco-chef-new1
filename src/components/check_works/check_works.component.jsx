@@ -203,7 +203,7 @@ class CheckWorks_Modal_Edit extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    // console.log(this.props);
+    //console.log(this.props);
 
     if (!this.props.event) {
       return;
@@ -682,7 +682,7 @@ class Checkworks_ extends React.Component {
 
       this.setState({
         modalDialogEdit: true,
-        itemEdit,
+        itemEdit: JSON.parse(JSON.stringify(itemEdit)),
         method,
         mark,
       });
