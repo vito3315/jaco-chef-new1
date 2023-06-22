@@ -1000,7 +1000,7 @@ class Experience_ extends React.Component {
             </Button>
           </Grid>
 
-          <Grid item xs={12} sm={12}>
+          <Grid item xs={12} sm={12} style={{ display: 'none' }}>
             <Button variant="contained" onClick={this.getDataСloth.bind(this)} sx={{ whiteSpace: 'nowrap' }}>
               Предметы одежды
             </Button>
