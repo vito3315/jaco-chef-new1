@@ -18,12 +18,37 @@ import TableRow from '@mui/material/TableRow';
 
 import Dropzone from "dropzone";
 
-import {
-  MyTextInput,
-  MySelect
-} from '../../stores/elements';
+import { MyTextInput, MySelect } from '../../stores/elements';
 
 import queryString from 'query-string';
+
+class ItemsPr_TableStat extends React.Component {
+
+  render() {
+    return (
+      <Table>
+        <TableHead>
+        <TableRow>
+            <TableCell  colSpan={3}><h2>Статистика</h2></TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Разыграно</TableCell>
+            <TableCell>Осталось</TableCell>
+            <TableCell>Воспользовалось</TableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          <TableRow>
+            <TableCell style={{ width: '33%'}}>{this.props.stat.prize}</TableCell>
+            <TableCell style={{ width: '33%'}}>{this.props.stat.no_prize}</TableCell>
+            <TableCell style={{ width: '33%'}}>{this.props.stat.count_promo}</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    );
+  }
+}
 
 class AppWorkTable extends React.Component {
   shouldComponentUpdate(nextProps) {
@@ -40,12 +65,16 @@ class AppWorkTable extends React.Component {
     return (
       <Table>
         <TableHead>
+        <TableRow>
+            <TableCell  colSpan={4}><h2>Призы</h2></TableCell>
+          </TableRow>
           <TableRow>
             <TableCell>Наименование</TableCell>
             <TableCell>Компания</TableCell>
             <TableCell>Сертификат</TableCell>
-            <TableCell>Фото</TableCell>
-            <TableCell>%</TableCell>
+            <TableCell>Победитель</TableCell>
+            {/* <TableCell>Фото</TableCell>
+            <TableCell>%</TableCell> */}
           </TableRow>
         </TableHead>
 
@@ -54,19 +83,20 @@ class AppWorkTable extends React.Component {
             <TableRow key={key}>
               <TableCell
                 onClick={this.props.openWork.bind(this, item.id)}
-                style={{ color: '#c03', cursor: 'pointer', fontWeight: 'bold' }}
+                style={{ color: '#c03', cursor: 'pointer', fontWeight: 'bold', width: '15%' }}
               >
                 {item.name}
               </TableCell>
-              <TableCell>{item.company}</TableCell>
-              <TableCell>{item.about}</TableCell>
-              <TableCell>
+              <TableCell style={{ width: '30%'}}>{item.company}</TableCell>
+              <TableCell style={{ width: '35%'}}>{item.about}</TableCell>
+              <TableCell style={{ width: '20%'}}>{item.login}</TableCell>
+              {/* <TableCell>
               <img 
                   src={"https://storage.yandexcloud.net/site-other-data/"+item.logo_src+"_512x512.jpg"} 
                   style={{ width: 100, height: 'auto' }}
                 />
               </TableCell>
-              <TableCell>{item.percent}</TableCell>
+              <TableCell>{item.percent}</TableCell> */}
             </TableRow>
           ))}
         </TableBody>
@@ -105,6 +135,8 @@ class ItemsPr_ extends React.Component {
       nameWork: '',
 
       itemsNew: null,
+
+      stat: null,
     };
   }
 
@@ -114,6 +146,7 @@ class ItemsPr_ extends React.Component {
     this.setState({
       module_name: data.module_info.name,
       items: data.items,
+      stat: data.stat,
     });
 
     document.title = data.module_info.name;
@@ -166,8 +199,6 @@ class ItemsPr_ extends React.Component {
   };
 
   async saveEdit() {
-    
-
 
     let itemsEdit = this.state.itemsEdit
 
@@ -442,8 +473,17 @@ class ItemsPr_ extends React.Component {
             </Button>
           </Grid>
 
-          <Grid item xs={12} sm={12}>
+          {/* таблица_статистика */}
+          <Grid item xs={12} sm={12} mb={5}>
+            {!this.state.stat ? null :
+              <ItemsPr_TableStat 
+                stat={this.state.stat} 
+              />
+            }
+          </Grid>
 
+          {/* таблица_призы */}
+          <Grid item xs={12} sm={12}>
           { this.state.items.length > 0 ?
             <AppWorkTable 
               items={this.state.items} 
