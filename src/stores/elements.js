@@ -519,6 +519,7 @@ export class MyDatePickerGraph extends React.PureComponent {
   };
 
   chooseDay(newValue, event){
+    
     let arr = this.state.arr;
 
     let res = arr.find( (item) => formatDate(item.date) == formatDate(newValue) );
@@ -553,16 +554,16 @@ export class MyDatePickerGraph extends React.PureComponent {
           displayStaticWrapperAs="desktop"
           label="Week picker"
           
-          renderDay={this.props.renderWeekPickerDay}
+          //renderDay={this.props.renderWeekPickerDay}
           //renderInput={(params) => <TextField {...params} />}
           //inputFormat="yyyy-MM-dd"
-          
-          slotProps={{
-            textField: { size: "small", multiple: true },
-          }}
-
-          value={this.state.activeValue}
           //onChange={ () => {} }
+
+          slotProps={{ textField: { size: "small", multiple: true } }}
+          value={this.state.activeValue}
+          
+          slots={{ day: (props) => this.props.renderWeekPickerDay(props)}}
+
         />
       </LocalizationProvider>
     )

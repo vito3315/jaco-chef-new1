@@ -27,6 +27,7 @@ import Typography from '@mui/material/Typography';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -1053,8 +1054,6 @@ class WorkSchedule_ extends React.Component {
   async openM(item) {
     // console.log(item);
 
-    return ;
-
     let data = {
       smena_id: item.smena_id,
       app_id: item.app_id,
@@ -1462,12 +1461,12 @@ class WorkSchedule_ extends React.Component {
     }
   }
 
-  renderWeekPickerDay = (date, selectedDates, pickersDayProps) => {
-    pickersDayProps['selected'] = false;
-    pickersDayProps['aria-selected'] = false;
+  renderWeekPickerDay = (props) => {
+
+    const date = dayjs(props.day).format('YYYY-MM-DD');
 
     let arr = this.state.arrTimeAdd;
-    let res = arr.find((item) => formatDate(item.date) == formatDate(date));
+    let res = arr.find((item) => item.date === date);
 
     if (res) {
       let backgroundColor = '#fff';
@@ -1488,7 +1487,7 @@ class WorkSchedule_ extends React.Component {
 
       return (
         <PickersDay
-          {...pickersDayProps}
+          {...props}
           style={{ backgroundColor: backgroundColor, color: '#fff' }}
           onClick={this.chooseDay.bind(this, date)}
         />
@@ -1497,16 +1496,18 @@ class WorkSchedule_ extends React.Component {
 
     return (
       <PickersDay
-        {...pickersDayProps}
+        {...props}
+        style={{ backgroundColor: '#fff', color: 'rgba(0, 0, 0, 0.87)' }}
         onClick={this.chooseDay.bind(this, date)}
       />
     );
   };
 
   chooseDay(newValue, event) {
+
     let arr = this.state.arrTimeAdd;
 
-    let res = arr.find((item) => formatDate(item.date) == formatDate(newValue));
+    let res = arr.find((item) => item.date === newValue);
 
     if (!res) {
       let time_start = '';
@@ -1528,7 +1529,7 @@ class WorkSchedule_ extends React.Component {
       }
 
       arr.push({
-        date: formatDate(newValue),
+        date: dayjs(newValue).format('YYYY-MM-DD'),
         type: this.state.typeTimeAdd,
         time_start: time_start,
         time_end: time_end,
@@ -1538,13 +1539,27 @@ class WorkSchedule_ extends React.Component {
         arrTimeAdd: arr,
       });
     } else {
-      let newArr = arr.filter(
-        (item) => formatDate(item.date) != formatDate(newValue)
-      );
 
-      this.setState({
-        arrTimeAdd: newArr,
-      });
+      if(res.type === this.state.typeTimeAdd) {
+
+        let newArr = arr.filter((item) => item.date !== newValue);
+  
+        this.setState({
+          arrTimeAdd: newArr,
+        });
+
+      } else {
+
+        arr.forEach(item => {
+          if(item.date === newValue) {
+            item.type = this.state.typeTimeAdd
+          }
+        })
+
+        this.setState({
+          arrTimeAdd: arr,
+        });
+      }
     }
   }
 
@@ -2595,7 +2610,7 @@ class WorkSchedule_ extends React.Component {
                   )}
                   {this.state.userInfo.hist.map((item, key) => (
                     <Accordion key={key}>
-                      <AccordionSummary>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography>{item.date + ' - ' + item.user_name}</Typography>
                       </AccordionSummary>
                       <AccordionDetails style={{ display: 'flex', flexDirection: 'column' }}>
@@ -2651,7 +2666,7 @@ class WorkSchedule_ extends React.Component {
               )}
               {this.state.userInfo.hist.map((item, key) => (
                 <Accordion key={key}>
-                  <AccordionSummary>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography>{item.date + ' - ' + item.user_name}</Typography>
                   </AccordionSummary>
                   <AccordionDetails style={{ display: 'flex', flexDirection: 'column' }}>
