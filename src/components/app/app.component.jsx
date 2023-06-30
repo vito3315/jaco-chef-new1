@@ -106,6 +106,7 @@ const VendorMini = React.lazy(() => import("../vendor_mini"));
 const StatByClients = React.lazy(() => import("../stat_by_clients"));
 const StatTimeOrders = React.lazy(() => import("../stat_time_orders"));
 const KitchenStat = React.lazy(() => import("../kitchen_stat"));
+const SiteBaners = React.lazy(() => import("../site_baners"));
 //const Test = React.lazy(() => import("../test"));
 const TabletRepair = React.lazy(() => import("../tablet_repair"));
 
@@ -437,6 +438,7 @@ export function App () {
                   <Route path={'/stat_by_clients'} exact={ true } element={ <StatByClients /> } />
                   <Route path={'/stat_time_orders'} exact={ true } element={ <StatTimeOrders /> } />
                   <Route path={'/kitchen_stat'} exact={ true } element={ <KitchenStat /> } />
+                  <Route path={'/site_baners'} exact={ true } element={ <SiteBaners /> } />
                   
                   <Route path={'/tablet_repair'} exact={ true } element={ <TabletRepair /> } />
 
