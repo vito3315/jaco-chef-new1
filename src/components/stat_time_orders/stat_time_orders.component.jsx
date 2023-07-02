@@ -30,6 +30,22 @@ class StatTimeOrders_Table extends React.Component {
     return nextProps.ItemTab !== this.props.ItemTab || nextProps.data !== this.props.data;
   }
 
+  checkColor(color = ''){
+    if(color == 'red' || color == 'pink'){
+      return '#d5265b';
+    }
+
+    if(color == 'yellow' || color == 'light_pink' ){
+      return '#ffba00';
+    }
+
+    if(color == 'black' ){
+      return '#000';
+    }
+
+    return color;
+  }
+
   render() {
     const { ItemTab, data, getDataCellOrder, getDataCellCount, getDataCellUser } = this.props;
     return (
@@ -53,8 +69,7 @@ class StatTimeOrders_Table extends React.Component {
                   {data.users.map((item, key) => (
                     <TableRow key={key} hover>
                       <TableCell
-                        style={{ backgroundColor: ItemTab === '1' ? item.my_color_day ? item.my_color_day : null : null,
-                          color: ItemTab === '1' ? item.my_color_day && item.my_color_day !== 'yellow' ? '#ffff' : null : null,
+                        style={{ backgroundColor: ItemTab === '1' ? item.my_color_day ? this.checkColor(item.my_color_day) : null : null,
                         }}
                       >
                         {item.user_name}
