@@ -1542,8 +1542,8 @@ class SiteSale2_edit_ extends React.Component {
         promo_summ_to: this.state.price_end,
         promo_when: this.state.date_promo,
         
-        date_start: this.state.date_start,
-        date_end: this.state.date_end,
+        date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+        date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
         time_start: this.state.time_start,
         time_end: this.state.time_end,
         
@@ -2754,8 +2754,9 @@ class SiteSale2_AnaliticList_ extends React.Component {
   async getUsers(){
     let data = {
       city_id: this.state.city_id,
-      dateStart: this.state.date_start,
-      dateEnd: this.state.date_end,
+
+      dateStart  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      dateEnd    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
     }
     
     let res = await this.getData('get_promo_users_analitic', data);
