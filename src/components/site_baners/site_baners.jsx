@@ -42,9 +42,9 @@ class SiteBaners_Modal extends React.Component {
     maxFiles: 1,
     timeout: 0,
     parallelUploads: 10,
-    acceptedFiles: 'image/jpeg,image/png',
+    acceptedFiles: 'image/jpeg',
     addRemoveLinks: true,
-    url: 'https://jacochef.ru/src/img/site_img/upload_img_new.php',
+    url: 'https://jacochef.ru/src/img/site_banners/upload_img_new.php',
   };
 
   myDropzone = null;
@@ -163,9 +163,8 @@ class SiteBaners_Modal extends React.Component {
             this.isInit = true;
 
             this.myDropzone.on('sending', (file, xhr, data) => {
-              data.append('name', item.akcia.name);
+              data.append('name', banner.this_ban.name);
               data.append('id', res.id);
-              data.append('img_type', 'full');
             });
 
             this.myDropzone.on('queuecomplete', (data) => {
@@ -241,9 +240,8 @@ class SiteBaners_Modal extends React.Component {
             this.isInit = true;
 
             this.myDropzone.on('sending', (file, xhr, data) => {
-              data.append('name', item.akcia.name);
-              data.append('id', item.akcia.id);
-              data.append('img_type', 'full');
+              data.append('name', banner.this_ban.name);
+              data.append('id', banner.this_ban.id);
             });
 
             this.myDropzone.on('queuecomplete', (data) => {
@@ -377,11 +375,10 @@ class SiteBaners_Modal extends React.Component {
                 ) : null}
 
                 <Grid item xs={12} sm={12}>
-                  <Typography>Картинка соотношением сторон (1:1) (пример: 2000х2000) только JPG</Typography>
+                  <Typography>Картинка разрешением: 2520х800 только JPG</Typography>
 
-                  {!this.state.banner ||
-                  this.state.banner.this_ban.img.length == 0 ? null : (
-                    <img style={{ width: '100%', height: 'auto' }} src={'https://cdnimg.jacofood.ru/' + this.state.banner.this_ban.img + '_732x732.jpg'}/>
+                  {!this.state.banner || this.state.banner.this_ban.img.length == 0 ? null : (
+                    <img style={{ width: '100%', height: 'auto' }} src={'https://storage.yandexcloud.net/site-home-img/' + this.state.banner.this_ban.img + '_2520x800.jpg'}/>
                   )}
 
                   <div className="dropzone" id="for_img_edit" style={{ width: '100%', minHeight: 150 }}/>
