@@ -350,6 +350,9 @@ class SiteUserManager_ extends React.Component {
 
         editUser_user.user.app_id = this.state.chose_app !== null ? this.state.chose_app.id : 0;
 
+
+        //editUser_user.user.birthday
+
         this.state.app_list.map((item, key) => {
             if (parseInt(editUser_user.user.app_id) == parseInt(item.id)) {
                 if (parseInt(item.is_graph) == 1 && parseInt(graphType) == 0) {
@@ -421,7 +424,7 @@ class SiteUserManager_ extends React.Component {
             })
         }
 
-        editUser_user.birthday = dayjs(editUser_user.birthday).format('YYYY-MM-DD')
+        editUser_user.user.birthday = dayjs(editUser_user.user.birthday).format('YYYY-MM-DD')
 
         let data = {
             user: editUser_user,
