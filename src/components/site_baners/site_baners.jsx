@@ -748,7 +748,7 @@ class SiteBaners_ extends React.Component {
                         {this.state.non_active.map((item, key) => (
                           <TableRow key={key} hover>
                             <TableCell>{key + 1}</TableCell>
-                            <TableCell>{item.name}</TableCell>
+                            <TableCell onClick={this.openModal.bind(this, 'bannerEdit', 'Редактирование банера', item.id)} style={{ fontWeight: 700, cursor: 'pointer' }}>{item.name}</TableCell>
                             <TableCell>{item.city_name ?? 'Все города'}</TableCell>
                             <TableCell>{item.date_start}</TableCell>
                             <TableCell>{item.date_end}</TableCell>
