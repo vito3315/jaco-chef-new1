@@ -598,7 +598,7 @@ class ZoneModules_ extends React.Component {
         free_drive: item.free_drive,
         new_zone: item.new_zone,
         zone_id: item.id,
-        is_active: item.is_active ?? 0,
+        is_active: item.is_active,
       };
 
       res = await this.getData('save_edit', data);
@@ -746,7 +746,7 @@ class ZoneModules_ extends React.Component {
                       <TableCell align="center">{item.sum_div}</TableCell>
                       <TableCell align="center">{item.sum_div_driver}</TableCell>
                       <TableCell align="center">{item.free_drive === '0' ? <CloseIcon /> : <CheckIcon />}</TableCell>
-                      <TableCell align="center">{item?.is_active === '1' ? <CheckIcon /> : <CloseIcon />}</TableCell>
+                      <TableCell align="center">{item.is_active === '0' ? <CloseIcon /> : <CheckIcon />}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

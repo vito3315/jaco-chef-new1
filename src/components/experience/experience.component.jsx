@@ -48,10 +48,7 @@ class Experience_Modal_Cloth extends React.Component {
     super(props);
 
     this.state = {
-      app: '',
-      ItemTab: '1',
-      listCloth: [],
-      listClothApp: [],
+      listCloth: null,
     };
   }
 
@@ -74,26 +71,7 @@ class Experience_Modal_Cloth extends React.Component {
       });
     }
   }
-
-  changeTab(event, value) {
-    this.setState({
-      ItemTab: value,
-    });
-  }
-
-  async changeApp(val, event) {
-    const data = {
-      app_id: event.target.value,
-    };
-
-    const listClothApp = await this.props.getData('get_cloth_app', data);
-
-    this.setState({
-      listClothApp,
-      [val]: event.target.value,
-    });
-  }
-
+ 
   changeName(index, event) {
     let listCloth = this.state.listCloth;
 
@@ -108,45 +86,19 @@ class Experience_Modal_Cloth extends React.Component {
     });
   }
 
-  changeListClothApp(event, listClothApp) {
-    this.setState({ listClothApp });
-  }
-
   saveClothList() {
     let listCloth = this.state.listCloth;
 
     listCloth = listCloth.filter((item) => item.name);
 
     this.props.saveClothList(listCloth);
-  }
-
-  saveClothApp() {
-    const listClothApp = this.state.listClothApp;
-
-    const app_id = this.state.app;
-
-    const items = listClothApp.reduce((newList, item) => {
-      item = { id: item.id };
-
-      return [...newList, ...[item]];
-    }, []);
-
-    const data = {
-      app_id,
-      items,
-    };
-
-    this.props.saveClothApp(data);
 
     this.onClose();
   }
 
   onClose() {
     this.setState({
-      app: '',
-      ItemTab: '1',
-      listCloth: [],
-      listClothApp: [],
+      listCloth: null,
     });
 
     this.props.onClose();
@@ -164,72 +116,31 @@ class Experience_Modal_Cloth extends React.Component {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle className="button">
-          <Typography style={{ fontWeight: 'bold' }}>Предметы одежды</Typography>
+          <Typography style={{ fontWeight: 'bold' }}>Список предметов одежды</Typography>
           <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
 
         <DialogContent style={{ paddingTop: 10, paddingBottom: 10 }}>
-          <TabContext value={this.state.ItemTab}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <TabList onChange={this.changeTab.bind(this)} variant="fullWidth">
-                <Tab label="Список" value="1" />
-                <Tab label="По должности" value="2" />
-              </TabList>
-            </Box>
-
-            {/* Список предметов одежды */}
-            <TabPanel value={'1'} style={{ padding: '24px 0' }}>
-              <Grid container spacing={3}>
-                {!this.state.listCloth.length ? null :
-                    this.state.listCloth.map((it, key) => (
-                      <Grid item xs={12} sm={12} key={key}>
-                        <MyTextInput
-                          label="Наименование"
-                          value={it.name}
-                          func={this.changeName.bind(this, key)}
-                        />
-                      </Grid>
-                    ))}
-              </Grid>
-            </TabPanel>
-
-            {/* Предметы одежды по должности */}
-            <TabPanel value={'2'} style={{ padding: '24px 0' }}>
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={12}>
-                  <MySelect
-                    label="Должность"
-                    data={this.props.listApp}
-                    value={this.state.app}
-                    func={this.changeApp.bind(this, 'app')}
+          <Grid container spacing={3}>
+            {!this.state.listCloth ? null :
+              this.state.listCloth.map((it, key) => (
+                <Grid item xs={12} sm={12} key={key}>
+                  <MyTextInput
+                    label="Наименование"
+                    value={it.name}
+                    func={this.changeName.bind(this, key)}
                   />
                 </Grid>
-                <Grid item xs={12} sm={12}>
-                  <MyAutocomplite
-                    label="Предметы одежды"
-                    multiple={true}
-                    data={this.state.listCloth}
-                    value={this.state.listClothApp}
-                    func={this.changeListClothApp.bind(this)}
-                  />
-                </Grid>
-              </Grid>
-            </TabPanel>
-          </TabContext>
+            ))}
+          </Grid>
         </DialogContent>
 
         <DialogActions>
-          {this.state.ItemTab === '1' ? (
-            <Button color="success" variant="contained" onClick={this.saveClothList.bind(this)}>
-              Coxранить
-            </Button>
-          ) : (
-            <Button color="success" variant="contained" onClick={this.saveClothApp.bind(this)}>
-              Coxранить
-            </Button>
-          )}
+          <Button color="success" variant="contained" onClick={this.saveClothList.bind(this)}>
+            Coxранить
+          </Button>
         </DialogActions>
       </Dialog>
     );
@@ -248,6 +159,8 @@ class Experience_Modal_User extends React.Component {
 
       ItemTab: '1',
       listData: null,
+      listClothUserActive: null,
+      listClothUserNonActive: null,
 
       openAlert: false,
       err_status: true,
@@ -256,7 +169,7 @@ class Experience_Modal_User extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    // console.log(this.props);
+    //console.log(this.props);
 
     if (!this.props.user) {
       return;
@@ -283,6 +196,8 @@ class Experience_Modal_User extends React.Component {
 
       this.setState({
         listData,
+        listClothUserActive: this.props.listClothUserActive,
+        listClothUserNonActive: this.props.listClothUserNonActive,
         item: this.props.user,
         data: this.props.user.date_registration,
         ItemTab: this.props.ItemTab ?? this.state.ItemTab,
@@ -296,7 +211,7 @@ class Experience_Modal_User extends React.Component {
     });
   }
 
-  changeDateRange(data, type, val) {
+  changeDateRange(data, type, date, val) {
     const value = val ? val : '';
 
     if (data === 'list') {
@@ -309,6 +224,17 @@ class Experience_Modal_User extends React.Component {
       this.setState({
         listData,
       });
+    } else if (data === 'cloth') {
+      const listClothUserActive = this.state.listClothUserActive;
+
+      listClothUserActive.forEach((item) =>
+        item.cloth_id === type ? (item[date] = dayjs(value).format('YYYY-MM-DD')) : item
+      );
+
+      this.setState({
+        listClothUserActive,
+      });
+
     } else {
       const item = this.state.item;
 
@@ -408,6 +334,20 @@ class Experience_Modal_User extends React.Component {
     this.onClose();
   }
 
+  saveListClothUser() {
+    const items = this.state.listClothUserActive;
+    const user = this.state.item;
+
+    const data = {
+      user_id: user.id,
+      items,
+    }
+
+    this.props.saveListClothUser(data);
+
+    this.onClose();
+  }
+
   onClose() {
     this.setState({
       item: null,
@@ -416,6 +356,8 @@ class Experience_Modal_User extends React.Component {
 
       ItemTab: '1',
       listData: null,
+      listClothUserActive: null,
+      listClothUserNonActive: [],
 
       openAlert: false,
       err_status: true,
@@ -460,6 +402,9 @@ class Experience_Modal_User extends React.Component {
                   <Tab label="Информация" value="1" />
                   {parseInt(this.state.item?.is_health_book) == 1 ? (
                     <Tab label="Мед книжка" value="2" />
+                  ) : null}
+                  {parseInt(this.state.item?.is_cloth) == 1 ? (
+                    <Tab label="Предметы одежды" value="3" />
                   ) : null}
                 </TabList>
               </Box>
@@ -515,7 +460,7 @@ class Experience_Modal_User extends React.Component {
                             <MyDatePickerNew 
                               label="Изменить датy"
                               value={dayjs(this.state.item?.date_registration ?? '')}
-                              func={this.changeDateRange.bind(this, 'registration', 0)}
+                              func={this.changeDateRange.bind(this, 'registration', 0, 0)}
                             />
                           </Grid>
                           <Grid mr={2}>
@@ -547,7 +492,7 @@ class Experience_Modal_User extends React.Component {
                       <TableRow>
                         <TableCell style={{ width: '33%' }}>Название</TableCell>
                         <TableCell style={{ width: '34%', minWidth: '150px' }}>Дата прохождения</TableCell>
-                        <TableCell style={{ width: '33%' }}>Дата окончания</TableCell>
+                        <TableCell style={{ width: '33%', minWidth: '150px' }}>Дата окончания</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -559,7 +504,7 @@ class Experience_Modal_User extends React.Component {
                                 <MyDatePickerNew
                                   label="Дата"
                                   value={dayjs(item?.start ?? '')}
-                                  func={this.changeDateRange.bind(this, 'list', item.type)}
+                                  func={this.changeDateRange.bind(this, 'list', item.type, 0)}
                                 />
                               </TableCell>
                               <TableCell 
@@ -573,10 +518,69 @@ class Experience_Modal_User extends React.Component {
                   </Table>
                 </TableContainer>
               </TabPanel>
+
+              {/* предметы одежды */}
+              <TabPanel value='3' style={{ padding: '24px 0' }}>
+                <TableContainer>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell style={{ width: '33%' }}>Наименование</TableCell>
+                        <TableCell style={{ width: '34%', minWidth: '150px' }}>Дата выдачи</TableCell>
+                        <TableCell style={{ width: '33%', minWidth: '150px' }}>Дата сдачи</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {!this.state.listClothUserActive ? null :
+                        this.state.listClothUserActive.map((item, key) => (
+                          <TableRow key={key}>
+                            <TableCell>{item.name}</TableCell>
+                            <TableCell>
+                              <MyDatePickerNew
+                                label="Дата"
+                                value={dayjs(item?.date_start ?? '')}
+                                func={this.changeDateRange.bind(this, 'cloth', item.cloth_id, 'date_start')}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <MyDatePickerNew
+                                label="Дата"
+                                value={dayjs(item?.date_end ?? '')}
+                                func={this.changeDateRange.bind(this, 'cloth', item.cloth_id, 'date_end')}
+                              />
+                            </TableCell>
+                          </TableRow>
+                       ))}
+                    </TableBody>
+                  </Table>
+                  <Table size="small" style={{ marginTop: '30px'}}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell  style={{ border: 'none' }} colSpan={3}><h4>Сданная одежда</h4></TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell style={{ width: '33%' }}>Наименование</TableCell>
+                        <TableCell style={{ width: '34%', minWidth: '150px' }}>Дата выдачи</TableCell>
+                        <TableCell style={{ width: '33%', minWidth: '150px' }}>Дата сдачи</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {!this.state.listClothUserNonActive ? null :
+                        this.state.listClothUserNonActive.map((item, key) => (
+                          <TableRow key={key}>
+                            <TableCell>{item.name}</TableCell>
+                            <TableCell>{item?.date_start ?? ''}</TableCell>
+                            <TableCell>{item?.date_end ?? ''}</TableCell>
+                          </TableRow>
+                       ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </TabPanel>
             </TabContext>
           </DialogContent>
 
-          <DialogActions className={this.state.ItemTab === '2' ? 'button' : null}>
+          <DialogActions className={this.state.ItemTab !== '1' ? 'button' : null}>
             {this.state.ItemTab === '1' ? (
               <Button variant="contained" onClick={this.onClose.bind(this)}>
                 Закрыть
@@ -586,7 +590,7 @@ class Experience_Modal_User extends React.Component {
                 <Button onClick={this.onClose.bind(this)} variant="contained">
                   Отмена
                 </Button>
-                <Button color="success" variant="contained" onClick={this.saveHealthBook.bind(this)}>
+                <Button color="success" variant="contained" onClick={this.state.ItemTab === '2' ? this.saveHealthBook.bind(this) : this.saveListClothUser.bind(this)}>
                   Coxранить
                 </Button>
               </>
@@ -641,8 +645,12 @@ class Experience_ extends React.Component {
       ItemTab: null,
 
       modalDialogCloth: false,
-      listApp: null,
       listCloth: null,
+
+      listClothUserActive: null,
+      listClothUserNonActive: null,
+
+      user_kind: null,
     };
   }
 
@@ -713,6 +721,14 @@ class Experience_ extends React.Component {
         if (json.st === false && json.type == 'auth') {
           window.location.pathname = '/auth';
           return;
+        }
+
+        if(json?.user?.kind) {
+          const user_kind = json.user.kind;
+
+          this.setState({
+            user_kind,
+          });
         }
 
         setTimeout(() => {
@@ -813,6 +829,8 @@ class Experience_ extends React.Component {
 
     const res = await this.getData('get_user_info', data);
 
+    console.log(res)
+
     listData.forEach((item) => {
       item.change = '';
 
@@ -828,9 +846,13 @@ class Experience_ extends React.Component {
       }
     });
 
+    const listClothUserNonActive = res.cloth.non_active ? [...[res.cloth.non_active]] : res.cloth.non_active;
+
     this.setState({
       ItemTab,
       listData,
+      listClothUserActive: res.cloth.active,
+      listClothUserNonActive,
       modalDialog: true,
       user: res.user,
     });
@@ -886,7 +908,6 @@ class Experience_ extends React.Component {
 
     this.setState({
       modalDialogCloth: true,
-      listApp: res.app,
       listCloth: res.cloth,
     });
   }
@@ -899,8 +920,6 @@ class Experience_ extends React.Component {
     const res = await this.getData('save_cloth_list', data);
 
     if (res.st) {
-      this.getDataСloth();
-
       this.setState({
         openAlert: true,
         err_status: true,
@@ -915,14 +934,18 @@ class Experience_ extends React.Component {
     }
   }
 
-  async saveClothApp(data) {
-    const res = await this.getData('save_cloth_app', data);
+  async saveListClothUser(data) {
+    console.log(data);
+
+    const res = await this.getData('save_cloth_user', data);
+
+    console.log(res);
 
     if (res.st) {
       this.setState({
         openAlert: true,
         err_status: true,
-        err_text: 'Список одежды для должности сохранен',
+        err_text: 'Список одежды для сотрудника сохранен',
       });
     } else {
       this.setState({
@@ -956,17 +979,17 @@ class Experience_ extends React.Component {
           saveHealthBook={this.saveHealthBook.bind(this)}
           listData={this.state.listData}
           ItemTab={this.state.ItemTab}
+          listClothUserActive={this.state.listClothUserActive}
+          listClothUserNonActive={this.state.listClothUserNonActive}
+          saveListClothUser={this.saveListClothUser.bind(this)}
         />
 
         <Experience_Modal_Cloth
           open={this.state.modalDialogCloth}
           onClose={() => this.setState({ modalDialogCloth: false })}
           fullScreen={this.state.fullScreen}
-          listApp={this.state.listApp}
           listCloth={this.state.listCloth}
           saveClothList={this.saveClothList.bind(this)}
-          saveClothApp={this.saveClothApp.bind(this)}
-          getData={this.getData.bind(this)}
         />
 
         <Grid item xs={12} mb={3}>
@@ -1000,11 +1023,15 @@ class Experience_ extends React.Component {
             </Button>
           </Grid>
 
-          <Grid item xs={12} sm={12} style={{ display: 'none' }}>
-            <Button variant="contained" onClick={this.getDataСloth.bind(this)} sx={{ whiteSpace: 'nowrap' }}>
-              Предметы одежды
-            </Button>
-          </Grid>
+          {this.state.user_kind === '1' || this.state.user_kind === '0' ?
+            <Grid item xs={12} sm={12}>
+              <Button variant="contained" onClick={this.getDataСloth.bind(this)} sx={{ whiteSpace: 'nowrap' }}>
+                Предметы одежды
+              </Button>
+            </Grid>
+            : null
+          }
+
         </Grid>
 
         <Grid container spacing={3} mt={3} mb={5}>
