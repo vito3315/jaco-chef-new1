@@ -420,6 +420,14 @@ class ZoneModules_Modal extends React.Component {
               </Grid>
 
               <Grid item xs={12} sm={3}>
+                <MyCheckBox
+                  label="Активность"
+                  value={this.state.item ? parseInt(this.state.item.zone.is_active) == 1 ? true : false : false}
+                  func={this.changeItemChecked.bind(this, 'is_active')}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={3}>
                 <Button variant="contained" onClick={this.state.isDrawing ? this.startDrawing.bind(this) : this.stopDrawing.bind(this)}>
                   {this.state.isDrawing ? 'Включить область редактирования' : 'Выключить область редактирования'}
                 </Button>
@@ -590,6 +598,7 @@ class ZoneModules_ extends React.Component {
         free_drive: item.free_drive,
         new_zone: item.new_zone,
         zone_id: item.id,
+        is_active: item.is_active ?? 0,
       };
 
       res = await this.getData('save_edit', data);
@@ -716,12 +725,13 @@ class ZoneModules_ extends React.Component {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell style={{ width: '5%' }}>#</TableCell>
-                    <TableCell style={{ width: '19%' }}>Точка</TableCell>
-                    <TableCell style={{ width: '19%' }}>Зона</TableCell>
-                    <TableCell style={{ width: '19%' }} align="center">Сумма для клиента</TableCell>
-                    <TableCell style={{ width: '19%' }} align="center">Сумма для курьера</TableCell>
-                    <TableCell style={{ width: '19%' }} align="center">Бесплатная доставка</TableCell>
+                    <TableCell style={{ width: '4%' }}>#</TableCell>
+                    <TableCell style={{ width: '16%' }}>Точка</TableCell>
+                    <TableCell style={{ width: '16%' }}>Зона</TableCell>
+                    <TableCell style={{ width: '16%' }} align="center">Сумма для клиента</TableCell>
+                    <TableCell style={{ width: '16%' }} align="center">Сумма для курьера</TableCell>
+                    <TableCell style={{ width: '16%' }} align="center">Бесплатная доставка</TableCell>
+                    <TableCell style={{ width: '16%' }} align="center">Активность</TableCell>
                   </TableRow>
                 </TableHead>
 
@@ -736,6 +746,7 @@ class ZoneModules_ extends React.Component {
                       <TableCell align="center">{item.sum_div}</TableCell>
                       <TableCell align="center">{item.sum_div_driver}</TableCell>
                       <TableCell align="center">{item.free_drive === '0' ? <CloseIcon /> : <CheckIcon />}</TableCell>
+                      <TableCell align="center">{item?.is_active === '1' ? <CheckIcon /> : <CloseIcon />}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
