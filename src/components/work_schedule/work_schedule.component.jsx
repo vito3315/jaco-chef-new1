@@ -153,6 +153,38 @@ function a11yProps(index) {
   };
 }
 
+class WorkSchedule_Confirm extends React.Component {
+
+  onClose() {
+    this.props.methodConfirm();
+
+    this.props.onClose();
+  }
+
+  render() {
+    return (
+      <Dialog
+        fullWidth={true}
+        maxWidth="sm"
+        open={this.props.open}
+        onClose={this.props.onClose.bind(this)}
+      >
+        <DialogTitle>Подтвердите действие</DialogTitle>
+        <DialogContent align="center" style={{ paddingBottom: 10, paddingTop: 10 }}>
+          <Typography style={{ fontWeight: 'bold' }}>
+            {this.props.textConfirm}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.props.onClose.bind(this)}>Отмена</Button>
+          <Button onClick={this.onClose.bind(this)} color="success">Ok</Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+
+}
+
 class HeaderItem extends React.Component {
   render() {
     return (
@@ -855,6 +887,10 @@ class WorkSchedule_ extends React.Component {
       isOpenHJ: false,
       date_start: dayjs(Date.now()),
       date_end: dayjs(Date.now()),
+
+      confirmDialog: false,
+      methodConfirm: null,
+      textConfirm: '',
     };
   }
 
@@ -1304,13 +1340,15 @@ class WorkSchedule_ extends React.Component {
   }
 
   checkFastPoint(point) {
-    // console.log(point);
+    //console.log(point);
 
-    if (confirm('Точно сменить точку с сегоднешнего дня ?')) {
-      this.fastPoint(point.point_id, point.smena_id);
-    }
+    this.setState({
+      confirmDialog: true,
+      methodConfirm: this.fastPoint.bind(this, point.point_id, point.smena_id),
+      textConfirm: 'Точно сменить точку с сегоднешнего дня ?',
+    });
   }
-
+ 
   async fastPoint(point_id, smena_id) {
     let data = {
       new_point_id: point_id,
@@ -1354,9 +1392,11 @@ class WorkSchedule_ extends React.Component {
   }
 
   checkNewLvDir(LV) {
-    if (confirm('Точно изменить уровень директора ?')) {
-      this.newLvDir(LV);
-    }
+    this.setState({
+      confirmDialog: true,
+      methodConfirm: this.newLvDir.bind(this, LV),
+      textConfirm: 'Точно изменить уровень директора ?',
+    });
   }
 
   async newLvDir(LV) {
@@ -1405,9 +1445,11 @@ class WorkSchedule_ extends React.Component {
   }
 
   checkDopBonus(type) {
-    if (confirm('Точно ?')) {
-      this.dop_bonus(type);
-    }
+    this.setState({
+      confirmDialog: true,
+      methodConfirm: this.dop_bonus.bind(this, type),
+      textConfirm: 'Точно ?',
+    });
   }
 
   async dop_bonus(type) {
@@ -1700,9 +1742,11 @@ class WorkSchedule_ extends React.Component {
   }
 
   fakeOrders() {
-    if (confirm('Точно обжаловать ?')) {
-      this.saveFakeOrders();
-    }
+    this.setState({
+      confirmDialog: true,
+      methodConfirm: this.saveFakeOrders.bind(this),
+      textConfirm: 'Точно обжаловать ?',
+    });
   }
 
   async saveFakeOrders() {
@@ -1755,9 +1799,11 @@ class WorkSchedule_ extends React.Component {
   }
 
   fakeCam() {
-    if (confirm('Точно обжаловать ?')) {
-      this.saveFakeCam();
-    }
+    this.setState({
+      confirmDialog: true,
+      methodConfirm: this.saveFakeCam.bind(this),
+      textConfirm: 'Точно обжаловать ?',
+    });
   }
 
   async saveFakeCam() {
@@ -1884,8 +1930,15 @@ class WorkSchedule_ extends React.Component {
     }
   }
 
+  deleteSmenaConfirm() {
+    this.setState({
+      confirmDialog: true,
+      methodConfirm: this.deleteSmena.bind(this),
+      textConfirm: 'Удалить смену ?',
+    });
+  }
+
   async deleteSmena() {
-    if (confirm('Удалить смену ?')) {
       let data = {
         id: this.state.smena.id,
         point_id: this.state.point,
@@ -1918,7 +1971,6 @@ class WorkSchedule_ extends React.Component {
           err_text: res.text,
         });
       }
-    }
   }
 
   changeNewSmenaUsers(user_id) {
@@ -2049,6 +2101,14 @@ class WorkSchedule_ extends React.Component {
           status={this.state.err_status}
           text={this.state.err_text}
         />
+
+        {/* конфирм */}
+        <WorkSchedule_Confirm
+          open={this.state.confirmDialog}
+          onClose={() => this.setState({ confirmDialog: false, textConfirm: '', methodConfirm: null })}
+          textConfirm={this.state.textConfirm}
+          methodConfirm={this.state.methodConfirm}
+        /> 
 
         <Dialog onClose={() => this.setState({ mainMenuAddUsersMounth: false })} open={this.state.mainMenuAddUsersMounth}>
           <List sx={{ pt: 0 }}>
@@ -2957,7 +3017,7 @@ class WorkSchedule_ extends React.Component {
                   <ListItemButton
                     disableRipple={false}
                     selected={true}
-                    onClick={this.deleteSmena.bind(this)}
+                    onClick={this.deleteSmenaConfirm.bind(this)}
                     className="SmenaDelete"
                   >
                     <ListItemText primary="Удалить смену" />
