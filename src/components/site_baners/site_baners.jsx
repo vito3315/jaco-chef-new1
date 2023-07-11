@@ -56,6 +56,10 @@ class SiteBaners_Modal extends React.Component {
 
     this.state = {
       banner: null,
+
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
@@ -284,9 +288,14 @@ class SiteBaners_Modal extends React.Component {
   }
 
   onClose(is_reload = false) {
-    this.state = {
+    
+    this.setState ({
       banner: null,
-    };
+
+      openAlert: false,
+      err_status: true,
+      err_text: '',
+    });
 
     this.props.onClose(is_reload);
   }

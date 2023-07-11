@@ -43,6 +43,10 @@ class KitchenStat_ extends React.Component {
       arrayOrdersByH: null,
       data: null,
       statAllItemsCount: null,
+
+      openAlert: false,
+      err_status: true,
+      err_text: '',
     };
   }
 
