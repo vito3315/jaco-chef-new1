@@ -846,7 +846,7 @@ class Experience_ extends React.Component {
       }
     });
 
-    const listClothUserNonActive = res.cloth.non_active ? [...[res.cloth.non_active]] : res.cloth.non_active;
+    const listClothUserNonActive = res.cloth.non_active;
 
     this.setState({
       ItemTab,
