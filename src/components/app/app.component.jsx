@@ -110,6 +110,7 @@ const SiteBaners = React.lazy(() => import("../site_baners"));
 //const Test = React.lazy(() => import("../test"));
 const TabletRepair = React.lazy(() => import("../tablet_repair"));
 const EdIzmer = React.lazy(() => import("../ed_izmer"));
+const TableBrak = React.lazy(() => import("../table_brak"));
 
 const Journal_of_work_of_bactericidal_lamps = React.lazy(() => import("../journal_of_work_of_bactericidal_lamps"));
 const ItemsPr = React.lazy(() => import("../items_pr"));
@@ -443,6 +444,7 @@ export function App () {
                   
                   <Route path={'/tablet_repair'} exact={ true } element={ <TabletRepair /> } />
                   <Route path={'/ed_izmer'} exact={ true } element={ <EdIzmer /> } />
+                  <Route path={'/table_brak'} exact={ true } element={ <TableBrak /> } />
 
                   <Route path={'/journal_of_work_of_bactericidal_lamps'} exact={ true } element={ <Journal_of_work_of_bactericidal_lamps /> } />
                   <Route path={'/items_pr'} exact={ true } element={ <ItemsPr /> } />
