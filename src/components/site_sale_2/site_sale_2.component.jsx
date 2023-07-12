@@ -2815,11 +2815,13 @@ class SiteSale2_AnaliticList_ extends React.Component {
                   <Typography>{item.name}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
+                  <span>Всего выписано: {item.count}</span>
+                  <br />
                   <span>Удаленных: {item.stat.is_delete_perc}</span>
                   <br />
-                  <span>Активированных: {item.stat.is_active_perc}</span>
+                  <span>Активации закончились: {item.stat.is_active_perc}</span>
                   <br />
-                  <span>Не активированных: {item.stat.is_nonactive_perc}</span>
+                  <span>Активации остались: {item.stat.is_nonactive_perc}</span>
                   <br />
                   <span>------------------------------</span>
                   <br />
