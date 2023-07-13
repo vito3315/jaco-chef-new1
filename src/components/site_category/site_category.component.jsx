@@ -94,7 +94,7 @@ function ListCat({ main, openModal, save }) {
           }
         });
 
-        if(dropItem.parent_id !== dragItem.parent_id) {
+        if(dropItem.parent_id !== dragItem.parent_id && dropItem.id !== dragItem.parent_id) {
           save(dragItem, item.id, 'edit');
         }
 
