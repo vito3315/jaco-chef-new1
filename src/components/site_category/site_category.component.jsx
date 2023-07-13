@@ -94,6 +94,10 @@ function ListCat({ main, openModal, save }) {
           }
         });
 
+        if(dropItem.parent_id !== dragItem.parent_id) {
+          save(dragItem, item.id, 'edit');
+        }
+
         if (item.items.length) {
           dragItem.parent_id = item.id;
           item.items = [...item.items, ...[dragItem]];
@@ -102,8 +106,6 @@ function ListCat({ main, openModal, save }) {
           dragItem.parent_id = item.id;
           item.items = [...item.items, ...[dragItem]];
         }
-        
-        save(dragItem, item.id, 'edit');
 
         return item;
       }
