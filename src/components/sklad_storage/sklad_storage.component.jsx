@@ -366,7 +366,7 @@ class SkladStorage_ extends React.Component {
                     <TableRow key={key}>
                       <TableCell>{key + 1}</TableCell>
                       <TableCell className='tableCellInput'>
-                        <MyTextInput sx={{ width: '30%' }} label="" value={item.sort} func={this.changeSort.bind(this, key)} onBlur={this.saveSort.bind(this, item.id)} />
+                        <MyTextInput label="" value={item.sort} func={this.changeSort.bind(this, key)} onBlur={this.saveSort.bind(this, item.id)} />
                       </TableCell>
                       <TableCell  onClick={this.openModal.bind(this, 'edit', item.id)} style={{ color: '#c03', fontWeight: 700, cursor: 'pointer' }}>
                         {item.name}

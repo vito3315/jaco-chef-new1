@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 
@@ -23,136 +23,6 @@ import { MyTextInput, MySelect, MyAlert } from '../../stores/elements';
 
 import queryString from 'query-string';
 
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-
-function ListItemCat({ moveItem, it, index, openModal }) {
-  const ref = useRef(null);
-
-  if (it.parent_id !== '0') {
-    const [_, drop] = useDrop({
-      accept: 'items',
-      drop(item) {
-        moveItem(it, item.it);
-      },
-    });
-
-    const [{ isDragging }, drag] = useDrag({
-      type: 'items',
-      item: () => {
-        return { it };
-      },
-      collect: (monitor) => ({
-        isDragging: monitor.isDragging(),
-      }),
-    });
-
-    drag(drop(ref));
-
-    return (
-      <TableRow hover ref={ref} sx={{ cursor: 'pointer' }} key={index} onClick={() => openModal('editCat', it.id)}>
-        <TableCell></TableCell>
-        <TableCell sx={{ paddingLeft: 10, alignItems: 'center', minWidth: '300px' }}>
-          <li>{it.name}</li>
-        </TableCell>
-        <TableCell sx={{ minWidth: '500px' }}>{it.shelf_life}</TableCell>
-      </TableRow>
-    );
-  } else {
-    const [_, drop] = useDrop({
-      accept: 'items',
-      drop(item) {
-        moveItem(it, item.it);
-      },
-    });
-
-    return (
-      <TableRow hover ref={drop} key={index} sx={{ '& th': { border: 'none' } }} onClick={() => openModal('edit', it.id)}>
-        <TableCell>{index + 1}</TableCell>
-        <TableCell sx={{ fontWeight: 'bold', cursor: 'pointer', color: '#c03' }}>
-          {it.name}
-        </TableCell>
-        <TableCell sx={{ minWidth: '500px' }}>{it.shelf_life}</TableCell>
-      </TableRow>
-    );
-  }
-}
-
-function ListCat({ main, openModal, save }) {
-  const [list, setList] = useState([]);
-
-  useEffect(() => {
-    setList(main);
-  }, [main]);
-
-  const moveItem = (dropItem, dragItem) => {
-    const newList = list.map((item) => {
-      if (item.id === dropItem.id || item.id === dropItem.parent_id) {
-        list.map((item) => {
-          if (item.id === dragItem.parent_id) {
-            item.items = item.items.filter((it) => it.id !== dragItem.id);
-          }
-        });
-
-        if(dropItem.parent_id !== dragItem.parent_id && dropItem.id !== dragItem.parent_id) {
-          save(dragItem, item.id, 'edit');
-        }
-
-        if (item.items.length) {
-          dragItem.parent_id = item.id;
-          item.items = [...item.items, ...[dragItem]];
-        } else {
-          item.items = [];
-          dragItem.parent_id = item.id;
-          item.items = [...item.items, ...[dragItem]];
-        }
-
-        return item;
-      }
-
-      return item;
-    });
-
-    setList(newList);
-  };
-
-  const renderItem = (item, index) => (
-    <ListItemCat
-      key={index}
-      moveItem={moveItem}
-      it={item}
-      index={index}
-      openModal={openModal}
-    />
-  );
-
-  return (
-    <TableContainer>
-      <Table size="small">
-        <TableHead>
-          <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
-            <TableCell>#</TableCell>
-            <TableCell sx={{ minWidth: '300px' }}>Название</TableCell>
-            <TableCell sx={{ minWidth: '500px' }}>Время жизни</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {list.map((item, key) =>
-            item.items.length ? (
-              <React.Fragment key={key}>
-                {renderItem(item, key)}
-                {item.items.map((it, key) => renderItem(it, key))}
-              </React.Fragment>
-            ) : (
-              renderItem(item, key)
-            )
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
-}
-
 class SiteCategory_Modal extends React.Component {
   constructor(props) {
     super(props);
@@ -160,7 +30,6 @@ class SiteCategory_Modal extends React.Component {
     this.state = {
       item: null,
       listCat: null,
-      parent_id: '',
     };
   }
 
@@ -189,20 +58,10 @@ class SiteCategory_Modal extends React.Component {
     });
   }
 
-  changeSelect(event) {
-    const parent_id = event.target.value;
-
-    this.setState({
-      parent_id,
-    });
-  }
-
   save() {
     const item = this.state.item;
 
-    const cat_id = this.state.parent_id;
-
-    this.props.save(item, cat_id, null);
+    this.props.save(item);
 
     this.onClose();
   }
@@ -211,7 +70,6 @@ class SiteCategory_Modal extends React.Component {
     this.setState({
       item: null,
       listCat: null,
-      parent_id: '',
     });
 
     this.props.onClose();
@@ -247,23 +105,20 @@ class SiteCategory_Modal extends React.Component {
 
             <Grid item xs={12} sm={12}>
               <MyTextInput
-                label="Время жизни"
+                label="Сроки хранения"
                 value={this.state.item ? this.state.item.shelf_life : ''}
                 func={this.changeItem.bind(this, 'shelf_life')}
               />
             </Grid>
 
-            {this.props.mark === 'editCat' ? null : (
-              <Grid item xs={12} sm={12}>
-                <MySelect
-                  label="Дочерняя категория"
-                  data={this.state.listCat ? this.state.listCat : []}
-                  value={this.state.parent_id}
-                  func={this.changeSelect.bind(this)}
-                />
-              </Grid>
-            )}
-
+            <Grid item xs={12} sm={12}>
+              <MySelect
+                label="Дочерняя категория"
+                data={this.state.listCat ? this.state.listCat : []}
+                value={this.state.item ? this.state.item.parent_id : ''}
+                func={this.changeItem.bind(this, 'parent_id')}
+              />
+            </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
@@ -285,9 +140,9 @@ class SiteCategory_ extends React.Component {
       module_name: '',
       is_load: false,
 
-      main: [],
-
       fullScreen: false,
+
+      main: null,
 
       mark: null,
       modalDialog: false,
@@ -392,7 +247,7 @@ class SiteCategory_ extends React.Component {
       });
     }
 
-    if (mark === 'edit' || mark === 'editCat') {
+    if (mark === 'edit') {
       const data = {
         id,
       };
@@ -410,8 +265,8 @@ class SiteCategory_ extends React.Component {
     }
   }
 
-  async save(item, cat_id, markEdit) {
-    const mark = markEdit ?? this.state.mark;
+  async save(item) {
+    const mark = this.state.mark;
 
     let res;
 
@@ -419,22 +274,61 @@ class SiteCategory_ extends React.Component {
       const data = {
         name: item.name,
         shelf_life: item.shelf_life,
-        cat_id,
+        cat_id: item.parent_id,
       };
 
       res = await this.getData('save_new', data);
     }
 
-    if (mark === 'edit' || mark === 'editCat') {
+    if (mark === 'edit') {
       const data = {
         id: item.id,
         name: item.name,
         shelf_life: item.shelf_life,
-        cat_id: cat_id ? cat_id : item.parent_id,
+        cat_id: item.parent_id,
       };
 
       res = await this.getData('save_edit', data);
     }
+
+    if (!res.st) {
+      this.setState({
+        openAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+    } else {
+      setTimeout(() => {
+        this.update();
+      }, 300);
+    }
+  }
+
+  changeSort(index, cat, id, event) {
+    const main = this.state.main;
+
+    if (cat === 'subCat') {
+      main.forEach((item) => {
+        if (item.id === id) {
+          item.items[index].sort = event.target.value;
+        }
+      });
+    } else {
+      main[index].sort = event.target.value;
+    }
+
+    this.setState({
+      main,
+    });
+  }
+
+  async saveSort(id, event) {
+    const data = {
+      id,
+      sort: event.target.value,
+    };
+
+    const res = await this.getData('save_sort', data);
 
     if (!res.st) {
       this.setState({
@@ -460,47 +354,118 @@ class SiteCategory_ extends React.Component {
   render() {
     return (
       <>
-        <DndProvider backend={HTML5Backend}>
-          <Backdrop open={this.state.is_load} style={{ zIndex: 99 }}>
-            <CircularProgress color="inherit" />
-          </Backdrop>
+        <Backdrop open={this.state.is_load} style={{ zIndex: 99 }}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
 
-          <MyAlert
-            isOpen={this.state.openAlert}
-            onClose={() => this.setState({ openAlert: false })}
-            status={this.state.err_status}
-            text={this.state.err_text}
-          />
+        <MyAlert
+          isOpen={this.state.openAlert}
+          onClose={() => this.setState({ openAlert: false })}
+          status={this.state.err_status}
+          text={this.state.err_text}
+        />
 
-          <SiteCategory_Modal
-            open={this.state.modalDialog}
-            onClose={() => this.setState({ modalDialog: false, itemName: '', method: '' })}
-            mark={this.state.mark}
-            item={this.state.item}
-            listCat={this.state.listCat}
-            method={this.state.method}
-            itemName={this.state.itemName}
-            fullScreen={this.state.fullScreen}
-            save={this.save.bind(this)}
-          />
+        <SiteCategory_Modal
+          open={this.state.modalDialog}
+          onClose={() => this.setState({ modalDialog: false, itemName: '', method: '' })}
+          mark={this.state.mark}
+          item={this.state.item}
+          listCat={this.state.listCat}
+          method={this.state.method}
+          itemName={this.state.itemName}
+          fullScreen={this.state.fullScreen}
+          save={this.save.bind(this)}
+        />
 
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={12}>
-              <h1>{this.state.module_name}</h1>
-            </Grid>
-
-            <Grid item xs={12} sm={12}>
-              <Button variant="contained" color="primary" style={{ whiteSpace: 'nowrap' }} onClick={this.openModal.bind(this, 'add', null)}>
-                Добавить
-              </Button>
-            </Grid>
-
-            <Grid item xs={12} sm={12}>
-              <ListCat main={this.state.main} openModal={this.openModal.bind(this)} save={this.save.bind(this)}/>
-            </Grid>
-
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={12}>
+            <h1>{this.state.module_name}</h1>
           </Grid>
-        </DndProvider>
+
+          <Grid item xs={12} sm={12}>
+            <Button
+              variant="contained"
+              color="primary"
+              style={{ whiteSpace: 'nowrap' }}
+              onClick={this.openModal.bind(this, 'add', null)}
+            >
+              Добавить
+            </Button>
+          </Grid>
+
+          {!this.state.main ? null : (
+            <Grid item xs={12} sm={12}>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
+                      <TableCell>#</TableCell>
+                      <TableCell sx={{ minWidth: '300px' }}>Название</TableCell>
+                      <TableCell>Сортировка</TableCell>
+                      <TableCell sx={{ minWidth: '500px' }}>Сроки хранения</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {this.state.main.map((item, index) =>
+                      item.items.length ? (
+                        <React.Fragment key={index}>
+                          <TableRow hover sx={{ '& th': { border: 'none' } }}>
+                            <TableCell>{index + 1}</TableCell>
+                            <TableCell onClick={this.openModal.bind(this, 'edit', item.id)} sx={{ fontWeight: 'bold', cursor: 'pointer', color: '#c03' }}>
+                              {item.name}
+                            </TableCell>
+                            <TableCell className="tableCellInput">
+                              <MyTextInput
+                                label=""
+                                value={item.sort}
+                                func={this.changeSort.bind(this, index, 'cat', null)}
+                                onBlur={this.saveSort.bind(this, item.id)}
+                              />
+                            </TableCell>
+                            <TableCell sx={{ minWidth: '500px' }}>{item.shelf_life}</TableCell>
+                          </TableRow>
+                          {item.items.map((it, key) => (
+                            <TableRow hover sx={{ cursor: 'pointer' }} key={key}>
+                              <TableCell></TableCell>
+                              <TableCell onClick={this.openModal.bind(this, 'edit', it.id)} sx={{ paddingLeft: 10, alignItems: 'center', minWidth: '300px'}}>
+                                <li>{it.name}</li>
+                              </TableCell>
+                              <TableCell className="tableCellInput">
+                                <MyTextInput
+                                  label=""
+                                  value={it.sort}
+                                  func={this.changeSort.bind(this, key, 'subCat', item.id)}
+                                  onBlur={this.saveSort.bind(this, it.id)}
+                                />
+                              </TableCell>
+                              <TableCell sx={{ minWidth: '500px' }}>{it.shelf_life}</TableCell>
+                            </TableRow>
+                          ))}
+                        </React.Fragment>
+                      ) : (
+                        <TableRow hover key={index} sx={{ '& th': { border: 'none' } }}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell onClick={this.openModal.bind(this, 'edit', item.id)} sx={{ fontWeight: 'bold', cursor: 'pointer', color: '#c03'}}>
+                            {item.name}
+                          </TableCell>
+                          <TableCell className="tableCellInput">
+                            <MyTextInput
+                              label=""
+                              value={item.sort}
+                              func={this.changeSort.bind(this, index, 'cat', null)}
+                              onBlur={this.saveSort.bind(this, item.id)}
+                            />
+                          </TableCell>
+                          <TableCell sx={{ minWidth: '500px' }}>{item.shelf_life}</TableCell>
+                        </TableRow>
+                      )
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          )}
+        </Grid>
       </>
     );
   }

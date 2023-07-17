@@ -1,0 +1,12 @@
+td[class*="tableCel"] {
+  text-align: left !important;
+}
+
+.tableCellInput {
+  & .MuiFormControl-root.MuiTextField-root {
+    width: 30% !important;
+    @media (max-width: 600px) {
+      width: 100% !important;
+    }
+  }
+}
