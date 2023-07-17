@@ -881,7 +881,7 @@ class SiteSale2_new_ extends React.Component {
 
             <br />
 
-            <Typography>Созданыне промокоды: { this.state.createdPromo.join(', ') }</Typography>
+            <Typography>Созданныне промокоды: { this.state.createdPromo.join(', ') }</Typography>
 
             <br />
             { this.state.modalLink == '' ? null :
