@@ -87,6 +87,7 @@ class SiteUserManager_ extends React.Component {
     };
     myDropzone = null;
     isInit = false;
+    click = false;
 
     constructor(props) {
         super(props);
@@ -263,6 +264,8 @@ class SiteUserManager_ extends React.Component {
             this.sortPoint();
 
             this.myDropzone = new Dropzone("#for_img_edit", this.dropzoneOptions);
+
+            this.click = false;
         }, 300)
     }
 
@@ -280,6 +283,8 @@ class SiteUserManager_ extends React.Component {
             this.sortPoint();
 
             this.myDropzone = new Dropzone("#for_img_new", this.dropzoneOptions);
+
+            this.click = false;
         }, 300)
 
     }
@@ -341,6 +346,9 @@ class SiteUserManager_ extends React.Component {
 
     async saveEditUser(graphType) {
 
+      if (!this.click) {
+        this.click = true;
+
         this.setState({
             graphType: graphType
         })
@@ -366,6 +374,10 @@ class SiteUserManager_ extends React.Component {
                 graphModal: true
             })
 
+            setTimeout(() => {
+              this.click = false;
+            }, 300);
+
             return;
         }
 
@@ -375,6 +387,10 @@ class SiteUserManager_ extends React.Component {
             this.setState({
                 delModal: true
             })
+
+            setTimeout(() => {
+              this.click = false;
+            }, 300);
 
             return;
         }
@@ -458,9 +474,17 @@ class SiteUserManager_ extends React.Component {
                 this.myDropzone.processQueue();
             }
         }
+
+        setTimeout(() => {
+          this.click = false;
+        }, 300);
+      }
     }
 
     async saveNewUser() {
+      if (!this.click) {
+        this.click = true;
+        
         let is_graph = false;
         let is_graph_ = false;
 
@@ -483,6 +507,11 @@ class SiteUserManager_ extends React.Component {
 
         if (is_graph_ === true && this.myDropzone['files'].length == 0) {
             alert('Необходимо фотография сотрудника');
+
+            setTimeout(() => {
+              this.click = false;
+            }, 300);
+
             return;
         }
 
@@ -576,6 +605,10 @@ class SiteUserManager_ extends React.Component {
                 }, 400)
             }
         }
+        setTimeout(() => {
+          this.click = false;
+        }, 300);
+      }
     }
 
     getOrientation(file, callback) {

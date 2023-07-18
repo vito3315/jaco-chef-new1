@@ -114,6 +114,7 @@ const TableBrak = React.lazy(() => import("../table_brak"));
 const SiteCategory = React.lazy(() => import("../site_category"));
 const SitePages = React.lazy(() => import("../site_pages"));
 const SkladStorage = React.lazy(() => import("../sklad_storage"));
+const SkladModules = React.lazy(() => import("../sklad_modules"));
 
 const Journal_of_work_of_bactericidal_lamps = React.lazy(() => import("../journal_of_work_of_bactericidal_lamps"));
 const ItemsPr = React.lazy(() => import("../items_pr"));
@@ -453,6 +454,7 @@ export function App () {
                   <Route path={'/site_category'} exact={ true } element={ <SiteCategory /> } />
                   <Route path={'/site_pages'} exact={ true } element={ <SitePages /> } />
                   <Route path={'/sklad_storage'} exact={ true } element={ <SkladStorage /> } />
+                  <Route path={'/sklad_modules'} exact={ true } element={ <SkladModules /> } />
 
                   <Route path={'/journal_of_work_of_bactericidal_lamps'} exact={ true } element={ <Journal_of_work_of_bactericidal_lamps /> } />
                   <Route path={'/items_pr'} exact={ true } element={ <ItemsPr /> } />

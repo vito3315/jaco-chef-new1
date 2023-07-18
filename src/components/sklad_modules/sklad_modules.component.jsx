@@ -19,11 +19,14 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
-import { MyTextInput, MySelect, MyAlert } from '../../stores/elements';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+
+import { MyTextInput, MySelect, MyAlert, MyCheckBox } from '../../stores/elements';
 
 import queryString from 'query-string';
 
-class SiteCategory_Modal extends React.Component {
+class SkladModules_Modal extends React.Component {
   constructor(props) {
     super(props);
 
@@ -52,6 +55,16 @@ class SiteCategory_Modal extends React.Component {
     const item = this.state.item;
 
     item[data] = event.target.value;
+
+    this.setState({
+      item,
+    });
+  }
+
+  changeItemChecked(data, event) {
+    const item = this.state.item;
+
+    item[data] = event.target.checked === true ? 1 : 0;
 
     this.setState({
       item,
@@ -97,7 +110,7 @@ class SiteCategory_Modal extends React.Component {
           <Grid container spacing={3}>
             <Grid item xs={12} sm={12}>
               <MyTextInput
-                label="Название категории"
+                label="Название"
                 value={this.state.item ? this.state.item.name : ''}
                 func={this.changeItem.bind(this, 'name')}
               />
@@ -105,20 +118,30 @@ class SiteCategory_Modal extends React.Component {
 
             <Grid item xs={12} sm={12}>
               <MyTextInput
-                label="Сроки хранения"
-                value={this.state.item ? this.state.item.shelf_life : ''}
-                func={this.changeItem.bind(this, 'shelf_life')}
+                label="Адрес модуля (URL)"
+                value={this.state.item ? this.state.item.link ?? '' : ''}
+                func={this.changeItem.bind(this, 'link')}
               />
             </Grid>
 
             <Grid item xs={12} sm={12}>
               <MySelect
-                label="Дочерняя категория"
+                label="Категория"
                 data={this.state.listCat ? this.state.listCat : []}
-                value={this.state.item ? this.state.item.parent_id : ''}
+                value={this.state.item ? this.state.item.parent_id ?? '' : ''}
                 func={this.changeItem.bind(this, 'parent_id')}
               />
             </Grid>
+
+            {this.props.mark === 'edit' ? (
+              <Grid item xs={12} sm={12}>
+                <MyCheckBox
+                  label="Активность"
+                  value={this.state.item ? parseInt(this.state.item.is_show) == 1 ? true : false : false}
+                  func={this.changeItemChecked.bind(this, 'is_show')}
+                />
+              </Grid>
+            ) : null}
           </Grid>
         </DialogContent>
         <DialogActions>
@@ -131,18 +154,18 @@ class SiteCategory_Modal extends React.Component {
   }
 }
 
-class SiteCategory_ extends React.Component {
+class SkladModules_ extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      module: 'site_category',
+      module: 'sklad_modules',
       module_name: '',
       is_load: false,
 
       fullScreen: false,
 
-      main: null,
+      list: null,
 
       mark: null,
       modalDialog: false,
@@ -151,7 +174,7 @@ class SiteCategory_ extends React.Component {
 
       itemNew: {
         name: '',
-        shelf_life: '',
+        link: '',
       },
 
       method: '',
@@ -167,7 +190,7 @@ class SiteCategory_ extends React.Component {
     const data = await this.getData('get_all');
 
     this.setState({
-      main: data.main,
+      list: data.items,
       module_name: data.module_info.name,
     });
 
@@ -241,9 +264,9 @@ class SiteCategory_ extends React.Component {
       this.setState({
         mark,
         item: JSON.parse(JSON.stringify(this.state.itemNew)),
-        listCat: res.category,
+        listCat: res.main_cat,
         modalDialog: true,
-        method: 'Новая категория',
+        method: 'Новая модуль',
       });
     }
 
@@ -256,11 +279,11 @@ class SiteCategory_ extends React.Component {
 
       this.setState({
         mark,
-        item: res.item,
-        itemName: res.item.name,
-        listCat: res.category,
+        item: res.item[0],
+        itemName: res.item[0].name,
+        listCat: res.main_cat,
         modalDialog: true,
-        method: 'Редактирование категории',
+        method: 'Редактирование модуля',
       });
     }
   }
@@ -273,8 +296,8 @@ class SiteCategory_ extends React.Component {
     if (mark === 'add') {
       const data = {
         name: item.name,
-        shelf_life: item.shelf_life,
-        cat_id: item.parent_id,
+        link: item.link,
+        parent_id: item.parent_id,
       };
 
       res = await this.getData('save_new', data);
@@ -284,8 +307,10 @@ class SiteCategory_ extends React.Component {
       const data = {
         id: item.id,
         name: item.name,
-        shelf_life: item.shelf_life,
-        cat_id: item.parent_id,
+        link: item.link,
+        parent_id: item.parent_id,
+        is_show: item.is_show,
+        modul_id: item.modul_id,
       };
 
       res = await this.getData('save_edit', data);
@@ -305,27 +330,27 @@ class SiteCategory_ extends React.Component {
   }
 
   changeSort(index, cat, id, event) {
-    const main = this.state.main;
+    const list = this.state.list;
 
     if (cat === 'subCat') {
-      main.forEach((item) => {
+      list.forEach((item) => {
         if (item.id === id) {
           item.items[index].sort = event.target.value;
         }
       });
     } else {
-      main[index].sort = event.target.value;
+      list[index].sort = event.target.value;
     }
 
     this.setState({
-      main,
+      list,
     });
   }
 
   async saveSort(id, event) {
     const data = {
       id,
-      sort: event.target.value,
+      value: event.target.value,
     };
 
     const res = await this.getData('save_sort', data);
@@ -347,7 +372,7 @@ class SiteCategory_ extends React.Component {
     const data = await this.getData('get_all');
 
     this.setState({
-      main: data.main,
+      list: data.items,
     });
   }
 
@@ -365,7 +390,7 @@ class SiteCategory_ extends React.Component {
           text={this.state.err_text}
         />
 
-        <SiteCategory_Modal
+        <SkladModules_Modal
           open={this.state.modalDialog}
           onClose={() => this.setState({ modalDialog: false, itemName: '', method: '' })}
           mark={this.state.mark}
@@ -383,30 +408,25 @@ class SiteCategory_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={12}>
-            <Button
-              variant="contained"
-              color="primary"
-              style={{ whiteSpace: 'nowrap' }}
-              onClick={this.openModal.bind(this, 'add', null)}
-            >
+            <Button variant="contained" color="primary" style={{ whiteSpace: 'nowrap' }} onClick={this.openModal.bind(this, 'add', null)}>
               Добавить
             </Button>
           </Grid>
 
-          {!this.state.main ? null : (
-            <Grid item xs={12} sm={12}>
+          {!this.state.list ? null : (
+            <Grid item xs={12} sm={12} mb={10}>
               <TableContainer>
                 <Table size="small">
                   <TableHead>
                     <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
-                      <TableCell>#</TableCell>
-                      <TableCell sx={{ minWidth: '300px' }}>Название</TableCell>
-                      <TableCell>Сортировка</TableCell>
-                      <TableCell sx={{ minWidth: '500px' }}>Сроки хранения</TableCell>
+                      <TableCell style={{ width: '5%' }}>#</TableCell>
+                      <TableCell style={{ width: '35%' }}>Название</TableCell>
+                      <TableCell style={{ width: '15%' }}>Сортировка</TableCell>
+                      <TableCell style={{ width: '45%' }} align="center"><VisibilityIcon /></TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {this.state.main.map((item, index) =>
+                    {this.state.list.map((item, index) =>
                       item.items.length ? (
                         <React.Fragment key={index}>
                           <TableRow hover sx={{ '& th': { border: 'none' } }}>
@@ -422,12 +442,14 @@ class SiteCategory_ extends React.Component {
                                 onBlur={this.saveSort.bind(this, item.id)}
                               />
                             </TableCell>
-                            <TableCell sx={{ minWidth: '500px' }}>{item.shelf_life}</TableCell>
+                            <TableCell align="center">
+                              {parseInt(item.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                            </TableCell>
                           </TableRow>
                           {item.items.map((it, key) => (
                             <TableRow hover key={key}>
                               <TableCell></TableCell>
-                              <TableCell onClick={this.openModal.bind(this, 'edit', it.id)} sx={{ paddingLeft: 10, alignItems: 'center', minWidth: '300px', cursor: 'pointer'}}>
+                              <TableCell onClick={this.openModal.bind(this, 'edit', it.id)} sx={{ paddingLeft: 10, alignItems: 'center', cursor: 'pointer' }}>
                                 <li>{it.name}</li>
                               </TableCell>
                               <TableCell>
@@ -438,14 +460,16 @@ class SiteCategory_ extends React.Component {
                                   onBlur={this.saveSort.bind(this, it.id)}
                                 />
                               </TableCell>
-                              <TableCell sx={{ minWidth: '500px' }}>{it.shelf_life}</TableCell>
+                              <TableCell align="center">
+                                {parseInt(it.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                              </TableCell>
                             </TableRow>
                           ))}
                         </React.Fragment>
                       ) : (
                         <TableRow hover key={index} sx={{ '& th': { border: 'none' } }}>
                           <TableCell>{index + 1}</TableCell>
-                          <TableCell onClick={this.openModal.bind(this, 'edit', item.id)} sx={{ fontWeight: 'bold', cursor: 'pointer', color: '#c03'}}>
+                          <TableCell onClick={this.openModal.bind(this, 'edit', item.id)} sx={{ fontWeight: 'bold', cursor: 'pointer', color: '#c03' }}>
                             {item.name}
                           </TableCell>
                           <TableCell>
@@ -456,7 +480,9 @@ class SiteCategory_ extends React.Component {
                               onBlur={this.saveSort.bind(this, item.id)}
                             />
                           </TableCell>
-                          <TableCell sx={{ minWidth: '500px' }}>{item.shelf_life}</TableCell>
+                          <TableCell align="center">
+                            {parseInt(item.is_show) == 1 ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                          </TableCell>
                         </TableRow>
                       )
                     )}
@@ -471,6 +497,6 @@ class SiteCategory_ extends React.Component {
   }
 }
 
-export function SiteCategory() {
-  return <SiteCategory_ />;
+export function SkladModules() {
+  return <SkladModules_ />;
 }
