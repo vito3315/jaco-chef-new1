@@ -22,7 +22,7 @@ import TableRow from '@mui/material/TableRow';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
-import { MyTextInput, MySelect, MyAlert, MyCheckBox } from '../../stores/elements';
+import { MyTextInput, MyAutocomplite, MyAlert, MyCheckBox } from '../../stores/elements';
 
 import queryString from 'query-string';
 
@@ -33,18 +33,23 @@ class SkladModules_Modal extends React.Component {
     this.state = {
       item: null,
       listCat: null,
+      itemCat: null,
     };
   }
 
   componentDidUpdate(prevProps) {
-    // console.log(this.props);
+    //console.log(this.props);
 
     if (!this.props.item) {
       return;
     }
 
     if (this.props.item !== prevProps.item) {
+
+      const itemCat = this.props.listCat.find(item => parseInt(item.id) === parseInt(this.props.item.parent_id));
+
       this.setState({
+        itemCat,
         item: this.props.item,
         listCat: this.props.listCat,
       });
@@ -71,6 +76,17 @@ class SkladModules_Modal extends React.Component {
     });
   }
 
+  changeItemCat(data, event, value) {
+    const item = this.state.item;
+
+    item[data] = value ? value.id : '';
+
+    this.setState({
+      item,
+      itemCat: value,
+    });
+  }
+
   save() {
     const item = this.state.item;
 
@@ -83,6 +99,7 @@ class SkladModules_Modal extends React.Component {
     this.setState({
       item: null,
       listCat: null,
+      itemCat: null,
     });
 
     this.props.onClose();
@@ -125,11 +142,12 @@ class SkladModules_Modal extends React.Component {
             </Grid>
 
             <Grid item xs={12} sm={12}>
-              <MySelect
+              <MyAutocomplite
                 label="Категория"
+                multiple={false}
                 data={this.state.listCat ? this.state.listCat : []}
-                value={this.state.item ? this.state.item.parent_id ?? '' : ''}
-                func={this.changeItem.bind(this, 'parent_id')}
+                value={this.state.itemCat ? this.state.itemCat : ''}
+                func={this.changeItemCat.bind(this, 'parent_id')}
               />
             </Grid>
 
@@ -175,6 +193,7 @@ class SkladModules_ extends React.Component {
       itemNew: {
         name: '',
         link: '',
+        parent_id: '',
       },
 
       method: '',
