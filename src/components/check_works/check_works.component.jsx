@@ -839,19 +839,21 @@ class Checkworks_ extends React.Component {
                               <TableCell >{item.manager_time}</TableCell>
                               <TableCell  style={{ padding: 0 }}>
                                 {item.namager_name || item.is_delete === '1' || this.state.check_cook ? item.namager_name ?? '' : (
-                                  <Grid display="flex" sx={{ justifyContent: { sm: 'space-evenly', xs: 'space-around' } }}>
+                                  <Grid display="flex" sx={{ justifyContent: { sm: 'space-evenly', xs: 'space-around', width: 300 } }}>
+                                    
+                                    <Button onClick={this.openConfirm.bind(this, item, 'clearWork')} style={{ cursor: 'pointer', backgroundColor: 'yellow' }} variant="contained">
+                                      <KeyboardBackspaceIcon />
+                                    </Button>
+
+                                    <Button onClick={this.openConfirm.bind(this, item, 'deleteWork')} style={{ cursor: 'pointer' }} color="error" variant="contained">
+                                      <ClearIcon />
+                                    </Button>
+
                                     {item.date_time_end ? (
                                       <Button onClick={this.openConfirm.bind(this, item, 'saveWork')} style={{ cursor: 'pointer' }} color="success" variant="contained">
                                         <CheckIcon />
                                       </Button>
-                                    ) : (
-                                      <Button onClick={this.openConfirm.bind(this, item, 'clearWork')} style={{ cursor: 'pointer', backgroundColor: 'yellow' }} variant="contained">
-                                        <KeyboardBackspaceIcon />
-                                      </Button>
-                                    )}
-                                    <Button onClick={this.openConfirm.bind(this, item, 'deleteWork')} style={{ cursor: 'pointer' }} color="error" variant="contained">
-                                      <ClearIcon />
-                                    </Button>
+                                    ) : false}
                                   </Grid>
                                 )}
                               </TableCell>

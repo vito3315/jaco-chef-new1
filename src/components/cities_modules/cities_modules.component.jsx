@@ -168,6 +168,14 @@ class CitiesModules_Modal extends React.Component {
               />
             </Grid>
 
+            <Grid item xs={12} sm={6}>
+              <MyTextInput
+                label="Сумма вознагрождения курьеру за завершенный заказ в радиусе"
+                value={this.state.item ? this.state.item.city.driver_dop_price : ''}
+                func={this.changeItem.bind(this, 'driver_dop_price')}
+              />
+            </Grid>
+
             {this.props.mark === 'editItem' ? (
               <Grid item xs={12} sm={3}>
                 <MyCheckBox
