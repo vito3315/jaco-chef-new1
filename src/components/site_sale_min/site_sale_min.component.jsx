@@ -2201,8 +2201,8 @@ class SiteSaleMin_StatList_ extends React.Component {
 
   async getUsers(){
     let data = {
-      dateStart: this.state.date_start,
-      dateEnd: this.state.date_end,
+      dateStart: dayjs(this.state.date_start).format('YYYY-MM-DD'),
+      dateEnd: dayjs(this.state.date_end).format('YYYY-MM-DD'),
     }
     
     let res = await this.getData('get_promo_users_min', data);
