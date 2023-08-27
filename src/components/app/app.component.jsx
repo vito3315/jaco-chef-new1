@@ -118,8 +118,8 @@ const SkladModules = React.lazy(() => import("../sklad_modules"));
 
 const Journal_of_work_of_bactericidal_lamps = React.lazy(() => import("../journal_of_work_of_bactericidal_lamps"));
 const ItemsPr = React.lazy(() => import("../items_pr"));
-
 const TableOnlinePay = React.lazy(() => import("../table_online_pay"));
+const JobDescriptions = React.lazy(() => import("../job_descriptions"));
 
 import { SiteSaleMin, SiteSaleMin_New, SiteSaleMin_Edit, SiteSaleMin_StatList } from '../site_sale_min';
 
@@ -459,6 +459,7 @@ export function App () {
                   <Route path={'/journal_of_work_of_bactericidal_lamps'} exact={ true } element={ <Journal_of_work_of_bactericidal_lamps /> } />
                   <Route path={'/items_pr'} exact={ true } element={ <ItemsPr /> } />
                   <Route path={'/table_online_pay'} exact={ true } element={ <TableOnlinePay /> } />
+                  <Route path={'/job_descriptions'} exact={ true } element={ <JobDescriptions /> } />
 
 
                   <Route
