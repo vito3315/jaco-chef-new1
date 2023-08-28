@@ -13,21 +13,11 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-
-import CloseIcon from '@mui/icons-material/Close';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 
 import {
   MyTextInput,
-  MyCheckBox,
-  MySelect,
-  MyTimePicker,
+  TextEditor,
   MyAutocomplite,
 } from '../../stores/elements';
 
@@ -70,6 +60,41 @@ class AppWorkTable extends React.Component {
   }
 }
 
+class AppWorkTableNews extends React.Component {
+  shouldComponentUpdate(nextProps) {
+
+    var array1 = nextProps.news;
+    var array2 = this.props.news;
+
+    var is_same = array1.length == array2.length && array1.every(function (element, index) { return element === array2[index] });
+
+    return !is_same;
+  }
+
+  render() {
+    return (
+      <Table>
+        
+        <TableBody>
+          {this.props.news.map((item, key) => (
+            <TableRow key={key}>
+              <TableCell>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', height: 30 }}>
+                    <span>{item.user}</span><span>{item.date_time}</span>
+                  </div>
+                  <div dangerouslySetInnerHTML={{__html: item.text}} />
+                </div>
+                    
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    );
+  }
+}
+
 class JobDescriptions_ extends React.Component {
   constructor(props) {
     super(props);
@@ -80,9 +105,10 @@ class JobDescriptions_ extends React.Component {
       is_load: false,
 
       items: [],
-      items_min: [],
+      news: [],
       modalDialog: false,
       modalDialogNew: false,
+      modalDialogNews: false,
 
       itemsEdit: null,
       nameWork: '',
@@ -90,6 +116,7 @@ class JobDescriptions_ extends React.Component {
       itemsNew: null,
       chengeItem1: null,
       chengeItemNew1: null,
+      newText: '',
 
       kind: 999
     };
@@ -101,6 +128,7 @@ class JobDescriptions_ extends React.Component {
     this.setState({
       module_name: data.module_info.name,
       items: data.items,
+      news: data.news,
       kind: data.user.kind
     });
 
@@ -183,10 +211,9 @@ class JobDescriptions_ extends React.Component {
 
       let data = await this.getData('get_all');
 
-      
-
       this.setState({
-        items: data.items
+        items: data.items,
+        news: data.news,
       });
     }
   }
@@ -212,7 +239,33 @@ class JobDescriptions_ extends React.Component {
       let data = await this.getData('get_all');
 
       this.setState({
-        items: data.items
+        items: data.items,
+        news: data.news,
+      });
+    }
+  }
+
+  async saveNewNews() {
+
+    let data = {
+      text: this.state.newText
+    };
+
+    let res = await this.getData('save_new_news', data);
+
+    if (res.st === false) {
+      alert(res.text);
+    } else {
+      this.setState({
+        modalDialogNews: false,
+        newText: '',
+      });
+
+      let data = await this.getData('get_all');
+
+      this.setState({
+        items: data.items,
+        news: data.news,
       });
     }
   }
@@ -237,6 +290,13 @@ class JobDescriptions_ extends React.Component {
     this.setState({
       itemsNew: res,
       modalDialogNew: true,
+    });
+  }
+
+  openNews(){
+    this.setState({ 
+      modalDialogNews: true,
+      newText: ''
     });
   }
 
@@ -546,31 +606,82 @@ class JobDescriptions_ extends React.Component {
           </Dialog>
         )}
 
+        <Dialog
+          open={this.state.modalDialogNews}
+          maxWidth={'md'}
+          onClose={() => {
+            this.setState({ modalDialogNews: false });
+          }}
+        >
+          <DialogTitle>Новая новость</DialogTitle>
+          <DialogContent style={{ paddingTop: 10 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={12}>
+                <TextEditor 
+                  value={this.state.newText}
+                  func={ (text) => { this.setState({ newText: text }); } }
+                
+                />
+              </Grid>
+      
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button color="primary" onClick={this.saveNewNews.bind(this)}>
+              Сохранить
+            </Button>
+          </DialogActions>
+        </Dialog>
+
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
 
-          <Grid item xs={12} sm={12}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.openNewWork.bind(this)}
-            >
-              Добавить
-            </Button>
-          </Grid>
+          { parseInt(this.state.kind) >= 3 ? null :
+            <Grid item xs={12} sm={6}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={this.openNewWork.bind(this)}
+              >
+                Добавить инструкцию
+              </Button>
+            </Grid>
+          }
 
-          <Grid item xs={12} sm={12}>
+          { parseInt(this.state.kind) >= 3 ? null :
+            <Grid item xs={12} sm={6}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={this.openNews.bind(this)}
+              >
+                Добавить новость
+              </Button>
+            </Grid>
+          }
 
-          { this.state.items.length > 0 ?
+          <Grid item xs={12} sm={6}>
+
+            { this.state.items.length > 0 ?
               <AppWorkTable 
                 items={this.state.items} 
                 openWork={ parseInt(this.state.kind) >= 3 ? () => {} : this.openWork.bind(this)}
                 kind={this.state.kind}
               /> : null
-          }
+            }
           </Grid>
+
+          <Grid item xs={12} sm={6}>
+
+            { this.state.news.length > 0 ?
+              <AppWorkTableNews 
+                news={this.state.news}
+              /> : null
+            }
+          </Grid>
+
         </Grid>
       </>
     );
