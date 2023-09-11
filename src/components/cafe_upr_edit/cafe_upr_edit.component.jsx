@@ -23,6 +23,19 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
+import ListSubheader from '@mui/material/ListSubheader';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Collapse from '@mui/material/Collapse';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import DraftsIcon from '@mui/icons-material/Drafts';
+import SendIcon from '@mui/icons-material/Send';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import StarBorder from '@mui/icons-material/StarBorder';
+
 import CloseIcon from '@mui/icons-material/Close';
 
 import { MyTextInput, MyTimePicker, MySelect, MyAutocomplite2, MyCheckBox } from '../../stores/elements';
@@ -98,6 +111,9 @@ class СafeUprEdit_ extends React.Component {
       is_load             : false,
 
       is_send_add_time    : false,
+
+      priority_order      : true,
+      priority_pizza      : true,
     };
   }
   
@@ -123,7 +139,9 @@ class СafeUprEdit_ extends React.Component {
         actual_time_list    : res.actual_time_list,
         nal_zone_id         : res.nal_zone_id,
         point_id            : res.points[0].id,
-        reason_list         : res.reason_list
+        reason_list         : res.reason_list,
+        priority_order      : parseInt(res.point_info.priority_order) == 1 ? true : false,
+        priority_pizza      : parseInt(res.point_info.priority_pizza) == 1 ? true : false,
     })
 
     document.title = res.module_info.name;
@@ -187,6 +205,8 @@ class СafeUprEdit_ extends React.Component {
         summ_driver         : this.state.summ_driver,
         summ_driver_min     : this.state.summ_driver_min,
         is_active           : this.state.is_active,
+        priority_order      : this.state.priority_order === true ? 1 : 0,
+        priority_pizza      : this.state.priority_pizza === true ? 1 : 0,
       };
      
       // причина закрытия кафе
@@ -228,34 +248,40 @@ class СafeUprEdit_ extends React.Component {
   // обычный чекбокс
   changeChekBox(type, event) {
 
-      //  убираем галку закрытия кафе если в модалке ничего не нажали
-      if(type == 'is_active' && event.target.checked  == false){
-        this.opneCloseCafeModal();
-      }
-     
-      this.setState({
-          [type]: event.target.checked 
-      })
-      
-      // сразу убираем стоп у кафе
-      if(type == 'is_active' && event.target.checked  == true){
-        setTimeout(() => {
-            this.runCafe();
-        }, 250)
-      }
+    //  убираем галку закрытия кафе если в модалке ничего не нажали
+    if(type == 'is_active' && event.target.checked  == false){
+      this.opneCloseCafeModal();
+    }
+    
+    this.setState({
+      [type]: event.target.checked 
+    })
+    
+    // сразу убираем стоп у кафе
+    if(type == 'is_active' && event.target.checked  == true){
+      setTimeout(() => {
+          this.runCafe();
+      }, 250)
+    }
 
-      if(type == 'is_сlosed_technic'){
-        this.setState({
-          showComment           : event.target.checked ? true : false,
-          is_сlosed_overload    : false
-        })
-      } else if (type == 'is_сlosed_overload') {
-        this.setState({
-          showComment           : false,
-          is_сlosed_technic     : false
-        }) 
-      }
+    if(type == 'is_сlosed_technic'){
+      this.setState({
+        showComment           : event.target.checked ? true : false,
+        is_сlosed_overload    : false
+      })
+    } else if (type == 'is_сlosed_overload') {
+      this.setState({
+        showComment           : false,
+        is_сlosed_technic     : false
+      }) 
+    }
      
+  }
+
+  changeChekBoxSimple(type, event) {
+    this.setState({
+      [type]: event.target.checked 
+    })
   }
 
   // чекбокс для зон
@@ -306,6 +332,8 @@ class СafeUprEdit_ extends React.Component {
         is_сlosed_overload  : res.point_info.is_сlosed_overload,
         is_сlosed_technic   : res.point_info.is_сlosed_technic,
         comment             : res.comment,
+        priority_order      : parseInt(res.point_info.priority_order) == 1 ? true : false,
+        priority_pizza      : parseInt(res.point_info.priority_pizza) == 1 ? true : false,
      })
 
   }
@@ -551,15 +579,20 @@ class СafeUprEdit_ extends React.Component {
           open={this.state.modalStopZone}
                onClose={() => { this.setState({ modalStopZone: false }) } }
         >
-          <DialogTitle>Поставить зону на стоп</DialogTitle>
+          <DialogTitle>Активность зон доставки</DialogTitle>
           <DialogContent style={{ paddingTop: 10 }}>
-            <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  { this.state.zone_list.map((item, key) =>
-                      <MyCheckBox key={key} label={item.name} value={parseInt(item.is_active) == 1 ? true : false} func={this.changeChekBoxZone.bind(this, 'zone_id', key)} />
-                  )} 
-                </Grid>
-            </Grid>
+            <List>
+              { this.state.zone_list.map((item, key) =>
+                <ListItemButton key={key}>
+                  
+                  <ListItemText primary={item.name} />
+
+                  <ListItemIcon>
+                    <MyCheckBox value={parseInt(item.is_active) == 1 ? true : false} func={this.changeChekBoxZone.bind(this, 'zone_id', key)} />
+                  </ListItemIcon>
+                </ListItemButton>
+              )}
+            </List>
           </DialogContent>
 
           <DialogActions>
@@ -605,7 +638,7 @@ class СafeUprEdit_ extends React.Component {
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                  <MySelect is_none={false} data={this.state.points_list} value={this.state.point_id} func={this.changePoint.bind(this)} label='Точка' />
+                <MySelect is_none={false} data={this.state.points_list} value={this.state.point_id} func={this.changePoint.bind(this)} label='Точка' />
               </Grid>
             </Grid>
           </Grid> 
@@ -616,16 +649,26 @@ class СafeUprEdit_ extends React.Component {
                   <MySelect is_none={false}  data={this.state.tables} value={this.state.count_tables} func={(event) => { this.setState({ count_tables: event.target.value }) } }  label='Количество столов сборки' />
               </Grid> 
 
+
+              <Grid item xs={12} sm={12}>
+                <MyCheckBox label='Если в заказе только пицца, она выйдет на сборку после начала ее приготовления (напитки, допы и закуски не учитываются)' value={this.state.priority_pizza} func={this.changeChekBoxSimple.bind(this, 'priority_pizza')} />
+              </Grid>
+
+              <Grid item xs={12} sm={12}>
+                <MyCheckBox label='Если заказ приготовить зарнее - он выйдет в приоритете на сборку, кроме предов (напитки, допы и закуски не учитываются)' value={this.state.priority_order}  func={this.changeChekBoxSimple.bind(this, 'priority_order')} />
+              </Grid>
+
+
               <Grid item xs={12} sm={8}>
-                  <MyCheckBox label='Общий стол' value={this.state.cook_common_stol == 1 ? true : false} func={this.changeChekBox.bind(this, 'cook_common_stol')} />
+                <MyCheckBox label='Общий стол' value={this.state.cook_common_stol == 1 ? true : false} func={this.changeChekBox.bind(this, 'cook_common_stol')} />
               </Grid>
 
               <Grid item xs={12} sm={4}>
-                  <MyCheckBox  label='Кафе работает' value={this.state.is_active == 1 ? true : false}  func={this.changeChekBox.bind(this, 'is_active')} />
+                <MyCheckBox  label='Кафе работает' value={this.state.is_active == 1 ? true : false}  func={this.changeChekBox.bind(this, 'is_active')} />
               </Grid>
 
               <Grid item xs={12} sm={8}>
-                <Button color="primary" onClick={this.stopZone.bind(this)}>Поставить зону на стоп</Button>
+                <Button color="primary" onClick={this.stopZone.bind(this)}>Зоны доставки</Button>
               </Grid>
 
               <Grid item xs={12} sm={6}>
