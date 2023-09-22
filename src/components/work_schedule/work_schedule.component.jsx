@@ -582,6 +582,8 @@ class WorkSchedule_Table_without_functions extends React.Component {
               ) : (
                 <TableRow key={key}>
                   <TableCell className="name_pinning"
+                    style={{ background: parseInt(item.data.type) == 0 ? '#fff' : parseInt(item.data.type) == 1 ? '#fff' : parseInt(item.data.type) == 2 ? '#ffcc00' : '#c03',
+                    color: parseInt(item.data.type) == 0 ? '#000' : parseInt(item.data.type) == 1 ? '#000' : parseInt(item.data.type) == 2 ? '#000' : '#fff' }}
                     // onClick={this.props.openM.bind(this, item.data)}
                   >
                     {item.data.user_name}
