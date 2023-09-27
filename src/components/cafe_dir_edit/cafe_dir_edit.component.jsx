@@ -37,11 +37,26 @@ class CafeDirEdit_Modal extends React.Component {
 
     this.state = {
       item: null,
+      count_orders: [],
     };
   }
 
   componentDidUpdate(prevProps) {
     // console.log(this.props.item);
+
+    let count_orders = [];
+
+    count_orders.push({
+      id: '0',
+      name: 'Без ограничений'
+    });
+
+    for(let i = 1; i <= 20; i ++){
+      count_orders.push({
+        id: i,
+        name: i
+      });
+    }
 
     if (!this.props.item) {
       return;
@@ -50,6 +65,7 @@ class CafeDirEdit_Modal extends React.Component {
     if (this.props.item !== prevProps.item) {
       this.setState({
         item: this.props.item,
+        count_orders: count_orders
       });
     }
   }
@@ -174,6 +190,15 @@ class CafeDirEdit_Modal extends React.Component {
               />
             </Grid>
 
+            <Grid item xs={12} sm={4}>
+              <MySelect 
+                is_none={false} 
+                data={this.state.count_orders} 
+                value={this.state.item ? this.state.item.count_driver : ''} 
+                func={ this.changeItem.bind(this, 'count_driver') } 
+                label='Количество заказов на руках у курьеров' />
+            </Grid> 
+
             <Grid item xs={12} sm={12}>
               <Typography>Коэффициенты:</Typography>
             </Grid>
@@ -223,6 +248,8 @@ class CafeDirEdit_Modal extends React.Component {
                 func={this.changeItem.bind(this, 'driver_price')}
               />
             </Grid>
+
+            
           </Grid>
         </DialogContent>
         <DialogActions>
@@ -256,6 +283,8 @@ class CafeDirEdit_ extends React.Component {
       item: null,
       mark: '',
 
+      count_orders: [],
+
       itemNew: {
         dir_price: 0,
         price_per_lv: 0,
@@ -272,6 +301,7 @@ class CafeDirEdit_ extends React.Component {
         kpp: '',
         full_addr: '',
         sort: 0,
+        count_order: '',
       },
 
       openAlert: false,
@@ -289,12 +319,27 @@ class CafeDirEdit_ extends React.Component {
 
     const res = await this.getData('get_one', point);
 
+    let count_orders = [];
+
+    count_orders.push({
+      id: '0',
+      name: 'Без ограничений'
+    });
+
+    for(let i = 1; i <= 20; i ++){
+      count_orders.push({
+        id: i,
+        name: i
+      });
+    }
+
     this.setState({
       points: data.points,
       point: data.points[0],
       cities: res.cities,
       data: { ...res.point_koef, ...res.point_info },
       module_name: data.module_info.name,
+      count_orders: count_orders
     });
 
     document.title = data.module_info.name;
@@ -600,6 +645,15 @@ class CafeDirEdit_ extends React.Component {
                     func={this.changeItemChecked.bind(this, 'is_active')}
                   />
                 </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <MySelect 
+                    is_none={false} 
+                    data={this.state.count_orders} 
+                    value={this.state.data ? this.state.data.count_driver : ''} 
+                    func={ this.changeData.bind(this, 'count_driver') } 
+                    label='Количество заказов на руках у курьеров' />
+                </Grid> 
               </Grid>
             </TabPanel>
 

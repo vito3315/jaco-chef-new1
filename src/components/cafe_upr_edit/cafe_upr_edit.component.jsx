@@ -92,8 +92,6 @@ class СafeUprEdit_ extends React.Component {
       add_time_list       : [],
       add_time_id         : 0,
       tables              : [],
-      count_orders        : [],
-      count_order         : '',
       
       reason_list         : [], // причины закрытия кафе
       chooseReason        : null, // выбранная причина
@@ -122,22 +120,6 @@ class СafeUprEdit_ extends React.Component {
   async componentDidMount(){
     let res = await this.getData('get_stat', {point_id : this.state.point_id});
     
-    let count_orders = [];
-
-    count_orders.push({
-      id: '0',
-      name: 'Без ограничений'
-    });
-
-    for(let i = 1; i <= 20; i ++){
-      count_orders.push({
-        id: i,
-        name: i
-      });
-    }
-
-    
-
     this.setState({
       module_name         : res.module_info.name,
       points_list         : res.points,
@@ -159,10 +141,7 @@ class СafeUprEdit_ extends React.Component {
       point_id            : res.points[0].id,
       reason_list         : res.reason_list,
       priority_order      : parseInt(res.point_info.priority_order) == 1 ? true : false,
-      priority_pizza      : parseInt(res.point_info.priority_pizza) == 1 ? true : false,
-
-      count_orders        : count_orders,
-      count_order         : res.point_info.count_driver
+      priority_pizza      : parseInt(res.point_info.priority_pizza) == 1 ? true : false
     })
 
     document.title = res.module_info.name;
@@ -227,9 +206,7 @@ class СafeUprEdit_ extends React.Component {
         summ_driver_min     : this.state.summ_driver_min,
         is_active           : this.state.is_active,
         priority_order      : this.state.priority_order === true ? 1 : 0,
-        priority_pizza      : this.state.priority_pizza === true ? 1 : 0,
-
-        count_order         : this.state.count_order
+        priority_pizza      : this.state.priority_pizza === true ? 1 : 0
       };
      
       // причина закрытия кафе
@@ -356,9 +333,7 @@ class СafeUprEdit_ extends React.Component {
         is_сlosed_technic   : res.point_info.is_сlosed_technic,
         comment             : res.comment,
         priority_order      : parseInt(res.point_info.priority_order) == 1 ? true : false,
-        priority_pizza      : parseInt(res.point_info.priority_pizza) == 1 ? true : false,
-
-        count_order         : res.point_info.count_driver
+        priority_pizza      : parseInt(res.point_info.priority_pizza) == 1 ? true : false
      })
 
   }
@@ -712,11 +687,6 @@ class СafeUprEdit_ extends React.Component {
                 <MyTextInput value={this.state.summ_driver_min} func={(event) => { this.setState({ summ_driver_min: event.target.value }) } } label='Максимальная сумма нала для курьера стажера' />
               </Grid> 
               
-              <Grid item xs={12} sm={4}>
-                <MySelect is_none={false} data={this.state.count_orders} value={this.state.count_order} func={(event) => { this.setState({ count_order: event.target.value }) } } label='Количество заказов на руках у курьеров' />
-              </Grid> 
-
-
               <Grid item xs={12} sm={4}>
                 <Button color="primary" onClick={this.addTimeDelivery.bind(this)}>Добавить время на доставку</Button>
               </Grid> 
