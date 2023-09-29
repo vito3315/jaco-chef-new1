@@ -42,8 +42,21 @@ class TabletRepair_Modal extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.tablets !== prevProps.tablets) {
-      const { tablets } = this.props;
+    if (this.props.tablet !== prevProps.tablet) {
+
+      if(this.props.type === 'updateTablet') {
+
+        const { tablet } = this.props;
+
+        this.setState({
+          tablet,
+          date: formatDate(tablet.buy_date),
+          number: tablet.number,
+          imei: tablet.imei,
+          name: tablet.model,
+        });
+
+      }
 
       //this.setState({ tablet: tablets ? tablets[0].id : '' });
     }
@@ -83,6 +96,20 @@ class TabletRepair_Modal extends React.Component {
     }
 
     this.props.add(data);
+
+    this.onClose();
+  }
+
+  update() {
+    const data = {
+      imei: this.state.imei,
+      model: this.state.name,
+      number: this.state.number,
+      buy_date: dayjs(this.state.date).format('YYYY-MM-DD'),
+      id: this.state.tablet.id,
+    };
+
+    this.props.updateTablet(data);
 
     this.onClose();
   }
@@ -131,7 +158,7 @@ class TabletRepair_Modal extends React.Component {
         </DialogTitle>
         <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
           <Grid container spacing={3}>
-            {this.props.type === 'addTablet' ? (
+            {this.props.type === 'addTablet' || this.props.type === 'updateTablet' ? (
               <>
                 <Grid item xs={12} sm={12}>
                   <MyTextInput
@@ -142,7 +169,7 @@ class TabletRepair_Modal extends React.Component {
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <MyTextInput
-                    label="Название (модель)"
+                    label="Название марки и модель, например Dexp K48"
                     value={this.state.name}
                     func={this.changeItem.bind(this, 'name')}
                   />
@@ -230,7 +257,11 @@ class TabletRepair_Modal extends React.Component {
             <Button variant="contained" onClick={this.close.bind(this)}>
               Снять с обращения
             </Button>
-          : 
+          : this.props.type === 'updateTablet' ? 
+            <Button variant="contained" onClick={this.update.bind(this)}>
+              Сохранить изменения
+            </Button>
+          :
             <Button variant="contained" onClick={this.add.bind(this)}>
               Добавить {this.props.type === 'addTablet' ? 'планшет' : 'ремонт'}
             </Button>
@@ -415,6 +446,23 @@ class TabletRepair_ extends React.Component {
         modalDialog: true,
       });
     }
+
+    if (type === 'updateTablet') {
+
+      const data = {
+        point_id,
+        table_id,
+      };
+
+      const res = await this.getData('get_one', data);
+
+      this.setState({
+        type,
+        tablet: res,
+        pointModal,
+        modalDialog: true,
+      });
+    }
   }
 
   async add(data) {
@@ -479,6 +527,28 @@ class TabletRepair_ extends React.Component {
     }
   }
 
+  async updateTablet(data) {
+    const res = await this.getData('update_tablet', data);
+
+    if (res.st) {
+      this.setState({
+        openAlert: true,
+        err_status: true,
+        err_text: 'Данные планшета изменены',
+      });
+
+      setTimeout(() => {
+        this.getTablets();
+      }, 300);
+    } else {
+      this.setState({
+        openAlert: true,
+        err_status: false,
+        err_text: res.text,
+      });
+    }
+  }
+
   render() {
     return (
       <>
@@ -503,6 +573,7 @@ class TabletRepair_ extends React.Component {
           onClose={() => this.setState({ modalDialog: false })}
           fullScreen={this.state.fullScreen}
           closeTablet={this.closeTablet.bind(this)}
+          updateTablet={this.updateTablet.bind(this)}
         />
 
         <Grid container spacing={3}>
@@ -541,7 +612,7 @@ class TabletRepair_ extends React.Component {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell colSpan={5}>Планшеты в эксплуатации</TableCell>
+                    <TableCell colSpan={6}>Планшеты в эксплуатации</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>№</TableCell>
@@ -553,9 +624,10 @@ class TabletRepair_ extends React.Component {
                 </TableHead>
                 <TableBody>
                   {this.state.tabletsActive.map((item, key) => (
-                    <TableRow key={key} style={{ cursor: 'pointer' }} hover onClick={this.openModal.bind(this, 'tablet', item.id)}>
-                      <TableCell>{item.number}</TableCell>
-                      <TableCell>{item.model}</TableCell>
+                    <TableRow key={key}>
+                      <TableCell onClick={this.openModal.bind(this, 'updateTablet', item.id)} style={{ cursor: 'pointer', fontWeight: 700, color: '#c03', textDecoration: 'underline' }}> {item.number}</TableCell>
+                      <TableCell onClick={this.openModal.bind(this, 'tablet', item.id)} style={{ cursor: 'pointer', fontWeight: 700, color: '#c03', textDecoration: 'underline' }}>
+                        {item.model}</TableCell>
                       <TableCell>{item.imei}</TableCell>
                       <TableCell>{item.buy_date}</TableCell>
                       <TableCell>{item.repairs.summ ?? 0}</TableCell>
