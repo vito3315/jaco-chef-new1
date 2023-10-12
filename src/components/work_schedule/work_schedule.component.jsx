@@ -232,6 +232,9 @@ class HeaderItem extends React.Component {
           <TableCell style={{ textAlign: 'center' }}></TableCell>
           <TableCell style={{ textAlign: 'center' }}></TableCell>
           <TableCell style={{ textAlign: 'center' }}></TableCell>
+
+          <TableCell style={{ textAlign: 'center' }}></TableCell>
+          <TableCell style={{ textAlign: 'center' }}></TableCell>
         </TableRow>
 
         <TableRow>
@@ -257,10 +260,13 @@ class HeaderItem extends React.Component {
           {this.props.show_zp == 1 || this.props.show_zp == 0 ? <TableCell style={{ textAlign: 'center' }}>Всего</TableCell> : null}
 
           <TableCell style={{ textAlign: 'center' }}>Выдано</TableCell>
+
+          <TableCell style={{ textAlign: 'center' }}>Перечислено на карты</TableCell>
+          <TableCell style={{ textAlign: 'center' }}>Сумма к выплате</TableCell>
         </TableRow>
 
         <TableRow style={{ backgroundColor: '#e5e5e5' }}>
-          <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} colSpan={this.props.days.length + 3 + 8}
+          <TableCell style={{ textAlign: 'center', cursor: 'pointer' }} colSpan={this.props.days.length + 3 + 8 + 2}
             onClick={this.props.kind == 'manager' ? () => {} : this.props.editSmena ? this.props.editSmena.bind(this, this.props.item.smena_id) : () => console.log('no_edit_smena')}>
             {this.props.item.data}
           </TableCell>
@@ -289,7 +295,7 @@ class WorkSchedule_Table extends React.Component {
           <TableBody>
             {!check_period ? null : (
               <TableRow>
-                <TableCell colSpan={this.props.number.days.length + 3 + 8} style={{ textAlign: 'center', color: 'red', fontSize: '3rem'}}>
+                <TableCell colSpan={this.props.number.days.length + 3 + 8 + 2} style={{ textAlign: 'center', color: 'red', fontSize: '3rem'}}>
                   Чтобы увидеть зарплату, надо закрыть все ошибки в модуле
                   "Регистрация ошибок кухни"
                 </TableCell>
@@ -320,7 +326,7 @@ class WorkSchedule_Table extends React.Component {
                   this.props.kind !== 'manager' &&
                   this.props.kind !== 'other' ? (
                     <TableRow>
-                      <TableCell colSpan={this.props.number.days.length + 3 + 8} style={{ textAlign: 'left', fontSize: '3rem', cursor: 'pointer' }} 
+                      <TableCell colSpan={this.props.number.days.length + 3 + 8 + 2} style={{ textAlign: 'left', fontSize: '3rem', cursor: 'pointer' }} 
                         onClick={this.props.addSmena.bind(this)}>
                         Добавить смену
                       </TableCell>
@@ -400,10 +406,37 @@ class WorkSchedule_Table extends React.Component {
                   {item.data.app_type == 'driver' ? (
                     <TableCell style={{ textAlign: 'center' }}></TableCell>
                   ) : (
-                    <TableCell style={{ textAlign: 'center' }}
+                    <TableCell style={{ textAlign: 'center', cursor: 'pointer' }}
                       onClick={this.props.openZP.bind(this, item.data.id, item.data.smena_id, item.data.app_id, this.props.numberChoose, item.data)}
                     >
                       {item.data.given}
+                    </TableCell>
+                  )}
+
+                  {item.data.app_type == 'driver' ? (
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  ) : (
+                    <TableCell style={{ textAlign: 'center', cursor: 'pointer' }}
+                      onClick={ this.props.kind == 'manager' || this.props.kind == 'dir' ? () => {} : this.props.openZPCart.bind(this, item.data.id, item.data.smena_id, item.data.app_id, this.props.numberChoose, item.data)}
+                    >
+                      {item.data.given_cart}
+                    </TableCell>
+                  )}
+
+                  {item.data.app_type == 'driver' ? (
+                    <TableCell style={{ textAlign: 'center' }}></TableCell>
+                  ) : (
+                    <TableCell style={{ textAlign: 'center' }}>
+                      {parseInt(item.data.check_period) == 1
+                        ? parseInt(item.data.dop_bonus) +
+                          parseInt(item.data.dir_price) +
+                          parseInt(item.data.dir_price_dop) +
+                          parseInt(item.data.h_price) +
+                          parseInt(item.data.my_bonus) -
+                          parseInt(item.data.err_price) -
+                          parseInt(item.data.given_cart) +
+                          ''
+                        : ' - '}
                     </TableCell>
                   )}
                 </TableRow>
@@ -648,6 +681,13 @@ class WorkSchedule_Table_without_functions extends React.Component {
                           {item.data.given}
                         </TableCell>
                       }
+
+                      <TableCell style={{ textAlign: 'center' }}>
+                        {item.data.given_cart}
+                      </TableCell>
+                      <TableCell style={{ textAlign: 'center' }}>
+                      
+                      </TableCell>
                     </>
                   )}
                 </TableRow>
@@ -829,6 +869,7 @@ class WorkSchedule_ extends React.Component {
       mainMenuLVDIR: false,
       mainMenuDopBonus: false,
       mainMenuZP: false,
+      mainMenuZPCart: false,
       mainMenuPoints: false,
 
       mainMenuDopBonusUser: false,
@@ -1659,7 +1700,8 @@ class WorkSchedule_ extends React.Component {
       parseInt(user.dir_price) +
       parseInt(user.dir_price_dop) +
       parseInt(user.dop_bonus) -
-      parseInt(user.err_price);
+      parseInt(user.err_price) - 
+      parseInt(user.given_cart);
 
     this.setState({
       mainMenuZP: true,
@@ -1667,7 +1709,33 @@ class WorkSchedule_ extends React.Component {
         name: user.user_name,
         app: user.full_app_name,
         fullPrice: fullPrice,
-        given: user.given,
+        given: user.given_cash,
+        date: this.state.mounth + (parseInt(part) == 1 ? '-01' : '-16'),
+        user_id: user_id,
+        smena_id: smena_id,
+        app_id: app_id,
+      },
+    });
+  }
+
+  openZPCart(user_id, smena_id, app_id, part, user) {
+    // console.log(user_id, smena_id, app_id, part, user)
+
+    let fullPrice =
+      parseInt(user.h_price) +
+      parseInt(user.my_bonus) +
+      parseInt(user.dir_price) +
+      parseInt(user.dir_price_dop) +
+      parseInt(user.dop_bonus) -
+      parseInt(user.err_price);
+
+    this.setState({
+      mainMenuZPCart: true,
+      userInfo: {
+        name: user.user_name,
+        app: user.full_app_name,
+        fullPrice: fullPrice,
+        given: user.given_cart,
         date: this.state.mounth + (parseInt(part) == 1 ? '-01' : '-16'),
         user_id: user_id,
         smena_id: smena_id,
@@ -1692,6 +1760,41 @@ class WorkSchedule_ extends React.Component {
     if (res['st'] == true) {
       this.setState({
         mainMenuZP: false,
+        userInfo: null,
+
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+
+      setTimeout(() => {
+        this.updateData();
+      }, 300);
+    } else {
+      this.setState({
+        operAlert: true,
+        err_status: res.st,
+        err_text: res.text,
+      });
+    }
+  }
+
+  async saveGiveCart() {
+    let data = {
+      date: this.state.userInfo.date,
+      user_id: this.state.userInfo.user_id,
+      smena_id: this.state.userInfo.smena_id,
+      app_id: this.state.userInfo.app_id,
+      give_price: this.state.userInfo.given,
+    };
+
+    let res = await this.getData('save_user_give_cart_price', data);
+
+    // console.log( res );
+
+    if (res['st'] == true) {
+      this.setState({
+        mainMenuZPCart: false,
         userInfo: null,
 
         operAlert: true,
@@ -2514,6 +2617,47 @@ class WorkSchedule_ extends React.Component {
           </Dialog>
         )}
 
+        {!this.state.userInfo || this.state.mainMenuZPCart === false ? null : (
+          <Dialog onClose={() => this.setState({ mainMenuZPCart: false, userInfo: null })} open={this.state.mainMenuZPCart}>
+            <DialogTitle>
+              Перечислено на карту {this.state.userInfo.app} {this.state.userInfo.name} {this.state.userInfo.date}
+            </DialogTitle>
+
+            <DialogContent>
+              <Grid container spacing={3} style={{ marginTop: 10 }}>
+                <Grid item xs={12} sm={12}>
+                  <MyTextInput
+                    label="Выданная сумма"
+                    value={this.state.userInfo.given}
+                    func={(event) => {
+                      let userInfo = this.state.userInfo;
+                      userInfo.given = event.target.value;
+                      this.setState({ userInfo: userInfo });
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={12}>
+                  <span>Вся сумма: </span>
+                  <span style={{ color: '#c03', borderBottom: '1px dotted #c03', cursor: 'pointer' }}
+                    onClick={() => {
+                      let userInfo = this.state.userInfo;
+                      userInfo.given = userInfo.fullPrice;
+                      this.setState({ userInfo: userInfo });
+                    }}
+                  >
+                    {this.state.userInfo.fullPrice}
+                  </span>
+                </Grid>
+              </Grid>
+            </DialogContent>
+            <DialogActions style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Button style={{ backgroundColor: 'green', color: '#fff' }} onClick={this.saveGiveCart.bind(this)}>Сохранить</Button>
+              <Button style={{ backgroundColor: 'red', color: '#fff' }} onClick={() => this.setState({ mainMenuZPCart: false, userInfo: null })}>Отмена</Button>
+            </DialogActions>
+          </Dialog>
+        )}
+
         {!this.state.userInfo || this.state.isOpenModalH === false ? null : (
           <Dialog
             open={this.state.isOpenModalH}
@@ -3143,6 +3287,7 @@ class WorkSchedule_ extends React.Component {
                     openM={this.openM.bind(this)}
                     openH={this.openHMini.bind(this)}
                     openZP={this.openZP.bind(this)}
+                    openZPCart={this.openZPCart.bind(this)}
                     mix={this.mix.bind(this)}
                     pricePerHour={this.pricePerHour.bind(this)}
 
@@ -3172,6 +3317,7 @@ class WorkSchedule_ extends React.Component {
                     openM={this.openM.bind(this)}
                     openH={this.openH.bind(this)}
                     openZP={this.openZP.bind(this)}
+                    openZPCart={this.openZPCart.bind(this)}
                     mix={this.mix.bind(this)}
                     pricePerHour={this.pricePerHour.bind(this)}
 
@@ -3203,6 +3349,7 @@ class WorkSchedule_ extends React.Component {
                     openM={this.openM.bind(this)}
                     openH={this.openHMini.bind(this)}
                     openZP={this.openZP.bind(this)}
+                    openZPCart={this.openZPCart.bind(this)}
                     mix={this.mix.bind(this)}
                     pricePerHour={this.pricePerHour.bind(this)}
 
@@ -3232,6 +3379,7 @@ class WorkSchedule_ extends React.Component {
                     openM={this.openM.bind(this)}
                     openH={this.openH.bind(this)}
                     openZP={this.openZP.bind(this)}
+                    openZPCart={this.openZPCart.bind(this)}
                     mix={this.mix.bind(this)}
                     pricePerHour={this.pricePerHour.bind(this)}
                     addSmena={this.addSmena.bind(this)}
