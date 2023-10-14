@@ -216,8 +216,8 @@ export class MyAutocomplite2 extends React.PureComponent {
           filterOptions={(options, params) => {
             const filtered = filter(options, params);
     
-            console.log( 'params', params )
-            console.log( 'filtered', filtered )
+            //console.log( 'params', params )
+            //console.log( 'filtered', filtered )
 
             const { inputValue } = params;
             // Suggest the creation of a new value
@@ -228,7 +228,7 @@ export class MyAutocomplite2 extends React.PureComponent {
               );
             }
     
-            console.log( 'new filtered', filtered )
+            //console.log( 'new filtered', filtered )
 
             return filtered;
           }}

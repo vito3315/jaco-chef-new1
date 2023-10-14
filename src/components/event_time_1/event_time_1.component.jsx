@@ -80,6 +80,15 @@ class EventTime1_Modal extends React.Component {
   changeItem(data, event, value) {
     const item = this.state.item;
 
+
+    if( data == 'time_dev' ){
+      if( !value ){
+        value = event.target.value;
+        console.log( event.target.value )
+      }
+      console.log( data, event, value )
+    }
+
     item[data] = value;
 
     this.setState({
@@ -115,7 +124,7 @@ class EventTime1_Modal extends React.Component {
     if (this.props.mark === 'newDay' && (!item.date || !item.time_start || !item.time_end || !item.time_dev)) {
       this.setState({
         openAlert: true,
-        err_status: res.st,
+        err_status: false,
         err_text: message,
       });
 
@@ -126,7 +135,7 @@ class EventTime1_Modal extends React.Component {
     (!item.time_start || !item.time_end || !item.time_dev)) {
       this.setState({
         openAlert: true,
-        err_status: res.st,
+        err_status: false,
         err_text: message,
       });
 
@@ -212,6 +221,7 @@ class EventTime1_Modal extends React.Component {
                   multiple={false}
                   freeSolo={true}
                   func={this.changeItem.bind(this, 'time_dev')}
+                  onBlur={this.changeItem.bind(this, 'time_dev')}
                   data={this.state.data}
                   value={this.state.item ? this.state.item.time_dev : ''}
                 />
