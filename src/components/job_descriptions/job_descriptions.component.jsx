@@ -15,6 +15,8 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 
+import CloseIcon from '@mui/icons-material/Close';
+
 import {
   MyTextInput,
   TextEditor,
@@ -81,7 +83,7 @@ class AppWorkTableNews extends React.Component {
               <TableCell>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', height: 30 }}>
-                    <span>{item.user}</span><span>{item.date_time}</span>
+                    <span>{item.user}</span><span style={{ display: 'flex' }}>{item.date_time} { this.props.to_delete == 1 ? <CloseIcon style={{ marginLeft: 10, cursor: 'pointer', color: '#c03' }} onClick={this.props.deleteNews.bind(this, item.id)} /> : false }</span>
                   </div>
                   <div dangerouslySetInnerHTML={{__html: item.text}} />
                 </div>
@@ -114,11 +116,11 @@ class JobDescriptions_ extends React.Component {
       nameWork: '',
 
       itemsNew: null,
-      chengeItem1: null,
       chengeItemNew1: null,
       newText: '',
 
-      kind: 999
+      kind: 999,
+      user: null
     };
   }
 
@@ -129,7 +131,8 @@ class JobDescriptions_ extends React.Component {
       module_name: data.module_info.name,
       items: data.items,
       news: data.news,
-      kind: data.user.kind
+      kind: data.user.kind,
+      user: data.user
     });
 
     document.title = data.module_info.name;
@@ -284,6 +287,25 @@ class JobDescriptions_ extends React.Component {
     });
   }
 
+  async deleteNews(id) {
+    if(confirm("Удалить новость ?")) {
+      let data = {
+        id: id,
+      };
+  
+      let res = await this.getData('delete_news', data);
+      
+      setTimeout( async () => {
+        let data = await this.getData('get_all');
+  
+        this.setState({
+          items: data.items,
+          news: data.news
+        });
+      }, 300 )
+    }
+  }
+
   async openNewWork() {
     let res = await this.getData('get_all_for_new');
 
@@ -320,17 +342,6 @@ class JobDescriptions_ extends React.Component {
     });
   }
 
-  chengeItem1(type, event, data) {
-    let item = this.state.itemsEdit;
-
-    item.item[[type]] = data.id;
-
-    this.setState({
-      itemsEdit: item,
-      chengeItem1: data,
-    });
-  }
-
   chengeItemNew(type, event) {
     let data = event.target.value;
     let item = this.state.itemsNew;
@@ -359,134 +370,6 @@ class JobDescriptions_ extends React.Component {
     this.setState({
       itemsNew: item,
       chengeItemNew1: data,
-    });
-  }
-
-  chengeTime(key, event) {
-    let data = event.target.value;
-    let item = this.state.itemsEdit;
-
-    item.times_add[key]['time_action'] = data;
-
-    this.setState({
-      itemsEdit: item,
-    });
-  }
-
-  chengeTimeNew(key, event) {
-    let data = event.target.value;
-    let item = this.state.itemsNew;
-
-    item.times_add[key]['time_action'] = data;
-
-    this.setState({
-      itemsNew: item,
-    });
-  }
-
-  delTime(key) {
-    let item = this.state.itemsEdit;
-
-    let newArr = [];
-
-    item.times_add.map((it, k) => {
-      if (parseInt(k) != parseInt(key)) {
-        newArr.push(it);
-      }
-    });
-
-    item.times_add = newArr;
-
-    this.setState({
-      itemsEdit: item,
-    });
-  }
-
-  delTimeNew(key) {
-    let item = this.state.itemsNew;
-
-    let newArr = [];
-
-    item.times_add.map((it, k) => {
-      if (parseInt(k) != parseInt(key)) {
-        newArr.push(it);
-      }
-    });
-
-    item.times_add = newArr;
-
-    this.setState({
-      itemsNew: item,
-    });
-  }
-
-  addTime(event) {
-    let data = document.getElementById('timePikerNew').value;
-    let item = this.state.itemsEdit;
-
-    if (data != '') {
-      item.times_add.push({
-        time_action: data,
-      });
-
-      this.setState({
-        itemsEdit: item,
-      });
-    }
-  }
-
-  addTimeNew(event) {
-    let data = document.getElementById('timePikerNew').value;
-    let item = this.state.itemsNew;
-
-    if (data != '') {
-      item.times_add.push({
-        time_action: data,
-      });
-
-      this.setState({
-        itemsNew: item,
-      });
-    }
-  }
-
-  chengeTimeClose(event) {
-    let data = event.target.value;
-    let item = this.state.itemsEdit;
-
-    item.times_close = data;
-
-    this.setState({
-      itemsEdit: item,
-    });
-  }
-
-  chengeTimeCloseNew(event) {
-    let data = event.target.value;
-    let item = this.state.itemsNew;
-
-    item.times_close = data;
-
-    this.setState({
-      itemsNew: item,
-    });
-  }
-
-  async changeCheck(key, type, event) {
-    let items = this.state.items;
-
-    items[key][[type]] = event.target.checked ? 1 : 0;
-
-    let data = {
-      type: type,
-      value: event.target.checked ? 1 : 0,
-      id: items[key].id,
-    };
-
-    let res = await this.getData('save_check', data);
-
-    this.setState({
-      items: items,
     });
   }
 
@@ -638,7 +521,7 @@ class JobDescriptions_ extends React.Component {
             <h1>{this.state.module_name}</h1>
           </Grid>
 
-          { parseInt(this.state.kind) >= 3 ? null :
+          { parseInt(this.state.kind) >= 3 || this.state.user?.app_type == 'dir' ? null :
             <Grid item xs={12} sm={6}>
               <Button
                 variant="contained"
@@ -650,7 +533,7 @@ class JobDescriptions_ extends React.Component {
             </Grid>
           }
 
-          { parseInt(this.state.kind) >= 3 ? null :
+          { parseInt(this.state.kind) >= 3 || this.state.user?.app_type == 'dir' ? null :
             <Grid item xs={12} sm={6}>
               <Button
                 variant="contained"
@@ -667,7 +550,7 @@ class JobDescriptions_ extends React.Component {
             { this.state.items.length > 0 ?
               <AppWorkTable 
                 items={this.state.items} 
-                openWork={ parseInt(this.state.kind) >= 3 ? () => {} : this.openWork.bind(this)}
+                openWork={ parseInt(this.state.kind) >= 3 || this.state.user?.app_type == 'dir' ? () => {} : this.openWork.bind(this)}
                 kind={this.state.kind}
               /> : null
             }
@@ -678,6 +561,8 @@ class JobDescriptions_ extends React.Component {
             { this.state.news.length > 0 ?
               <AppWorkTableNews 
                 news={this.state.news}
+                deleteNews={ parseInt(this.state.kind) >= 3 || this.state.user?.app_type == 'dir' ? () => {} : this.deleteNews.bind(this)}
+                to_delete={ parseInt(this.state.kind) >= 3 || this.state.user?.app_type == 'dir' ? 0 : 1 }
               /> : null
             }
           </Grid>

@@ -114,6 +114,7 @@ class СafeUprEdit_ extends React.Component {
 
       priority_order      : true,
       priority_pizza      : true,
+      rolls_pizza_dif     : false
     };
   }
   
@@ -141,7 +142,8 @@ class СafeUprEdit_ extends React.Component {
       point_id            : res.points[0].id,
       reason_list         : res.reason_list,
       priority_order      : parseInt(res.point_info.priority_order) == 1 ? true : false,
-      priority_pizza      : parseInt(res.point_info.priority_pizza) == 1 ? true : false
+      priority_pizza      : parseInt(res.point_info.priority_pizza) == 1 ? true : false,
+      rolls_pizza_dif      : parseInt(res.point_info.rolls_pizza_dif) == 1 ? true : false
     })
 
     document.title = res.module_info.name;
@@ -206,7 +208,8 @@ class СafeUprEdit_ extends React.Component {
         summ_driver_min     : this.state.summ_driver_min,
         is_active           : this.state.is_active,
         priority_order      : this.state.priority_order === true ? 1 : 0,
-        priority_pizza      : this.state.priority_pizza === true ? 1 : 0
+        priority_pizza      : this.state.priority_pizza === true ? 1 : 0,
+        rolls_pizza_dif     : this.state.rolls_pizza_dif === true ? 1 : 0,
       };
      
       // причина закрытия кафе
@@ -333,7 +336,8 @@ class СafeUprEdit_ extends React.Component {
         is_сlosed_technic   : res.point_info.is_сlosed_technic,
         comment             : res.comment,
         priority_order      : parseInt(res.point_info.priority_order) == 1 ? true : false,
-        priority_pizza      : parseInt(res.point_info.priority_pizza) == 1 ? true : false
+        priority_pizza      : parseInt(res.point_info.priority_pizza) == 1 ? true : false,
+        rolls_pizza_dif     : parseInt(res.point_info.rolls_pizza_dif) == 1 ? true : false,
      })
 
   }
@@ -658,6 +662,10 @@ class СafeUprEdit_ extends React.Component {
                 <MyCheckBox label='Если заказ приготовить зарнее - он выйдет в приоритете на сборку, кроме предов (напитки, допы и закуски не учитываются)' value={this.state.priority_order}  func={this.changeChekBoxSimple.bind(this, 'priority_order')} />
               </Grid>
 
+              <Grid item xs={12} sm={12}>
+                <MyCheckBox label='Пицца у повара будет отображаться, если более 50% роллов в заказе начнут готовить' value={this.state.rolls_pizza_dif}  func={this.changeChekBoxSimple.bind(this, 'rolls_pizza_dif')} />
+              </Grid>
+
 
               <Grid item xs={12} sm={8}>
                 <MyCheckBox label='Общий стол' value={this.state.cook_common_stol == 1 ? true : false} func={this.changeChekBox.bind(this, 'cook_common_stol')} />
@@ -687,7 +695,7 @@ class СafeUprEdit_ extends React.Component {
                 <MyTextInput value={this.state.summ_driver_min} func={(event) => { this.setState({ summ_driver_min: event.target.value }) } } label='Максимальная сумма нала для курьера стажера' />
               </Grid> 
               
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={4} style={{ display: 'none' }}>
                 <Button color="primary" onClick={this.addTimeDelivery.bind(this)}>Добавить время на доставку</Button>
               </Grid> 
               
