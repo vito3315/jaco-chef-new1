@@ -1,0 +1,42 @@
+.img_modal {
+  max-width: 300px!important;
+  max-height: 300px!important;
+  margin-right: 10px;
+}
+
+.accordion_summary {
+  padding-left: 0 !important;
+  margin: 0 !important;
+  min-height: 48px !important;
+
+  & .MuiAccordionSummary-content{
+    margin: 0 0 !important;
+    min-height: 48px;
+  }
+}
+
+.ceil_tooltip {
+  width: max-content;
+
+  & .MuiFormControlLabel-root{
+    margin: 0 !important;
+  }
+}
+
+.ceil_white {
+  & .MuiFormControl-root {
+    border-radius: 4px;
+    background-color: #fff !important;
+  }
+
+  & .MuiFormControl-root.MuiTextField-root {
+    border-radius: 4px;
+    background-color: #fff !important;
+
+  }
+}
+
+.span_text {
+  font-weight: bold !important;
+  font-size: 20px !important;
+}
