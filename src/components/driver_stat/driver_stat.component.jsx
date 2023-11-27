@@ -61,6 +61,8 @@ class DriverStat_ extends React.Component {
       modalDialogStatSummMain: false,
       statSumm: [],
       statSummMain: [],
+
+      show_dop: 0
     };
   }
   
@@ -137,6 +139,7 @@ class DriverStat_ extends React.Component {
     console.log( res )
     
     this.setState({
+      show_dop: parseInt(res.user.kind) < 3 ? 1 : 0,
       drive_stat_full: res.drive_stat_full,
       drive_stat_date: res.stat_drive_date
     })
@@ -301,7 +304,8 @@ class DriverStat_ extends React.Component {
 
     this.setState({
       modalDialogStatSummMain: true,
-      statSummMain: res,
+      statSummMain: res?.stat,
+      show_dop: parseInt(res.my.kind) < 3 ? 1 : 0,
       getSummDriverId: driver 
     })
   }
@@ -417,6 +421,9 @@ class DriverStat_ extends React.Component {
                   <TableCell>Сумма</TableCell>
                   <TableCell>Пользователь</TableCell>
                   <TableCell>Тип</TableCell>
+                  { this.state.show_dop == 0 ? false : 
+                    <TableCell>Дистанция</TableCell>
+                  }
                 </TableRow>
               </TableHead>
 
@@ -429,6 +436,9 @@ class DriverStat_ extends React.Component {
                     <TableCell>{ parseInt(item.my_cash) == 0 ? item.give : item.my_cash }</TableCell>
                     <TableCell>{ parseInt(item.order_id) == 0 ? item.user_name : '' }</TableCell>
                     <TableCell>{ parseInt(item.order_id) == 0 ? 'Сдал' : 'С заказа' }</TableCell>
+                    { this.state.show_dop == 0 ? false :
+                      <TableCell>{item.dist}</TableCell>
+                    }
                   </TableRow>
                 ) }
               
@@ -476,6 +486,10 @@ class DriverStat_ extends React.Component {
 
                     <TableCell>Сдал за период</TableCell>
 
+                    { this.state.show_dop == 0 ? false :
+                      <TableCell>Кол-во в радиусе</TableCell>
+                    }
+
                     <TableCell>Довозы</TableCell>
                     <TableCell style={{ display: 'none' }}>Ошибки</TableCell>
                     <TableCell>-</TableCell>
@@ -500,6 +514,10 @@ class DriverStat_ extends React.Component {
                       <TableCell>{item.sdacha}</TableCell>
 
                       <TableCell>{item.give_by_date}</TableCell>
+
+                      { this.state.show_dop == 0 ? false :
+                        <TableCell>{item.count_true_dist}</TableCell>
+                      }
 
                       <TableCell>
                         <Button variant="contained" onClick={this.getStatDop.bind(this, item)} style={{ fontWeight: 'bolder' }}>{item.dop_price ? item.dop_price : 0}</Button>

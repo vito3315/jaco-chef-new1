@@ -170,9 +170,19 @@ class CitiesModules_Modal extends React.Component {
 
             <Grid item xs={12} sm={6}>
               <MyTextInput
+                type={'number'}
                 label="Сумма вознагрождения курьеру за завершенный заказ в радиусе"
                 value={this.state.item ? this.state.item.city.driver_dop_price : ''}
                 func={this.changeItem.bind(this, 'driver_dop_price')}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <MyTextInput
+                type={'number'}
+                label="Радиус в метрах в пределах которого положено вознагрождение"
+                value={this.state.item ? this.state.item.city.driver_dop_price_radius : ''}
+                func={this.changeItem.bind(this, 'driver_dop_price_radius')}
               />
             </Grid>
 
@@ -314,6 +324,8 @@ class CitiesModules_ extends React.Component {
         k_rolls: item.k_rolls,
         k_pizza: item.k_pizza,
         is_show: item.is_show,
+        driver_dop_price: item.driver_dop_price,
+        driver_dop_price_radius: item.driver_dop_price_radius,
       }
 
       // console.log(data);
