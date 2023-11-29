@@ -451,7 +451,7 @@ class WorkSchedule_Table extends React.Component {
 
                   { this.props.kind == 'manager' || this.props.kind == 'dir' ? false :
                     this.props.numberChoose == 1 ? false :
-                    <TableCell style={{ textAlign: 'center' }}>{ parseInt(item.data.test_all_price) }</TableCell>
+                    <TableCell style={{ textAlign: 'center', backgroundColor: parseInt(item.data.acc_to_kas) == 1 ? '#c03' : '#fff', color: parseInt(item.data.acc_to_kas) == 1 ? '#fff' : '#000' }}>{ parseInt(item.data.test_all_price) }</TableCell>
                   }
                 </TableRow>
               )
