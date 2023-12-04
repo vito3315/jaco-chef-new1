@@ -235,6 +235,10 @@ class HeaderItem extends React.Component {
 
           <TableCell style={{ textAlign: 'center' }}></TableCell>
           <TableCell style={{ textAlign: 'center' }}></TableCell>
+          { this.props.kind == 'manager' || this.props.kind == 'dir' ? false :
+            this.props.part == 1 ? false :
+            <TableCell style={{ textAlign: 'center' }}></TableCell>
+          }
         </TableRow>
 
         <TableRow>
@@ -263,6 +267,10 @@ class HeaderItem extends React.Component {
 
           <TableCell style={{ textAlign: 'center' }}>Перечислено на карты</TableCell>
           <TableCell style={{ textAlign: 'center' }}>Сумма к выплате</TableCell>
+          { this.props.kind == 'manager' || this.props.kind == 'dir' ? false :
+            this.props.part == 1 ? false :
+            <TableCell style={{ textAlign: 'center' }}>Премия по ведомости</TableCell>
+          }
         </TableRow>
 
         <TableRow style={{ backgroundColor: '#e5e5e5' }}>
@@ -320,6 +328,7 @@ class WorkSchedule_Table extends React.Component {
                     item={item}
                     editSmena={this.props.editSmena.bind(this)}
                     openAddUser={this.props.openAddUser.bind(this)}
+                    part={this.props.numberChoose}
                   />
 
                   {parseInt(key) == 0 &&
@@ -439,6 +448,11 @@ class WorkSchedule_Table extends React.Component {
                         : ' - '}
                     </TableCell>
                   )}
+
+                  { this.props.kind == 'manager' || this.props.kind == 'dir' ? false :
+                    this.props.numberChoose == 1 ? false :
+                    <TableCell style={{ textAlign: 'center', backgroundColor: parseInt(item.data.acc_to_kas) == 1 ? '#c03' : '#fff', color: parseInt(item.data.acc_to_kas) == 1 ? '#fff' : '#000' }}>{ parseInt(item.data.test_all_price) }</TableCell>
+                  }
                 </TableRow>
               )
             )}
@@ -611,6 +625,7 @@ class WorkSchedule_Table_without_functions extends React.Component {
                   days={this.props.number.days}
                   item={item}
                   openAddUser={this.props.openAddUser.bind(this)}
+                  part={this.props.numberChoose}
                 />
               ) : (
                 <TableRow key={key}>

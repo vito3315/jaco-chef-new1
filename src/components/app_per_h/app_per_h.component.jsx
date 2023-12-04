@@ -212,9 +212,10 @@ class AppPerH_ extends React.Component {
                   <TableRow>
                     <TableCell style={{ width: '5%' }}>#</TableCell>
                     <TableCell style={{ width: '35%' }}>Должность</TableCell>
-                    <TableCell style={{ width: '20%' }}>Минимальная ставка</TableCell>
-                    <TableCell style={{ width: '20%' }}>Средняя ставка</TableCell>
-                    <TableCell style={{ width: '20%' }}>Максимальная ставка</TableCell>
+                    <TableCell style={{ width: '15%' }}>Оклад</TableCell>
+                    <TableCell style={{ width: '15%' }}>Минимальная ставка</TableCell>
+                    <TableCell style={{ width: '15%' }}>Средняя ставка</TableCell>
+                    <TableCell style={{ width: '15%' }}>Максимальная ставка</TableCell>
                   </TableRow>
                 </TableHead>
 
@@ -223,6 +224,13 @@ class AppPerH_ extends React.Component {
                     <TableRow key={key} hover>
                       <TableCell>{key + 1}</TableCell>
                       <TableCell>{item.app_name}</TableCell>
+                      <TableCell>
+                        <MyTextInput
+                          label=""
+                          value={item.oklad}
+                          func={this.changeItem.bind(this, 'oklad', item.app_id)}
+                        />
+                      </TableCell>
                       <TableCell>
                         <MyTextInput
                           label=""
