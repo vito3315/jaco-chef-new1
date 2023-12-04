@@ -417,6 +417,10 @@ export class MyDatePickerNew extends React.PureComponent {
           className={'datePicker'}
           slotProps={{
             textField: { size: "small" },
+            field: { clearable: this.props.clearable },
+            actionBar: {
+              actions: this.props.customActions ? ["clear", "accept"] : ["cancel", "accept"],
+             },
           }}
           //renderInput={(params) => <TextField variant="outlined" size={'small'} color='primary' style={{ width: '100%' }} {...params} />}
         />

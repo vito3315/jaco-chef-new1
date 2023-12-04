@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -24,17 +25,52 @@ import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import ClearIcon from '@mui/icons-material/Clear';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import Dropzone from 'dropzone';
 
 import { MySelect, MyAutocomplite, MyAutocomplite2, MyDatePickerNew, formatDate, MyTextInput, MyCheckBox, MyAlert} from '../../stores/elements';
-import Typography from '@mui/material/Typography';
 
 import queryString from 'query-string';
-import ModalImage from 'react-modal-image';
+import ReactPanZoom from 'react-image-pan-zoom-rotate';
 import dayjs from 'dayjs';
 
-import { main, view, edit } from './data';
+import { main, view, edit } from './data'; //  для тестов
+
+class Billing_Modal extends React.Component {
+
+  render() {
+    return (
+      <Dialog
+        open={this.props.open}
+        onClose={this.props.onClose.bind(this)}
+        fullScreen={this.props.fullScreen}
+        fullWidth={true}
+        maxWidth='xl'
+      >
+        <DialogContent style={{ paddingBottom: 10, paddingTop: 20 }}>
+
+          <DialogTitle style={{ padding: 0, marginBottom: 20 }}>
+            <IconButton onClick={this.props.onClose.bind(this)} className='close_btn'>
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+
+          <ReactPanZoom
+            image={this.props.image}
+            alt="Image bill"
+          />
+
+        </DialogContent>
+      </Dialog>
+    );
+  }
+}
 
 // Аккродион с данными из накладной для страниц Новая / Просмотр / Редактирование накладной
 class Billing_Accordion extends React.Component {
@@ -47,145 +83,155 @@ class Billing_Accordion extends React.Component {
     return !is_same;
   }
   render() {
-    const { bill_list, bill_items } = this.props;
+    const { bill_list, bill_items, type } = this.props;
 
     return (
       <Grid item xs={12} sm={12} mb={5}>
-        <Accordion expanded={true}>
-          <AccordionDetails>
-            <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ opacity: 0 }} />} aria-controls="panel1a-content" style={{ paddingLeft: 0 }}>
-              <Grid item xs display="flex" flexDirection="row">
-                <Typography style={{ width: '3%' }} noWrap></Typography>
-                <Typography style={{ width: '2%' }} noWrap></Typography>
-                <Typography style={{ width: '2%' }} noWrap></Typography>
-                <Typography style={{ width: '15%' }} noWrap>Номер накладной</Typography>
-                <Typography style={{ width: '10%' }} noWrap>Дата в накладной</Typography>
-                <Typography style={{ width: '13%' }} noWrap>Создатель</Typography>
-                <Typography style={{ width: '10%' }} noWrap>Дата обновления</Typography>
-                <Typography style={{ width: '10%' }} noWrap>Редактор</Typography>
-                <Typography style={{ width: '10%' }} noWrap>Время обновления</Typography>
-                <Typography style={{ width: '15%' }} noWrap>Тип накладной</Typography>
-                <Typography style={{ width: '10%' }} noWrap>Сумма с НДС</Typography>
-              </Grid>
-            </AccordionSummary>
+        <TableContainer component={Paper}>
+          <Accordion expanded={true} style={{ minWidth: 'max-content'}}>
+            <AccordionDetails>
+              <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ opacity: 0 }} />} aria-controls="panel1a-content">
+                <Grid item xs display="flex" flexDirection="row">
+                  <Typography style={{ width: '1%' }}></Typography>
+                  <Typography style={{ width: '3%' }}></Typography>
+                  <Typography style={{ width: '3%' }}></Typography>
+                  <Typography style={{ width: '10%' }}>
+                    Номер {type === 'edit' ? ' документа' : ' накладной'}
+                  </Typography>
+                  <Typography style={{ width: '10%' }}>
+                    Дата в {type === 'edit' ? ' документе' : ' накладной'}
+                  </Typography>
+                  <Typography style={{ width: '14%', minWidth: '200px' }}>Создатель</Typography>
+                  <Typography style={{ width: '10%' }}>Дата обновления</Typography>
+                  <Typography style={{ width: '14%', minWidth: '200px' }}>Редактор</Typography>
+                  <Typography style={{ width: '10%' }}>Время обновления</Typography>
+                  <Typography style={{ width: '17%', minWidth: '250px' }}>
+                    Тип {type === 'edit' ? ' документа' : ' накладной'}
+                  </Typography>
+                  <Typography style={{ width: '8%' }}>Сумма с НДС</Typography>
+                </Grid>
+              </AccordionSummary>
 
-            {bill_list.map((item, i) => (
-              <Accordion key={i}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" className="accordion_summary">
-                  <Grid item xs display="flex" sx={{ flexDirection: { sm: 'row', xs: 'column' } }}>
-                    <Typography style={{ width: '2%', backgroundColor: item.color, marginRight: '1%' }}></Typography>
+              {bill_list.map((item, i) => (
+                <Accordion key={i}>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" className="accordion_summary" style={{ paddingRight: '1%' }}>
 
-                    <Tooltip title="Нету бумажного носителя" arrow placement="bottom-start"
-                      componentsProps={{
-                        tooltip: {
-                          sx: { bgcolor: '#fff', color: '#000', border: '0.5px solid rgba(0, 0, 0, 0.87)',
-                            '& .MuiTooltip-arrow': {
-                              color: '#fff',
-                              '&::before': {
-                                backgroundColor: 'white',
-                                border: '0.5px solid black',
+                    <Grid item xs display="flex" flexDirection='row'>
+
+                      <Typography component="div" style={{ width: '1%', backgroundColor: item.color, marginRight: '1%' }}></Typography>
+
+                      <Tooltip title="Нету бумажного носителя" arrow placement="bottom-start"
+                        componentsProps={{
+                          tooltip: {
+                            sx: { bgcolor: '#fff', color: '#000', border: '0.5px solid rgba(0, 0, 0, 0.87)',
+                              '& .MuiTooltip-arrow': {
+                                color: '#fff',
+                                '&::before': {
+                                  backgroundColor: 'white',
+                                  border: '0.5px solid black',
+                                },
                               },
                             },
                           },
-                        },
-                      }}
-                    >
-                      <Typography component="div" style={{ width: '2%', display: 'flex', alignItems: 'center' }}>
-                        <MyCheckBox
-                          value={false}
-                          //func={this.props.changeCheck.bind(this, key, 'is_not_del')}
-                          label=""
-                        />
-                      </Typography>
-                    </Tooltip>
+                        }}
+                      >
+                        <Typography component="div" style={{ width: '3%', display: 'flex', alignItems: 'center' }}>
+                          <MyCheckBox
+                            value={false}
+                            //func={this.props.changeCheck.bind(this, key, 'is_not_del')}
+                            label=""
+                          />
+                        </Typography>
+                      </Tooltip>
 
-                    <Tooltip title="С бумажным носителем все хорошо" arrow placement="bottom-start"
-                      componentsProps={{
-                        tooltip: {
-                          sx: { bgcolor: '#fff', color: '#000', border: '0.5px solid rgba(0, 0, 0, 0.87)',
-                            '& .MuiTooltip-arrow': {
-                              color: '#fff',
-                              '&::before': {
-                                backgroundColor: 'white',
-                                border: '0.5px solid black',
+                      <Tooltip title="С бумажным носителем все хорошо" arrow placement="bottom-start"
+                        componentsProps={{
+                          tooltip: {
+                            sx: { bgcolor: '#fff', color: '#000', border: '0.5px solid rgba(0, 0, 0, 0.87)',
+                              '& .MuiTooltip-arrow': {
+                                color: '#fff',
+                                '&::before': {
+                                  backgroundColor: 'white',
+                                  border: '0.5px solid black',
+                                },
                               },
                             },
                           },
-                        },
-                      }}
-                    >
-                      <Typography component="div" style={{ width: '2%', display: 'flex', alignItems: 'center' }}>
-                        <MyCheckBox
-                          value={false}
-                          //func={this.props.changeCheck.bind(this, key, 'is_not_del')}
-                          label=""
-                        />
+                        }}
+                      >
+                        <Typography component="div" style={{ width: '3%', display: 'flex', alignItems: 'center' }}>
+                          <MyCheckBox
+                            value={false}
+                            //func={this.props.changeCheck.bind(this, key, 'is_not_del')}
+                            label=""
+                          />
+                        </Typography>
+                      </Tooltip>
+
+                      <Typography style={{ width: '10%',  display: 'flex', alignItems: 'center' }}>
+                        {item.number}
                       </Typography>
-                    </Tooltip>
 
-                    <Typography style={{ width: '15%', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }} noWrap>
-                      {item.number}
-                    </Typography>
+                      <Typography style={{ width: '10%',  display: 'flex', alignItems: 'center' }}>
+                        {item.date}
+                      </Typography>
 
-                    <Typography style={{ width: '10%', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }} noWrap>
-                      {item.date}
-                    </Typography>
+                      <Typography style={{ width: '14%', minWidth: '200px', display: 'flex', alignItems: 'center' }}>
+                        {item.creator_id}
+                      </Typography>
 
-                    <Typography style={{ width: '13%', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }} noWrap>
-                      {item.creator_id}
-                    </Typography>
+                      <Typography style={{ width: '10%',  display: 'flex', alignItems: 'center' }}>
+                        {item.date_update}
+                      </Typography>
 
-                    <Typography style={{ width: '10%', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }} noWrap>
-                      {item.date_update}
-                    </Typography>
+                      <Typography style={{ width: '14%', minWidth: '200px', display: 'flex', alignItems: 'center'}}>
+                        {item.editor_id}
+                      </Typography>
 
-                    <Typography style={{ width: '10%', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center'}} noWrap>
-                      {item.editor_id}
-                    </Typography>
+                      <Typography style={{ width: '10%',  display: 'flex', alignItems: 'center' }}>
+                        {item.time_update}
+                      </Typography>
 
-                    <Typography style={{ width: '10%', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }} noWrap>
-                      {item.time_update}
-                    </Typography>
+                      <Typography style={{ width: '17%', minWidth: '250px',  display: 'flex', alignItems: 'center' }}>
+                        {item.name}
+                      </Typography>
 
-                    <Typography style={{ width: '15%', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }} noWrap>
-                      {item.name}
-                    </Typography>
+                      <Typography style={{ width: '8%',  display: 'flex', alignItems: 'center' }}>
+                        {item.sum_w_nds}
+                      </Typography>
+                    </Grid>
+                  </AccordionSummary>
 
-                    <Typography style={{ width: '10%', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }} noWrap>
-                      {item.sum_w_nds}
-                    </Typography>
-                  </Grid>
-                </AccordionSummary>
-
-                <AccordionDetails style={{ width: '100%' }}>
-                  <Table>
-                    <TableHead>
-                      <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
-                        <TableCell>Товар</TableCell>
-                        <TableCell>Объем упак.</TableCell>
-                        <TableCell>Кол-во упак.</TableCell>
-                        <TableCell>Кол-во</TableCell>
-                        <TableCell>Сумма с НДС</TableCell>
-                      </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                      {bill_items?.map((item, key) => (
-                        <TableRow key={key} hover>
-                          <TableCell> {item.item_name} </TableCell>
-                          <TableCell>{item.pq} {item.ed_izmer_name}</TableCell>
-                          <TableCell>{item.count}</TableCell>
-                          <TableCell>{item.fact_unit} {item.ed_izmer_name}</TableCell>
-                          <TableCell> {item.price_w_nds} ₽</TableCell>
+                  <AccordionDetails style={{ width: '100%' }}>
+                    <Table>
+                      <TableHead>
+                        <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
+                          <TableCell>Товар</TableCell>
+                          <TableCell>Объем упак.</TableCell>
+                          <TableCell>Кол-во упак.</TableCell>
+                          <TableCell>Кол-во</TableCell>
+                          <TableCell>Сумма с НДС</TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </AccordionDetails>
-              </Accordion>
-            ))}
-          </AccordionDetails>
-        </Accordion>
+                      </TableHead>
+
+                      <TableBody>
+                        {bill_items?.map((item, key) => (
+                          <TableRow key={key} hover>
+                            <TableCell> {item.item_name} </TableCell>
+                            <TableCell>{item.pq} {item.ed_izmer_name}</TableCell>
+                            <TableCell>{item.count}</TableCell>
+                            <TableCell>{item.fact_unit} {item.ed_izmer_name}</TableCell>
+                            <TableCell> {item.price_w_nds} ₽</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </AccordionDetails>
+                </Accordion>
+              ))}
+            </AccordionDetails>
+          </Accordion>
+        </TableContainer>
       </Grid>
     );
   }
@@ -211,13 +257,11 @@ class Billing_ extends React.Component {
       type: '',
 
       vendors: [],
-      vendor: '',
+      vendorsCopy: [],
+      search_vendor: '',
 
       points: [],
       point: [],
-
-      carriers: [],
-      carrier: '',
 
       number: '',
 
@@ -230,25 +274,22 @@ class Billing_ extends React.Component {
   }
 
   async componentDidMount() {
-    //const data = await this.getData('get_all');
+    const data = await this.getData('get_all');
 
-    const data = main;
+    console.log('res', data)
 
     this.setState({
       //module_name: data.module_info.name,
       module_name: 'Накладные',
-      bill_list: data.bill_list,
-      status: data.bill_list[0].id,
-      types: data.types,
-      type: data.types[0].id,
+      bill_list: main.bill_list,
+      status: main.bill_list[0].id,
+      types: main.types,
       vendors: data.vendors,
-      vendor: data.vendors[0].id,
+      vendorsCopy: data.vendors,
       points: data.points,
-      carriers: data.carriers,
-      carrier: data.carriers[0].id,
-      all_items: data.all_items,
-      billings: data.billings,
-      bills: data.bills,
+      all_items: data.items,
+      billings: main.billings,
+      bills: main.bills,
     });
 
     //document.title = data.module_info.name;
@@ -303,7 +344,7 @@ class Billing_ extends React.Component {
 
   changeDateRange(data, event) {
     this.setState({
-      [data]: event,
+      [data]: event ? event : null,
     });
   }
 
@@ -345,6 +386,22 @@ class Billing_ extends React.Component {
     localStorage.setItem('type_bill', type);
   }
 
+   // поиск/выбор поставщика
+  search(event, value) {
+
+    const search = event.target.value ? event.target.value : value ? value : '';
+
+    const vendorsCopy = this.state.vendorsCopy;
+
+    const vendors = vendorsCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
+
+    this.setState({
+      search_vendor: search,
+      vendors,
+    });
+  
+  }
+
   render() {
     return (
       <>
@@ -365,34 +422,27 @@ class Billing_ extends React.Component {
             </Button>
           </Grid> 
 
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={4}>
             <MyDatePickerNew
               label="Дата от"
               value={this.state.date_start}
               func={this.changeDateRange.bind(this, 'date_start')}
+              clearable={true}
+              customActions={true}
             />
           </Grid>
 
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={4}>
             <MyDatePickerNew
               label="Дата до"
               value={this.state.date_end}
               func={this.changeDateRange.bind(this, 'date_end')}
+              clearable={true}
+              customActions={true}
             />
           </Grid>
 
-          <Grid item xs={12} sm={3}>
-            <MySelect
-              data={this.state.bill_list}
-              value={this.state.status}
-              multiple={false}
-              is_none={false}
-              func={this.changeSelect.bind(this, 'status')}
-              label="Статус"
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={4}>
             <MySelect
               data={this.state.types}
               value={this.state.type}
@@ -403,33 +453,34 @@ class Billing_ extends React.Component {
             />
           </Grid>
 
-          <Grid item xs={7} sm={4}>
+          <Grid item xs={12} sm={4}>
+            <MyAutocomplite2
+              label="Поставщик"
+              freeSolo={true}
+              multiple={false}
+              data={this.state.vendors}
+              value={this.state.search_vendor}
+              func={this.search.bind(this)}
+              onBlur={this.search.bind(this)}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <MySelect
+              data={this.state.bill_list}
+              value={this.state.status}
+              multiple={false}
+              is_none={false}
+              func={this.changeSelect.bind(this, 'status')}
+              label="Статус"
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
             <MyTextInput
               label="Номер накладной"
               value={this.state.number}
               func={this.changeInput.bind(this)}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <MySelect
-              data={this.state.vendors}
-              value={this.state.vendor}
-              multiple={false}
-              is_none={false}
-              func={this.changeSelect.bind(this, 'vendor')}
-              label="Поставщик"
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <MySelect
-              data={this.state.carriers}
-              value={this.state.carrier}
-              multiple={false}
-              is_none={false}
-              func={this.changeSelect.bind(this, 'carrier')}
-              label="Бумажный носитель"
             />
           </Grid>
 
@@ -453,8 +504,8 @@ class Billing_ extends React.Component {
             />
           </Grid>
 
-          <Grid item xs={12} sm={12} style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained"
+          <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', flexDirection: { sm: 'row', xs: 'column' } }}>
+            <Button variant="contained" sx={{ marginBottom: { xs: 1 } }}
               //onClick={this.getItems.bind(this)}
             >
               Проставить бумажный носитель
@@ -467,13 +518,13 @@ class Billing_ extends React.Component {
             </Button>
           </Grid>
 
-          <Grid item xs={12} sm={12} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+          <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: { sm: 20, xs: 3 }, flexDirection: { sm: 'row', xs: 'column' } }}>
             {this.state.billings.map((item, key) => (
-              <Button style={{ background: item.color, fontWeight: 400, whiteSpace: 'nowrap', padding: '6px 14px' }} key={key} variant="contained">
+              <Button sx={{ background: item.color, fontWeight: 400, whiteSpace: 'nowrap', padding: '6px 14px', marginBottom: { xs: 1, sm: 0 } }} key={key} variant="contained">
                 {item.name}{` (${item.count})`}
               </Button>
             ))}
-            <Button style={{ background: 'aqua', fontWeight: 400, whiteSpace: 'nowrap', padding: '6px 14px' }} variant="contained">
+            <Button sx={{ background: 'aqua', fontWeight: 400, whiteSpace: { xs: 'wrap', sm: 'nowrap' }, padding: '6 14px' }} variant="contained">
               Данный документ храниться слишком долго
             </Button>
           </Grid>
@@ -582,7 +633,7 @@ class Billing_View_ extends React.Component {
       module: 'billing',
       module_name: '',
       is_load: false,
-
+      
       point: null,
       vendor: null,
       bill: null,
@@ -590,6 +641,10 @@ class Billing_View_ extends React.Component {
       bill_items: [],
       bill_list: [],
       users: [],
+
+      modalDialog: false,
+      fullScreen: false,
+      image: ''
     };
   }
 
@@ -658,12 +713,40 @@ class Billing_View_ extends React.Component {
       });
   };
 
+  handleResize() {
+    if (window.innerWidth < 601) {
+      this.setState({
+        fullScreen: true,
+      });
+    } else {
+      this.setState({
+        fullScreen: false,
+      });
+    }
+  }
+
+  openImageBill (image) {
+    this.handleResize();
+
+    this.setState({ 
+      modalDialog: true, 
+      image
+    })
+  }
+
   render() {
     return (
       <>
         <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
+
+        <Billing_Modal
+          open={this.state.modalDialog}
+          onClose={() => this.setState({ modalDialog: false })}
+          fullScreen={this.state.fullScreen}
+          image={this.state.image}
+        />
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
@@ -701,18 +784,15 @@ class Billing_View_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={12} display="flex" flexDirection="row" style={{ fontWeight: 'bold' }}>
-            {/* react-awesome-lightbox https://www.npmjs.com/package/react-awesome-lightbox */}
             {!this.state.imgs.length ? 'Фото отсутствует' : 
               <>
                 {this.state.imgs.map((img, key) => (
-                  <ModalImage
-                    key={key}
+                  <img 
+                    key={key} 
+                    src={'https://storage.yandexcloud.net/bill/' + img} 
+                    alt="Image bill" 
                     className="img_modal"
-                    small={'https://storage.yandexcloud.net/bill/' + img}
-                    large={'https://storage.yandexcloud.net/bill/' + img}
-                    hideDownload={true}
-                    hideZoom={false}
-                    showRotate={true}
+                    onClick={this.openImageBill.bind(this, 'https://storage.yandexcloud.net/bill/' + img)}
                   />
                 ))}
               </>
@@ -729,15 +809,15 @@ class Billing_View_ extends React.Component {
               <Table aria-label="a dense table">
                 <TableHead>
                   <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
-                    <TableCell>Товар</TableCell>
-                    <TableCell>В упак.</TableCell>
+                    <TableCell style={{ minWidth: '150px' }}>Товар</TableCell>
+                    <TableCell style={{ minWidth: '130px' }}>В упак.</TableCell>
                     <TableCell>Упак</TableCell>
-                    <TableCell>Кол-во</TableCell>
+                    <TableCell style={{ minWidth: '130px' }}>Кол-во</TableCell>
                     <TableCell>НДС</TableCell>
-                    <TableCell>Сумма без НДС</TableCell>
-                    <TableCell>Сумма НДС</TableCell>
-                    <TableCell>Сумма с НДС</TableCell>
-                    <TableCell>За 1 ед с НДС</TableCell>
+                    <TableCell style={{ minWidth: '180px' }}>Сумма без НДС</TableCell>
+                    <TableCell style={{ minWidth: '180px' }}>Сумма НДС</TableCell>
+                    <TableCell style={{ minWidth: '150px' }}>Сумма с НДС</TableCell>
+                    <TableCell style={{ minWidth: '150px' }}>За 1 ед с НДС</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -764,8 +844,8 @@ class Billing_View_ extends React.Component {
             <Typography>{this.state.bill?.date}</Typography>
           </Grid>
 
-          <Grid item xs={12} sm={12} style={{ display: 'flex' }}>
-            <Typography style={{ fontWeight: 'bold', color: '#9e9e9e' }}>Сотрудники:&nbsp;</Typography>
+          <Grid item xs={12} sm={12} sx={{ display: 'flex', flexWrap: 'wrap' }}>
+            <Typography component='span' style={{ fontWeight: 'bold', color: '#9e9e9e' }}>Сотрудники:&nbsp;</Typography>
             {this.state.users.map((user, key) => (
               <Typography key={key} component="span" mr={1}>
                 {user.name}{this.state.users.length === 1 || this.state.users.at(-1) === user ? null : ', '}
@@ -841,9 +921,6 @@ class Billing_Edit_ extends React.Component {
       types: [],
       type: '',
 
-      sorts: [],
-      sort: '',
-
       docs: [],
       doc: '',
 
@@ -873,12 +950,21 @@ class Billing_Edit_ extends React.Component {
       bill_list: [],
 
       type_bill: null,
+
+      number_invoice: '',
+      date_invoice: formatDate(new Date()),
+
+      modalDialog: false,
+      fullScreen: false,
+      image: ''
     };
   }
 
   async componentDidMount() {
     //const data = await this.getData('get_all');
 
+    const data = await this.getData('get_points')
+   
     const type_bill = localStorage.getItem('type_bill');
 
     this.setState({
@@ -887,21 +973,17 @@ class Billing_Edit_ extends React.Component {
 
     if (type_bill === 'new') {
       this.setState({
-        module_name: 'Новая накладная',
+        module_name: 'Новый документ',
         points: edit.points,
-        users: edit.users,
-        vendors: edit.vendors,
-        vendorsCopy: edit.vendors,
-        types: edit.types,
-        type: edit.types[0].id,
-        sorts: edit.sorts,
+        //
+        types: edit.sorts,
         kinds: edit.kinds,
         docs: edit.docs,
-        users: edit.users,
       });
     }
 
     if (type_bill === 'edit') {
+
       const bill_items = view.bill_items.map((item) => {
         item.all_ed_izmer = item.pq_item.split('#').map((it) => {
           it = { name: `${it} ${item.ed_izmer_name}`, id: it };
@@ -910,27 +992,42 @@ class Billing_Edit_ extends React.Component {
         return item;
       });
 
-      const allPrice = bill_items.reduce((all, item) => all + Number(item.price), 0);
-      const allPrice_w_nds = bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0);
+      const allPrice = (bill_items.reduce((all, item) => all + Number(item.price), 0)).toFixed(2);
+      const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
+
+      if(data.points.length === 1) {
+
+        const obj = {
+          point_id: data.points[0].id
+        }
+
+        const res = await this.getData('get_vendors', obj)
+
+        this.setState({
+          vendors: res.vendors,
+          vendorsCopy: res.vendors,
+          point: data.points[0].id,
+        })
+
+      }
 
       this.setState({
-        module_name: 'Редактирование накладной',
+        points: data.points,
+        module_name: 'Редактирование документа',
+        allPrice,
+        allPrice_w_nds,
+        //
         bill: view.bill,
-        point: view.point,
-        vendor: view.vendor,
         imgs: view.imgs,
         bill_items,
         bill_list: view.bill_list,
-        users: view.users,
-        user: view.users,
         number: view.bill?.number,
         date: dayjs(view.bill?.date),
-        vendor_items: edit.vendor_items,
-        vendor_itemsCopy: edit.vendor_items,
         date_unload: dayjs(view.bill?.date),
         comment: 'Переделать фото',
-        allPrice,
-        allPrice_w_nds,
+        types: edit.sorts,
+        kinds: edit.kinds,
+        docs: edit.docs,
       });
     }
 
@@ -985,19 +1082,40 @@ class Billing_Edit_ extends React.Component {
   };
 
   // поиск/выбор поставщика/товара поставщика
-  search(type, event, value) {
+  async search(type, event, value) {
+
     if (type === 'search_vendor') {
       const search = event.target.value ? event.target.value : value ? value : '';
 
-      if (search) {
-        const data = edit; // запрос или функция к серверу
+      const vendorsCopy = this.state.vendorsCopy;
+
+      const vendors = vendorsCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
+
+      if (search && vendors.length) {
+
+        const point_id = this.state.point;
+
+        const data = {
+          point_id,
+          vendor_id: vendors[0].id
+        }
+
+        const res = await this.getData('get_vendor_items', data)
 
         this.setState({
-          vendor_items: data.vendor_items,
-          vendor_itemsCopy: data.vendor_items,
+          vendor_items: res.items,
+          vendor_itemsCopy: res.items,
+          users: res.users,
         });
 
       } else {
+
+        if(this.state.type_bill === 'new') {
+          this.setState({
+            bill_items: [],
+          });
+        }
+
         this.setState({
           search_item: '',
           vendor_items: [],
@@ -1008,13 +1126,9 @@ class Billing_Edit_ extends React.Component {
           fact_unit: '',
           summ: '',
           sum_w_nds: '',
-          bill_items: [],
         });
+
       }
-
-      const vendorsCopy = this.state.vendorsCopy;
-
-      const vendors = vendorsCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
 
       this.setState({
         search_vendor: search,
@@ -1028,14 +1142,13 @@ class Billing_Edit_ extends React.Component {
       const vendor_itemsCopy = this.state.vendor_itemsCopy;
 
       if (vendor_itemsCopy.length) {
-        const vendor_items = vendor_itemsCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
 
-        const all_ed_izmer = vendor_items[0].pq.split('#').map((item) => (item = { name: `${item} ${vendor_items[0].ed_izmer_name}`, id: item }));
+        const vendor_items = vendor_itemsCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
 
         this.setState({
           vendor_items,
-          all_ed_izmer: search ? all_ed_izmer : [],
-          pq: search ? all_ed_izmer[0].id : '',
+          all_ed_izmer: search && vendor_items.length ? vendor_items[0].pq_item : [],
+          pq: search && vendor_items.length ? vendor_items[0].pq_item[0].id : '',
           count: '',
           fact_unit: '',
           summ: '',
@@ -1049,8 +1162,42 @@ class Billing_Edit_ extends React.Component {
     }
   }
 
-  changeSelect(data, event) {
+  async changeSelect(data, event) {
     const value = event.target.value;
+
+    if(data === 'point') {
+
+      const type_bill = this.state.type_bill;
+
+      if(type_bill === 'new') {
+        this.setState({
+          bill_items: [],
+        });
+      }
+
+      const obj = {
+        point_id: value
+      }
+
+      const res = await this.getData('get_vendors', obj)
+
+      this.setState({
+        vendors: res.vendors,
+        vendorsCopy: res.vendors,
+        search_vendor: '',
+        search_item: '',
+        vendor_items: [],
+        vendor_itemsCopy: [],
+        all_ed_izmer: [],
+        pq: '',
+        count: '',
+        fact_unit: '',
+        summ: '',
+        sum_w_nds: '',
+        users: []
+      })
+
+    }
 
     this.setState({
       [data]: value,
@@ -1058,7 +1205,7 @@ class Billing_Edit_ extends React.Component {
   }
 
   changeInput(type, event) {
-    if (type === 'number') {
+    if (type === 'number' || type === 'number_invoice') {
       this.setState({
         [type]: event.target.value,
       });
@@ -1107,6 +1254,16 @@ class Billing_Edit_ extends React.Component {
     });
   }
 
+  check_nds_bill(value) {
+   let nds = [];
+   nds[0] = 'без НДС';
+   nds[10] = '10 %';
+   nds[20] = '20 %';
+   nds[18] = '18 %';
+
+   return nds[Number(value)] ? nds[Number(value)] : false;
+  }
+
   addItem() {
     const { count, fact_unit, summ, sum_w_nds, all_ed_izmer, pq, vendor_items } = this.state;
 
@@ -1118,20 +1275,25 @@ class Billing_Edit_ extends React.Component {
         err_status: false,
         err_text: 'Необходимо указать сумму / кол-во Товара',
       });
+
       return;
     }
 
-    const res_w_nds = Number(summ) * (Number(vendor_items[0].nds) / 100) + Number(summ);
+    const nds = this.check_nds_bill((Number(sum_w_nds) - Number(summ)) / (Number(summ) / 100))
 
-    if (res_w_nds !== Number(sum_w_nds)) {
+    if (!nds) {
+
       this.setState({
         operAlert: true,
         err_status: false,
-        err_text: 'Сумма указаны неверно',
+        err_text: 'Суммы указаны неверно',
       });
+
       return;
     }
 
+    vendor_items[0].summ_nds = (Number(sum_w_nds) - Number(summ)).toFixed(2);
+    vendor_items[0].nds = nds;
     vendor_items[0].pq = pq;
     vendor_items[0].all_ed_izmer = all_ed_izmer;
     vendor_items[0].count = count;
@@ -1141,8 +1303,8 @@ class Billing_Edit_ extends React.Component {
 
     bill_items.push(vendor_items[0]);
 
-    const allPrice = bill_items.reduce((all, item) => all + Number(item.price), 0);
-    const allPrice_w_nds = bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0);
+    const allPrice = (bill_items.reduce((all, item) => all + Number(item.price), 0)).toFixed(2);
+    const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
 
     this.setState({
       bill_items,
@@ -1160,8 +1322,8 @@ class Billing_Edit_ extends React.Component {
 
     bill_items.splice(index, 1);
 
-    const allPrice = bill_items.reduce((all, item) => all + Number(item.price), 0);
-    const allPrice_w_nds = bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0);
+    const allPrice = (bill_items.reduce((all, item) => all + Number(item.price), 0)).toFixed(2);
+    const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
 
     this.setState({
       bill_items,
@@ -1196,8 +1358,27 @@ class Billing_Edit_ extends React.Component {
       return item;
     });
 
+    if(type === 'price' || type === 'price_w_nds') {
+
+      bill_items = bill_items.map((item, index) => {
+        if (item.id === id && key === index) {
+          const nds = this.check_nds_bill((Number(item.price_w_nds) - Number(item.price)) / (Number(item.price) / 100))
+  
+          if (nds) {
+            item.nds = nds;
+            item.summ_nds = (Number(item.price_w_nds) - Number(item.price)).toFixed(2)
+  
+          } else {
+            item.summ_nds = 0;
+            item.nds = '';
+          }
+        }
+        return item;
+      });
+    }
+
     if (type === 'price') {
-      const allPrice = bill_items.reduce((all, item) => all + Number(item.price), 0);
+      const allPrice = (bill_items.reduce((all, item) => all + Number(item.price), 0)).toFixed(2);
 
       this.setState({
         allPrice,
@@ -1205,7 +1386,7 @@ class Billing_Edit_ extends React.Component {
     }
 
     if (type === 'price_w_nds') {
-      const allPrice_w_nds = bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0);
+      const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
 
       this.setState({
         allPrice_w_nds,
@@ -1217,12 +1398,40 @@ class Billing_Edit_ extends React.Component {
     });
   }
 
+  handleResize() {
+    if (window.innerWidth < 601) {
+      this.setState({
+        fullScreen: true,
+      });
+    } else {
+      this.setState({
+        fullScreen: false,
+      });
+    }
+  }
+
+  openImageBill (image) {
+    this.handleResize();
+
+    this.setState({ 
+      modalDialog: true, 
+      image
+    })
+  }
+
   render() {
     return (
       <>
         <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
           <CircularProgress color="inherit" />
         </Backdrop>
+
+        <Billing_Modal
+          open={this.state.modalDialog}
+          onClose={() => this.setState({ modalDialog: false })}
+          fullScreen={this.state.fullScreen}
+          image={this.state.image}
+        />
 
         <MyAlert
           isOpen={this.state.operAlert}
@@ -1232,97 +1441,94 @@ class Billing_Edit_ extends React.Component {
         />
 
         <Grid container spacing={3} mb={10}>
+
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}{this.state.type_bill === 'edit' ? `: ${this.state.bill?.number}` : null}</h1>
             <Divider style={{ backgroundColor: 'rgba(0, 0, 0, 0.87)' }} />
           </Grid>
 
-          {this.state.type_bill === 'new' ? (
+          <Grid item xs={12} sm={4}>
+            <MySelect
+              data={this.state.points}
+              value={this.state.point}
+              multiple={false}
+              is_none={false}
+              func={this.changeSelect.bind(this, 'point')}
+              label="Точка"
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <MySelect
+              data={this.state.types}
+              value={this.state.type}
+              multiple={false}
+              is_none={false}
+              func={this.changeSelect.bind(this, 'type')}
+              label="Тип"
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <MyAutocomplite2
+              label="Поставщик"
+              freeSolo={true}
+              multiple={false}
+              data={this.state.vendors}
+              value={this.state.search_vendor}
+              func={this.search.bind(this, 'search_vendor')}
+              onBlur={this.search.bind(this, 'search_vendor')}
+            />
+          </Grid>
+
+          {parseInt(this.state.type) === 2 || parseInt(this.state.type) === 3 ? (
             <>
               <Grid item xs={12} sm={4}>
-                <MyAutocomplite2
-                  label="Поставщик"
-                  freeSolo={true}
-                  multiple={false}
-                  data={this.state.vendors}
-                  value={this.state.search_vendor}
-                  func={this.search.bind(this, 'search_vendor')}
-                  onBlur={this.search.bind(this, 'search_vendor')}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={4}>
                 <MySelect
-                  data={this.state.sorts}
-                  value={this.state.sort}
+                  data={this.state.kinds}
+                  value={this.state.kind}
                   multiple={false}
                   is_none={false}
-                  func={this.changeSelect.bind(this, 'sort')}
-                  label="Вид документа"
+                  func={this.changeSelect.bind(this, 'kind')}
+                  label="Документ"
                 />
               </Grid>
-
-              <Grid item xs={12} sm={4}>
-                <MySelect
-                  data={this.state.points}
-                  value={this.state.point}
-                  multiple={false}
-                  is_none={false}
-                  func={this.changeSelect.bind(this, 'point')}
-                  label="Точка"
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={4}>
-                <MySelect
-                  data={this.state.types}
-                  value={this.state.type}
-                  multiple={false}
-                  is_none={false}
-                  func={this.changeSelect.bind(this, 'type')}
-                  label="Тип"
-                />
-              </Grid>
+              {parseInt(this.state.type) === 2 ? 
+                <Grid item xs={12} sm={4}></Grid>
+                : null
+              }
             </>
-          ) : (
-            <Grid item xs={12} sm={12}>
-              <Grid style={{ display: 'flex' }}>
-                <Typography style={{ fontWeight: 'bold' }}>Точка:&nbsp;</Typography>
-                <Typography>{this.state.point?.name}</Typography>
-              </Grid>
-              <Grid style={{ display: 'flex' }}>
-                <Typography style={{ fontWeight: 'bold' }}>Поставщик:&nbsp;</Typography>
-                <Typography>{this.state.vendor?.name}</Typography>
-              </Grid>
-              <Grid style={{ display: 'flex' }}>
-                <Typography style={{ fontWeight: 'bold' }}>Тип накладой:&nbsp;</Typography>
-                <Typography>{this.state.bill?.type_bill === '1' ? 'Приходная' : 'Возвратная'}</Typography>
-              </Grid>
-              <Grid style={{ display: 'flex' }}>
-                <Typography style={{ fontWeight: 'bold' }}>Вид документа:&nbsp;</Typography>
-                <Typography>Коррекция</Typography>
-              </Grid>
-              <Grid style={{ display: 'flex' }}>
-                <Typography style={{ fontWeight: 'bold' }}>УПД</Typography>
-              </Grid>
-              <Grid style={{ display: 'flex' }}>
-                <Typography style={{ fontWeight: 'bold' }}>Документ основание:&nbsp;</Typography>
-                <Typography>Основание_1</Typography>
-              </Grid>
-            </Grid>
-          )}
+          ) : null}
 
-          <Grid item xs={7} sm={4}>
+          {parseInt(this.state.type) === 3 || parseInt(this.state.type) === 4 ? (
+            <>
+              <Grid item xs={12} sm={4}>
+                <MyAutocomplite
+                  data={this.state.docs}
+                  multiple={false}
+                  value={this.state.doc}
+                  func={this.changeAutocomplite.bind(this, 'doc')}
+                  label="Документ основание"
+                />
+              </Grid>
+                {parseInt(this.state.type) === 4 ? 
+                  <Grid item xs={12} sm={4}></Grid>
+                  : null
+                }
+            </>
+          ) : null}
+
+          <Grid item xs={12} sm={6}>
             <MyTextInput
-              label="Номер накладной"
+              label="Номер документа"
               value={this.state.number}
               func={this.changeInput.bind(this, 'number')}
             />
           </Grid>
 
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={6}>
             <MyDatePickerNew
-              label="Дата"
+              label="Дата документа"
               value={this.state.date}
               func={this.changeDateRange.bind(this, 'date')}
             />
@@ -1330,52 +1536,20 @@ class Billing_Edit_ extends React.Component {
 
           {this.state.type_bill === 'new' ? null : (
             <Grid item xs={12} sm={12} display="flex" flexDirection="row" style={{ fontWeight: 'bold' }}>
-              {/* react-awesome-lightbox https://www.npmjs.com/package/react-awesome-lightbox */}
               {!this.state.imgs.length ? 'Фото отсутствует' :
                 <>
                   {this.state.imgs.map((img, key) => (
-                    <ModalImage
-                      key={key}
+                    <img 
+                      key={key} 
+                      src={'https://storage.yandexcloud.net/bill/' + img} 
+                      alt="Image bill" 
                       className="img_modal"
-                      small={'https://storage.yandexcloud.net/bill/' + img}
-                      large={'https://storage.yandexcloud.net/bill/' + img}
-                      hideDownload={true}
-                      hideZoom={false}
-                      showRotate={true}
+                      onClick={this.openImageBill.bind(this, 'https://storage.yandexcloud.net/bill/' + img)}
                     />
                   ))}
                 </>
               }
             </Grid>
-          )}
-
-          {this.state.type_bill === 'edit' ? null : (
-            <>
-              {parseInt(this.state.sort) === 2 || parseInt(this.state.sort) === 3 ? (
-                <Grid item xs={12} sm={4}>
-                  <MySelect
-                    data={this.state.kinds}
-                    value={this.state.kind}
-                    multiple={false}
-                    is_none={false}
-                    func={this.changeSelect.bind(this, 'kind')}
-                    label="Накладная / УПД"
-                  />
-                </Grid>
-              ) : null}
-
-              {parseInt(this.state.sort) === 3 || parseInt(this.state.sort) === 4 ? (
-                <Grid item xs={12} sm={4}>
-                  <MyAutocomplite
-                    data={this.state.docs}
-                    multiple={false}
-                    value={this.state.doc}
-                    func={this.changeAutocomplite.bind(this, 'doc')}
-                    label="Документ основание"
-                  />
-                </Grid>
-              ) : null}
-            </>
           )}
 
           <Grid item xs={12} sm={12}>
@@ -1384,9 +1558,57 @@ class Billing_Edit_ extends React.Component {
               id="for_img_edit"
               style={{ width: '100%', minHeight: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <span>Выбери файлы для загрузки</span>
+              <span>Выбери документ для загрузки</span>
             </div>
           </Grid>
+
+          {parseInt(this.state.type) === 2 ? (
+            <>
+              <Grid item xs={12} sm={6}>
+                <MyTextInput
+                 label="Номер счет-фактуры"
+                 value={this.state.number_invoice}
+                 func={this.changeInput.bind(this, 'number_invoice')}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <MyDatePickerNew
+                 label="Дата счет-фактуры"
+                 value={this.state.date_invoice}
+                 func={this.changeDateRange.bind(this, 'date_invoice')}
+                />
+              </Grid>
+
+              {this.state.type_bill === 'new' ? null : (
+                <Grid item xs={12} sm={12} display="flex" flexDirection="row" style={{ fontWeight: 'bold' }}>
+                  {!this.state.imgs.length ? 'Фото отсутствует' :
+                    <>
+                      {this.state.imgs.map((img, key) => (
+                        <img 
+                          key={key} 
+                          src={'https://storage.yandexcloud.net/bill/' + img} 
+                          alt="Image bill" 
+                          className="img_modal"
+                          onClick={this.openImageBill.bind(this, 'https://storage.yandexcloud.net/bill/' + img)}
+                        />
+                      ))}
+                    </>
+                  }
+                </Grid>
+              )}
+
+              <Grid item xs={12} sm={12}>
+                <div
+                  className="dropzone"
+                  id="for_img_edit"
+                  style={{ width: '100%', minHeight: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <span>Выбери счет-фактуру для загрузки</span>
+                </div>
+              </Grid>
+            </>
+          ) : null}
 
           <Grid item xs={12} sm={12}>
             <h2>Товары поставщика</h2>
@@ -1453,7 +1675,7 @@ class Billing_Edit_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={12}>
-            <h2>Товары в накладной</h2>
+            <h2>Товары в документе</h2>
             <Divider style={{ backgroundColor: 'rgba(0, 0, 0, 0.87)' }} />
           </Grid>
 
@@ -1462,14 +1684,14 @@ class Billing_Edit_ extends React.Component {
               <Table aria-label="a dense table">
                 <TableHead>
                   <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
-                    <TableCell>Товар</TableCell>
-                    <TableCell>В упак.</TableCell>
-                    <TableCell>Упак</TableCell>
+                    <TableCell style={{ minWidth: '150px' }}>Товар</TableCell>
+                    <TableCell style={{ minWidth: '130px' }}>В упак.</TableCell>
+                    <TableCell style={{ minWidth: '130px' }}>Упак</TableCell>
                     <TableCell>Кол-во</TableCell>
-                    <TableCell>НДС</TableCell>
-                    <TableCell>Сумма без НДС</TableCell>
+                    <TableCell style={{ minWidth: '100px' }}>НДС</TableCell>
+                    <TableCell style={{ minWidth: '130px' }}>Сумма без НДС</TableCell>
                     <TableCell>Сумма НДС</TableCell>
-                    <TableCell>Сумма с НДС</TableCell>
+                    <TableCell style={{ minWidth: '130px' }}>Сумма с НДС</TableCell>
                     <TableCell></TableCell>
                     <TableCell></TableCell>
                   </TableRow>
@@ -1498,7 +1720,7 @@ class Billing_Edit_ extends React.Component {
                         />
                       </TableCell>
                       <TableCell style={{ whiteSpace: 'nowrap' }}>{item.fact_unit} {item.ed_izmer_name}</TableCell>
-                      <TableCell>{item.nds}%</TableCell>
+                      <TableCell>{item.nds}</TableCell>
                       <TableCell className="ceil_white">
                         <MyTextInput
                           type="number"
@@ -1508,7 +1730,7 @@ class Billing_Edit_ extends React.Component {
                           onBlur={this.changeDataTable.bind(this, 'price', item.id, key)}
                         />
                       </TableCell>
-                      <TableCell style={{ whiteSpace: 'nowrap' }}>{Number(item.price_w_nds) - Number(item.price)} ₽</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{item.summ_nds} ₽</TableCell>
                       <TableCell className="ceil_white">
                         <MyTextInput
                           type="number"
@@ -1575,14 +1797,14 @@ class Billing_Edit_ extends React.Component {
 
           {this.state.type_bill === 'new' ? null : (
             <>
-              <Grid item xs={6} sm={6} style={{ display: 'flex', marginBottom: 20 }}>
+              <Grid item xs={12} sm={6} style={{ display: 'flex', marginBottom: 20 }}>
                 <Typography style={{ fontWeight: 'bold', color: '#9e9e9e' }}>
                   Причина удаления:&nbsp;
                 </Typography>
                 <Typography></Typography>
               </Grid>
 
-              <Grid item xs={6} sm={6} style={{ display: 'flex', marginBottom: 20 }}>
+              <Grid item xs={12} sm={6} style={{ display: 'flex', marginBottom: 20 }}>
                 <Typography style={{ fontWeight: 'bold', color: '#9e9e9e' }}>Комментарий бухгалтера:&nbsp;</Typography>
                 <Typography>Переделать фото</Typography>
               </Grid>
@@ -1596,7 +1818,7 @@ class Billing_Edit_ extends React.Component {
               label=""
             />
             <Typography component="span" className="span_text">
-              Поставщик привезет новую накладную
+              Поставщик привезет новый документ
             </Typography>
           </Grid>
 
@@ -1604,6 +1826,7 @@ class Billing_Edit_ extends React.Component {
             <Billing_Accordion
               bill_list={this.state.bill_list}
               bill_items={this.state.bill_items}
+              type='edit'
             />
           )}
 
