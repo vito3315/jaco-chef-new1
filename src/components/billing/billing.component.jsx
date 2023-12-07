@@ -413,7 +413,7 @@ class Billing_ extends React.Component {
 
     const { type, vendors, point } = this.state;
 
-    if(vendors.length === 1 && type && point.length) {
+    if(type && point.length) {
 
       const { status, number, items } = this.state;
   
@@ -455,7 +455,7 @@ class Billing_ extends React.Component {
       this.setState({
         operAlert: true,
         err_status: false,
-        err_text: 'Необходимо выбрать Поставщика / Тип / Точку',
+        err_text: 'Необходимо выбрать Тип / Точку',
       });
 
     }
@@ -594,12 +594,12 @@ class Billing_ extends React.Component {
             </Button>
           </Grid>
 
-          <Grid item xs={12} style={{ marginBottom: 20 }} sm={12}>
+          <Grid item xs={12} style={{ marginBottom: 20 }} sm={6}>
             <TableContainer component={Paper}>
               <Table aria-label="a dense table">
                 <TableHead>
                   <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
-                    <TableCell style={{ width: '20%' }}>Тип</TableCell>
+                    <TableCell>Тип</TableCell>
                     <TableCell>Количество</TableCell>
                     <TableCell>Сумма с НДС</TableCell>
                   </TableRow>
