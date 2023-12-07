@@ -306,6 +306,7 @@ export class MyTextInput extends React.PureComponent {
         onKeyUp={this.props.enter}
         InputProps={this.props.inputAdornment}
         inputProps={this.props.tabindex}
+        className={this.props.className}
       />
     )
   }

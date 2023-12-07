@@ -1,6 +1,6 @@
 .img_modal {
-  max-width: 300px!important;
-  max-height: 300px!important;
+  max-width: 300px !important;
+  max-height: 300px !important;
   margin-right: 10px;
 }
 
@@ -9,7 +9,7 @@
   margin: 0 !important;
   min-height: 48px !important;
 
-  & .MuiAccordionSummary-content{
+  & .MuiAccordionSummary-content {
     margin: 0 0 !important;
     min-height: 48px;
   }
@@ -18,7 +18,7 @@
 .ceil_tooltip {
   width: max-content;
 
-  & .MuiFormControlLabel-root{
+  & .MuiFormControlLabel-root {
     margin: 0 !important;
   }
 }
@@ -32,7 +32,6 @@
   & .MuiFormControl-root.MuiTextField-root {
     border-radius: 4px;
     background-color: #fff !important;
-
   }
 }
 
@@ -51,6 +50,26 @@
   border-radius: 30px;
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
   & .MuiSvgIcon-root {
-    fill: #4C68C1;
+    fill: #4c68c1;
+  }
+}
+
+.disabled_input {
+  & .MuiFormLabel-root.MuiInputLabel-root.Mui-disabled {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  & .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled {
+    opacity: 1 !important;
+    -webkit-text-fill-color: rgba(0, 0, 0, 0.87);
+  }
+
+  & .MuiInputBase-root.MuiOutlinedInput-root.Mui-disabled {
+    color: rgba(0, 0, 0, 0.87);
+  }
+
+  & .MuiInputBase-root.MuiOutlinedInput-root.Mui-disabled
+    .MuiOutlinedInput-notchedOutline {
+    border-color: rgba(0, 0, 0, 0.23);
   }
 }
