@@ -54,7 +54,7 @@ const VendorItemPrice = React.lazy(() => import("../vendor_item_price"));
 const Tender = React.lazy(() => import("../tender"));
 const WorkSchedule = React.lazy(() => import("../work_schedule"));
 
-import { Billing, BillingView, BillingEdit } from "../billing";
+import { Billing, BillingView, BillingNew, BillingEdit } from "../billing";
 import { Revizion, RevizionNew, RevizionEdit } from '../revizion';
 import { OrderPost2, OrderPost2New, OrderPost2Manual } from '../order_post_2';
 import { SiteSale2, SiteSale2_New, SiteSale2_Edit, SiteSale2_Stat, SiteSale2_StatList, SiteSale2_AnaliticList } from '../site_sale_2';
@@ -379,7 +379,8 @@ export function App () {
                   <Route path={'/ras_by_bill'} exact={ true } element={ <RasByBill /> } />
                   <Route path={'/billing'} exact={ true } element={ <Billing /> } />
                   <Route path={'/billing/view'} exact={ true } element={ <BillingView /> } />
-                  <Route path={'/billing/edit'} exact={ true } element={ <BillingEdit /> } />
+                  <Route path={'/billing/new'} exact={ true } element={ <BillingNew /> } />
+                  <Route path={'/billing/:type/:id/:point'} exact={ true } element={ <BillingEdit /> } />
                   <Route path={'/category_items'} exact={ true } element={ <CategoryItems /> } />
                   <Route path={'/vendor_module'} exact={ true } element={ <VendorModule /> } />
 
