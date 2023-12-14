@@ -23,6 +23,15 @@
   }
 }
 
+.ceil_svg {
+  display: flex;
+
+  & svg {
+    fill: rgb(204, 0, 51);
+  }
+
+}
+
 .ceil_white {
   & .MuiFormControl-root {
     border-radius: 4px;

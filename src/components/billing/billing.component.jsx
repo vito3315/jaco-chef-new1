@@ -27,6 +27,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ClearIcon from '@mui/icons-material/Clear';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import ErrorIcon from '@mui/icons-material/Error';
 
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -40,7 +41,92 @@ import queryString from 'query-string';
 import ReactPanZoom from 'react-image-pan-zoom-rotate';
 import dayjs from 'dayjs';
 
-import { main, view, edit } from './data'; //  для тестов
+import { view, edit } from './data'; //  для тестов
+
+const bill_status = [
+  {
+      "id": "0",
+      "name": "Все",
+      "sum_w_nds": "0",
+      "count": "0",
+      "clr": "rgba(0, 0, 0, 0.04)",
+  },
+  {
+      "id": "5",
+      "name": "Шаблон",
+      "sum_w_nds": "0",
+      "count": "0",
+      "clr": "#dcdcdc",
+  },
+  {
+      "id": "2",
+      "name": "Заведенная",
+      "sum_w_nds": "0",
+      "count": "0",
+      "clr": "#ffcc00",
+  },
+  {
+      "id": "7",
+      "name": "Отправленная бухгалтеру",
+      "sum_w_nds": "0",
+      "count": "0",
+      "clr": "#f5770a",
+  },
+  {
+      "id": "8",
+      "name": "Отправленная в 1с",
+      "sum_w_nds": "0",
+      "count": "0",
+      "clr": "#1faee9",
+  },
+  {
+      "id": "9",
+      "name": "Вернулась из 1с",
+      "sum_w_nds": "0",
+      "count": "0",
+      "clr": "#baacc7",
+  },
+  {
+      "id": "1",
+      "name": "Оплаченная",
+      "sum_w_nds": "0",
+      "count": "0",
+      "clr": "#008000",
+  },
+  {
+      "id": "10",
+      "name": "Для ген дира",
+      "sum_w_nds": "0",
+      "count": "0",
+      "clr": "#942f3d",
+  },
+  {
+      "id": "3",
+      "name": "Удаленная",
+      "sum_w_nds": "0",
+      "count": "0",
+      "clr": "#000000",
+  }
+]
+
+const types = [
+  {
+    "name": "Счет",
+    "id": "1"
+  },
+  {
+    "name": "Поступление",
+    "id": "2"
+  },
+  {
+    "name": "Коррекция",
+    "id": "3"
+  },
+  {
+    "name": "Возврат",
+    "id": "4"
+  },
+]
 
 // модалка просмотра фото/картинок документов на страницах Новая / Просмотр / Редактирование накладной
 class Billing_Modal extends React.Component {
@@ -281,24 +367,25 @@ class Billing_ extends React.Component {
   async componentDidMount() {
     const data = await this.getData('get_all');
 
-    //console.log('res', data)
+    //console.log('data', data)
 
     this.setState({
-      //module_name: data.module_info.name,
       module_name: 'Накладные',
       vendors: data.vendors,
       vendorsCopy: data.vendors,
       points: data.points,
       all_items: data.items,
-      //
-      billings: main.billings,
-      bill_list: main.bill_list,
-      status: main.bill_list[0].id,
-      types: main.types,
+      bill_list: bill_status,
+      billings: bill_status,
+      status: bill_status[0].id,
+      types: types,
     });
 
-    //document.title = data.module_info.name;
     document.title = 'Накладные';
+
+    setTimeout(() => {
+      this.getLocalStorage();
+    }, 300);
   }
 
   getData = (method, data = {}) => {
@@ -351,52 +438,89 @@ class Billing_ extends React.Component {
     this.setState({
       [data]: event ? event : null,
     });
+
+    setTimeout(() => {
+      this.setLocalStorage();
+    }, 300);
   }
 
   changeSelect(data, event) {
-    const data_2 = main;
-
-    const value = event.target.value;
-
-    if (value === '1') {
-      this.setState({
-        bills: data_2.bills_pay,
-      });
-    } else {
-      this.setState({
-        bills: data_2.bills,
-      });
-    }
-
     this.setState({
-      [data]: value,
+      [data]: event.target.value,
     });
+
+    setTimeout(() => {
+      this.setLocalStorage();
+    }, 300);
   }
 
   changeAutocomplite(type, event, data) {
     this.setState({
       [type]: data,
     });
+
+    setTimeout(() => {
+      this.setLocalStorage();
+    }, 300);
   }
 
   changeInput(event) {
     this.setState({
       number: event.target.value,
     });
+
+    setTimeout(() => {
+      this.setLocalStorage();
+    }, 300);
+  }
+
+  setLocalStorage() {
+   
+    const {date_start, date_end, status, type, search_vendor, point, number, items} = this.state;
+
+    const dateStart = date_start ? dayjs(date_start).format('YYYY-MM-DD') : null;
+    const dateEnd = date_end ? dayjs(date_end).format('YYYY-MM-DD') : null;
+
+    const data = {
+      dateStart, 
+      dateEnd, 
+      status, 
+      type, 
+      search_vendor, 
+      point, 
+      number, 
+      items
+    }
+
+    console.log('setLocalStorage', data)
+
+    localStorage.setItem('main_page_bill', JSON.stringify(data));
+  }
+
+  getLocalStorage() {
+
+    const res = JSON.parse(localStorage.getItem('main_page_bill'));
+
+    if(res) {
+      const {dateStart, dateEnd, status, type, search_vendor, point, number, items} = res;
+  
+      const date_start = dateStart ? dayjs(dateStart) : null;
+      const date_end = dateEnd ? dayjs(dateEnd) : null;
+  
+      this.setState({
+        date_start,
+        date_end,
+        status, 
+        type,
+        search_vendor, 
+        point, 
+        number, 
+        items
+      });
+    }
   }
 
   getOneBill() {}
-
-  // открытие документа
-  getOneDoc(item) {
-    const type = this.state.type;
-    const typeDoc = parseInt(type) === 1 ? 'bill_ex' : 'bill';
-
-    const url = `/billing/${typeDoc}/${item?.id}/${item?.point_id}`
-
-    window.open(url, '_blank');
-    
-  }
 
    // поиск/выбор поставщика
   search(event, value) {
@@ -454,10 +578,34 @@ class Billing_ extends React.Component {
 
       const res = await this.getData('get_billing_list', data);
 
-      console.log('getBillingList', res)
+      console.log('getBillingList', res);
+
+      let billings = this.state.billings;
+
+      billings = billings.map(status => {
+
+        if(res.svod[status.id]) {
+          status.count = res.svod[status.id].count
+        } else {
+          status.count = 0
+        }
+
+        return status
+      })
+
+      const bills = res.res.map(bill => {
+        bill_status.map(item => {
+          if(item.id === bill.status && bill.status !== '0') {
+            bill.color = item.clr
+          }
+        })
+        
+        return bill
+      })
 
       this.setState({
-        bills: res.res,
+        bills,
+        billings,
       });
 
     } else {
@@ -593,31 +741,20 @@ class Billing_ extends React.Component {
             </Button>
           </Grid>
 
-          <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: { sm: 5, xs: 3 }, flexDirection: { sm: 'row', xs: 'column' }, flexWrap: 'wrap', gap: 2 }}>
-            {this.state.billings.map((item, key) => (
-              <Button sx={{ width: { sm: '18%', xs: '100%' }, background: item.color, fontWeight: 400, padding: '6px 14px' }} key={key} variant="contained">
-                {item.name}{` (${item.count})`}
-              </Button>
-            ))}
-            <Button sx={{ width: { sm: '38.5%', xs: '100%' }, background: 'aqua', fontWeight: 400, padding: '6px 14px' }} variant="contained">
-              Данный документ храниться слишком долго
-            </Button>
-          </Grid>
-
           <Grid item xs={12} style={{ marginBottom: 20 }} sm={6}>
             <TableContainer component={Paper}>
               <Table aria-label="a dense table">
                 <TableHead>
                   <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
-                    <TableCell>Тип</TableCell>
+                    <TableCell style={{ minWidth: '180px' }}>Тип</TableCell>
                     <TableCell>Количество</TableCell>
-                    <TableCell>Сумма с НДС</TableCell>
+                    <TableCell style={{ minWidth: '150px' }}>Сумма с НДС</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {this.state.billings.map((item, key) => (
-                    <TableRow key={key} hover>
-                      <TableCell>{item.name}</TableCell>
+                    <TableRow key={key}>
+                      <TableCell style={{ backgroundColor: item.clr, color: key !== 0 ? '#fff' : 'rgba(0, 0, 0, 0.8)' }}>{item.name}</TableCell>
                       <TableCell>{item.count}</TableCell>
                       <TableCell>{item.sum_w_nds}</TableCell>
                     </TableRow>
@@ -637,17 +774,38 @@ class Billing_ extends React.Component {
                     <TableCell>Бумажный носитель</TableCell>
                     <TableCell>Тип</TableCell>
                     <TableCell>Номер</TableCell>
-                    <TableCell>Дата накладной</TableCell>
-                    <TableCell>Поставщик</TableCell>
-                    <TableCell>Сумма с НДС</TableCell>
-                    <TableCell></TableCell>
+                    <TableCell style={{ minWidth: '180px' }}>Дата накладной</TableCell>
+                    <TableCell style={{ minWidth: '180px' }}>Поставщик</TableCell>
+                    <TableCell style={{ minWidth: '180px' }}>Сумма с НДС</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {this.state.bills.map((item, key) => (
-                    <TableRow key={key} hover>
-                      <TableCell>{key + 1}</TableCell>
-                      <TableCell></TableCell>
+                    <TableRow key={key}>
+                      <TableCell style={{ backgroundColor: item?.color ?? '#fff', color: item?.color ? '#fff' : 'rgba(0, 0, 0, 0.87)'}}>{key + 1}</TableCell>
+                      <TableCell>
+                        {parseInt(item.check_day) === 1 || parseInt(item.check_price) === 1 ? 
+                          <Tooltip title={item.err_items ? item.err_items : item.err_date} arrow placement="bottom-start"
+                            componentsProps={{
+                              tooltip: {
+                                sx: { bgcolor: '#fff', color: '#000', border: '0.5px solid rgba(0, 0, 0, 0.87)',
+                                  '& .MuiTooltip-arrow': {
+                                    color: '#fff',
+                                    '&::before': {
+                                      backgroundColor: 'white',
+                                      border: '0.5px solid black',
+                                    },
+                                  },
+                                },
+                              },
+                            }}
+                          >
+                            <Typography component="div" className="ceil_svg">
+                              <ErrorIcon />
+                            </Typography>
+                          </Tooltip>
+                        : null}
+                      </TableCell>
                       <TableCell>
                         <Tooltip title="Есть в наличии" arrow placement="bottom-start"
                           componentsProps={{
@@ -674,17 +832,25 @@ class Billing_ extends React.Component {
                         </Tooltip>
                       </TableCell>
                       <TableCell>Прих</TableCell>
-                      <TableCell>
+                      <TableCell style={{ cursor: 'pointer' }}>
                         <Link to="/billing/view" onClick={this.getOneBill.bind(this)}>
                           {item.number}
                         </Link>
                       </TableCell>
-                      <TableCell onClick={this.getOneDoc.bind(this, item)} style={{ cursor: 'pointer' }}>
-                        {item.date}
+                      <TableCell 
+                        style={{ backgroundColor: parseInt(item.check_day) === 1 ? 'rgb(204, 0, 51)' : '#fff', cursor: 'pointer', color: parseInt(item.check_day) === 1 ? '#fff' : 'rgba(0, 0, 0, 0.87)' }}
+                      >
+                        <Link 
+                          to={`/billing/${parseInt(this.state.type) === 1 ? 'bill_ex' : 'bill'}/${item?.id}/${item?.point_id}`} target="_blank">
+                          {item.date}
+                        </Link>
                       </TableCell>
                       <TableCell>{item.vendor_name}</TableCell>
-                      <TableCell>{item.sum_w_nds}</TableCell>
-                      <TableCell></TableCell>
+                      <TableCell 
+                        style={{ backgroundColor: parseInt(item.check_price) === 1 ? 'rgb(204, 0, 51)' : '#fff', color: parseInt(item.check_price) === 1 ? '#fff' : 'rgba(0, 0, 0, 0.87)'}}
+                      >
+                        {item.sum_w_nds} ₽
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -1042,8 +1208,8 @@ class Billing_New_ extends React.Component {
     this.setState({
       module_name: 'Новый документ',
       points: data.points,
+      types: types,
       //
-      types: edit.sorts,
       kinds: edit.kinds,
     });
 
@@ -2209,15 +2375,14 @@ class Billing_Edit_ extends React.Component {
       err_status: true,
       err_text: '',
 
-      points: [],
-      point: '',
+      point: [],
       point_name: '',
 
       users: [],
       user: [],
 
       vendors: [],
-      vendorsCopy: [],
+      vendor_name: '',
 
       vendor_items: [],
       vendor_itemsCopy: [],
@@ -2232,7 +2397,6 @@ class Billing_Edit_ extends React.Component {
       doc: '',
 
       number: '',
-      search_vendor: '',
       search_item: '',
 
       all_ed_izmer: [],
@@ -2252,14 +2416,12 @@ class Billing_Edit_ extends React.Component {
       comment: '',
 
       bill_list: [],
-      vendor: null,
       bill: null,
       imgs_bill: [],
-      imgs_factur: [],
-      bill_list: [],
-
+      
       number_factur: '',
       date_factur: null,
+      imgs_factur: [],
 
       modalDialog: false,
       fullScreen: false,
@@ -2279,13 +2441,20 @@ class Billing_Edit_ extends React.Component {
     }
 
     const res = await this.getData('get_one', obj);
-    const data = await this.getData('get_points');
+    const points = await this.getData('get_points');
 
-    console.log('componentDidMount res', res);
+    const point = points.points.find(point => point.id === res.bill.point_id);
 
-    this.getDataBill(res, data);
+    const data = {
+      point_id: point?.id,
+      vendor_id: res?.vendors[0]?.id
+    }
 
-    //document.title = data.module_info.name;
+    const items = await this.getData('get_vendor_items', data);
+    const docs = await this.getData('get_base_doc', data);
+
+    this.getDataBill(res, point, items.items, docs);
+
     document.title = 'Накладные';
   }
 
@@ -2336,7 +2505,7 @@ class Billing_Edit_ extends React.Component {
   };
 
   // данные для отрисовки документа на странице
-  async getDataBill(res, data) {
+  async getDataBill(res, point, items, docs) {
 
     this.setState({
       is_load: true,
@@ -2344,8 +2513,8 @@ class Billing_Edit_ extends React.Component {
 
     const bill_items = res.bill_items.map((item) => {
 
-      item.all_ed_izmer = item.pq_item.split('#').map((it) => {
-        it = { name: `${it} ${item.ed_izmer_name}`, id: it };
+      item.all_ed_izmer = item.pq_item.map(it => {
+        it = { name: `${it.name} ${item.ed_izmer_name}`, id: it.id };
         return it;
       });
 
@@ -2367,40 +2536,30 @@ class Billing_Edit_ extends React.Component {
 
     const allPrice = (bill_items.reduce((all, item) => all + Number(item.price), 0)).toFixed(2);
     const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
-
-    if(data.points.length === 1) {
-
-      const obj = {
-        point_id: data.points[0].id
-      }
-
-      const res = await this.getData('get_vendors', obj)
-
-      this.setState({
-        vendors: res.vendors,
-        vendorsCopy: res.vendors,
-        point: data.points[0].id,
-      })
-
-    }
-
+   
     this.setState({
-      bill_list: res.bill_hist,
-      imgs_bill: res.bill_imgs,
-      points: data.points,
+      vendor_items: items,
+      vendor_itemsCopy: items,
+      docs: docs.billings,
+      point: point ?? [],
+      point_name: point?.name ?? '',
+      vendors: res?.vendors ?? [],
+      vendor_name: res?.vendors[0]?.name ?? '',
+      bill_list: res?.bill_hist,
+      imgs_bill: res?.bill_imgs,
       allPrice,
       allPrice_w_nds,
-      is_load: false,
-      bill: res.bill,
+      bill: res?.bill,
       bill_items,
       number: res.bill?.number,
       date: res.bill?.date && res.bill?.date !== "0000-00-00" ? dayjs(res.bill?.date) : null,
       date_items: res.bill?.date_items ? dayjs(res.bill?.date_items) : null,
       comment: res.bill?.comment,
-      users: res.users,
-      user: res.bill_users,
+      users: res?.users,
+      user: res?.bill_users,
+      types: types,
+      is_load: false,
       //
-      types: edit.sorts,
       kinds: edit.kinds,
     });
 
@@ -2410,56 +2569,6 @@ class Billing_Edit_ extends React.Component {
   async search(type, event, value) {
 
     const search = event.target.value ? event.target.value : value ? value : '';
-
-    if (type === 'search_vendor') {
-
-      const vendorsCopy = this.state.vendorsCopy;
-
-      const vendors = vendorsCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
-
-      if (search && vendors.length) {
-
-        const point = this.state.point;
-
-        const data = {
-          point_id: point.id,
-          vendor_id: vendors[0].id
-        }
-
-        const res = await this.getData('get_vendor_items', data);
-        const docs = await this.getData('get_base_doc', data);
-
-        this.setState({
-          vendor_items: res.items,
-          vendor_itemsCopy: res.items,
-          users: res.users,
-          docs: docs.billings,
-        });
-
-      } else {
-        
-        this.setState({
-          bill_items_doc: [],
-          search_item: '',
-          vendor_items: [],
-          vendor_itemsCopy: [],
-          all_ed_izmer: [],
-          pq: '',
-          count: '',
-          fact_unit: '',
-          summ: '',
-          sum_w_nds: '',
-          docs: [],
-          doc: '',
-        });
-
-      }
-
-      this.setState({
-        search_vendor: search,
-        vendors,
-      });
-    }
 
     if (type === 'search_item') {
       const vendor_itemsCopy = JSON.parse(JSON.stringify(this.state.vendor_itemsCopy))
@@ -2562,51 +2671,7 @@ class Billing_Edit_ extends React.Component {
       });
 
     }
-
-    if (type === 'point_name') {
-      
-      const points = this.state.points;
-      const point = points.find(item => item.name === search);
-      
-      this.setState({
-        bill_items_doc: [],
-        point: point ?? '',
-        [type]: point?.name ?? '',
-        search_vendor: '',
-        search_item: '',
-        vendor_items: [],
-        vendor_itemsCopy: [],
-        all_ed_izmer: [],
-        pq: '',
-        count: '',
-        fact_unit: '',
-        summ: '',
-        sum_w_nds: '',
-        users: [],
-        docs: [],
-        doc: ''
-      });
-
-      if(point) {
-    
-          const obj = {
-            point_id: point.id
-          }
-    
-          const res = await this.getData('get_vendors', obj)
-    
-          this.setState({
-            vendors: res.vendors,
-            vendorsCopy: res.vendors,
-          })
-
-        } else {
-          this.setState({
-            vendors: [],
-            vendorsCopy: [],
-          })
-        }
-      }
+  
   }
 
   async changeSelect(data, event) {
@@ -3013,19 +3078,12 @@ class Billing_Edit_ extends React.Component {
         <Grid container spacing={3} mb={10}>
 
           <Grid item xs={12} sm={12}>
-            <h1>Редактирование документа:{' '}{this.state.number}</h1>
+            <h1>Редактирование документа:{' '}{this.state.bill?.number}</h1>
             <Divider style={{ backgroundColor: 'rgba(0, 0, 0, 0.87)' }} />
           </Grid>
           
           <Grid item xs={12} sm={4}>
-            <MyAutocomplite2
-              data={this.state.points}
-              value={this.state.point_name}
-              multiple={false}
-              func={this.search.bind(this, 'point_name')}
-              onBlur={this.search.bind(this, 'point_name')}
-              label="Точка"
-            />
+            <MyTextInput label="Точка" disabled={true} value={this.state.point_name} className='disabled_input'/>
           </Grid>
 
           <Grid item xs={12} sm={4}>
@@ -3040,15 +3098,7 @@ class Billing_Edit_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={4}>
-            <MyAutocomplite2
-              label="Поставщик"
-              freeSolo={true}
-              multiple={false}
-              data={this.state.vendors}
-              value={this.state.search_vendor}
-              func={this.search.bind(this, 'search_vendor')}
-              onBlur={this.search.bind(this, 'search_vendor')}
-            />
+            <MyTextInput label="Поставщик" disabled={true} value={this.state.vendor_name} className='disabled_input'/>
           </Grid>
 
           {parseInt(this.state.type) === 2 || parseInt(this.state.type) === 3 ? (
