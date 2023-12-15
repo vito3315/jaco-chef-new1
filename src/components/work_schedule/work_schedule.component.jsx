@@ -352,13 +352,13 @@ class WorkSchedule_Table extends React.Component {
                   </TableCell>
                   <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
 
-                  {this.props.kind == 'manager' ? null : (
+                  {this.props.kind == 'manager' || item.data.smena_id === '-1' ? null : (
                     <TableCell className="checkBox">
                       <MyCheckBox style={{ justifyContent: 'center' }} func={this.props.addUser.bind(this, item.data)} size={'small'} defaultChecked={false} />
                     </TableCell>
                   )}
 
-                  {this.props.kind == 'manager' ? null : (
+                  {this.props.kind == 'manager' || item.data.smena_id === '-1' ? null : (
                     <TableCell style={{ textAlign: 'center' }}>
                       <SyncAltIcon style={{ cursor: 'pointer', display: 'block', margin: 'auto' }} onClick={this.props.mix.bind(this, item.data)}/>
                     </TableCell>
