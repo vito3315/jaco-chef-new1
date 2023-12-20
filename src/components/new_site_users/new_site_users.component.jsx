@@ -533,11 +533,11 @@ class CatWork_ extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={3}>
-            <MyDatePickerNew label={'Дата от'} value={this.state.date_start} func={ this.changeDate.bind(this, 'date_start') } />
+            <MyDatePickerNew minDate={formatDate('2023-01-01')} label={'Дата от'} value={this.state.date_start} func={ this.changeDate.bind(this, 'date_start') } />
           </Grid>
 
           <Grid item xs={12} sm={3}>
-            <MyDatePickerNew label={'Дата до'} value={this.state.date_end} func={ this.changeDate.bind(this, 'date_end') } />
+            <MyDatePickerNew minDate={formatDate('2023-01-01')} label={'Дата до'} value={this.state.date_end} func={ this.changeDate.bind(this, 'date_end') } />
           </Grid>
 
 
