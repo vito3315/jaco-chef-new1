@@ -638,6 +638,35 @@ export function TextEditor(props){
   )
 }
 
+
+
+export class TextEditor22 extends React.PureComponent {
+  render(){
+    return (
+      <Editor
+        apiKey='r0ihgs4ukfpmudzw7aexxgb88tnx5jw26h1xx9x6409ji3gx'
+        value={this.props.value}
+        onEditorChange={this.props.func}
+        onInit={(evt, editor) => this.props.refs_.current = editor}
+        init={{
+          height: 500,
+          //menubar: false,
+          plugins: [
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+            'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+          ],
+          toolbar: 'undo redo | blocks | ' +
+            'bold italic forecolor | alignleft aligncenter ' +
+            'alignright alignjustify | bullist numlist outdent indent | ' +
+            'removeformat | link image | code | fullscreen | help',
+          content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+        }}
+      />
+    )
+  }
+}
+
 export class TextEditor11 extends React.PureComponent {
   render(){
     return (
