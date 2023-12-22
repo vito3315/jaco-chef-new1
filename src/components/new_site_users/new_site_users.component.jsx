@@ -481,8 +481,8 @@ class CatWork_ extends React.Component {
                             <TableCell>{item.point}</TableCell>
                             <TableCell>{item.new_type_order}</TableCell>
                             <TableCell>{item.date_time}</TableCell>
-                            <TableCell>{item.order_id}</TableCell>
-                            <TableCell>{item.summ}</TableCell>
+                            <TableCell>#{item.order_id}</TableCell>
+                            <TableCell>{item.summ}р.</TableCell>
                           </TableRow>
                         ) }
                       </TableBody>
@@ -550,7 +550,7 @@ class CatWork_ extends React.Component {
             <div id="chartordersD" style={{ width: "100%", height: "500px" }} />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid item xs={12} style={{ marginBottom: 100 }}>
             {this.state.svod.map( (item, key) =>
               <Accordion style={{ width: '100%' }} key={key}>
                 <AccordionSummary
@@ -561,8 +561,9 @@ class CatWork_ extends React.Component {
                 <AccordionDetails>
                   <List style={{ width: '100%' }}>
                     { item.users.map( (it, k) =>
-                      <ListItem button key={k} onClick={ this.get_user_info.bind(this, it.number) } style={{ backgroundColor: parseInt(it.count) == 1 ? '#ffba00' : '#90ee90' }}>
+                      <ListItem button key={k} onClick={ this.get_user_info.bind(this, it.number) } style={{ backgroundColor: parseInt(it.check_comment) == 1 ? '#fff' : parseInt(it.count) == 1 ? '#ffba00' : '#90ee90' }}>
                         <ListItemText primary={ it.number + ' / заказов - ' + it.count } />
+                        <span dangerouslySetInnerHTML={{__html: it.last_comment}} />
                       </ListItem>
                     ) }
                   </List>
