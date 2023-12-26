@@ -18,7 +18,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 import { TextEditor22 } from '../../stores/elements';
 
-import { MyAutocomplite, MyDatePickerNew, formatDate } from '../../stores/elements';
+import { MyAutocomplite, MyDatePickerNew, formatDate, MyAlert } from '../../stores/elements';
 
 import dayjs from 'dayjs';
 import queryString from 'query-string';
@@ -74,7 +74,11 @@ class CatWork_ extends React.Component {
       user_orders: [],
       openNumber: '',
       comments: [],
-      textComment: ''
+      textComment: '',
+
+      openAlert: false,
+      alertStatus: '',
+      alertText: ''
     };
   }
   
@@ -134,73 +138,7 @@ class CatWork_ extends React.Component {
     });
   }
    
-  openCat(item){
-    this.setState({
-      modalDialog: true,
-      showCat: item,
-      nameCat: item.name,
-      editText: item.text
-    })
-  }
-
-  async save(){
-    let data = {
-      cat_id: this.state.showCat.id,
-      name: this.state.nameCat,
-      text: this.state.showCat.text
-    };
-
-    let res = await this.getData('save_edit', data);
-
-    if( res.st === false ){
-      alert(res.text)
-    }else{
-      this.setState({ 
-        modalDialog: false, 
-        showCat: null, 
-        nameCat: '' 
-      })
-
-      //document.getElementById('EditorEdit').value = '';
-
-      res = await this.getData('get_all');
-    
-      this.setState({
-        cats: res.cats
-      })
-    }
-  }
-
-  async saveNew(){
-    let data = {
-      name: this.state.nameCatNew,
-      text: document.getElementById('EditorNew').value
-    };
-
-    let res = await this.getData('save_new', data);
-
-    if( res.st === false ){
-      alert(res.text)
-    }else{
-      this.setState({ 
-        modalDialogNew: false, 
-        editTextNew: '', 
-        nameCatNew: '' 
-      })
-
-      document.getElementById('EditorNew').value = '';
-
-      res = await this.getData('get_all');
-    
-      this.setState({
-        cats: res.cats
-      })
-    }
-  }
-
   
-
-
   changeDate(type, val){
     this.setState({
       [type]: val
@@ -385,9 +323,19 @@ class CatWork_ extends React.Component {
   async saveComment(){
 
     if(this.myRef.current) {
-      //console.log(this.myRef.current.getContent());
+      if( this.myRef.current.getContent().length == 0 ){
+        this.setState({
+          openAlert: true,
+          alertStatus: 'error',
+          alertText: 'Комментарий пустой'
+        });
+      }
     }else{
-      alert('Комментарий пустой')
+      this.setState({
+        openAlert: true,
+        alertStatus: 'error',
+        alertText: 'Комментарий пустой'
+      });
     }
 
     if( this.click === true ){
@@ -404,14 +352,41 @@ class CatWork_ extends React.Component {
     let res = await this.getData('save_comment', data);
 
     if( res.st === false ){
-      alert(res.text)
+      this.setState({
+        openAlert: true,
+        alertStatus: 'error',
+        alertText: res.text
+      });
     }else{
+      this.setState({
+        openAlert: true,
+        alertStatus: 'success',
+        alertText: 'Успешно сохранено'
+      });
+
       this.myRef.current.setContent('');
 
       this.setState({
         comments: res.comments,
       })
+
+      this.show();
     }
+
+    setTimeout( () => {
+      this.click = false;
+    }, 500 )
+  }
+
+  async savePromo(){
+    if( this.click === true ){
+      return ;
+    }else{
+      this.click = true;
+    }
+
+    let res = await this.getData('save_promo', {});
+
 
     setTimeout( () => {
       this.click = false;
@@ -425,6 +400,8 @@ class CatWork_ extends React.Component {
           <CircularProgress color="inherit" />
         </Backdrop>
         
+        <MyAlert isOpen={this.state.openAlert} onClose={ () => { this.setState({ openAlert: false }) } } status={this.state.alertStatus} text={this.state.alertText} />
+
         <Dialog
           open={this.state.modalDialogNew}
           onClose={ () => { this.setState({ modalDialogNew: false }) } }
@@ -440,6 +417,10 @@ class CatWork_ extends React.Component {
 
                 <Grid container>
                   <Grid item xs={12} sm={12}>
+                    <span>Телефон: </span>
+                    <span>{this.state.openNumber}</span>
+                  </Grid>
+                  <Grid item xs={12} sm={12} style={{ paddingTop: 12 }}>
                     <span>Имя: </span>
                     <span>{this.state.user_info?.name}</span>
                   </Grid>
@@ -512,7 +493,7 @@ class CatWork_ extends React.Component {
 
           </DialogContent>
           <DialogActions>
-            <Button color="primary" onClick={this.saveComment.bind(this)}>Добавить новый комментарий</Button>
+            <Button color="primary" variant="contained" onClick={this.saveComment.bind(this)}>Добавить новый комментарий</Button>
           </DialogActions>
         </Dialog>
         
@@ -563,7 +544,7 @@ class CatWork_ extends React.Component {
                     { item.users.map( (it, k) =>
                       <ListItem button key={k} onClick={ this.get_user_info.bind(this, it.number) } style={{ backgroundColor: parseInt(it.check_comment) == 1 ? '#fff' : parseInt(it.count) == 1 ? '#ffba00' : '#90ee90' }}>
                         <ListItemText primary={ it.number + ' / заказов - ' + it.count } />
-                        <span dangerouslySetInnerHTML={{__html: it.last_comment}} />
+                        <span style={{ maxWidth: '50%' }} dangerouslySetInnerHTML={{__html: it.last_comment}} />
                       </ListItem>
                     ) }
                   </List>
