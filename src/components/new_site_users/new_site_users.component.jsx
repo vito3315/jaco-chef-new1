@@ -32,6 +32,7 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
+import TableFooter from '@mui/material/TableFooter';
 
 import Paper from '@mui/material/Paper';
 
@@ -78,7 +79,10 @@ class CatWork_ extends React.Component {
 
       openAlert: false,
       alertStatus: '',
-      alertText: ''
+      alertText: '',
+
+      openOrder: false,
+      showOrder: null
     };
   }
   
@@ -393,6 +397,20 @@ class CatWork_ extends React.Component {
     }, 500 )
   }
 
+  async orderOpen(order_id, point_id){
+    let data = {
+      order_id,
+      point_id
+    };
+
+    let res = await this.getData('get_order', data);
+
+    this.setState({
+      showOrder: res,
+      openOrder: true
+    })
+  }
+
   render(){
     return (
       <>
@@ -401,6 +419,122 @@ class CatWork_ extends React.Component {
         </Backdrop>
         
         <MyAlert isOpen={this.state.openAlert} onClose={ () => { this.setState({ openAlert: false }) } } status={this.state.alertStatus} text={this.state.alertText} />
+
+        { !this.state.showOrder ? null : 
+          <Dialog
+            open={this.state.openOrder}
+            onClose={ () => { this.setState({ openOrder: false }) } }
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle style={{textAlign: 'center'}}>Заказ #{this.state.showOrder.order.order_id}</DialogTitle>
+            <DialogContent>
+              
+              <Grid container spacing={0}>
+                <Grid item xs={12}>
+                  <span>{this.state.showOrder.order.type_order}: {this.state.showOrder.order.type_order_addr_new}</span>
+                </Grid>
+                { parseInt(this.state.showOrder.order.type_order_) == 1 ?
+                  parseInt(this.state.showOrder.order.fake_dom) == 0 ?
+                    <Grid item xs={12}>
+                      <b style={{ color: 'red', fontWeight: 900 }}>Домофон не работает</b>
+                    </Grid>
+                      :
+                    <Grid item xs={12}>
+                      <b style={{ color: 'green', fontWeight: 900 }}>Домофон работает</b>
+                    </Grid>
+                    :
+                  null
+                }
+                <Grid item xs={12}>
+                  <span>{this.state.showOrder.order.time_order_name}: {this.state.showOrder.order.time_order}</span>
+                </Grid>
+
+                { this.state.showOrder.order.number.length > 1 ? 
+                  <Grid item xs={12}>
+                    <b>Телефон: </b> 
+                    <span>{this.state.showOrder.order.number}</span> 
+                  </Grid>
+                    : 
+                  null
+                }
+
+                { this.state.showOrder.order.delete_reason.length > 0 ? <Grid item xs={12}><span style={{ color: 'red' }}>Удален: {this.state.showOrder.order.date_time_delete}</span></Grid> : null}
+                { this.state.showOrder.order.delete_reason.length > 0 ? <Grid item xs={12}><span style={{ color: 'red' }}>{this.state.showOrder.order.delete_reason}</span></Grid> : null}
+                
+                { parseInt(this.state.showOrder.order.is_preorder) == 1 ? null :
+                  <Grid item xs={12}><span>{this.state.showOrder.order.text_time}{this.state.showOrder.order.time_to_client}</span></Grid>
+                }
+                
+                { this.state.showOrder.order.promo_name == null || this.state.showOrder.order.promo_name.length == 0 ? null :
+                  <>
+                    <Grid item xs={12}>
+                      <b>Промокод: </b>
+                      <span>{this.state.showOrder.order.promo_name}</span>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <span className="noSpace">{this.state.showOrder.order.promo_text}</span>
+                    </Grid>
+                  </>
+                }
+                
+                { this.state.showOrder.order.comment == null || this.state.showOrder.order.comment.length == 0 ? null :
+                  <Grid item xs={12}>
+                    <b>Комментарий: </b>
+                    <span>{this.state.showOrder.order.comment}</span>
+                  </Grid>
+                }
+                
+                { this.state.showOrder.order.sdacha == null || parseInt(this.state.showOrder.order.sdacha) == 0 ? null :
+                  <Grid item xs={12}>
+                    <b>Сдача: </b>
+                    <span>{this.state.showOrder.order.sdacha}</span>
+                  </Grid>
+                }
+                
+                <Grid item xs={12}>
+                  <b>Сумма заказа: </b>
+                  <span>{this.state.showOrder.order.sum_order} р</span>
+                </Grid>
+
+                { this.state.showOrder.order.check_pos_drive == null || !this.state.showOrder.order.check_pos_drive ? null :
+                  <Grid item xs={12}>
+                    <b>Довоз оформлен: </b>
+                    <span>{this.state.showOrder.order.check_pos_drive.comment}</span>
+                  </Grid>
+                }
+
+                <Grid item xs={12}>
+                  <Table size={'small'} style={{ marginTop: 15 }}>
+                    <TableBody>
+                      { this.state.showOrder.order_items.map( (item, key) =>
+                        <TableRow key={key}>
+                          <TableCell>{item.name}</TableCell>
+                          <TableCell>{item.count}</TableCell>
+                          <TableCell>{item.price} р</TableCell>
+                        </TableRow>
+                      ) }
+                    </TableBody>
+                    <TableFooter>
+                      <TableRow>
+                        <TableCell style={{fontWeight: 'bold', color: '#000'}}>Сумма закза</TableCell>
+                        <TableCell></TableCell>
+                        <TableCell style={{fontWeight: 'bold', color: '#000'}}>{this.state.showOrder.order.sum_order} р</TableCell>
+                      </TableRow>
+                    </TableFooter>
+                  </Table>
+                </Grid>
+
+                
+              </Grid>
+
+            </DialogContent>
+
+            
+
+            
+          </Dialog>
+        }
 
         <Dialog
           open={this.state.modalDialogNew}
@@ -458,7 +592,7 @@ class CatWork_ extends React.Component {
                     <Table>
                       <TableBody>
                         { this.state.user_orders.map( (item, key) =>
-                          <TableRow key={key}>
+                          <TableRow key={key} onClick={this.orderOpen.bind(this, item.order_id, item.point_id)}>
                             <TableCell>{item.point}</TableCell>
                             <TableCell>{item.new_type_order}</TableCell>
                             <TableCell>{item.date_time}</TableCell>
