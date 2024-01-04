@@ -165,7 +165,7 @@ class AppWorkPoint_ extends React.Component {
     let thisItem = allList.find( (item, key) => parseInt(item['id']) == parseInt(id) );
 
 		if( !check ){
-			thisList.push({id: id, name: name, time_min: 0, dop_time: 0, time_min: thisItem.time_min})
+			thisList.push({id: id, name: name, dop_time: 0, time_min: thisItem.time_min})
 		}
 
 		this.setState({

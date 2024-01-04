@@ -48,101 +48,98 @@ class StatTimeOrders_Table extends React.Component {
 
   render() {
     const { ItemTab, data, getDataCellOrder, getDataCellCount, getDataCellUser } = this.props;
+
     return (
-      <>
-        {!data?.hours ? null : (
-          <TabPanel value={ItemTab} style={{ padding: '24px 0' }}>
-            <TableContainer sx={{ maxHeight: { xs: 'none', sm: 1000 } }}>
-              <Table stickyHeader size="small">
-                <TableHead style={{ position: 'sticky', top: 0, zIndex: 7 }}>
-                  <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
-                    <TableCell sx={{ zIndex: 30, minWidth: 100 }}>Сотрудник</TableCell>
-                    <TableCell sx={{ zIndex: 30, minWidth: 100 }}>Должность</TableCell>
-                    {data.hours.map((item, key) => (
-                      <TableCell key={key} sx={{ zIndex: 30, minWidth: 50 }}>{item.h}</TableCell>
-                    ))}
-                    <TableCell sx={{ zIndex: 30, minWidth: 100 }}>Всего</TableCell>
-                  </TableRow>
-                </TableHead>
+      <TabPanel value={ItemTab} style={{ padding: '24px 0' }}>
+        <TableContainer sx={{ maxHeight: { xs: 'none', sm: 1000 } }}>
+          <Table stickyHeader size="small">
+            <TableHead style={{ position: 'sticky', top: 0, zIndex: 7 }}>
+              <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
+                <TableCell sx={{ zIndex: 30, minWidth: 100 }}>Сотрудник</TableCell>
+                <TableCell sx={{ zIndex: 30, minWidth: 100 }}>Должность</TableCell>
+                {data?.hours.map((item, key) => (
+                  <TableCell key={key} sx={{ zIndex: 30, minWidth: 50 }}>{item.h}</TableCell>
+                ))}
+                <TableCell sx={{ zIndex: 30, minWidth: 100 }}>Всего</TableCell>
+              </TableRow>
+            </TableHead>
 
-                <TableBody>
-                  {data.users.map((item, key) => (
-                    <TableRow key={key} hover>
-                      <TableCell
-                        style={{ backgroundColor: ItemTab === '1' ? item.my_color_day ? this.checkColor(item.my_color_day) : null : null,
-                        }}
-                      >
-                        {item.user_name}
-                      </TableCell>
-                      <TableCell style={{ borderRight: '1px solid #e5e5e5' }}>
-                        {item.app_name}{' '}{ItemTab === '1' ? item?.new_app_name ? `(${item?.new_app_name})` : null : null}
-                      </TableCell>
-                      {data.hours.map((it) => getDataCellUser(it.h, item.user_id, key))}
-                      <TableCell sx={{ fontWeight: 'bold' }}>
-                        {ItemTab === '1' ? item.all_time_all
-                          : ItemTab === '2' ? item.povar_time_all
-                          : ItemTab === '3' ? item.kassir_time_all
-                          : ItemTab === '4' ? item.work_time_all
-                          : ItemTab === '5' ? item.pf_work_time_all
-                          : null}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+            <TableBody>
+              {data?.users.map((item, key) => (
+                <TableRow key={key} hover>
+                  <TableCell
+                    style={{ backgroundColor: ItemTab === '1' ? item.my_color_day ? this.checkColor(item.my_color_day) : null : null,
+                    }}
+                  >
+                    {item.user_name}
+                  </TableCell>
+                  <TableCell style={{ borderRight: '1px solid #e5e5e5' }}>
+                    {item.app_name}{' '}{ItemTab === '1' ? item?.new_app_name ? `(${item?.new_app_name})` : null : null}
+                  </TableCell>
+                  {data?.hours.map((it) => getDataCellUser(it.h, item.user_id, key))}
+                  <TableCell sx={{ fontWeight: 'bold' }}>
+                    {ItemTab === '1' ? item.all_time_all
+                      : ItemTab === '2' ? item.povar_time_all
+                      : ItemTab === '3' ? item.kassir_time_all
+                      : ItemTab === '4' ? item.work_time_all
+                      : ItemTab === '5' ? item.pf_work_time_all
+                      : null}
+                  </TableCell>
+                </TableRow>
+              ))}
+
+              <TableRow>
+                <TableCell sx={{ border: 'none' }}></TableCell>
+                <TableCell sx={{ fontWeight: 'bold', border: 'none' }}>Загруженность</TableCell>
+                {data?.hours.map((item, key) => (
+                  <TableCell key={key} sx={{ fontWeight: 'bold', border: 'none' }}>
+                    {ItemTab === '1' ? item?.all_time_h
+                      : ItemTab === '2' ? item?.povar_time_h
+                      : ItemTab === '3' ? item?.kassir_time_h
+                      : ItemTab === '4' ? item?.work_time_h
+                      : ItemTab === '5' ? item?.pf_work_time_h
+                      : null}
+                  </TableCell>
+                ))}
+                <TableCell sx={{ fontWeight: 'bold', border: 'none' }}>
+                  {ItemTab === '1' ? data?.all_load_time
+                    : ItemTab === '2' ? data?.all_povar_time
+                    : ItemTab === '3' ? data?.all_kassit_time
+                    : ItemTab === '4' ? data?.all_work_time
+                    : ItemTab === '5' ? data?.all_pf_work_time
+                    : null}
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell sx={{ border: 'none' }}></TableCell>
+                <TableCell sx={{ fontWeight: 'bold', border: 'none' }}>Заказов</TableCell>
+                {data?.hours.map((item, key) => getDataCellOrder(item.h, key))}
+                <TableCell sx={{ fontWeight: 'bold', border: 'none' }}>{data?.full_time_orders}</TableCell>
+              </TableRow>
+
+              {ItemTab === '2' ? (
+                <>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none' }}></TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', border: 'none' }}>Сотрудников</TableCell>
+                    {data?.hours.map((item, key) => getDataCellCount(item.h, key))}
+                    <TableCell sx={{ fontWeight: 'bold', border: 'none' }}>{data?.full_time_orders}</TableCell>
+                  </TableRow>
 
                   <TableRow>
                     <TableCell sx={{ border: 'none' }}></TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', border: 'none' }}>Загруженность</TableCell>
-                    {data.hours.map((item, key) => (
-                      <TableCell key={key} sx={{ fontWeight: 'bold', border: 'none' }}>
-                        {ItemTab === '1' ? item.all_time_h
-                          : ItemTab === '2' ? item.povar_time_h
-                          : ItemTab === '3' ? item.kassir_time_h
-                          : ItemTab === '4' ? item.work_time_h
-                          : ItemTab === '5' ? item.pf_work_time_h
-                          : null}
-                      </TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', border: 'none' }}>Задержка кухни</TableCell>
+                    {data?.hours.map((item, key) => (
+                      <TableCell key={key} sx={{ fontWeight: 'bold', border: 'none' }}>{item.wait}</TableCell>
                     ))}
-                    <TableCell sx={{ fontWeight: 'bold', border: 'none' }}>
-                      {ItemTab === '1' ? data.all_load_time
-                        : ItemTab === '2' ? data.all_povar_time
-                        : ItemTab === '3' ? data.all_kassit_time
-                        : ItemTab === '4' ? data.all_work_time
-                        : ItemTab === '5' ? data.all_pf_work_time
-                        : null}
-                    </TableCell>
                   </TableRow>
-
-                  <TableRow>
-                    <TableCell sx={{ border: 'none' }}></TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', border: 'none' }}>Заказов</TableCell>
-                    {data.hours.map((item, key) => getDataCellOrder(item.h, key))}
-                    <TableCell sx={{ fontWeight: 'bold', border: 'none' }}>{data.full_time_orders}</TableCell>
-                  </TableRow>
-
-                  {ItemTab === '2' ? (
-                    <>
-                      <TableRow>
-                        <TableCell sx={{ border: 'none' }}></TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', border: 'none' }}>Сотрудников</TableCell>
-                        {data.hours.map((item, key) => getDataCellCount(item.h, key))}
-                        <TableCell sx={{ fontWeight: 'bold', border: 'none' }}>{data.full_time_orders}</TableCell>
-                      </TableRow>
-
-                      <TableRow>
-                        <TableCell sx={{ border: 'none' }}></TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', border: 'none' }}>Задержка кухни</TableCell>
-                        {data.hours.map((item, key) => (
-                          <TableCell key={key} sx={{ fontWeight: 'bold', border: 'none' }}>{item.wait}</TableCell>
-                        ))}
-                      </TableRow>
-                    </>
-                  ) : null}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </TabPanel>
-        )}
-      </>
+                </>
+              ) : null}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </TabPanel>
     );
   }
 }

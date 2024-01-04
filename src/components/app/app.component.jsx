@@ -246,75 +246,69 @@ class Header extends React.Component {
           </Toolbar>
         </AppBar>
         
-        
-        <React.Fragment >
-          <SwipeableDrawer
-            anchor={'left'}
-            open={ this.state.open }
-            onClose={ () => { this.setState({ open: false }) } }
-            onOpen={ () => { this.setState({ open: true }) } }
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: 10 }}>
+        <SwipeableDrawer
+          anchor={'left'}
+          open={ this.state.open }
+          onClose={ () => { this.setState({ open: false }) } }
+          onOpen={ () => { this.setState({ open: true }) } }
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: 10 }}>
+          
+            <Autocomplete
+              size="small"
+              options={this.state.full_menu}
+              getOptionLabel={(option) => option.name}
+              onChange={(event, newValue) => {
+                if( newValue ){
+                  window.location.pathname = "/"+newValue.key_query+"/";
+                }
+              }}
+              style={{ width: 300 }}
+              renderInput={(params) => <TextField {...params} label="Поиск" variant="outlined" />}
+            />
             
-              <Autocomplete
-                size="small"
-                options={this.state.full_menu}
-                getOptionLabel={(option) => option.name}
-                onChange={(event, newValue) => {
-                  if( newValue ){
-                    window.location.pathname = "/"+newValue.key_query+"/";
-                  }
-                }}
-                style={{ width: 300 }}
-                renderInput={(params) => <TextField {...params} label="Поиск" variant="outlined" />}
-              />
-              
-              <IconButton onClick={this.handleDrawerClose.bind(this)}>
-                <ChevronLeftIcon />
-              </IconButton>
-            </div>
-            <Divider />
-            
-            { this.state.menu.map( (item, key) =>
-              <Accordion key={key} >
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                  id="panel1a-header"
-                >
-                  <Typography>{ item.parent.name }</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  
-                  <List style={{ width: '100%' }}>
-                  
-                    { item.chaild.map( (it, k) =>
-                      <ListItem button key={k}>
-                        <Link to={"/"+it.key_query+"/"}>
-                          <ListItemText primary={ it.name } />
-                        </Link>
-                      </ListItem>
-                    ) }
-                  
-                  </List>
-                  
-                </AccordionDetails>
-              </Accordion>
-            ) }
-
-            
-
-            <Accordion>
-              <AccordionSummary onClick={this.logOut.bind(this)}>
-                <Typography>Выйти из аккаунта</Typography>
+            <IconButton onClick={this.handleDrawerClose.bind(this)}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </div>
+          <Divider />
+          
+          { this.state.menu.map( (item, key) =>
+            <Accordion key={key} >
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+              >
+                <Typography>{ item.parent.name }</Typography>
               </AccordionSummary>
+              <AccordionDetails>
+                
+                <List style={{ width: '100%' }}>
+                
+                  { item.chaild.map( (it, k) =>
+                    <ListItem button key={k}>
+                      <Link to={"/"+it.key_query+"/"}>
+                        <ListItemText primary={ it.name } />
+                      </Link>
+                    </ListItem>
+                  ) }
+                
+                </List>
+                
+              </AccordionDetails>
             </Accordion>
+          ) }
 
-          </SwipeableDrawer>
-        </React.Fragment>
-        
-        
-        
+          
+
+          <Accordion>
+            <AccordionSummary onClick={this.logOut.bind(this)}>
+              <Typography>Выйти из аккаунта</Typography>
+            </AccordionSummary>
+          </Accordion>
+
+        </SwipeableDrawer>
       </>
     )
   }

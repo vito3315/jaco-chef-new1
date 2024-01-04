@@ -1088,11 +1088,9 @@ class SiteSale2_new_ extends React.Component {
             </Grid>
             
             { parseInt(this.state.promo_conditions) !== 1 ? null :
-              <>
-                <Grid item xs={12} sm={8}>
-                  <MyAutocomplite data={this.state.items} value={this.state.conditionItems} func={ (event, data) => { this.changeDataData('conditionItems', data) } } multiple={true} label='Товары' />
-                </Grid>
-              </>
+              <Grid item xs={12} sm={8}>
+                <MyAutocomplite data={this.state.items} value={this.state.conditionItems} func={ (event, data) => { this.changeDataData('conditionItems', data) } } multiple={true} label='Товары' />
+              </Grid>
             }
             
             { parseInt(this.state.promo_conditions) !== 2 ? null :
@@ -1932,11 +1930,9 @@ class SiteSale2_edit_ extends React.Component {
             </Grid>
             
             { parseInt(this.state.promo_conditions) !== 1 ? null :
-              <>
-                <Grid item xs={12} sm={8}>
-                  <MyAutocomplite data={this.state.items} value={this.state.conditionItems} func={ (event, data) => { this.changeDataData('conditionItems', data) } } multiple={true} label='Товары' />
-                </Grid>
-              </>
+              <Grid item xs={12} sm={8}>
+                <MyAutocomplite data={this.state.items} value={this.state.conditionItems} func={ (event, data) => { this.changeDataData('conditionItems', data) } } multiple={true} label='Товары' />
+              </Grid>
             }
             
             { parseInt(this.state.promo_conditions) !== 2 ? null :

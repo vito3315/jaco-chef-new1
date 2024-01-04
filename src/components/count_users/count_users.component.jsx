@@ -480,137 +480,135 @@ class CountUsers_TablePanel extends React.Component {
 
   render() {
     return (
-      <>
-        <TabPanel value={this.props.value}>
-          <Grid container justifyContent="center">
-            {this.state.item.map((item, key) => (
-              <Grid
-                container
-                spacing={3}
-                key={key}
-                sx={{ borderBottom: 1, borderColor: 'divider' }}
-                item
-                sm={8}
-              >
-                <Grid item xs={8} sm={3} mt={2}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-around',
-                      height: '100%',
-                      minHeight: 120,
-                    }}
-                  >
-                    <MyTimePicker
-                      value={item.time_start}
-                      func={this.changeTimeStart.bind(this, item)}
-                      label="Время начала"
-                    />
-                    <MyTimePicker
-                      value={item.time_end}
-                      func={this.changeTimeEnd.bind(this, item)}
-                      label="Время окончания"
-                    />
-                  </div>
-                </Grid>
-                <Grid
-                  item
-                  xs={4}
-                  sm={0}
-                  sx={{
-                    display: { xs: 'flex', sm: 'none' },
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <CloseIcon
-                    fontSize="large"
-                    onClick={this.deleteItem.bind(this, item.id)}
-                    style={{ cursor: 'pointer' }}
-                  />
-                </Grid>
-
-                <Grid item sm={6}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      height: '100%',
-                    }}
-                  >
-                    {item.apps.map((el, i) => (
-                      <div
-                        key={i + 10}
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginBottom: 20,
-                          marginTop: i === 0 ? 20 : 0,
-                        }}
-                      >
-                        <span style={{ minWidth: 200 }}>{el.app_name}</span>
-                        <MyTextInput
-                          value={el.count}
-                          type="number"
-                          func={this.changeItem.bind(this, el, item)}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </Grid>
-
-                <Grid
-                  item
-                  xs={4}
-                  sm={3}
-                  sx={{
-                    display: { xs: 'none', sm: 'flex' },
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <CloseIcon
-                    fontSize="large"
-                    onClick={this.deleteItem.bind(this, item.id)}
-                    style={{ cursor: 'pointer' }}
-                  />
-                </Grid>
-              </Grid>
-            ))}
-
+      <TabPanel value={this.props.value}>
+        <Grid container justifyContent="center">
+          {this.state.item.map((item, key) => (
             <Grid
-              item
-              sm={8}
               container
               spacing={3}
-              sx={{ marginBottom: { xs: 0, sm: 3 }, marginTop: 1 }}
+              key={key}
+              sx={{ borderBottom: 1, borderColor: 'divider' }}
+              item
+              sm={8}
             >
-              <Grid item xs={6} sm={9}>
-                <Button
-                  variant="contained"
-                  style={{ whiteSpace: 'nowrap' }}
-                  onClick={this.addItem.bind(this)}
+              <Grid item xs={8} sm={3} mt={2}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-around',
+                    height: '100%',
+                    minHeight: 120,
+                  }}
                 >
-                  Добавить
-                </Button>
+                  <MyTimePicker
+                    value={item.time_start}
+                    func={this.changeTimeStart.bind(this, item)}
+                    label="Время начала"
+                  />
+                  <MyTimePicker
+                    value={item.time_end}
+                    func={this.changeTimeEnd.bind(this, item)}
+                    label="Время окончания"
+                  />
+                </div>
+              </Grid>
+              <Grid
+                item
+                xs={4}
+                sm={0}
+                sx={{
+                  display: { xs: 'flex', sm: 'none' },
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <CloseIcon
+                  fontSize="large"
+                  onClick={this.deleteItem.bind(this, item.id)}
+                  style={{ cursor: 'pointer' }}
+                />
               </Grid>
 
-              <Grid item xs={6} sm={3}>
-                <Button
-                  variant="contained"
-                  onClick={this.save.bind(this)}
-                  style={{ backgroundColor: '#00a550', whiteSpace: 'nowrap' }}
+              <Grid item sm={6}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    height: '100%',
+                  }}
                 >
-                  Сохранить
-                </Button>
+                  {item.apps.map((el, i) => (
+                    <div
+                      key={i + 10}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginBottom: 20,
+                        marginTop: i === 0 ? 20 : 0,
+                      }}
+                    >
+                      <span style={{ minWidth: 200 }}>{el.app_name}</span>
+                      <MyTextInput
+                        value={el.count}
+                        type="number"
+                        func={this.changeItem.bind(this, el, item)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </Grid>
+
+              <Grid
+                item
+                xs={4}
+                sm={3}
+                sx={{
+                  display: { xs: 'none', sm: 'flex' },
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <CloseIcon
+                  fontSize="large"
+                  onClick={this.deleteItem.bind(this, item.id)}
+                  style={{ cursor: 'pointer' }}
+                />
               </Grid>
             </Grid>
+          ))}
+
+          <Grid
+            item
+            sm={8}
+            container
+            spacing={3}
+            sx={{ marginBottom: { xs: 0, sm: 3 }, marginTop: 1 }}
+          >
+            <Grid item xs={6} sm={9}>
+              <Button
+                variant="contained"
+                style={{ whiteSpace: 'nowrap' }}
+                onClick={this.addItem.bind(this)}
+              >
+                Добавить
+              </Button>
+            </Grid>
+
+            <Grid item xs={6} sm={3}>
+              <Button
+                variant="contained"
+                onClick={this.save.bind(this)}
+                style={{ backgroundColor: '#00a550', whiteSpace: 'nowrap' }}
+              >
+                Сохранить
+              </Button>
+            </Grid>
           </Grid>
-        </TabPanel>
-      </>
+        </Grid>
+      </TabPanel>
     );
   }
 }

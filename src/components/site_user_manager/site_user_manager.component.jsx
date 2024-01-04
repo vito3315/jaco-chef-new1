@@ -59,7 +59,7 @@ class SiteUserManagerTable extends React.Component{
                                 <TableCell>{key + 1}</TableCell>
                                 <TableCell>
                                     {item['img_name'] === null ? null :
-                                        <img src={'https://storage.yandexcloud.net/user-img/min-img/' + item['img_name'] + '?' + item['img_update']} style={{ maxWidth: 100, maxHeight: 100 }} />
+                                        <img alt={item.name} src={'https://storage.yandexcloud.net/user-img/min-img/' + item['img_name'] + '?' + item['img_update']} style={{ maxWidth: 100, maxHeight: 100 }} />
                                     }
                                 </TableCell>
                                 <TableCell>{item.login}</TableCell>
@@ -705,7 +705,7 @@ class SiteUserManager_ extends React.Component {
                         <Grid container spacing={3}>
 
                             {this.state.editUser && this.state.modalUserEdit ?
-                                <>
+                                
                                     <Grid item xs={12}>
 
                                         <Grid container spacing={3}>
@@ -738,7 +738,7 @@ class SiteUserManager_ extends React.Component {
                                             <Grid item xs={12}>
                                                 <Grid container spacing={3}>
                                                     <Grid item xs={12} sm={6}>
-                                                        <img src={'https://storage.yandexcloud.net/user-img/max-img/' + this.state.editUser.user['img_name'] + '?' + this.state.editUser.user['img_update']} style={{ maxWidth: 300, maxHeight: 300 }} />
+                                                        <img alt={this.state.editUser.user['img_name']} src={'https://storage.yandexcloud.net/user-img/max-img/' + this.state.editUser.user['img_name'] + '?' + this.state.editUser.user['img_update']} style={{ maxWidth: 300, maxHeight: 300 }} />
                                                     </Grid>
                                                     <Grid item xs={12} sm={6}>
                                                         <div className="dropzone" id="for_img_edit" style={{ width: '100%', minHeight: 150 }} />
@@ -817,7 +817,7 @@ class SiteUserManager_ extends React.Component {
 
                                     </Grid>
 
-                                </>
+                                
                                 :
                                 null
                             }
@@ -841,7 +841,7 @@ class SiteUserManager_ extends React.Component {
                         <Grid container spacing={3}>
 
                             {this.state.editUser && this.state.modalUserNew ?
-                                <>
+                                
                                     <Grid item xs={12}>
 
                                         <Grid container spacing={3}>
@@ -874,7 +874,7 @@ class SiteUserManager_ extends React.Component {
                                             <Grid item xs={12}>
                                                 <Grid container spacing={3}>
                                                     <Grid item xs={12} sm={6}>
-                                                        <img src={'https://storage.yandexcloud.net/user-img/max-img/' + this.state.editUser.user['img_name'] + '?' + this.state.editUser.user['img_update']} style={{ maxWidth: 300, maxHeight: 300 }} />
+                                                        <img alt={this.state.editUser.user['img_name']} src={'https://storage.yandexcloud.net/user-img/max-img/' + this.state.editUser.user['img_name'] + '?' + this.state.editUser.user['img_update']} style={{ maxWidth: 300, maxHeight: 300 }} />
                                                     </Grid>
                                                     <Grid item xs={12} sm={6}>
                                                         <div className="dropzone" id="for_img_new" style={{ width: '100%', minHeight: 150 }} />
@@ -917,7 +917,7 @@ class SiteUserManager_ extends React.Component {
 
                                     </Grid>
 
-                                </>
+                                
                                 :
                                 null
                             }

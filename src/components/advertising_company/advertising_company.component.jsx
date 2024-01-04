@@ -151,7 +151,6 @@ class AdvertisingCompany_ extends React.Component {
       date_start  : dayjs(this.state.date_start).format('YYYY-MM-DD'),
       date_end    : dayjs(this.state.date_end).format('YYYY-MM-DD'),
       is_active   : this.state.is_active,
-      id          : this.state.id,
       description : this.state.description,
       promo       : this.state.promo,
     };

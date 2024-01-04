@@ -74,7 +74,7 @@ class СafeUprEdit_ extends React.Component {
 
       phone_upr           : '',
       phone_man           : '',
-      summ_driver         : '',
+      
       id                  : 0,
       is_active           : 0,
       points_list         : [],
