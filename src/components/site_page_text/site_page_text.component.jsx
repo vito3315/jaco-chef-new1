@@ -30,39 +30,6 @@ import {
 
 import queryString from 'query-string';
 
-function App() {
-  const editorRef = useRef(null);
-  const log = () => {
-    if (editorRef.current) {
-      console.log(editorRef.current.getContent());
-    }
-  };
-  return (
-    <>
-      <Editor
-        apiKey='qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc'
-        onInit={(evt, editor) => editorRef.current = editor}
-        initialValue=""
-        init={{
-          height: 500,
-          //menubar: false,
-          plugins: [
-            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'fonts', 'font size',
-            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-          ],
-          toolbar: 'undo redo | blocks | fonts | font size | ' +
-            'bold italic forecolor | alignleft aligncenter ' +
-            'alignright alignjustify | bullist numlist outdent indent | ' +
-            'removeformat | link image | code | fullscreen | help',
-          content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-        }}
-      />
-      <button onClick={log}>Log editor content</button>
-    </>
-  );
-}
-
 class SitePageText_Modal extends React.Component {
   constructor(props) {
     super(props);

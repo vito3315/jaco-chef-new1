@@ -124,7 +124,7 @@ const JobDescriptions = React.lazy(() => import("../job_descriptions"));
 const ReceptModuleNew = React.lazy(() => import("../recept_module_new"));
 
 const NewSiteUsers = React.lazy(() => import("../new_site_users"));
-
+const DriverStatTime = React.lazy(() => import("../driver_stat_time"));
 
 
 import { SiteSaleMin, SiteSaleMin_New, SiteSaleMin_Edit, SiteSaleMin_StatList } from '../site_sale_min';
@@ -467,6 +467,7 @@ export function App () {
                   <Route path={'/recept_module_new'} exact={ true } element={ <ReceptModuleNew /> } />
 
                   <Route path={'/new_site_users'} exact={ true } element={ <NewSiteUsers /> } />
+                  <Route path={'/driver_stat_time'} exact={ true } element={ <DriverStatTime /> } />
 
 
                   <Route

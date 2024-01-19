@@ -41,7 +41,7 @@ import queryString from 'query-string';
 import ReactPanZoom from 'react-image-pan-zoom-rotate';
 import dayjs from 'dayjs';
 
-import { view, edit } from './data'; //  для тестов
+//import { view, edit } from './data'; //  для тестов
 
 const bill_status = [
   {
@@ -127,6 +127,43 @@ const types = [
     "id": "4"
   },
 ]
+
+function getOrientation(file, callback) {
+	var reader = new FileReader();
+  
+	reader.onload = function(event) {
+    var view = new DataView(event.target.result);
+
+    if (view.getUint16(0, false) != 0xFFD8) return callback(-2);
+
+    var length = view.byteLength,
+      offset = 2;
+
+    while (offset < length) {
+    var marker = view.getUint16(offset, false);
+    offset += 2;
+
+    if (marker == 0xFFE1) {
+      if (view.getUint32(offset += 2, false) != 0x45786966) {
+        return callback(-1);
+      }
+        var little = view.getUint16(offset += 6, false) == 0x4949;
+        offset += view.getUint32(offset + 4, little);
+        var tags = view.getUint16(offset, little);
+        offset += 2;
+  
+        for (var i = 0; i < tags; i++)
+        if (view.getUint16(offset + (i * 12), little) == 0x0112)
+            return callback(view.getUint16(offset + (i * 12) + 8, little));
+			}else if ((marker & 0xFF00) != 0xFF00) break;
+			else offset += view.getUint16(offset, false);
+		}
+		  
+	  return callback(-1);
+	};
+  
+	reader.readAsArrayBuffer(file.slice(0, 64 * 1024));
+};
 
 // модалка просмотра фото/картинок документов на страницах Новая / Просмотр / Редактирование накладной
 class Billing_Modal extends React.Component {
@@ -1117,12 +1154,13 @@ class Billing_New_ extends React.Component {
   dropzoneOptions = {
     autoProcessQueue: false,
     autoQueue: true,
-    maxFiles: 1,
+    maxFiles: 10,
     timeout: 0,
     parallelUploads: 10,
     acceptedFiles: 'image/jpeg,image/png',
     addRemoveLinks: true,
-    url: 'https://jacochef.ru/src/img/site_aktii/upload_img.php',
+    addRotateLinks: true,
+    url: 'https://jacochef.ru/src/img/billing_items/upload.php',
   };
 
   myDropzone = null;
@@ -1184,7 +1222,6 @@ class Billing_New_ extends React.Component {
 
       comment: '',
 
-      bill_list: [],
       vendor: null,
       bill: null,
       imgs_bill: [],
@@ -1199,6 +1236,8 @@ class Billing_New_ extends React.Component {
       image: '',
 
       is_new_doc: 0,
+
+      DropzoneDop: null
     };
   }
 
@@ -1209,12 +1248,11 @@ class Billing_New_ extends React.Component {
       module_name: 'Новый документ',
       points: data.points,
       types: types,
-      //
-      kinds: edit.kinds,
     });
 
     //document.title = data.module_info.name;
-    document.title = 'Накладные';
+
+    this.myDropzone = new Dropzone("#img_bill", this.dropzoneOptions);
   }
 
   getData = (method, data = {}) => {
@@ -1370,7 +1408,6 @@ class Billing_New_ extends React.Component {
         
         this.setState({
           bill_items: [],
-          bill_items_doc: [],
           search_item: '',
           vendor_items: res.items,
           vendor_itemsCopy: res.items,
@@ -1475,41 +1512,87 @@ class Billing_New_ extends React.Component {
 
     const value = event.target.value;
     
+    if(data === 'type' && (parseInt(value) === 3 || parseInt(value) === 2)) {
+      let kinds = [];
+
+      if( parseInt(value) === 2 ){
+        kinds = [
+          {
+            "name": "Накладная",
+            "id": "1"
+          },
+          {
+            "name": "УПД",
+            "id": "2"
+          },
+        ];
+      }else{
+        kinds = [
+          {
+            "name": "Накладная",
+            "id": "1"
+          },
+          {
+            "name": "УКД",
+            "id": "2"
+          },
+        ];
+      }
+
+      this.setState({
+        kinds,
+      });
+    }
+
     if(data === 'type' && (parseInt(value) === 1 || parseInt(value) === 2)) {
 
       const point = this.state.point;
       const vendors = this.state.vendors;
 
-        if(point && vendors.length === 1) {
+      if(point && vendors.length === 1) {
 
-          const data = {
-            point_id: point.id,
-            vendor_id: vendors[0]?.id
-          }
-          
-          const res = await this.getData('get_vendor_items', data);
-          
-          this.setState({
-            bill_items: [],
-            bill_items_doc: [],
-            vendor_items: res.items,
-            vendor_itemsCopy: res.items,
-            users: res.users,
-            search_item: '',
-            all_ed_izmer: [],
-            pq: '',
-            count: '',
-            fact_unit: '',
-            summ: '',
-            sum_w_nds: '',
-            doc: '',
-          });
+        const data = {
+          point_id: point.id,
+          vendor_id: vendors[0]?.id
         }
+        
+        const res = await this.getData('get_vendor_items', data);
+        
+        this.setState({
+          bill_items: [],
+          bill_items_doc: [],
+          vendor_items: res.items,
+          vendor_itemsCopy: res.items,
+          users: res.users,
+          search_item: '',
+          all_ed_izmer: [],
+          pq: '',
+          count: '',
+          fact_unit: '',
+          summ: '',
+          sum_w_nds: '',
+          doc: '',
+          kinds: []
+        });
+      }
     }
 
     this.setState({
       [data]: value,
     });
+
+    if(data === 'type' && parseInt(value) === 2){
+      setTimeout( () => {
+        this.setState({
+          DropzoneDop: new Dropzone("#img_bill_type", this.dropzoneOptions)
+        })
+      }, 500 )
+      
+    }else{
+      this.setState({
+        DropzoneDop: null
+      })
+    }
   }
 
   changeInput(type, event) {
@@ -1800,6 +1883,49 @@ class Billing_New_ extends React.Component {
     });
   }
 
+  save_main_img(dropzone, point_id, bill_id){
+    if( dropzone && dropzone['files'].length > 0 ){
+      let i = 0;
+
+      dropzone.on("sending", (file, xhr, data) => {
+        let file_type = (file.name).split('.');
+        file_type = file_type[file_type.length - 1];
+        file_type = file_type.toLowerCase();
+        
+        i ++;
+        data.append("filetype", 'bill_file_'+i+'_point_id_'+point_id+'_bill_id_'+bill_id+'.'+file_type);
+
+        getOrientation(file, function(orientation) {
+          data.append("orientation", orientation);
+        })
+      });
+  
+      //6304
+      return dropzone.on("queuecomplete", (data) => {
+        var check_img = false;
+  
+        dropzone['files'].map((item, key) => {  
+          if( item['status'] == "error" ){
+            check_img = true;
+          }
+
+          
+        })
+        
+        if( check_img ){
+          return {
+            st: false,
+            text: 'Ошибка при загрузке фотографии'
+          };
+        }else{
+          return {
+            st: true
+          };
+        }
+      })
+    }
+  }
+
   async saveNewBill () {
     const {number, point, vendors, date, number_factur, date_factur, type, doc, doc_base_id, date_items, user, comment, is_new_doc, bill_items} = this.state;
 
@@ -1816,6 +1942,7 @@ class Billing_New_ extends React.Component {
       it.item_id = item.id;
       it.summ = item.price_item;
       it.summ_w_nds = item.price_w_nds;
+      it.color = item.color;
 
       const nds = item.nds.split(' %')[0];
 
@@ -1825,10 +1952,35 @@ class Billing_New_ extends React.Component {
         it.nds = nds;
       }
 
-      newItems = [...newItems,...[it]];
+      newItems.push(it);
 
       return newItems;
     }, [])
+
+    if( this.myDropzone ){
+      console.log( 'main', this.myDropzone.files )
+      if( this.myDropzone.files.length == 0 ){
+        this.setState({
+          operAlert: true,
+          err_status: false,
+          err_text: 'Нет изображения накладной',
+        });
+
+        return ;
+      }
+    }
+
+    if( parseInt(type) == 2 ){
+      if( !this.state.DropzoneDop || this.state.DropzoneDop.files.length == 0 ){
+        this.setState({
+          operAlert: true,
+          err_status: false,
+          err_text: 'Нет изображения счет фактуры',
+        });
+
+        return ;
+      }
+    }
 
     const data = {
       doc,
@@ -1844,8 +1996,10 @@ class Billing_New_ extends React.Component {
       date_items: dateItems,
       date_factur: dateFactur,
       point_id: point?.id ?? '',
-      vendor_id: vendors.length === 1 ? vendors[0]?.id : ''
+      vendor_id: vendors.length === 1 ? vendors[0]?.id : '',
     }
+
+    console.log( this.myDropzone.files.length )
 
     console.log('saveNewBill data', data);
 
@@ -2031,22 +2185,18 @@ class Billing_New_ extends React.Component {
           <Grid item xs={12} sm={parseInt(this.state.type) === 2 ? 6 : 12}>
             <div
               className="dropzone"
-              id="for_img_edit"
+              id="img_bill"
               style={{ width: '100%', minHeight: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >
-              <span>Выбери документ для загрузки</span>
-            </div>
+            />
           </Grid>
 
           {parseInt(this.state.type) === 2 && !this.state.fullScreen ? (
             <Grid item xs={12} sm={6}>
               <div
                 className="dropzone"
-                id="for_img_edit"
+                id="img_bill_type"
                 style={{ width: '100%', minHeight: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <span>Выбери счет-фактуру для загрузки</span>
-              </div>
+              />
             </Grid>
           ) : null}
 
@@ -2091,11 +2241,9 @@ class Billing_New_ extends React.Component {
               <Grid item xs={12}>
                 <div
                   className="dropzone"
-                  id="for_img_edit"
+                  id="img_bill_type"
                   style={{ width: '100%', minHeight: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                >
-                  <span>Выбери счет-фактуру для загрузки</span>
-                </div>
+                />
               </Grid>
             </>
            : null
@@ -2620,7 +2768,6 @@ class Billing_Edit_ extends React.Component {
         const res = await this.getData('get_base_doc_data', obj);
         
         this.setState({
-          bill_items_doc: [],
           search_item: '',
           vendor_items: res.items,
           vendor_itemsCopy: res.items,
@@ -3027,7 +3174,7 @@ class Billing_Edit_ extends React.Component {
         it.nds = nds;
       }
 
-      newItems = [...newItems,...[it]];
+      newItems.push([it]);
 
       return newItems;
     }, [])
