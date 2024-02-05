@@ -41,7 +41,114 @@ import queryString from 'query-string';
 import ReactPanZoom from 'react-image-pan-zoom-rotate';
 import dayjs from 'dayjs';
 
-//import { view, edit } from './data'; //  для тестов
+import { create } from 'zustand'
+
+const useStore = create((set, get) => ({
+  isPink: false,
+  setPink: () => set((state) => ({ isPink: !state.isPink })),
+
+  vendor_items: [],
+  search_item: '',
+  vendor_itemsCopy: [],
+
+  all_ed_izmer: [],
+
+  pq: '',
+  count: '',
+  fact_unit: '',
+  summ: '',
+  sum_w_nds: '',
+
+  allPrice: 0,
+  allPrice_w_nds: 0,
+
+  bill_items_doc: [],
+
+  bill_items: [],
+
+
+  setData: (...props) => {
+
+    set(
+      ...props
+    )
+  },
+
+  search: (name) => {
+
+    const vendor_itemsCopy = JSON.parse(JSON.stringify(get().vendor_itemsCopy))
+
+    let vendor_items = [];
+
+    if (vendor_itemsCopy.length > 0) {
+
+      vendor_items = vendor_itemsCopy.filter((value) => value.name.toLowerCase() === name.toLowerCase());
+
+      vendor_items.map((item) => {
+        item.pq_item = item.pq_item.map(it => {
+          it = { name: `${it.name} ${item.ed_izmer_name}`, id: it.id };
+          return it;
+        });
+        return item;
+      });
+
+      set({
+        vendor_items,
+        all_ed_izmer: vendor_items.length ? vendor_items[0].pq_item : [],
+        pq: vendor_items.length ? vendor_items[0].pq_item[0].id : '',
+        count: '',
+        fact_unit: '',
+        summ: '',
+        sum_w_nds: '',
+      });
+    }
+
+    set({
+      search_item: vendor_items[0],
+    });
+  },
+
+  changeCount: (event) => {
+    const count = event.target.value;
+
+    const fact_unit = Number(get().pq) * Number(count);
+
+    set({
+      count,
+      fact_unit: fact_unit ? fact_unit : '',
+    });
+  },
+
+  changeData: (data, event) => {
+    set({
+      [data]: event.target.value
+    });
+  },
+
+  reducePrice: () => {
+    const bill_items = get().bill_items;
+
+    const allPrice = (bill_items.reduce((all, item) => all + Number(item.price_item), 0)).toFixed(2);
+    const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
+
+    set({
+      allPrice,
+      allPrice_w_nds
+    })
+  },
+
+  deleteItem: (key) => {
+    const bill_items = get().bill_items;
+
+    bill_items.splice(key, 1);
+
+    this.setState({
+      bill_items,
+    });
+
+    get().reducePrice();
+  },
+}));
 
 const bill_status = [
   {
@@ -1149,6 +1256,216 @@ class Billing_View_ extends React.Component {
   }
 }
 
+function FormVendorItems(){
+
+  const [ vendor_items, search_item, all_ed_izmer, changeCount, changeData ] = useStore( state => [ state.vendor_items, state.search_item, state.all_ed_izmer, state.changeCount, state.changeData ]);
+  const [ search, pq, count, fact_unit, summ, sum_w_nds ] = useStore( state => [ state.search, state.pq, state.count, state.fact_unit, state.summ, state.sum_w_nds ]);
+
+  return (
+    <>
+      <Grid item xs={12} sm={12}>
+        <h2>Товары поставщика</h2>
+        <Divider style={{ backgroundColor: 'rgba(0, 0, 0, 0.87)' }} />
+      </Grid>
+
+      <Grid item xs={12} sm={4}>
+        <MyAutocomplite2
+          label="Товар поставщика"
+          freeSolo={true}
+          multiple={false}
+          data={ vendor_items }
+          value={ search_item?.name }
+          func={ (event, name) => { search(name) } }
+          onBlur={ (event, name) => { search(event?.target?.value) } }
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={3}>
+        <MySelect
+          data={all_ed_izmer}
+          value={pq}
+          multiple={false}
+          is_none={false}
+          func={ event => changeData('pq', event) }
+          label="Объем упаковки"
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={3}>
+        <MyTextInput
+          type="number"
+          label="Кол-во упаковок"
+          value={count}
+          func={changeCount}
+        />
+      </Grid>
+        
+      <Grid item xs={12} sm={2}>
+        <MyTextInput label="Кол-вo" disabled={true} value={fact_unit} className='disabled_input' />
+      </Grid>
+
+      <Grid item xs={12} sm={4}>
+        <MyTextInput
+          type="number"
+          label="Сумма без НДС"
+          value={summ}
+          func={ event => changeData('summ', event) }
+        />
+      </Grid>
+      <Grid item xs={12} sm={4}>
+        <MyTextInput
+          type="number"
+          label="Сумма c НДС"
+          value={sum_w_nds}
+          func={ event => changeData('sum_w_nds', event) }
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={4}>
+        <Button variant="contained" fullWidth style={{ height: '100%' }} onClick={ () => {} }>
+          <AddIcon />
+        </Button>
+      </Grid>
+    </>
+  )
+}
+
+function VendorItemsTableEdit(){
+
+  const [ deleteItem ] = useStore( state => [ state.deleteItem ]);
+  const [ bill_items_doc, bill_items, allPrice, allPrice_w_nds ] = useStore( state => [ state.bill_items_doc, state.allPrice, state.allPrice_w_nds ]);
+
+  return (
+    <>
+      <Grid item xs={12} sm={12}>
+        <h2>Товары в документе</h2>
+        <Divider style={{ backgroundColor: 'rgba(0, 0, 0, 0.87)' }} />
+      </Grid>
+
+      <Grid item xs={12} style={{ marginBottom: 20 }} sm={12}>
+        <TableContainer component={Paper}>
+          <Table aria-label="a dense table">
+            <TableHead>
+              <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
+                <TableCell style={{ minWidth: '150px' }}>Товар</TableCell>
+                { bill_items_doc.length == 0 ? null : <TableCell style={{ minWidth: '130px' }}>Изменения</TableCell> }
+                <TableCell style={{ minWidth: '130px' }}>В упак.</TableCell>
+                <TableCell style={{ minWidth: '130px' }}>Упак</TableCell>
+                <TableCell>Кол-во</TableCell>
+                <TableCell style={{ minWidth: '100px' }}>НДС</TableCell>
+                <TableCell style={{ minWidth: '130px' }}>Сумма без НДС</TableCell>
+                <TableCell>Сумма НДС</TableCell>
+                <TableCell style={{ minWidth: '130px' }}>Сумма с НДС</TableCell>
+                <TableCell></TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {bill_items.map((item, key) => (
+                <React.Fragment key={key}>
+                  {!item?.data_bill ? null :
+                    <TableRow style={{ backgroundColor: item?.color ? 'rgb(255, 204, 0)' : '#fff' }}>
+                      <TableCell rowSpan={2}>{item?.name ?? item.item_name}</TableCell>
+                      <TableCell>До</TableCell>
+                      <TableCell>{item?.data_bill?.pq} {item.ed_izmer_name}</TableCell>
+                      <TableCell>{item?.data_bill?.count}</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{item?.data_bill?.fact_unit} {item.ed_izmer_name}</TableCell>
+                      <TableCell>{item?.data_bill?.nds}</TableCell>
+                      <TableCell>{item?.data_bill?.price} ₽</TableCell>
+                      <TableCell style={{ whiteSpace: 'nowrap' }}>{item?.data_bill?.summ_nds} ₽</TableCell>
+                      <TableCell>{item?.data_bill?.price_w_nds} ₽</TableCell>
+                      <TableCell rowSpan={2}>
+                        <Button onClick={ () => deleteItem(key) } style={{ cursor: 'pointer' }} color="error" variant="contained">
+                          <ClearIcon />
+                        </Button>
+                      </TableCell>
+                      <TableCell rowSpan={2}>
+                        {Number(item.count) === 0 ? Number(item.count).toFixed(2) : (Number(item.price_w_nds) / Number(item.count)).toFixed(2)}
+                      </TableCell>
+                    </TableRow>
+                  }
+
+                  <TableRow hover style={{ backgroundColor: item?.color ? 'rgb(255, 204, 0)' : '#fff' }}>
+                    {item?.data_bill ? null : <TableCell> {item?.name ?? item.item_name} </TableCell>}
+                    {!item?.data_bill ? null : <TableCell>После</TableCell>}
+                    <TableCell className="ceil_white">
+                      <MySelect
+                        data={item.all_ed_izmer}
+                        value={item.pq}
+                        multiple={false}
+                        is_none={false}
+                        func={this.changeDataTable.bind(this, 'pq', item.id, key)}
+                        label=""
+                      />
+                    </TableCell>
+                    <TableCell className="ceil_white">
+                      <MyTextInput
+                        type="number"
+                        label=""
+                        value={item.count}
+                        func={this.changeDataTable.bind(this, 'count', item.id, key)}
+                        onBlur={this.changeDataTable.bind(this, 'count', item.id, key)}
+                      />
+                    </TableCell>
+                    <TableCell style={{ whiteSpace: 'nowrap' }}>{item.fact_unit} {item.ed_izmer_name}</TableCell>
+                    <TableCell>{item.nds}</TableCell>
+                    <TableCell className="ceil_white">
+                      <MyTextInput
+                        type="number"
+                        label=""
+                        value={item.price_item}
+                        func={this.changeDataTable.bind(this, 'price_item', item.id, key)}
+                        onBlur={this.changeDataTable.bind(this, 'price_item', item.id, key)}
+                      />
+                    </TableCell>
+                    <TableCell style={{ whiteSpace: 'nowrap' }}>{item.summ_nds} ₽</TableCell>
+                    <TableCell className="ceil_white">
+                      <MyTextInput
+                        type="number"
+                        label=""
+                        value={item.price_w_nds}
+                        func={this.changeDataTable.bind(this, 'price_w_nds', item.id, key)}
+                        onBlur={this.changeDataTable.bind(this, 'price_w_nds', item.id, key)}
+                      />
+                    </TableCell>
+                    {item?.data_bill ? null :
+                      <>
+                        <TableCell>
+                          <Button onClick={ () => deleteItem(key) } style={{ cursor: 'pointer' }} color="error" variant="contained">
+                            <ClearIcon />
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          {Number(item.count) === 0 ? Number(item.count).toFixed(2) : (Number(item.price_w_nds) / Number(item.count)).toFixed(2)}
+                        </TableCell>
+                      </>
+                    }
+                  </TableRow>
+                </React.Fragment>
+              ))}
+              { bill_items.length == 0 ? null : (
+                <TableRow sx={{ '& td': { fontWeight: 'bold' } }}>
+                  <TableCell>Итого:</TableCell>
+                  { bill_items_doc.length == 0 ? null : <TableCell></TableCell> }
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell align="center">{allPrice} ₽</TableCell>
+                  <TableCell></TableCell>
+                  <TableCell align="center">{allPrice_w_nds} ₽</TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Grid>
+    </>
+  )
+}
+
 // Страница Новый документ
 class Billing_New_ extends React.Component {
   dropzoneOptions = {
@@ -1303,6 +1620,7 @@ class Billing_New_ extends React.Component {
 
   // поиск/выбор поставщика/товара поставщика/точки/документа для коррекции/возврата
   async search(type, event, value) {
+    const { setData } = this.props.store;
 
     const search = event.target.value ? event.target.value : value ? value : '';
 
@@ -1323,6 +1641,11 @@ class Billing_New_ extends React.Component {
 
         const res = await this.getData('get_vendor_items', data);
         const docs = await this.getData('get_base_doc', data);
+
+        setData({
+          vendor_items: res.items,
+          vendor_itemsCopy: res.items,
+        })
 
         this.setState({
           vendor_items: res.items,
@@ -1406,6 +1729,11 @@ class Billing_New_ extends React.Component {
         
         const res = await this.getData('get_base_doc_data', obj);
         
+        setData({
+          vendor_items: res.items,
+          vendor_itemsCopy: res.items,
+        })
+
         this.setState({
           bill_items: [],
           search_item: '',
@@ -1436,6 +1764,11 @@ class Billing_New_ extends React.Component {
           
           const res = await this.getData('get_vendor_items', data);
           
+          setData({
+            vendor_items: res.items,
+            vendor_itemsCopy: res.items,
+          })
+
           this.setState({
             bill_items: [],
             bill_items_doc: [],
@@ -1504,11 +1837,13 @@ class Billing_New_ extends React.Component {
             vendorsCopy: [],
           })
         }
-      }
+    }
   }
 
   async changeSelect(data, event) {
     this.handleResize();
+
+    const { setData } = this.props.store;
 
     const value = event.target.value;
     
@@ -1558,6 +1893,16 @@ class Billing_New_ extends React.Component {
         
         const res = await this.getData('get_vendor_items', data);
         
+        console.log( {
+          vendor_items: res.items,
+          vendor_itemsCopy: res.items,
+        } )
+
+        setData({
+          vendor_items: res.items,
+          vendor_itemsCopy: res.items,
+        })
+
         this.setState({
           bill_items: [],
           bill_items_doc: [],
@@ -2007,6 +2352,10 @@ class Billing_New_ extends React.Component {
   }
 
   render() {
+    const { isPink } = this.props.store;
+
+    console.log( 'isPink', isPink )
+
     return (
       <>
         <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
@@ -2249,194 +2598,9 @@ class Billing_New_ extends React.Component {
            : null
           }
 
-          <Grid item xs={12} sm={12}>
-            <h2>Товары поставщика</h2>
-            <Divider style={{ backgroundColor: 'rgba(0, 0, 0, 0.87)' }} />
-          </Grid>
+          { console.log('тут товары') }
 
-          <Grid item xs={12} sm={4}>
-            <MyAutocomplite2
-              label="Товар поставщика"
-              freeSolo={true}
-              multiple={false}
-              data={this.state.vendor_items}
-              value={this.state.search_item}
-              func={this.search.bind(this, 'search_item')}
-              onBlur={this.search.bind(this, 'search_item')}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={3}>
-            <MySelect
-              data={this.state.all_ed_izmer}
-              value={this.state.pq}
-              multiple={false}
-              is_none={false}
-              func={this.changeSelect.bind(this, 'pq')}
-              label="Объем упаковки"
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={3}>
-            <MyTextInput
-              type="number"
-              label="Кол-во упаковок"
-              value={this.state.count}
-              func={this.changeInput.bind(this, 'count')}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={2}>
-            <MyTextInput label="Кол-вo" disabled={true} value={this.state.fact_unit} className='disabled_input' />
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <MyTextInput
-              type="number"
-              label="Сумма без НДС"
-              value={this.state.summ}
-              func={this.changeInput.bind(this, 'summ')}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <MyTextInput
-              type="number"
-              label="Сумма c НДС"
-              value={this.state.sum_w_nds}
-              func={this.changeInput.bind(this, 'sum_w_nds')}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <Button variant="contained" fullWidth style={{ height: '100%' }} onClick={this.addItem.bind(this)}>
-              <AddIcon />
-            </Button>
-          </Grid>
-
-          <Grid item xs={12} sm={12}>
-            <h2>Товары в документе</h2>
-            <Divider style={{ backgroundColor: 'rgba(0, 0, 0, 0.87)' }} />
-          </Grid>
-
-          <Grid item xs={12} style={{ marginBottom: 20 }} sm={12}>
-            <TableContainer component={Paper}>
-              <Table aria-label="a dense table">
-                <TableHead>
-                  <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
-                    <TableCell style={{ minWidth: '150px' }}>Товар</TableCell>
-                    {!this.state.bill_items_doc.length ? null : <TableCell style={{ minWidth: '130px' }}>Изменения</TableCell>}
-                    <TableCell style={{ minWidth: '130px' }}>В упак.</TableCell>
-                    <TableCell style={{ minWidth: '130px' }}>Упак</TableCell>
-                    <TableCell>Кол-во</TableCell>
-                    <TableCell style={{ minWidth: '100px' }}>НДС</TableCell>
-                    <TableCell style={{ minWidth: '130px' }}>Сумма без НДС</TableCell>
-                    <TableCell>Сумма НДС</TableCell>
-                    <TableCell style={{ minWidth: '130px' }}>Сумма с НДС</TableCell>
-                    <TableCell></TableCell>
-                    <TableCell></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {this.state.bill_items.map((item, key) => (
-                    <React.Fragment key={key}>
-                       {!item?.data_bill ? null :
-                        <TableRow style={{ backgroundColor: item?.color ? 'rgb(255, 204, 0)' : '#fff' }}>
-                          <TableCell rowSpan={2}>{item?.name ?? item.item_name}</TableCell>
-                          <TableCell>До</TableCell>
-                          <TableCell>{item?.data_bill?.pq} {item.ed_izmer_name}</TableCell>
-                          <TableCell>{item?.data_bill?.count}</TableCell>
-                          <TableCell style={{ whiteSpace: 'nowrap' }}>{item?.data_bill?.fact_unit} {item.ed_izmer_name}</TableCell>
-                          <TableCell>{item?.data_bill?.nds}</TableCell>
-                          <TableCell>{item?.data_bill?.price} ₽</TableCell>
-                          <TableCell style={{ whiteSpace: 'nowrap' }}>{item?.data_bill?.summ_nds} ₽</TableCell>
-                          <TableCell>{item?.data_bill?.price_w_nds} ₽</TableCell>
-                          <TableCell rowSpan={2}>
-                            <Button onClick={this.deleteItem.bind(this, key)} style={{ cursor: 'pointer' }} color="error" variant="contained">
-                              <ClearIcon />
-                            </Button>
-                          </TableCell>
-                          <TableCell rowSpan={2}>
-                            {Number(item.count) === 0 ? Number(item.count).toFixed(2) : (Number(item.price_w_nds) / Number(item.count)).toFixed(2)}
-                          </TableCell>
-                        </TableRow>
-                        }
-                      <TableRow hover style={{ backgroundColor: item?.color ? 'rgb(255, 204, 0)' : '#fff' }}>
-                        {item?.data_bill ? null : <TableCell> {item?.name ?? item.item_name} </TableCell>}
-                        {!item?.data_bill ? null : <TableCell>После</TableCell>}
-                        <TableCell className="ceil_white">
-                          <MySelect
-                            data={item.all_ed_izmer}
-                            value={item.pq}
-                            multiple={false}
-                            is_none={false}
-                            func={this.changeDataTable.bind(this, 'pq', item.id, key)}
-                            label=""
-                          />
-                        </TableCell>
-                        <TableCell className="ceil_white">
-                          <MyTextInput
-                            type="number"
-                            label=""
-                            value={item.count}
-                            func={this.changeDataTable.bind(this, 'count', item.id, key)}
-                            onBlur={this.changeDataTable.bind(this, 'count', item.id, key)}
-                          />
-                        </TableCell>
-                        <TableCell style={{ whiteSpace: 'nowrap' }}>{item.fact_unit} {item.ed_izmer_name}</TableCell>
-                        <TableCell>{item.nds}</TableCell>
-                        <TableCell className="ceil_white">
-                          <MyTextInput
-                            type="number"
-                            label=""
-                            value={item.price_item}
-                            func={this.changeDataTable.bind(this, 'price_item', item.id, key)}
-                            onBlur={this.changeDataTable.bind(this, 'price_item', item.id, key)}
-                          />
-                        </TableCell>
-                        <TableCell style={{ whiteSpace: 'nowrap' }}>{item.summ_nds} ₽</TableCell>
-                        <TableCell className="ceil_white">
-                          <MyTextInput
-                            type="number"
-                            label=""
-                            value={item.price_w_nds}
-                            func={this.changeDataTable.bind(this, 'price_w_nds', item.id, key)}
-                            onBlur={this.changeDataTable.bind(this, 'price_w_nds', item.id, key)}
-                          />
-                        </TableCell>
-                        {item?.data_bill ? null :
-                          <>
-                            <TableCell>
-                              <Button onClick={this.deleteItem.bind(this, key)} style={{ cursor: 'pointer' }} color="error" variant="contained">
-                                <ClearIcon />
-                              </Button>
-                            </TableCell>
-                            <TableCell>
-                              {Number(item.count) === 0 ? Number(item.count).toFixed(2) : (Number(item.price_w_nds) / Number(item.count)).toFixed(2)}
-                            </TableCell>
-                          </>
-                        }
-                      </TableRow>
-                    </React.Fragment>
-                  ))}
-                  {!this.state.bill_items.length ? null : (
-                    <TableRow sx={{ '& td': { fontWeight: 'bold' } }}>
-                      <TableCell>Итого:</TableCell>
-                      {!this.state.bill_items_doc.length ? null : <TableCell></TableCell>}
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell align="center">{this.state.allPrice} ₽</TableCell>
-                      <TableCell></TableCell>
-                      <TableCell align="center">{this.state.allPrice_w_nds} ₽</TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
+          <FormVendorItems />
 
           {parseInt(this.state.type) === 1 ? null :
             <>
@@ -3715,6 +3879,11 @@ class Billing_Edit_ extends React.Component {
   }
 }
 
+const withStore = BaseComponent => props => {
+  const store = useStore();
+  return <BaseComponent {...props} store={store} />;
+};
+
 export function Billing() {
   return <Billing_ />;
 }
@@ -3723,10 +3892,14 @@ export function BillingView() {
   return <Billing_View_ />;
 }
 
+const Billing_New_Store = withStore(Billing_New_)
+
 export function BillingNew() {
-  return <Billing_New_ />;
+  return <Billing_New_Store />;
 }
 
+const Billing_Edit_Store = withStore(Billing_Edit_)
+
 export function BillingEdit() {
-  return <Billing_Edit_ />;
+  return <Billing_Edit_Store />;
 }
