@@ -285,14 +285,35 @@ class HeaderItem extends React.Component {
 }
 
 class WorkSchedule_Table extends React.Component {
-  shouldComponentUpdate(nextProps) {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      index: null,
+    };
+  }
+
+  clickAppName(index) {
+    this.props.clickAppNameUser(index, this.props.numberChoose);
+
+    const i = this.state.index;
+    const newIndex = i === index ? null : index;
+
+    this.setState({
+      index: newIndex,
+    });
+
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
     var array1 = nextProps.test;
     var array2 = this.props.test;
 
-    var is_same = array1.length == array2.length && array1.every(function (element, index) { return element === array2[index] });
+    var is_same = array1.length == array2.length && array1.every(function (element, index) { return element === array2[index] }) && nextState.index === this.state.index;
 
     return !is_same;
-  }
+ }
 
   render() {
     let check_period = this.props.test.find((item) => item.row !== 'header' && parseInt(item.data.check_period) == 0);
@@ -343,14 +364,18 @@ class WorkSchedule_Table extends React.Component {
                   ) : null}
                 </React.Fragment>
               ) : (
-                <TableRow key={key}>
+                <TableRow key={key} style={{ backgroundColor: item?.color ? '#D3D3D3' : '#fff'}}>
+
                   <TableCell className="name_pinning"
-                    style={{ background: parseInt(item.data.type) == 0 ? '#fff' : parseInt(item.data.type) == 1 ? '#fff' : parseInt(item.data.type) == 2 ? '#ffcc00' : '#c03',
-                      color: parseInt(item.data.type) == 0 ? '#000' : parseInt(item.data.type) == 1 ? '#000' : parseInt(item.data.type) == 2 ? '#000' : '#fff' }}
+                    style={{ 
+                      background: item?.color ? '#D3D3D3' : parseInt(item.data.type) == 0 ? '#fff' : parseInt(item.data.type) == 1 ? '#fff' : parseInt(item.data.type) == 2 ? '#ffcc00' : '#c03',
+                      color: item?.color ? '#000' : parseInt(item.data.type) == 0 ? '#000' : parseInt(item.data.type) == 1 ? '#000' : parseInt(item.data.type) == 2 ? '#000' : '#fff' 
+                    }}
                     onClick={this.props.kind == 'manager' ? () => {} : this.props.openM.bind(this, item.data)}>
                     {item.data.user_name}
                   </TableCell>
-                  <TableCell style={{ minWidth: 165, minHeight: 38 }}>{item.data.app_name}</TableCell>
+
+                  <TableCell style={{ minWidth: 165, minHeight: 38, cursor: 'pointer' }} onClick={this.clickAppName.bind(this, key)}>{item.data.app_name}</TableCell>
 
                   {this.props.kind == 'manager' || item.data.smena_id === '-1' ? null : (
                     <TableCell className="checkBox">
@@ -367,7 +392,10 @@ class WorkSchedule_Table extends React.Component {
                   {item.data.dates.map((date, date_k) => (
                     <TableCell onClick={this.props.openH.bind(this, item.data, date.date)}
                       className="min_block"
-                      style={{ backgroundColor: date.info ? date.info.color : '#fff', color: date.info ? date.info.colorT : '#000', cursor: 'pointer' }}
+                      style={{
+                        backgroundColor: item?.color ? '#D3D3D3' : date.info ? date.info.color : '#fff', 
+                        color: item?.color ? '#000' : date.info ? date.info.colorT : '#000', 
+                        cursor: 'pointer' }}
                       key={date_k}
                     >
                       {date.info ? date.info.hours : ''}
@@ -2208,6 +2236,41 @@ class WorkSchedule_ extends React.Component {
     }
   }
 
+  clickAppNameUser(index, numberChoose) {
+    if(numberChoose === 1) {
+      const test_one = this.state.test_one;
+
+      test_one.forEach((item, i) => {
+        if(index === i) {
+          item.color = item?.color ? !item?.color : true
+        } else {
+          item.color = false
+        }
+      })
+  
+      this.setState({
+        test_one,
+      });
+    }
+
+    if(numberChoose === 2) {
+      const test_two = this.state.test_two;
+
+      test_two.forEach((item, i) => {
+        if(index === i) {
+          item.color = item?.color ? !item?.color : true
+        } else {
+          item.color = false
+        }
+      })
+  
+      this.setState({
+        test_two,
+      });
+    }
+
+  }
+
   render() {
     return (
       <>
@@ -3340,6 +3403,8 @@ class WorkSchedule_ extends React.Component {
                     editSmena={this.editSmena.bind(this)}
                     addUser={this.addUser.bind(this)}
                     openAddUser={() => this.setState({ mainMenuAddUsers: true })}
+
+                    clickAppNameUser={this.clickAppNameUser.bind(this)}
                   />
                 )}
               </TabPanel>
@@ -3401,6 +3466,8 @@ class WorkSchedule_ extends React.Component {
                     editSmena={this.editSmena.bind(this)}
                     addUser={this.addUser.bind(this)}
                     openAddUser={() => this.setState({ mainMenuAddUsers: true })}
+
+                    clickAppNameUser={this.clickAppNameUser.bind(this)}
                   />
                 )}
               </TabPanel>
