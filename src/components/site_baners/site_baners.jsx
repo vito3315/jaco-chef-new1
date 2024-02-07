@@ -48,6 +48,7 @@ class SiteBaners_Modal extends React.Component {
   };
 
   myDropzone = null;
+  myDropzone_m = null;
   isInit = false;
   click = false;
 
@@ -60,12 +61,12 @@ class SiteBaners_Modal extends React.Component {
       openAlert: false,
       err_status: true,
       err_text: '',
+
+      promo_list: [],
     };
   }
 
   componentDidUpdate(prevProps) {
-    //console.log(this.props.banner);
-
     if (!this.props.banner) {
       return;
     }
@@ -73,20 +74,32 @@ class SiteBaners_Modal extends React.Component {
     if (this.props.banner !== prevProps.banner) {
       this.setState({
         banner: this.props.banner,
+        promo_list: this.props.promos,
       });
-
-      //console.log(this.props.banner);
 
       setTimeout(() => {
         this.myDropzone = new Dropzone('#for_img_edit', this.dropzoneOptions);
+        this.myDropzone_m = new Dropzone('#for_img_edit_', this.dropzoneOptions);
       }, 300);
     }
   }
 
-  changeItem(data, event) {
+  async changeItem(data, event) {
     const banner = this.state.banner;
 
     banner.this_ban[data] = event.target.value;
+
+    if( data == 'city_id' ) {
+      const data = {
+        city_id: event.target.value
+      };
+
+      const res = await this.props.getData('get_active_promo', data);
+
+      this.setState({
+        promo_list: res.promos
+      });
+    }
 
     this.setState({
       banner,
@@ -105,6 +118,14 @@ class SiteBaners_Modal extends React.Component {
 
   changeAutocomplite(data, event, value) {
     const banner = this.state.banner;
+
+    if( data == 'items' ) {
+      banner.this_ban['promo_id'] = null;
+    }
+
+    if( data == 'promo_id' ) {
+      banner.this_ban['items'] = [];
+    }
 
     banner.this_ban[data] = value;
 
@@ -162,51 +183,26 @@ class SiteBaners_Modal extends React.Component {
           err_text: res.text,
         });
       } else {
-        if (this.myDropzone['files'].length > 0) {
-          if (this.myDropzone['files'].length > 0 && this.isInit === false) {
-            this.isInit = true;
+        this.myDropzone.on('sending', (file, xhr, data) => {
+          data.append('name', banner.this_ban.name);
+          data.append('id', res.id);
+          data.append('type', 'full');
+        });
 
-            this.myDropzone.on('sending', (file, xhr, data) => {
-              data.append('name', banner.this_ban.name);
-              data.append('id', res.id);
-            });
+        this.myDropzone_m.on('sending', (file, xhr, data1) => {
+          data1.append('name', banner.this_ban.name);
+          data1.append('id', res.id);
+          data1.append('type', 'mobile');
+        });
 
-            this.myDropzone.on('queuecomplete', (data) => {
-              var check_img = false;
-
-              this.myDropzone['files'].map((item, key) => {
-                if (item['status'] == 'error') {
-                  check_img = true;
-                }
-              });
-
-              if (check_img) {
-                this.setState({
-                  openAlert: true,
-                  err_status: false,
-                  err_text: 'Ошибка при загрузке фотографии',
-                });
-
-                return;
-              } else {
-                setTimeout(() => {
-                  this.onClose(true);
-                }, 1000);
-              }
-
-              this.isInit = false;
-            });
-          }
-
-          this.myDropzone.processQueue();
-        } else {
-          this.onClose(true);
-        }
+        this.myDropzone.processQueue();
+        this.myDropzone_m.processQueue();
       }
 
       setTimeout(() => {
         this.click = false;
-      }, 300);
+        this.onClose(true);
+      }, 3000);
     }
   }
 
@@ -331,9 +327,16 @@ class SiteBaners_Modal extends React.Component {
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <MyTextInput
-                    label="Название банера"
+                    label="Название банера (внутреннее)"
                     value={ this.state.banner ? this.state.banner.this_ban.name : '' }
                     func={this.changeItem.bind(this, 'name')}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <MyTextInput
+                    label="Заголовок"
+                    value={ this.state.banner ? this.state.banner.this_ban.title : '' }
+                    func={this.changeItem.bind(this, 'title')}
                   />
                 </Grid>
 
@@ -346,6 +349,8 @@ class SiteBaners_Modal extends React.Component {
                     func={this.changeItem.bind(this, 'city_id')}
                   />
                 </Grid>
+
+                <Grid item xs={12} sm={6}></Grid>
 
                 <Grid item xs={12} sm={6}>
                   <MyDatePickerNew
@@ -363,9 +368,9 @@ class SiteBaners_Modal extends React.Component {
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={this.props.mark === 'bannerEdit' ? 10 : 12}>
+                <Grid item xs={12} sm={12}>
                   <MyAutocomplite
-                    label="Ссылка на товар"
+                    label="Позиции (вместо промика)"
                     multiple={true}
                     data={this.state.banner ? this.state.banner.items ? this.state.banner.items : [] : []}
                     value={this.state.banner ? this.state.banner.this_ban.items ? this.state.banner.this_ban.items : [] : []}
@@ -373,24 +378,43 @@ class SiteBaners_Modal extends React.Component {
                   />
                 </Grid>
 
-                {this.props.mark === 'bannerEdit' ? (
-                  <Grid item xs={12} sm={2}>
-                    <MyCheckBox
-                      label="Активность"
-                      value={this.state.banner ? parseInt(this.state.banner.this_ban.is_active) == 1 ? true : false : false}
-                      func={this.changeItemChecked.bind(this, 'is_active')}
-                    />
-                  </Grid>
-                ) : null}
+                <Grid item xs={12} sm={6}>
+                  <MyAutocomplite
+                    label="Промокод (вместо позиций)"
+                    multiple={false}
+                    data={this.state.promo_list}
+                    value={this.state.banner ? this.state.banner.this_ban.promo_id ? this.state.banner.this_ban.promo_id : null : null}
+                    func={this.changeAutocomplite.bind(this, 'promo_id')}
+                  />
+                </Grid>
 
-                <Grid item xs={12} sm={12}>
-                  <Typography>Картинка разрешением: 2520х800 только JPG</Typography>
+                <Grid item xs={12} sm={6}>
+                  <MyCheckBox
+                    label="Активность"
+                    value={this.state.banner ? parseInt(this.state.banner.this_ban.is_active) == 1 ? true : false : false}
+                    func={this.changeItemChecked.bind(this, 'is_active')}
+                  />
+                </Grid>
+                
+
+                <Grid item xs={12} sm={6}>
+                  <Typography>Картинка на ПК разрешением 3700x1000 только JPG</Typography>
 
                   {!this.state.banner || this.state.banner.this_ban.img.length == 0 ? null : (
-                    <img style={{ width: '100%', height: 'auto' }} src={'https://storage.yandexcloud.net/site-home-img/' + this.state.banner.this_ban.img + '_2520x800.jpg'}/>
+                    <img style={{ width: '100%', height: 'auto' }} src={'https://storage.yandexcloud.net/site-home-img/' + this.state.banner.this_ban.img + '3700х1000.jpg'}/>
                   )}
 
                   <div className="dropzone" id="for_img_edit" style={{ width: '100%', minHeight: 150 }}/>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <Typography>Картинка мобильная соотношением 2:1 (например: 1000x500) только JPG</Typography>
+
+                  {!this.state.banner || this.state.banner.this_ban.img.length == 0 ? null : (
+                    <img style={{ width: '100%', height: 'auto' }} src={'https://storage.yandexcloud.net/site-home-img/' + this.state.banner.this_ban.img + '1000х500.jpg'}/>
+                  )}
+
+                  <div className="dropzone" id="for_img_edit_" style={{ width: '100%', minHeight: 150 }}/>
                 </Grid>
 
                 <Grid item xs={12} sm={12}>
@@ -445,6 +469,8 @@ class SiteBaners_ extends React.Component {
         date_start: formatDate(new Date()),
         date_end: formatDate(new Date()),
       },
+
+      promos: [],
     };
   }
 
@@ -559,6 +585,7 @@ class SiteBaners_ extends React.Component {
         method,
         banner,
         modalDialog: true,
+        promos: []
       });
     }
 
@@ -584,6 +611,7 @@ class SiteBaners_ extends React.Component {
         mark,
         banner,
         bannerName: banner.this_ban.name,
+        promos: banner.promos,
       });
     }
   }
@@ -656,6 +684,7 @@ class SiteBaners_ extends React.Component {
           method={this.state.method}
           mark={this.state.mark}
           banner={this.state.banner}
+          promos={this.state.promos}
           bannerName={this.state.bannerName}
           fullScreen={this.state.fullScreen}
           getData={this.getData.bind(this)}
