@@ -50,6 +50,7 @@ class SiteBaners_Modal extends React.Component {
   myDropzone = null;
   myDropzone_m = null;
   isInit = false;
+  isInit_m = false;
   click = false;
 
   constructor(props) {
@@ -177,32 +178,200 @@ class SiteBaners_Modal extends React.Component {
       const res = await this.props.getData('save_new', data);
 
       if (!res.st) {
+
         this.setState({
           openAlert: true,
           err_status: res.st,
           err_text: res.text,
         });
+
       } else {
-        this.myDropzone.on('sending', (file, xhr, data) => {
-          data.append('name', banner.this_ban.name);
-          data.append('id', res.id);
-          data.append('type', 'full');
-        });
 
-        this.myDropzone_m.on('sending', (file, xhr, data1) => {
-          data1.append('name', banner.this_ban.name);
-          data1.append('id', res.id);
-          data1.append('type', 'mobile');
-        });
+        if(this.myDropzone.files.length && this.myDropzone_m.files.length) {
 
-        this.myDropzone.processQueue();
-        this.myDropzone_m.processQueue();
+          let save_img = false;
+          let save_img_m = false;
+
+          if (this.myDropzone['files'].length && this.isInit === false) {
+            this.isInit = true;
+            
+            this.myDropzone.on('sending', (file, xhr, data) => {
+              data.append('name', banner.this_ban.name);
+              data.append('id', res.id);
+              data.append('type', 'full');
+            });
+
+            this.myDropzone.on('queuecomplete', (data) => {
+              var check_img = false;
+
+              this.myDropzone['files'].map((item, key) => {
+                if (item['status'] == 'error') {
+                  check_img = true;
+                }
+              });
+
+              if (check_img) {
+                this.setState({
+                  openAlert: true,
+                  err_status: false,
+                  err_text: 'Ошибка при загрузке фотографии',
+                });
+
+                return;
+
+              } else {
+                save_img = true;
+              }
+              this.isInit = false;
+            });
+          }
+
+          if (this.myDropzone_m['files'].length && this.isInit_m === false) {
+            this.isInit_m = true;
+
+            this.myDropzone_m.on('sending', (file, xhr, data1) => {
+              data1.append('name', banner.this_ban.name);
+              data1.append('id', res.id);
+              data1.append('type', 'mobile');
+            });
+
+            this.myDropzone_m.on('queuecomplete', (data) => {
+              var check_img = false;
+
+              this.myDropzone_m['files'].map((item, key) => {
+                if (item['status'] == 'error') {
+                  check_img = true;
+                }
+              });
+
+              if (check_img) {
+                this.setState({
+                  openAlert: true,
+                  err_status: false,
+                  err_text: 'Ошибка при загрузке фотографии',
+                });
+
+                return;
+
+              } else {
+                save_img_m = true;
+              }
+              this.isInit_m = false;
+            });
+          }
+
+          setTimeout(() => {
+            if(save_img && save_img_m) {
+              this.onClose(true);
+            }
+          }, 3000);
+
+          this.myDropzone.processQueue();
+          this.myDropzone_m.processQueue();
+
+        } else if(this.myDropzone.files.length || this.myDropzone_m.files.length) {
+
+          if (this.myDropzone['files'].length > 0) {
+
+            if (this.myDropzone['files'].length > 0 && this.isInit === false) {
+              this.isInit = true;
+  
+              this.myDropzone.on('sending', (file, xhr, data) => {
+                data.append('name', banner.this_ban.name);
+                data.append('id', res.id);
+                data.append('type', 'full');
+              });
+  
+              this.myDropzone.on('queuecomplete', (data) => {
+                var check_img = false;
+  
+                this.myDropzone['files'].map((item, key) => {
+                  if (item['status'] == 'error') {
+                    check_img = true;
+                  }
+                });
+  
+                if (check_img) {
+                  this.setState({
+                    openAlert: true,
+                    err_status: false,
+                    err_text: 'Ошибка при загрузке фотографии',
+                  });
+  
+                  return;
+  
+                } else {
+  
+                  setTimeout(() => {
+                    this.onClose(true);
+                  }, 1000);
+  
+                }
+  
+                this.isInit = false;
+  
+              });
+            }
+  
+            this.myDropzone.processQueue();
+  
+          } 
+          
+          if (this.myDropzone_m['files'].length > 0) {
+
+            if (this.myDropzone_m['files'].length > 0 && this.isInit_m === false) {
+              this.isInit_m = true;
+  
+              this.myDropzone_m.on('sending', (file, xhr, data1) => {
+                data1.append('name', banner.this_ban.name);
+                data1.append('id', res.id);
+                data1.append('type', 'mobile');
+              });
+  
+              this.myDropzone_m.on('queuecomplete', (data) => {
+                var check_img = false;
+  
+                this.myDropzone_m['files'].map((item, key) => {
+                  if (item['status'] == 'error') {
+                    check_img = true;
+                  }
+                });
+  
+                if (check_img) {
+                  this.setState({
+                    openAlert: true,
+                    err_status: false,
+                    err_text: 'Ошибка при загрузке фотографии',
+                  });
+  
+                  return;
+  
+                } else {
+  
+                  setTimeout(() => {
+                    this.onClose(true);
+                  }, 1000);
+  
+                }
+  
+                this.isInit_m = false;
+  
+              });
+            }
+  
+            this.myDropzone_m.processQueue();
+  
+          } 
+          
+        } else {
+          this.onClose(true);
+        }
       }
 
       setTimeout(() => {
         this.click = false;
-        this.onClose(true);
-      }, 3000);
+      }, 300);
+
     }
   }
 
@@ -234,14 +403,21 @@ class SiteBaners_Modal extends React.Component {
           err_status: res.st,
           err_text: res.text,
         });
-      } else {
-        if (this.myDropzone['files'].length > 0) {
-          if (this.myDropzone['files'].length > 0 && this.isInit === false) {
-            this.isInit = true;
 
+      } else {
+
+        if(this.myDropzone.files.length && this.myDropzone_m.files.length) {
+
+          let save_img = false;
+          let save_img_m = false;
+
+          if (this.myDropzone['files'].length && this.isInit === false) {
+            this.isInit = true;
+            
             this.myDropzone.on('sending', (file, xhr, data) => {
               data.append('name', banner.this_ban.name);
-              data.append('id', banner.this_ban.id);
+              data.append('id', res.id);
+              data.append('type', 'full');
             });
 
             this.myDropzone.on('queuecomplete', (data) => {
@@ -261,20 +437,149 @@ class SiteBaners_Modal extends React.Component {
                 });
 
                 return;
-              } else {
-                setTimeout(() => {
-                  this.onClose(true);
-                }, 1000);
-              }
 
+              } else {
+                save_img = true;
+              }
               this.isInit = false;
             });
           }
 
+          if (this.myDropzone_m['files'].length && this.isInit_m === false) {
+            this.isInit_m = true;
+
+            this.myDropzone_m.on('sending', (file, xhr, data1) => {
+              data1.append('name', banner.this_ban.name);
+              data1.append('id', res.id);
+              data1.append('type', 'mobile');
+            });
+
+            this.myDropzone_m.on('queuecomplete', (data) => {
+              var check_img = false;
+
+              this.myDropzone_m['files'].map((item, key) => {
+                if (item['status'] == 'error') {
+                  check_img = true;
+                }
+              });
+
+              if (check_img) {
+                this.setState({
+                  openAlert: true,
+                  err_status: false,
+                  err_text: 'Ошибка при загрузке фотографии',
+                });
+
+                return;
+
+              } else {
+                save_img_m = true;
+              }
+              this.isInit_m = false;
+            });
+
+          }
+          
+          setTimeout(() => {
+            if(save_img && save_img_m) {
+              this.onClose(true);
+            }
+          }, 3000);
+
           this.myDropzone.processQueue();
+          this.myDropzone_m.processQueue();
+
+        } else if(this.myDropzone.files.length || this.myDropzone_m.files.length) {
+
+          if (this.myDropzone['files'].length > 0) {
+
+            if (this.myDropzone['files'].length > 0 && this.isInit === false) {
+              this.isInit = true;
+  
+              this.myDropzone.on('sending', (file, xhr, data) => {
+                data.append('name', banner.this_ban.name);
+                data.append('id', res.id);
+              });
+  
+              this.myDropzone.on('queuecomplete', (data) => {
+                var check_img = false;
+  
+                this.myDropzone['files'].map((item, key) => {
+                  if (item['status'] == 'error') {
+                    check_img = true;
+                  }
+                });
+  
+                if (check_img) {
+                  this.setState({
+                    openAlert: true,
+                    err_status: false,
+                    err_text: 'Ошибка при загрузке фотографии',
+                  });
+  
+                  return;
+  
+                } else {
+                  setTimeout(() => {
+                    this.onClose(true);
+                  }, 1000);
+                }
+  
+                this.isInit = false;
+  
+              });
+            }
+  
+            this.myDropzone.processQueue();
+  
+          } 
+          
+          if (this.myDropzone_m['files'].length > 0) {
+            if (this.myDropzone_m['files'].length > 0 && this.isInit_m === false) {
+              this.isInit_m = true;
+  
+              this.myDropzone_m.on('sending', (file, xhr, data1) => {
+                data1.append('name', banner.this_ban.name);
+                data1.append('id', res.id);
+              });
+  
+              this.myDropzone_m.on('queuecomplete', (data) => {
+                var check_img = false;
+  
+                this.myDropzone_m['files'].map((item, key) => {
+                  if (item['status'] == 'error') {
+                    check_img = true;
+                  }
+                });
+  
+                if (check_img) {
+                  this.setState({
+                    openAlert: true,
+                    err_status: false,
+                    err_text: 'Ошибка при загрузке фотографии',
+                  });
+  
+                  return;
+  
+                } else {
+                  setTimeout(() => {
+                    this.onClose(true);
+                  }, 1000);
+                }
+  
+                this.isInit_m = false;
+  
+              });
+            }
+  
+            this.myDropzone_m.processQueue();
+  
+          } 
+          
         } else {
           this.onClose(true);
         }
+
       }
 
       setTimeout(() => {
@@ -397,11 +702,13 @@ class SiteBaners_Modal extends React.Component {
                 </Grid>
                 
 
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={6} >
                   <Typography>Картинка на ПК разрешением 3700x1000 только JPG</Typography>
 
                   {!this.state.banner || this.state.banner.this_ban.img.length == 0 ? null : (
-                    <img style={{ width: '100%', height: 'auto' }} src={'https://storage.yandexcloud.net/site-home-img/' + this.state.banner.this_ban.img + '3700х1000.jpg'}/>
+                    <div style={{ height: 400, display: 'flex' }}>
+                      <img style={{ width: '100%', height: 'auto', alignSelf: 'center', borderRadius: 20 }} src={'https://storage.yandexcloud.net/site-home-img/' + this.state.banner.this_ban.img + '3700х1000.jpg'}/>
+                    </div>
                   )}
 
                   <div className="dropzone" id="for_img_edit" style={{ width: '100%', minHeight: 150 }}/>
@@ -411,8 +718,10 @@ class SiteBaners_Modal extends React.Component {
                   <Typography>Картинка мобильная соотношением 2:1 (например: 1000x500) только JPG</Typography>
 
                   {!this.state.banner || this.state.banner.this_ban.img.length == 0 ? null : (
-                    <img style={{ width: '100%', height: 'auto' }} src={'https://storage.yandexcloud.net/site-home-img/' + this.state.banner.this_ban.img + '1000х500.jpg'}/>
-                  )}
+                    <div style={{ height: 400, display: 'flex' }}>
+                      <img style={{ width: '100%', height: 'auto', alignSelf: 'center', borderRadius: 40 }} src={'https://storage.yandexcloud.net/site-home-img/' + this.state.banner.this_ban.img + '1000х500.jpg'}/>
+                    </div>
+                    )}
 
                   <div className="dropzone" id="for_img_edit_" style={{ width: '100%', minHeight: 150 }}/>
                 </Grid>
