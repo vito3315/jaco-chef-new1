@@ -42,6 +42,7 @@ import ReactPanZoom from 'react-image-pan-zoom-rotate';
 import dayjs from 'dayjs';
 
 import { create } from 'zustand'
+import { typeOf } from 'mathjs';
 
 const useStore = create((set, get) => ({
   isPink: false,
@@ -63,9 +64,388 @@ const useStore = create((set, get) => ({
   allPrice_w_nds: 0,
 
   bill_items_doc: [],
-
   bill_items: [],
 
+  operAlert: false,
+  err_status: true,
+  err_text: '',
+
+  points: [],
+  point: '',
+  point_name: '',
+
+  search_vendor: '',
+
+  docs: [],
+  doc: '',
+
+  vendors: [],
+  vendorsCopy: [],
+
+  types: [],
+  type: '',
+
+  fullScreen: false,
+
+  kinds: [],
+  doc_base_id: '',
+
+  number: '',
+  number_factur: '',
+
+  date: null,
+  date_factur: null,
+  date_items: null,
+
+  is_load_store: false,
+  module: 'billing',
+
+  imgs_bill: [],
+  modalDialog: false,
+  image: '',
+  imgs_factur: [],
+
+  vendor_name: '',
+
+  bill_list: [],
+  bill: null,
+
+  is_new_doc: 0,
+
+  users: [],
+  user: [],
+
+  comment: '',
+
+  getData: (method, data = {}) => {
+    set({
+      is_load_store: true,
+    });
+
+    return fetch('https://jacochef.ru/api/index_new.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: queryString.stringify({
+        method: method,
+        module: get().module,
+        version: 2,
+        login: localStorage.getItem('token'),
+        data: JSON.stringify(data),
+      }),
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.st === false && json.type == 'redir') {
+          window.location.pathname = '/';
+          return;
+        }
+
+        if (json.st === false && json.type == 'auth') {
+          window.location.pathname = '/auth';
+          return;
+        }
+
+        setTimeout(() => {
+          set({
+            is_load_store: false,
+          });
+        }, 300);
+
+        return json;
+      })
+      .catch((err) => {
+        console.log(err);
+        set({
+          is_load_store: false,
+        });
+      });
+  },
+
+  changeAutocomplite: (type, data) => {
+    set({
+      [type]: data,
+    })
+  },
+
+  changeItemChecked: (event, data) => {
+    const value = event.target.checked === true ? 1 : 0;
+
+    set({
+      [data]: value,
+    });
+  },
+
+  getDataBill: (res, point, items, docs) => {
+
+    set({
+      is_load_store: true,
+    });
+
+    const bill_items = res.bill_items.map((item) => {
+
+      item.all_ed_izmer = item.pq_item.map(it => {
+        it = { name: `${it.name} ${item.ed_izmer_name}`, id: it.id };
+        return it;
+      });
+
+      item.fact_unit = (Number(item.fact_unit)).toFixed(2);
+      item.price_item = item.price;
+
+      const nds = get().check_nds_bill((Number(item.price_w_nds) - Number(item.price_item)) / (Number(item.price_item) / 100));
+
+      if (nds) {
+        item.nds = nds;
+        item.summ_nds = (Number(item.price_w_nds) - Number(item.price_item)).toFixed(2)
+      } else {
+        item.summ_nds = (0).toFixed(2);
+        item.nds = '';
+      }
+
+      return item;
+    });
+
+    const allPrice = (bill_items.reduce((all, item) => all + Number(item.price), 0)).toFixed(2);
+    const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
+   
+    set({
+      vendor_items: items,
+      vendor_itemsCopy: items,
+      docs: docs.billings,
+      point: point ?? [],
+      point_name: point?.name ?? '',
+      vendors: res?.vendors ?? [],
+      vendor_name: res?.vendors[0]?.name ?? '',
+      bill_list: res?.bill_hist,
+      imgs_bill: res?.bill_imgs,
+      allPrice,
+      allPrice_w_nds,
+      bill: res?.bill,
+      bill_items,
+      number: res.bill?.number,
+      date: res.bill?.date && res.bill?.date !== "0000-00-00" ? dayjs(res.bill?.date) : null,
+      date_items: res.bill?.date_items ? dayjs(res.bill?.date_items) : null,
+      comment: res.bill?.comment,
+      users: res?.users,
+      user: res?.bill_users,
+      types: types,
+      is_load_store: false,
+    });
+
+  },
+
+  closeDialog: () => {
+    set({ modalDialog: false })
+  },
+
+  openImageBill: (image) => {
+    get().handleResize();
+
+    set({ 
+      modalDialog: true, 
+      image
+    })
+  },
+
+  handleResize: () => {
+    if (window.innerWidth < 601) {
+      set({
+        fullScreen: true,
+      });
+    } else {
+      set({
+        fullScreen: false,
+      });
+    }
+  },
+
+  changeDateRange(event, data) {
+    set({
+      [data]: event,
+    });
+  },
+
+  changeInput(event, type) {
+    set({
+      [type]: event.target.value,
+    });
+  },
+
+  search_doc: async (event, name) => {
+
+    const search = event.target.value ? event.target.value : name ? name : '';
+
+    if(search) {
+        
+      const docs = get().docs;
+      const vendor_id = get().vendors[0]?.id;
+      const point = get().point;
+      
+      const billing_id = docs.find(doc => doc.name === search)?.id;
+      
+      const obj = {
+        billing_id,
+        vendor_id,
+        point_id: point.id,
+      }
+      
+      const res = await get().getData('get_base_doc_data', obj);
+      
+      set({
+        bill_items: [],
+        bill_items_doc: [],
+        search_item: '',
+        vendor_items: res.items,
+        vendor_itemsCopy: res.items,
+        users: res.users,
+        all_ed_izmer: [],
+        pq: '',
+        count: '',
+        fact_unit: '',
+        summ: '',
+        sum_w_nds: '',
+        bill_items_doc: res.billing_items,
+      });
+
+    } else {
+
+      const point = get().point;
+      const vendors = get().vendors;
+      const docs = get().docs;
+
+      if(point && vendors.length === 1 && docs.length) {
+        
+        const data = {
+          point_id: point.id,
+          vendor_id: vendors[0]?.id
+        }
+        
+        const res = await get().getData('get_vendor_items', data);
+        
+        set({
+          bill_items: [],
+          bill_items_doc: [],
+          vendor_items: res.items,
+          vendor_itemsCopy: res.items,
+          users: res.users,
+          search_item: '',
+          all_ed_izmer: [],
+          pq: '',
+          count: '',
+          fact_unit: '',
+          summ: '',
+          sum_w_nds: '',
+        });
+      }
+
+    }
+
+    set({
+      doc: search,
+    });
+  },
+
+  search_vendors: async (event, name) => {
+    const search = event.target.value ? event.target.value : name ? name : '';
+
+    const vendorsCopy = get().vendorsCopy;
+
+    const vendors = vendorsCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
+
+    if (search && vendors.length) {
+
+      const point = get().point;
+
+      const data = {
+        point_id: point.id,
+        vendor_id: vendors[0].id
+      }
+
+      const res = await get().getData('get_vendor_items', data);
+      const docs = await get().getData('get_base_doc', data);
+
+      set({
+        vendor_items: res.items,
+        vendor_itemsCopy: res.items,
+        users: res.users,
+        docs: docs.billings,
+      });
+
+    } else {
+    
+      set({
+        bill_items: [],
+        bill_items_doc: [],
+        search_item: '',
+        vendor_items: [],
+        vendor_itemsCopy: [],
+        all_ed_izmer: [],
+        pq: '',
+        count: '',
+        fact_unit: '',
+        summ: '',
+        sum_w_nds: '',
+        docs: [],
+        doc: '',
+      });
+
+    }
+
+    set({
+      search_vendor: search,
+      vendors,
+    });
+  },
+
+  search_point: async (event, name) => {
+    const search = event.target.value ? event.target.value : name ? name : '';
+
+    const points = get().points;
+    const point = points.find(item => item.name === search);
+    
+    set({
+      bill_items: [],
+      bill_items_doc: [],
+      point: point ?? '',
+      point_name: point?.name ?? '',
+      search_vendor: '',
+      search_item: '',
+      vendor_items: [],
+      vendor_itemsCopy: [],
+      all_ed_izmer: [],
+      pq: '',
+      count: '',
+      fact_unit: '',
+      summ: '',
+      sum_w_nds: '',
+      users: [],
+      docs: [],
+      doc: ''
+    });
+
+    if(point) {
+  
+        const obj = {
+          point_id: point.id
+        }
+  
+        const res = await get().getData('get_vendors', obj)
+  
+        set({
+          vendors: res.vendors,
+          vendorsCopy: res.vendors,
+        })
+
+      } else {
+
+        set({
+          vendors: [],
+          vendorsCopy: [],
+        })
+
+      }
+  },
 
   setData: (...props) => {
 
@@ -74,15 +454,17 @@ const useStore = create((set, get) => ({
     )
   },
 
-  search: (name) => {
+  search_vendor_items: (event, name) => {
+
+    const search = event.target.value ? event.target.value : name ? name : '';
 
     const vendor_itemsCopy = JSON.parse(JSON.stringify(get().vendor_itemsCopy))
 
     let vendor_items = [];
 
-    if (vendor_itemsCopy.length > 0) {
+    if (vendor_itemsCopy.length) {
 
-      vendor_items = vendor_itemsCopy.filter((value) => value.name.toLowerCase() === name.toLowerCase());
+      vendor_items = vendor_itemsCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
 
       vendor_items.map((item) => {
         item.pq_item = item.pq_item.map(it => {
@@ -101,10 +483,11 @@ const useStore = create((set, get) => ({
         summ: '',
         sum_w_nds: '',
       });
+
     }
 
     set({
-      search_item: vendor_items[0],
+      search_item: search,
     });
   },
 
@@ -119,7 +502,88 @@ const useStore = create((set, get) => ({
     });
   },
 
-  changeData: (data, event) => {
+  changeData: async (data, event) => {
+    get().handleResize();
+
+    const value = event.target.value;
+    
+    if(data === 'type' && (parseInt(value) === 1 || parseInt(value) === 2)) {
+
+      const point = get().point;
+      const vendors = get().vendors;
+
+        if(point && vendors.length === 1) {
+
+          const data = {
+            point_id: point.id,
+            vendor_id: vendors[0]?.id
+          }
+          
+          const res = await get().getData('get_vendor_items', data);
+          
+          set({
+            bill_items: [],
+            bill_items_doc: [],
+            vendor_items: res.items,
+            vendor_itemsCopy: res.items,
+            users: res.users,
+            search_item: '',
+            all_ed_izmer: [],
+            pq: '',
+            count: '',
+            fact_unit: '',
+            summ: '',
+            sum_w_nds: '',
+            doc: '',
+          });
+        }
+    }
+
+    if(data === 'type' && (parseInt(value) === 3 || parseInt(value) === 2)) {
+      let kinds = [];
+
+      if( parseInt(value) === 2 ){
+        kinds = [
+          {
+            "name": "Накладная",
+            "id": "1"
+          },
+          {
+            "name": "УПД",
+            "id": "2"
+          },
+        ];
+      } else {
+        kinds = [
+          {
+            "name": "Накладная",
+            "id": "1"
+          },
+          {
+            "name": "УКД",
+            "id": "2"
+          },
+        ];
+      }
+
+      set({
+        kinds,
+      });
+    }
+
+    // if(data === 'type' && parseInt(value) === 2){
+    //   setTimeout( () => {
+    //     set({
+    //       DropzoneDop: new Dropzone("#img_bill_type", this.dropzoneOptions)
+    //     })
+    //   }, 500 )
+      
+    // } else {
+    //   set({
+    //     DropzoneDop: null
+    //   })
+    // }
+
     set({
       [data]: event.target.value
     });
@@ -142,12 +606,212 @@ const useStore = create((set, get) => ({
 
     bill_items.splice(key, 1);
 
-    this.setState({
+    set({
       bill_items,
     });
 
     get().reducePrice();
   },
+
+  closeAlert: () => {
+    set({ operAlert: false });
+  },
+
+  addItem: () => {
+    const { count, fact_unit, summ, sum_w_nds, all_ed_izmer, pq, vendor_items } = get();
+
+    let bill_items = JSON.parse(JSON.stringify(get().bill_items));
+
+    if (!count || !fact_unit || !summ || !sum_w_nds || !pq || !all_ed_izmer.length) {
+
+      set({
+        operAlert: true,
+        err_status: false,
+        err_text: 'Необходимо выбрать Товар / кол-во Товара / указать суммы',
+      });
+
+      return;
+    }
+
+    const nds = get().check_nds_bill((Number(sum_w_nds) - Number(summ)) / (Number(summ) / 100))
+
+    if (!nds) {
+
+      set({
+        operAlert: true,
+        err_status: false,
+        err_text: 'Суммы указаны неверно',
+      });
+
+      return;
+    }
+
+    const range_price_item = get().check_price_item(vendor_items[0].price, vendor_items[0].vend_percent, summ, pq)
+
+    if(range_price_item) {
+      vendor_items[0].color = false;
+    } else {
+      vendor_items[0].color = true;
+    }
+
+    vendor_items[0].summ_nds = (Number(sum_w_nds) - Number(summ)).toFixed(2);
+    vendor_items[0].nds = nds;
+    vendor_items[0].pq = pq;
+    vendor_items[0].all_ed_izmer = all_ed_izmer;
+    vendor_items[0].count = count;
+    vendor_items[0].fact_unit = (Number(fact_unit)).toFixed(2);
+    vendor_items[0].price_item = summ;
+    vendor_items[0].price_w_nds = sum_w_nds;
+
+    const bill_items_doc = get().bill_items_doc;
+
+    if(bill_items_doc.length) {
+      const item = bill_items_doc.find(it => it.item_id === vendor_items[0].id);
+
+      item.fact_unit = (Number(item.count) * Number(item.pq)).toFixed(2);
+      item.summ_nds = (Number(item.price_w_nds) - Number(item.price)).toFixed(2);
+
+      const nds = get().check_nds_bill((Number(item.price_w_nds) - Number(item.price)) / (Number(item.price) / 100))
+
+      if(nds) {
+        item.nds = nds;
+      } else {
+        item.nds = '';
+      }
+
+      vendor_items[0].data_bill = item;
+    }
+
+    bill_items.push(vendor_items[0]);
+
+    const allPrice = (bill_items.reduce((all, item) => all + Number(item.price_item), 0)).toFixed(2);
+    const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
+
+    set({
+      bill_items,
+      allPrice,
+      allPrice_w_nds,
+      count: '',
+      fact_unit: '',
+      summ: '',
+      sum_w_nds: '',
+    });
+  },
+
+  check_nds_bill: (value) => {
+    let nds = [];
+    nds[0] = 'без НДС';
+    nds[10] = '10 %';
+    nds[20] = '20 %';
+    nds[18] = '18 %';
+ 
+    return nds[Number(value)] ? nds[Number(value)] : false;
+  },
+
+  check_price_item: (price, percent, summ, pq) => {
+
+    const res = Number(price) / 100 * Number(percent);
+
+    const price_item = Number(summ) / Number(pq);
+
+    if(price_item >= (Number(price) - res) && price_item <= (Number(price) + res)) {
+      return true
+    } else {
+      return false
+    }
+  },
+
+  changeDataTable: (event, type, id, key) => {
+    const value = event.target.value;
+
+    let bill_items = JSON.parse(JSON.stringify(get().bill_items));
+
+    bill_items = bill_items.map((item, index) => {
+      if (item.id === id && key === index) {
+
+        item[type] = value;
+
+        if (type === 'pq') {
+          item.fact_unit = (Number(item[type]) * Number(item.count)).toFixed(2);
+
+          const range_price_item = get().check_price_item(item.price, item.vend_percent, item.price_item, item.pq)
+  
+          if(range_price_item) {
+            item.color = false;
+          } else {
+            item.color = true;
+          }
+
+        } 
+
+        if (value && value !== '0' && value[0] !== '0' && type === 'count') {
+
+          item.fact_unit = (Number(item[type]) * Number(item.pq)).toFixed(2);
+          const range_price_item = get().check_price_item(item.price, item.vend_percent, item.price_item, item.pq)
+
+          if(range_price_item) {
+            item.color = false;
+          } else {
+            item.color = true;
+          }
+
+        } else {
+
+          if (type === 'count') {
+            item.fact_unit = 0;
+          }
+    
+          item.color = true;
+
+        }
+
+
+        if(type === 'price_item' || type === 'price_w_nds') {
+          const nds = get().check_nds_bill((Number(item.price_w_nds) - Number(item.price_item)) / (Number(item.price_item) / 100))
+
+          const range_price_item = get().check_price_item(item.price, item.vend_percent, item.price_item, item.pq)
+  
+          if (nds) {
+            item.nds = nds;
+            item.summ_nds = (Number(item.price_w_nds) - Number(item.price_item)).toFixed(2)
+          } else {
+            item.summ_nds = 0;
+            item.nds = '';
+          }
+
+          if(nds && range_price_item) {
+            item.color = false;
+          } else {
+            item.color = true;
+          }
+        } 
+
+      }
+
+      return item;
+    });
+
+    if (type === 'price_item') {
+      const allPrice = (bill_items.reduce((all, item) => all + Number(item.price_item), 0)).toFixed(2);
+
+      set({
+        allPrice,
+      });
+    }
+
+    if (type === 'price_w_nds') {
+      const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
+
+      set({
+        allPrice_w_nds,
+      });
+    }
+
+    set({
+      bill_items,
+    });
+  }
+
 }));
 
 const bill_status = [
@@ -664,9 +1328,19 @@ class Billing_ extends React.Component {
     }
   }
 
-  getOneBill() {}
+  getOneBill(item) {
+    const type = this.state.type;
 
-   // поиск/выбор поставщика
+    const data = {
+      type: parseInt(type) === 1 ? 'bill_ex' : 'bill',
+      id: item?.id,
+      point_id: item?.point_id,
+    }
+
+    localStorage.setItem('one_bill', JSON.stringify(data));
+  }
+
+  // поиск/выбор поставщика
   search(event, value) {
 
     const search = event.target.value ? event.target.value : value ? value : '';
@@ -977,7 +1651,7 @@ class Billing_ extends React.Component {
                       </TableCell>
                       <TableCell>Прих</TableCell>
                       <TableCell style={{ cursor: 'pointer' }}>
-                        <Link to="/billing/view" onClick={this.getOneBill.bind(this)}>
+                        <Link to="/billing/view" onClick={this.getOneBill.bind(this, item)} target="_blank">
                           {item.number}
                         </Link>
                       </TableCell>
@@ -985,6 +1659,7 @@ class Billing_ extends React.Component {
                         style={{ backgroundColor: parseInt(item.check_day) === 1 ? 'rgb(204, 0, 51)' : '#fff', cursor: 'pointer', color: parseInt(item.check_day) === 1 ? '#fff' : 'rgba(0, 0, 0, 0.87)' }}
                       >
                         <Link 
+                          onClick={this.getOneBill.bind(this, item)}
                           to={`/billing/${parseInt(this.state.type) === 1 ? 'bill_ex' : 'bill'}/${item?.id}/${item?.point_id}`} target="_blank">
                           {item.date}
                         </Link>
@@ -1005,6 +1680,54 @@ class Billing_ extends React.Component {
       </>
     );
   }
+}
+
+function VendorItemsTableView(){
+  const [bill_items] = useStore(state => [state.bill_items]);
+
+  return (
+    <>
+     <Grid item xs={12} sm={12}>
+        <h2>Товары в накладной</h2>
+        <Divider style={{ backgroundColor: 'rgba(0, 0, 0, 0.87)' }} />
+     </Grid>
+
+     <Grid item xs={12} style={{ marginBottom: 20 }} sm={12}>
+      <TableContainer component={Paper}>
+        <Table aria-label="a dense table">
+          <TableHead>
+            <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
+              <TableCell style={{ minWidth: '150px' }}>Товар</TableCell>
+              <TableCell style={{ minWidth: '130px' }}>В упак.</TableCell>
+              <TableCell>Упак</TableCell>
+              <TableCell style={{ minWidth: '130px' }}>Кол-во</TableCell>
+              <TableCell>НДС</TableCell>
+              <TableCell style={{ minWidth: '180px' }}>Сумма без НДС</TableCell>
+              <TableCell style={{ minWidth: '180px' }}>Сумма НДС</TableCell>
+              <TableCell style={{ minWidth: '150px' }}>Сумма с НДС</TableCell>
+              <TableCell style={{ minWidth: '150px' }}>За 1 ед с НДС</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {bill_items.map((item, key) => (
+              <TableRow key={key} hover>
+                <TableCell>{item.item_name}</TableCell>
+                <TableCell>{item.pq} {item.ed_izmer_name}</TableCell>
+                <TableCell>{item.count}</TableCell>
+                <TableCell>{item.fact_unit} {item.ed_izmer_name}</TableCell>
+                <TableCell>{item.nds}%</TableCell>
+                <TableCell>{item.price} ₽</TableCell>
+                <TableCell>{Number(item.price_w_nds) - Number(item.price)} ₽</TableCell>
+                <TableCell>{item.price_w_nds} ₽</TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+     </Grid>
+    </>
+  )
 }
 
 // Страница просмотра одной Накладной
@@ -1032,21 +1755,30 @@ class Billing_View_ extends React.Component {
   }
 
   async componentDidMount() {
-    //const data = await this.getData('get_all');
+    const bill = JSON.parse(localStorage.getItem('one_bill'));
 
-    const data = view;
+    const data = await this.getData('get_one', bill);
+
+    const { setData } = this.props.store;
+
+    setData({
+      bill_items: data.bill_items,
+    })
+
+    const points = await this.getData('get_points');
+
+    const point = points.points.find(point => point.id === data.bill.point_id);
 
     this.setState({
       bill: data.bill,
-      point: data.point,
-      vendor: data.vendor,
-      imgs: data.imgs,
+      point: point,
+      vendor: data.vendors[0],
+      imgs: data.bill_imgs,
       bill_items: data.bill_items,
-      bill_list: data.bill_list,
-      users: data.users,
+      bill_list: data.bill_hist,
+      users: data.bill_users,
     });
 
-    //document.title = data.module_info.name;
     document.title = 'Накладные';
   }
 
@@ -1182,45 +1914,7 @@ class Billing_View_ extends React.Component {
             }
           </Grid>
 
-          <Grid item xs={12} sm={12}>
-            <h2>Товары в накладной</h2>
-            <Divider style={{ backgroundColor: 'rgba(0, 0, 0, 0.87)' }} />
-          </Grid>
-
-          <Grid item xs={12} style={{ marginBottom: 20 }} sm={12}>
-            <TableContainer component={Paper}>
-              <Table aria-label="a dense table">
-                <TableHead>
-                  <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
-                    <TableCell style={{ minWidth: '150px' }}>Товар</TableCell>
-                    <TableCell style={{ minWidth: '130px' }}>В упак.</TableCell>
-                    <TableCell>Упак</TableCell>
-                    <TableCell style={{ minWidth: '130px' }}>Кол-во</TableCell>
-                    <TableCell>НДС</TableCell>
-                    <TableCell style={{ minWidth: '180px' }}>Сумма без НДС</TableCell>
-                    <TableCell style={{ minWidth: '180px' }}>Сумма НДС</TableCell>
-                    <TableCell style={{ minWidth: '150px' }}>Сумма с НДС</TableCell>
-                    <TableCell style={{ minWidth: '150px' }}>За 1 ед с НДС</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {this.state.bill_items?.map((item, key) => (
-                    <TableRow key={key} hover>
-                      <TableCell>{item.item_name}</TableCell>
-                      <TableCell>{item.pq} {item.ed_izmer_name}</TableCell>
-                      <TableCell>{item.count}</TableCell>
-                      <TableCell>{item.fact_unit} {item.ed_izmer_name}</TableCell>
-                      <TableCell>{item.nds}%</TableCell>
-                      <TableCell>{item.price} ₽</TableCell>
-                      <TableCell>{Number(item.price_w_nds) - Number(item.price)} ₽</TableCell>
-                      <TableCell>{item.price_w_nds} ₽</TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
+          <VendorItemsTableView />
 
           <Grid item xs={12} sm={12} style={{ display: 'flex' }}>
             <Typography style={{ fontWeight: 'bold', color: '#9e9e9e' }}>Дата разгрузки:&nbsp;</Typography>
@@ -1258,8 +1952,8 @@ class Billing_View_ extends React.Component {
 
 function FormVendorItems(){
 
-  const [ vendor_items, search_item, all_ed_izmer, changeCount, changeData ] = useStore( state => [ state.vendor_items, state.search_item, state.all_ed_izmer, state.changeCount, state.changeData ]);
-  const [ search, pq, count, fact_unit, summ, sum_w_nds ] = useStore( state => [ state.search, state.pq, state.count, state.fact_unit, state.summ, state.sum_w_nds ]);
+  const [ vendor_items, search_item, all_ed_izmer, changeCount, changeData, addItem ] = useStore( state => [ state.vendor_items, state.search_item, state.all_ed_izmer, state.changeCount, state.changeData, state.addItem ]);
+  const [ search_vendor_items, pq, count, fact_unit, summ, sum_w_nds ] = useStore( state => [ state.search_vendor_items, state.pq, state.count, state.fact_unit, state.summ, state.sum_w_nds ]);
 
   return (
     <>
@@ -1275,8 +1969,8 @@ function FormVendorItems(){
           multiple={false}
           data={ vendor_items }
           value={ search_item?.name }
-          func={ (event, name) => { search(name) } }
-          onBlur={ (event, name) => { search(event?.target?.value) } }
+          func={ (event, name) => search_vendor_items(event, name) }
+          onBlur={ (event, name) => search_vendor_items(event, name) }
         />
       </Grid>
 
@@ -1322,7 +2016,7 @@ function FormVendorItems(){
       </Grid>
 
       <Grid item xs={12} sm={4}>
-        <Button variant="contained" fullWidth style={{ height: '100%' }} onClick={ () => {} }>
+        <Button variant="contained" fullWidth style={{ height: '100%' }} onClick={addItem}>
           <AddIcon />
         </Button>
       </Grid>
@@ -1332,8 +2026,8 @@ function FormVendorItems(){
 
 function VendorItemsTableEdit(){
 
-  const [ deleteItem ] = useStore( state => [ state.deleteItem ]);
-  const [ bill_items_doc, bill_items, allPrice, allPrice_w_nds ] = useStore( state => [ state.bill_items_doc, state.allPrice, state.allPrice_w_nds ]);
+  const [ deleteItem, changeDataTable ] = useStore( state => [ state.deleteItem, state.changeDataTable ]);
+  const [ bill_items_doc, bill_items, allPrice, allPrice_w_nds ] = useStore( state => [ state.bill_items_doc, state.bill_items, state.allPrice, state.allPrice_w_nds ]);
 
   return (
     <>
@@ -1394,7 +2088,7 @@ function VendorItemsTableEdit(){
                         value={item.pq}
                         multiple={false}
                         is_none={false}
-                        func={this.changeDataTable.bind(this, 'pq', item.id, key)}
+                        func={(event) => changeDataTable(event, 'pq', item.id, key)}
                         label=""
                       />
                     </TableCell>
@@ -1403,8 +2097,8 @@ function VendorItemsTableEdit(){
                         type="number"
                         label=""
                         value={item.count}
-                        func={this.changeDataTable.bind(this, 'count', item.id, key)}
-                        onBlur={this.changeDataTable.bind(this, 'count', item.id, key)}
+                        func={(event) => changeDataTable(event, 'count', item.id, key)}
+                        onBlur={(event) => changeDataTable(event, 'count', item.id, key)}
                       />
                     </TableCell>
                     <TableCell style={{ whiteSpace: 'nowrap' }}>{item.fact_unit} {item.ed_izmer_name}</TableCell>
@@ -1414,8 +2108,8 @@ function VendorItemsTableEdit(){
                         type="number"
                         label=""
                         value={item.price_item}
-                        func={this.changeDataTable.bind(this, 'price_item', item.id, key)}
-                        onBlur={this.changeDataTable.bind(this, 'price_item', item.id, key)}
+                        func={(event) => changeDataTable(event, 'price_item', item.id, key)}
+                        onBlur={(event) => changeDataTable(event, 'price_item', item.id, key)}
                       />
                     </TableCell>
                     <TableCell style={{ whiteSpace: 'nowrap' }}>{item.summ_nds} ₽</TableCell>
@@ -1424,8 +2118,8 @@ function VendorItemsTableEdit(){
                         type="number"
                         label=""
                         value={item.price_w_nds}
-                        func={this.changeDataTable.bind(this, 'price_w_nds', item.id, key)}
-                        onBlur={this.changeDataTable.bind(this, 'price_w_nds', item.id, key)}
+                        func={(event) => changeDataTable(event, 'price_w_nds', item.id, key)}
+                        onBlur={(event) => changeDataTable(event, 'price_w_nds', item.id, key)}
                       />
                     </TableCell>
                     {item?.data_bill ? null :
@@ -1466,6 +2160,315 @@ function VendorItemsTableEdit(){
   )
 }
 
+function FormHeader_new({ page }){
+
+  const [points, point_name, search_point, types, type, changeData, search_vendors, vendors, search_vendor, kinds, doc_base_id, docs, doc, search_doc, changeInput, number, number_factur, changeDateRange, date, date_factur, fullScreen, vendor_name] = useStore( state => [ state.points, state.point_name, state.search_point, state.types, state.type, state.changeData, state.search_vendors, state.vendors, state.search_vendor, state.kinds, state.doc_base_id, state.docs, state.doc, state.search_doc, state.changeInput, state.number, state.number_factur, state.changeDateRange, state.date, state.date_factur, state.fullScreen, state.vendor_name]);
+
+  return (
+    <>
+      {page === 'new' ? 
+        <Grid item xs={12} sm={4}>
+          <MyAutocomplite2
+            data={points}
+            value={point_name}
+            multiple={false}
+            func={ (event, name) => search_point(event, name) }
+            onBlur={ (event, name) => search_point(event, name) }
+            label="Точка"
+          />
+        </Grid>
+        :
+        <Grid item xs={12} sm={4}>
+          <MyTextInput label="Точка" disabled={true} value={point_name} className='disabled_input'/>
+        </Grid>
+      }
+
+      <Grid item xs={12} sm={4}>
+        <MySelect
+          data={types}
+          value={type}
+          multiple={false}
+          is_none={false}
+          func={ event => changeData('type', event) }
+          label="Тип"
+        />
+      </Grid>
+
+      {page === 'new' ? 
+        <Grid item xs={12} sm={4}>
+          <MyAutocomplite2
+            label="Поставщик"
+            freeSolo={true}
+            multiple={false}
+            data={vendors}
+            value={search_vendor}
+            func={ (event, name) => search_vendors(event, name) }
+            onBlur={ (event, name) => search_vendors(event, name) }
+          />
+        </Grid>
+        :
+        <Grid item xs={12} sm={4}>
+          <MyTextInput label="Поставщик" disabled={true} value={vendor_name} className='disabled_input'/>
+        </Grid>
+      }
+
+      {parseInt(type) === 2 || parseInt(type) === 3 ? (
+        <>
+          <Grid item xs={12} sm={4}>
+            <MySelect
+              data={kinds}
+              value={doc_base_id}
+              multiple={false}
+              is_none={false}
+              func={ event => changeData('doc_base_id', event) }
+              label="Документ"
+            />
+          </Grid>
+          {parseInt(type) === 2 ?  <Grid item xs={12} sm={4}></Grid> : null}
+        </>
+      ) : null}
+
+      {parseInt(type) === 3 || parseInt(type) === 4 ? (
+        <>
+          <Grid item xs={12} sm={4}>
+            <MyAutocomplite2
+              data={docs}
+              multiple={false}
+              value={doc}
+              func={ (event, name) => search_doc(event, name) }
+              onBlur={ (event, name) => search_doc(event, name) }
+              label="Документ основание"
+            />
+          </Grid>
+          {parseInt(type) === 4 ?  <Grid item xs={12} sm={4}></Grid> : null}
+        </>
+      ) : null}
+
+      <Grid item xs={12} sm={6}>
+        <MyTextInput
+          label="Номер документа"
+          value={number}
+          func={ (event) => changeInput(event, 'number') }
+        />
+      </Grid>
+
+      {parseInt(type) === 2 && !fullScreen ? 
+        <Grid item xs={12} sm={6}>
+          <MyTextInput
+            label="Номер счет-фактуры"
+            value={number_factur}
+            func={ (event) => changeInput(event, 'number_factur') }
+          />
+        </Grid>
+        : null
+      }
+
+      <Grid item xs={12} sm={6}>
+        <MyDatePickerNew
+          label="Дата документа"
+          value={date}
+          func={ (event) => changeDateRange(event, 'date') }
+        />
+      </Grid>
+
+      {parseInt(type) === 2 && !fullScreen ? 
+        <Grid item xs={12} sm={6}>
+          <MyDatePickerNew
+            label="Дата счет-фактуры"
+            value={date_factur}
+            func={ (event) => changeDateRange(event, 'date_factur') }
+          />
+        </Grid>
+        : null
+      }
+    </>
+  )
+}
+
+function FormImage_new({ page }){
+
+  const [type, imgs_bill, openImageBill, fullScreen, imgs_factur, number_factur, changeInput, changeDateRange, date_factur] = useStore( state => [state.type, state.imgs_bill, state.openImageBill, state.fullScreen, state.imgs_factur, state.number_factur, state.changeInput, state.changeDateRange, state.date_factur]);
+
+  return (
+    <>
+      <Grid item xs={12} sm={parseInt(type) === 2 ? 6 : 12}>
+        <TableContainer>
+          <Grid display="flex" flexDirection="row" style={{ fontWeight: 'bold' }}>
+            {!imgs_bill.length ? page === 'new' ? null : 'Фото отсутствует' :
+              <>
+                {imgs_bill.map((img, key) => (
+                  <img 
+                    key={key} 
+                    src={'https://storage.yandexcloud.net/bill/' + img} 
+                    alt="Image bill" 
+                    className="img_modal"
+                    onClick={() => openImageBill('https://storage.yandexcloud.net/bill/' + img)}
+                  />
+                ))}
+              </>
+            }
+          </Grid>
+        </TableContainer>
+      </Grid>
+
+      {parseInt(type) === 2 && !fullScreen ? (
+        <Grid item xs={12} sm={6} display="flex" flexDirection="row" style={{ fontWeight: 'bold' }}>
+          {!imgs_factur.length ? page === 'new' ? null : 'Фото отсутствует' :
+            <>
+              {imgs_factur.map((img, key) => (
+                <img 
+                  key={key} 
+                  src={'https://storage.yandexcloud.net/bill/' + img} 
+                  alt="Image bill" 
+                  className="img_modal"
+                  onClick={() => openImageBill('https://storage.yandexcloud.net/bill/' + img)}
+                />
+              ))}
+            </>
+          }
+        </Grid>
+      ) : null}
+
+      <Grid item xs={12} sm={parseInt(type) === 2 ? 6 : 12}>
+        <div
+          className="dropzone"
+          id="img_bill"
+          style={{ width: '100%', minHeight: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        />
+      </Grid>
+
+      {parseInt(type) === 2 && !fullScreen ? (
+        <Grid item xs={12} sm={6}>
+          <div
+            className="dropzone"
+            id="img_bill_type"
+            style={{ width: '100%', minHeight: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          />
+        </Grid>
+      ) : null}
+
+      {parseInt(type) === 2 && fullScreen ? 
+        <>
+          <Grid item xs={12}>
+            <MyTextInput
+              label="Номер счет-фактуры"
+              value={number_factur}
+              func={ (event) => changeInput(event, 'number_factur') }
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <MyDatePickerNew
+              label="Дата счет-фактуры"
+              value={date_factur}
+              func={ (event) => changeDateRange(event, 'date_factur') }
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TableContainer>
+              <Grid display="flex" flexDirection="row" style={{ fontWeight: 'bold' }}>
+                {!imgs_factur.length ? page === 'new' ? null : 'Фото отсутствует' :
+                  <>
+                    {imgs_factur.map((img, key) => (
+                      <img 
+                        key={key} 
+                        src={'https://storage.yandexcloud.net/bill/' + img} 
+                        alt="Image bill" 
+                        className="img_modal"
+                        onClick={() => openImageBill('https://storage.yandexcloud.net/bill/' + img)}
+                      />
+                    ))}
+                  </>
+                }
+              </Grid>
+            </TableContainer>
+          </Grid>
+
+          <Grid item xs={12}>
+            <div
+              className="dropzone"
+              id="img_bill_type"
+              style={{ width: '100%', minHeight: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            />
+          </Grid>
+        </>
+        : null
+      }
+    </>
+  )
+}
+
+function FormOther_new({ page }){
+
+  const [type, date_items, changeDateRange, users, user, changeAutocomplite, comment, changeInput, changeItemChecked, is_new_doc] = useStore( state => [state.type, state.date_items, state.changeDateRange, state.users, state.user, state.changeAutocomplite, state.comment, state.changeInput, state.changeItemChecked, state.is_new_doc]);
+
+  return (
+    <>
+      {parseInt(type) === 1 ? null :
+        <>
+          <Grid item xs={12} sm={6}>
+            <MyDatePickerNew
+              label="Дата разгрузки"
+              value={date_items}
+              func={ (event) => changeDateRange(event, 'date_items') }
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <MyAutocomplite
+              data={users}
+              multiple={true}
+              value={user}
+              func={(event, data) => changeAutocomplite('user', data)}
+              label="Сотрудники"
+            />
+          </Grid>
+        </>
+      }
+
+      <Grid item xs={12} sm={12}>
+        <MyTextInput
+          label="Комментарии"
+          multiline={true}
+          maxRows={3}
+          value={comment}
+          func={ (event) => changeInput(event, 'comment') }
+        />
+      </Grid>
+
+      {page === 'new' ? null :
+        <>
+          <Grid item xs={12} sm={6} style={{ display: 'flex', marginBottom: 20 }}>
+            <Typography style={{ fontWeight: 'bold', color: '#9e9e9e' }}>
+              Причина удаления:&nbsp;
+            </Typography>
+            <Typography></Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} style={{ display: 'flex', marginBottom: 20 }}>
+            <Typography style={{ fontWeight: 'bold', color: '#9e9e9e' }}>Комментарий бухгалтера:&nbsp;</Typography>
+            <Typography>Переделать фото</Typography>
+          </Grid>
+        </>
+      }
+
+
+      <Grid item xs={12} sm={12} display="flex" alignItems="center">
+        <MyCheckBox
+          value={parseInt(is_new_doc) === 1 ? true : false}
+          func={ (event) => changeItemChecked(event, 'is_new_doc') }
+          label=""
+        />
+        <Typography component="span" className="span_text">
+          Поставщик привезет новый документ
+        </Typography>
+      </Grid>
+
+    </>
+  )
+}
+
 // Страница Новый документ
 class Billing_New_ extends React.Component {
   dropzoneOptions = {
@@ -1490,70 +2493,6 @@ class Billing_New_ extends React.Component {
       module_name: '',
       is_load: false,
 
-      date: null,
-      date_items: null,
-
-      operAlert: false,
-      err_status: true,
-      err_text: '',
-
-      points: [],
-      point: '',
-      point_name: '',
-
-      users: [],
-      user: [],
-
-      vendors: [],
-      vendorsCopy: [],
-
-      vendor_items: [],
-      vendor_itemsCopy: [],
-
-      kinds: [],
-      doc_base_id: '',
-
-      types: [],
-      type: '',
-
-      docs: [],
-      doc: '',
-
-      number: '',
-      search_vendor: '',
-      search_item: '',
-
-      all_ed_izmer: [],
-      pq: '',
-      count: '',
-      fact_unit: '',
-
-      summ: '',
-      sum_w_nds: '',
-
-      bill_items: [],
-      bill_items_doc: [],
-
-      allPrice: '',
-      allPrice_w_nds: '',
-
-      comment: '',
-
-      vendor: null,
-      bill: null,
-      imgs_bill: [],
-      bill_list: [],
-
-      number_factur: '',
-      date_factur: null,
-      imgs_factur: [],
-
-      modalDialog: false,
-      fullScreen: false,
-      image: '',
-
-      is_new_doc: 0,
-
       DropzoneDop: null
     };
   }
@@ -1561,15 +2500,21 @@ class Billing_New_ extends React.Component {
   async componentDidMount() {
     const data = await this.getData('get_points')
 
-    this.setState({
-      module_name: 'Новый документ',
+    const { setData } = this.props.store;
+
+    setData({
       points: data.points,
       types: types,
+    })
+
+    this.setState({
+      module_name: 'Новый документ',
     });
 
-    //document.title = data.module_info.name;
+    document.title = 'Накладные';
 
     this.myDropzone = new Dropzone("#img_bill", this.dropzoneOptions);
+   
   }
 
   getData = (method, data = {}) => {
@@ -1618,616 +2563,6 @@ class Billing_New_ extends React.Component {
       });
   };
 
-  // поиск/выбор поставщика/товара поставщика/точки/документа для коррекции/возврата
-  async search(type, event, value) {
-    const { setData } = this.props.store;
-
-    const search = event.target.value ? event.target.value : value ? value : '';
-
-    if (type === 'search_vendor') {
-
-      const vendorsCopy = this.state.vendorsCopy;
-
-      const vendors = vendorsCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
-
-      if (search && vendors.length) {
-
-        const point = this.state.point;
-
-        const data = {
-          point_id: point.id,
-          vendor_id: vendors[0].id
-        }
-
-        const res = await this.getData('get_vendor_items', data);
-        const docs = await this.getData('get_base_doc', data);
-
-        setData({
-          vendor_items: res.items,
-          vendor_itemsCopy: res.items,
-        })
-
-        this.setState({
-          vendor_items: res.items,
-          vendor_itemsCopy: res.items,
-          users: res.users,
-          docs: docs.billings,
-        });
-
-      } else {
-      
-        this.setState({
-          bill_items: [],
-          bill_items_doc: [],
-          search_item: '',
-          vendor_items: [],
-          vendor_itemsCopy: [],
-          all_ed_izmer: [],
-          pq: '',
-          count: '',
-          fact_unit: '',
-          summ: '',
-          sum_w_nds: '',
-          docs: [],
-          doc: '',
-        });
-
-      }
-
-      this.setState({
-        search_vendor: search,
-        vendors,
-      });
-    }
-
-    if (type === 'search_item') {
-      const vendor_itemsCopy = JSON.parse(JSON.stringify(this.state.vendor_itemsCopy))
-
-      if (vendor_itemsCopy.length) {
-
-        let vendor_items = vendor_itemsCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
-
-        vendor_items.map((item) => {
-          item.pq_item = item.pq_item.map(it => {
-            it = { name: `${it.name} ${item.ed_izmer_name}`, id: it.id };
-            return it;
-          });
-          return item;
-        });
-
-        this.setState({
-          vendor_items,
-          all_ed_izmer: search && vendor_items.length ? vendor_items[0].pq_item : [],
-          pq: search && vendor_items.length ? vendor_items[0].pq_item[0].id : '',
-          count: '',
-          fact_unit: '',
-          summ: '',
-          sum_w_nds: '',
-        });
-      }
-
-      this.setState({
-        search_item: search,
-      });
-    }
-
-    if(type === 'doc') {
-
-      if(search) {
-        
-        const docs = this.state.docs;
-        const vendor_id = this.state.vendors[0]?.id;
-        const point = this.state.point;
-        
-        const billing_id = docs.find(doc => doc.name === search)?.id;
-        
-        const obj = {
-          billing_id,
-          vendor_id,
-          point_id: point.id,
-        }
-        
-        const res = await this.getData('get_base_doc_data', obj);
-        
-        setData({
-          vendor_items: res.items,
-          vendor_itemsCopy: res.items,
-        })
-
-        this.setState({
-          bill_items: [],
-          search_item: '',
-          vendor_items: res.items,
-          vendor_itemsCopy: res.items,
-          users: res.users,
-          all_ed_izmer: [],
-          pq: '',
-          count: '',
-          fact_unit: '',
-          summ: '',
-          sum_w_nds: '',
-          bill_items_doc: res.billing_items,
-        });
-  
-      } else {
-
-        const point = this.state.point;
-        const vendors = this.state.vendors;
-        const docs = this.state.docs;
-
-        if(point && vendors.length === 1 && docs.length) {
-          
-          const data = {
-            point_id: point.id,
-            vendor_id: vendors[0]?.id
-          }
-          
-          const res = await this.getData('get_vendor_items', data);
-          
-          setData({
-            vendor_items: res.items,
-            vendor_itemsCopy: res.items,
-          })
-
-          this.setState({
-            bill_items: [],
-            bill_items_doc: [],
-            vendor_items: res.items,
-            vendor_itemsCopy: res.items,
-            users: res.users,
-            search_item: '',
-            all_ed_izmer: [],
-            pq: '',
-            count: '',
-            fact_unit: '',
-            summ: '',
-            sum_w_nds: '',
-          });
-        }
-
-      }
-
-      this.setState({
-        [type]: search,
-      });
-
-    }
-
-    if (type === 'point_name') {
-      
-      const points = this.state.points;
-      const point = points.find(item => item.name === search);
-      
-      this.setState({
-        bill_items: [],
-        bill_items_doc: [],
-        point: point ?? '',
-        [type]: point?.name ?? '',
-        search_vendor: '',
-        search_item: '',
-        vendor_items: [],
-        vendor_itemsCopy: [],
-        all_ed_izmer: [],
-        pq: '',
-        count: '',
-        fact_unit: '',
-        summ: '',
-        sum_w_nds: '',
-        users: [],
-        docs: [],
-        doc: ''
-      });
-
-      if(point) {
-    
-          const obj = {
-            point_id: point.id
-          }
-    
-          const res = await this.getData('get_vendors', obj)
-    
-          this.setState({
-            vendors: res.vendors,
-            vendorsCopy: res.vendors,
-          })
-
-        } else {
-          this.setState({
-            vendors: [],
-            vendorsCopy: [],
-          })
-        }
-    }
-  }
-
-  async changeSelect(data, event) {
-    this.handleResize();
-
-    const { setData } = this.props.store;
-
-    const value = event.target.value;
-    
-    if(data === 'type' && (parseInt(value) === 3 || parseInt(value) === 2)) {
-      let kinds = [];
-
-      if( parseInt(value) === 2 ){
-        kinds = [
-          {
-            "name": "Накладная",
-            "id": "1"
-          },
-          {
-            "name": "УПД",
-            "id": "2"
-          },
-        ];
-      }else{
-        kinds = [
-          {
-            "name": "Накладная",
-            "id": "1"
-          },
-          {
-            "name": "УКД",
-            "id": "2"
-          },
-        ];
-      }
-
-      this.setState({
-        kinds,
-      });
-    }
-
-    if(data === 'type' && (parseInt(value) === 1 || parseInt(value) === 2)) {
-
-      const point = this.state.point;
-      const vendors = this.state.vendors;
-
-      if(point && vendors.length === 1) {
-
-        const data = {
-          point_id: point.id,
-          vendor_id: vendors[0]?.id
-        }
-        
-        const res = await this.getData('get_vendor_items', data);
-        
-        console.log( {
-          vendor_items: res.items,
-          vendor_itemsCopy: res.items,
-        } )
-
-        setData({
-          vendor_items: res.items,
-          vendor_itemsCopy: res.items,
-        })
-
-        this.setState({
-          bill_items: [],
-          bill_items_doc: [],
-          vendor_items: res.items,
-          vendor_itemsCopy: res.items,
-          users: res.users,
-          search_item: '',
-          all_ed_izmer: [],
-          pq: '',
-          count: '',
-          fact_unit: '',
-          summ: '',
-          sum_w_nds: '',
-          doc: '',
-          kinds: []
-        });
-      }
-    }
-
-    this.setState({
-      [data]: value,
-    });
-
-    if(data === 'type' && parseInt(value) === 2){
-      setTimeout( () => {
-        this.setState({
-          DropzoneDop: new Dropzone("#img_bill_type", this.dropzoneOptions)
-        })
-      }, 500 )
-      
-    }else{
-      this.setState({
-        DropzoneDop: null
-      })
-    }
-  }
-
-  changeInput(type, event) {
-    if (type === 'number' || type === 'number_factur') {
-      this.setState({
-        [type]: event.target.value,
-      });
-    } else {
-      if (!this.state.pq && !this.state.all_ed_izmer.lenght) {
-        this.setState({
-          operAlert: true,
-          err_status: false,
-          err_text: 'Необходимо выбрать Товар',
-        });
-        return;
-      }
-
-      if (type === 'count') {
-        const count = event.target.value;
-
-        const fact_unit = Number(this.state.pq) * Number(count);
-
-        this.setState({
-          count,
-          fact_unit: fact_unit ? fact_unit : '',
-        });
-      } else {
-        this.setState({
-          [type]: event.target.value,
-        });
-      }
-    }
-  }
-
-  changeDateRange(data, event) {
-    this.setState({
-      [data]: event,
-    });
-  }
-
-  async changeAutocomplite(type, event, data) {
-    this.setState({
-      [type]: data,
-    });
-  }
-
-  changeItem(data, event) {
-    this.setState({
-      [data]: event.target.value,
-    });
-  }
-
-  check_nds_bill(value) {
-   let nds = [];
-   nds[0] = 'без НДС';
-   nds[10] = '10 %';
-   nds[20] = '20 %';
-   nds[18] = '18 %';
-
-   return nds[Number(value)] ? nds[Number(value)] : false;
-  }
-
-  check_price_item(price, percent, summ, pq) {
-
-    const res = Number(price) / 100 * Number(percent);
-
-    const price_item = Number(summ) / Number(pq);
-
-    if(price_item >= (Number(price) - res) && price_item <= (Number(price) + res)) {
-      return true
-    } else {
-      return false
-    }
-  }
-
-  addItem() {
-    const { count, fact_unit, summ, sum_w_nds, all_ed_izmer, pq, vendor_items } = this.state;
-
-    let bill_items = JSON.parse(JSON.stringify(this.state.bill_items));
-
-    if (!count || !fact_unit || !summ || !sum_w_nds) {
-      this.setState({
-        operAlert: true,
-        err_status: false,
-        err_text: 'Необходимо указать сумму / кол-во Товара',
-      });
-
-      return;
-    }
-
-    const nds = this.check_nds_bill((Number(sum_w_nds) - Number(summ)) / (Number(summ) / 100))
-
-    if (!nds) {
-
-      this.setState({
-        operAlert: true,
-        err_status: false,
-        err_text: 'Суммы указаны неверно',
-      });
-
-      return;
-    }
-
-    const range_price_item = this.check_price_item(vendor_items[0].price, vendor_items[0].vend_percent, summ, pq)
-
-    if(range_price_item) {
-      vendor_items[0].color = false;
-    } else {
-      vendor_items[0].color = true;
-    }
-
-    vendor_items[0].summ_nds = (Number(sum_w_nds) - Number(summ)).toFixed(2);
-    vendor_items[0].nds = nds;
-    vendor_items[0].pq = pq;
-    vendor_items[0].all_ed_izmer = all_ed_izmer;
-    vendor_items[0].count = count;
-    vendor_items[0].fact_unit = (Number(fact_unit)).toFixed(2);
-    vendor_items[0].price_item = summ;
-    vendor_items[0].price_w_nds = sum_w_nds;
-
-    const bill_items_doc = this.state.bill_items_doc;
-
-    if(bill_items_doc.length) {
-      const item = bill_items_doc.find(it => it.item_id === vendor_items[0].id);
-
-      item.fact_unit = (Number(item.count) * Number(item.pq)).toFixed(2);
-      item.summ_nds = (Number(item.price_w_nds) - Number(item.price)).toFixed(2);
-
-      const nds = this.check_nds_bill((Number(item.price_w_nds) - Number(item.price)) / (Number(item.price) / 100))
-
-      if(nds) {
-        item.nds = nds;
-      } else {
-        item.nds = '';
-      }
-
-      vendor_items[0].data_bill = item;
-    }
-
-    bill_items.push(vendor_items[0]);
-
-    const allPrice = (bill_items.reduce((all, item) => all + Number(item.price_item), 0)).toFixed(2);
-    const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
-
-    this.setState({
-      bill_items,
-      allPrice,
-      allPrice_w_nds,
-      count: '',
-      fact_unit: '',
-      summ: '',
-      sum_w_nds: '',
-    });
-  }
-
-  deleteItem(index) {
-    const bill_items = JSON.parse(JSON.stringify(this.state.bill_items));
-
-    bill_items.splice(index, 1);
-
-    const allPrice = (bill_items.reduce((all, item) => all + Number(item.price_item), 0)).toFixed(2);
-    const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
-
-    this.setState({
-      bill_items,
-      allPrice,
-      allPrice_w_nds,
-    });
-  }
-
-  changeDataTable(type, id, key, event) {
-    const value = event.target.value;
-
-    let bill_items = JSON.parse(JSON.stringify(this.state.bill_items));
-
-    bill_items = bill_items.map((item, index) => {
-      if (item.id === id && key === index) {
-
-        item[type] = value;
-
-        if (type === 'pq') {
-          item.fact_unit = (Number(item[type]) * Number(item.count)).toFixed(2);
-
-          const range_price_item = this.check_price_item(item.price, item.vend_percent, item.price_item, item.pq)
-  
-          if(range_price_item) {
-            item.color = false;
-          } else {
-            item.color = true;
-          }
-
-        } 
-
-        if (value && value !== '0' && value[0] !== '0' && type === 'count') {
-
-          item.fact_unit = (Number(item[type]) * Number(item.pq)).toFixed(2);
-          const range_price_item = this.check_price_item(item.price, item.vend_percent, item.price_item, item.pq)
-
-          if(range_price_item) {
-            item.color = false;
-          } else {
-            item.color = true;
-          }
-
-        } else {
-
-          if (type === 'count') {
-            item.fact_unit = 0;
-          }
-    
-          item.color = true;
-
-        }
-
-
-        if(type === 'price_item' || type === 'price_w_nds') {
-          const nds = this.check_nds_bill((Number(item.price_w_nds) - Number(item.price_item)) / (Number(item.price_item) / 100))
-
-          const range_price_item = this.check_price_item(item.price, item.vend_percent, item.price_item, item.pq)
-  
-          if (nds) {
-            item.nds = nds;
-            item.summ_nds = (Number(item.price_w_nds) - Number(item.price_item)).toFixed(2)
-          } else {
-            item.summ_nds = 0;
-            item.nds = '';
-          }
-
-          if(nds && range_price_item) {
-            item.color = false;
-          } else {
-            item.color = true;
-          }
-        } 
-
-      }
-
-      return item;
-    });
-
-    if (type === 'price_item') {
-      const allPrice = (bill_items.reduce((all, item) => all + Number(item.price_item), 0)).toFixed(2);
-
-      this.setState({
-        allPrice,
-      });
-    }
-
-    if (type === 'price_w_nds') {
-      const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
-
-      this.setState({
-        allPrice_w_nds,
-      });
-    }
-
-    this.setState({
-      bill_items,
-    });
-  }
-
-  handleResize() {
-    if (window.innerWidth < 601) {
-      this.setState({
-        fullScreen: true,
-      });
-    } else {
-      this.setState({
-        fullScreen: false,
-      });
-    }
-  }
-
-  openImageBill (image) {
-    this.handleResize();
-
-    this.setState({ 
-      modalDialog: true, 
-      image
-    })
-  }
-
-  changeItemChecked(data, event) {
-    const value = event.target.checked === true ? 1 : 0;
-
-    this.setState({
-      [data]: value,
-    });
-  }
-
   save_main_img(dropzone, point_id, bill_id){
     if( dropzone && dropzone['files'].length > 0 ){
       let i = 0;
@@ -2272,7 +2607,7 @@ class Billing_New_ extends React.Component {
   }
 
   async saveNewBill () {
-    const {number, point, vendors, date, number_factur, date_factur, type, doc, doc_base_id, date_items, user, comment, is_new_doc, bill_items} = this.state;
+    const {number, point, vendors, date, number_factur, date_factur, type, doc, doc_base_id, date_items, user, comment, is_new_doc, bill_items} = this.props.store;
 
     const dateBill = date ? dayjs(date).format('YYYY-MM-DD') : '';
     const dateFactur = date_factur ? dayjs(date_factur).format('YYYY-MM-DD') : '';
@@ -2352,28 +2687,28 @@ class Billing_New_ extends React.Component {
   }
 
   render() {
-    const { isPink } = this.props.store;
+    const { isPink, operAlert, err_status, err_text, closeAlert, is_load_store, modalDialog, fullScreen, image, closeDialog } = this.props.store;
 
-    console.log( 'isPink', isPink )
+    // console.log( 'isPink', isPink )
 
     return (
       <>
-        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load || is_load_store}>
           <CircularProgress color="inherit" />
         </Backdrop>
 
         <Billing_Modal
-          open={this.state.modalDialog}
-          onClose={() => this.setState({ modalDialog: false })}
-          fullScreen={this.state.fullScreen}
-          image={this.state.image}
+          open={modalDialog}
+          onClose={closeDialog}
+          fullScreen={fullScreen}
+          image={image}
         />
-
+        
         <MyAlert
-          isOpen={this.state.operAlert}
-          onClose={() => this.setState({ operAlert: false })}
-          status={this.state.err_status}
-          text={this.state.err_text}
+          isOpen={operAlert}
+          onClose={closeAlert}
+          status={err_status}
+          text={err_text}
         />
 
         <Grid container spacing={3} mb={10}>
@@ -2382,268 +2717,16 @@ class Billing_New_ extends React.Component {
             <h1>{this.state.module_name}</h1>
             <Divider style={{ backgroundColor: 'rgba(0, 0, 0, 0.87)' }} />
           </Grid>
+
+          <FormHeader_new page={'new'} />
           
-          <Grid item xs={12} sm={4}>
-            <MyAutocomplite2
-              data={this.state.points}
-              value={this.state.point_name}
-              multiple={false}
-              func={this.search.bind(this, 'point_name')}
-              onBlur={this.search.bind(this, 'point_name')}
-              label="Точка"
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <MySelect
-              data={this.state.types}
-              value={this.state.type}
-              multiple={false}
-              is_none={false}
-              func={this.changeSelect.bind(this, 'type')}
-              label="Тип"
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <MyAutocomplite2
-              label="Поставщик"
-              freeSolo={true}
-              multiple={false}
-              data={this.state.vendors}
-              value={this.state.search_vendor}
-              func={this.search.bind(this, 'search_vendor')}
-              onBlur={this.search.bind(this, 'search_vendor')}
-            />
-          </Grid>
-
-          {parseInt(this.state.type) === 2 || parseInt(this.state.type) === 3 ? (
-            <>
-              <Grid item xs={12} sm={4}>
-                <MySelect
-                  data={this.state.kinds}
-                  value={this.state.doc_base_id}
-                  multiple={false}
-                  is_none={false}
-                  func={this.changeSelect.bind(this, 'doc_base_id')}
-                  label="Документ"
-                />
-              </Grid>
-              {parseInt(this.state.type) === 2 ? 
-                <Grid item xs={12} sm={4}></Grid>
-                : null
-              }
-            </>
-          ) : null}
-
-          {parseInt(this.state.type) === 3 || parseInt(this.state.type) === 4 ? (
-            <>
-              <Grid item xs={12} sm={4}>
-                <MyAutocomplite2
-                  data={this.state.docs}
-                  multiple={false}
-                  value={this.state.doc}
-                  func={this.search.bind(this, 'doc')}
-                  onBlur={this.search.bind(this, 'doc')}
-                  label="Документ основание"
-                />
-              </Grid>
-                {parseInt(this.state.type) === 4 ? 
-                  <Grid item xs={12} sm={4}></Grid>
-                  : null
-                }
-            </>
-          ) : null}
-
-          <Grid item xs={12} sm={6}>
-            <MyTextInput
-              label="Номер документа"
-              value={this.state.number}
-              func={this.changeInput.bind(this, 'number')}
-            />
-          </Grid>
-
-          {parseInt(this.state.type) === 2 && !this.state.fullScreen ? 
-            <Grid item xs={12} sm={6}>
-              <MyTextInput
-                label="Номер счет-фактуры"
-                value={this.state.number_factur}
-                func={this.changeInput.bind(this, 'number_factur')}
-              />
-            </Grid>
-            : null
-          }
-
-          <Grid item xs={12} sm={6}>
-            <MyDatePickerNew
-              label="Дата документа"
-              value={this.state.date}
-              func={this.changeDateRange.bind(this, 'date')}
-            />
-          </Grid>
-
-          {parseInt(this.state.type) === 2 && !this.state.fullScreen ? 
-            <Grid item xs={12} sm={6}>
-              <MyDatePickerNew
-                label="Дата счет-фактуры"
-                value={this.state.date_factur}
-                func={this.changeDateRange.bind(this, 'date_factur')}
-              />
-            </Grid>
-            : null
-          }
-          
-          <Grid item xs={12} sm={parseInt(this.state.type) === 2 ? 6 : 12}>
-            <TableContainer>
-              <Grid display="flex" flexDirection="row" style={{ fontWeight: 'bold' }}>
-                {!this.state.imgs_bill.length ? null :
-                  <>
-                    {this.state.imgs_bill.map((img, key) => (
-                      <img 
-                        key={key} 
-                        src={'https://storage.yandexcloud.net/bill/' + img} 
-                        alt="Image bill" 
-                        className="img_modal"
-                        onClick={this.openImageBill.bind(this, 'https://storage.yandexcloud.net/bill/' + img)}
-                      />
-                    ))}
-                  </>
-                }
-              </Grid>
-            </TableContainer>
-          </Grid>
-
-          {parseInt(this.state.type) === 2 && !this.state.fullScreen ? (
-            <Grid item xs={12} sm={6} display="flex" flexDirection="row" style={{ fontWeight: 'bold' }}>
-              {!this.state.imgs_factur.length ? null :
-                <>
-                  {this.state.imgs_factur.map((img, key) => (
-                    <img 
-                      key={key} 
-                      src={'https://storage.yandexcloud.net/bill/' + img} 
-                      alt="Image bill" 
-                      className="img_modal"
-                      onClick={this.openImageBill.bind(this, 'https://storage.yandexcloud.net/bill/' + img)}
-                    />
-                  ))}
-                </>
-              }
-            </Grid>
-          ) : null}
-
-          <Grid item xs={12} sm={parseInt(this.state.type) === 2 ? 6 : 12}>
-            <div
-              className="dropzone"
-              id="img_bill"
-              style={{ width: '100%', minHeight: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            />
-          </Grid>
-
-          {parseInt(this.state.type) === 2 && !this.state.fullScreen ? (
-            <Grid item xs={12} sm={6}>
-              <div
-                className="dropzone"
-                id="img_bill_type"
-                style={{ width: '100%', minHeight: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              />
-            </Grid>
-          ) : null}
-
-          {parseInt(this.state.type) === 2 && this.state.fullScreen ? 
-            <>
-              <Grid item xs={12}>
-                <MyTextInput
-                  label="Номер счет-фактуры"
-                  value={this.state.number_factur}
-                  func={this.changeInput.bind(this, 'number_factur')}
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <MyDatePickerNew
-                  label="Дата счет-фактуры"
-                  value={this.state.date_factur}
-                  func={this.changeDateRange.bind(this, 'date_factur')}
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <TableContainer>
-                  <Grid display="flex" flexDirection="row" style={{ fontWeight: 'bold' }}>
-                    {!this.state.imgs_factur.length ? null :
-                      <>
-                        {this.state.imgs_factur.map((img, key) => (
-                          <img 
-                            key={key} 
-                            src={'https://storage.yandexcloud.net/bill/' + img} 
-                            alt="Image bill" 
-                            className="img_modal"
-                            onClick={this.openImageBill.bind(this, 'https://storage.yandexcloud.net/bill/' + img)}
-                          />
-                        ))}
-                      </>
-                    }
-                  </Grid>
-                </TableContainer>
-              </Grid>
-
-              <Grid item xs={12}>
-                <div
-                  className="dropzone"
-                  id="img_bill_type"
-                  style={{ width: '100%', minHeight: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                />
-              </Grid>
-            </>
-           : null
-          }
-
-          { console.log('тут товары') }
+          <FormImage_new page={'new'} />
 
           <FormVendorItems />
 
-          {parseInt(this.state.type) === 1 ? null :
-            <>
-              <Grid item xs={12} sm={6}>
-                <MyDatePickerNew
-                  label="Дата разгрузки"
-                  value={this.state.date_items}
-                  func={this.changeDateRange.bind(this, 'date_items')}
-                />
-              </Grid>
+          <VendorItemsTableEdit />
 
-              <Grid item xs={12} sm={6}>
-                <MyAutocomplite
-                  data={this.state.users}
-                  multiple={true}
-                  value={this.state.user}
-                  func={this.changeAutocomplite.bind(this, 'user')}
-                  label="Сотрудники"
-                />
-              </Grid>
-            </>
-          }
-
-          <Grid item xs={12} sm={12}>
-            <MyTextInput
-              label="Комментарии"
-              multiline={true}
-              maxRows={3}
-              value={this.state.comment}
-              func={this.changeItem.bind(this, 'comment')}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={12} display="flex" alignItems="center">
-            <MyCheckBox
-              value={parseInt(this.state.is_new_doc) === 1 ? true : false}
-              func={this.changeItemChecked.bind(this, 'is_new_doc')}
-              label=""
-            />
-            <Typography component="span" className="span_text">
-              Поставщик привезет новый документ
-            </Typography>
-          </Grid>
+          <FormOther_new page={'new'} />
 
           <Grid item xs={12} sm={4}>
             <Button variant="contained" fullWidth color="success" style={{ height: '100%' }} onClick={this.saveNewBill.bind(this)}>
@@ -2679,80 +2762,14 @@ class Billing_Edit_ extends React.Component {
       module: 'billing',
       module_name: '',
       is_load: false,
-
-      date: null,
-      date_items: null,
-
-      operAlert: false,
-      err_status: true,
-      err_text: '',
-
-      point: [],
-      point_name: '',
-
-      users: [],
-      user: [],
-
-      vendors: [],
-      vendor_name: '',
-
-      vendor_items: [],
-      vendor_itemsCopy: [],
-
-      kinds: [],
-      doc_base_id: '',
-
-      types: [],
-      type: '',
-
-      docs: [],
-      doc: '',
-
-      number: '',
-      search_item: '',
-
-      all_ed_izmer: [],
-      pq: '',
-      count: '',
-      fact_unit: '',
-
-      summ: '',
-      sum_w_nds: '',
-
-      bill_items: [],
-      bill_items_doc: [],
-
-      allPrice: '',
-      allPrice_w_nds: '',
-
-      comment: '',
-
-      bill_list: [],
-      bill: null,
-      imgs_bill: [],
-      
-      number_factur: '',
-      date_factur: null,
-      imgs_factur: [],
-
-      modalDialog: false,
-      fullScreen: false,
-      image: '',
-
-      is_new_doc: 0,
     };
   }
 
   async componentDidMount() {
-    const url = window.location.pathname.split('/');
 
-    const obj = {
-      type: url[2],
-      id: url[3],
-      point_id: url[4],
-    }
+    const bill = JSON.parse(localStorage.getItem('one_bill'));
 
-    const res = await this.getData('get_one', obj);
+    const res = await this.getData('get_one', bill);
     const points = await this.getData('get_points');
 
     const point = points.points.find(point => point.id === res.bill.point_id);
@@ -2765,7 +2782,9 @@ class Billing_Edit_ extends React.Component {
     const items = await this.getData('get_vendor_items', data);
     const docs = await this.getData('get_base_doc', data);
 
-    this.getDataBill(res, point, items.items, docs);
+    const { getDataBill } = this.props.store;
+
+    getDataBill(res, point, items.items, docs);
 
     document.title = 'Накладные';
   }
@@ -2816,505 +2835,8 @@ class Billing_Edit_ extends React.Component {
       });
   };
 
-  // данные для отрисовки документа на странице
-  async getDataBill(res, point, items, docs) {
-
-    this.setState({
-      is_load: true,
-    });
-
-    const bill_items = res.bill_items.map((item) => {
-
-      item.all_ed_izmer = item.pq_item.map(it => {
-        it = { name: `${it.name} ${item.ed_izmer_name}`, id: it.id };
-        return it;
-      });
-
-      item.fact_unit = (Number(item.fact_unit)).toFixed(2);
-      item.price_item = item.price;
-
-      const nds = this.check_nds_bill((Number(item.price_w_nds) - Number(item.price_item)) / (Number(item.price_item) / 100));
-
-      if (nds) {
-        item.nds = nds;
-        item.summ_nds = (Number(item.price_w_nds) - Number(item.price_item)).toFixed(2)
-      } else {
-        item.summ_nds = (0).toFixed(2);
-        item.nds = '';
-      }
-
-      return item;
-    });
-
-    const allPrice = (bill_items.reduce((all, item) => all + Number(item.price), 0)).toFixed(2);
-    const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
-   
-    this.setState({
-      vendor_items: items,
-      vendor_itemsCopy: items,
-      docs: docs.billings,
-      point: point ?? [],
-      point_name: point?.name ?? '',
-      vendors: res?.vendors ?? [],
-      vendor_name: res?.vendors[0]?.name ?? '',
-      bill_list: res?.bill_hist,
-      imgs_bill: res?.bill_imgs,
-      allPrice,
-      allPrice_w_nds,
-      bill: res?.bill,
-      bill_items,
-      number: res.bill?.number,
-      date: res.bill?.date && res.bill?.date !== "0000-00-00" ? dayjs(res.bill?.date) : null,
-      date_items: res.bill?.date_items ? dayjs(res.bill?.date_items) : null,
-      comment: res.bill?.comment,
-      users: res?.users,
-      user: res?.bill_users,
-      types: types,
-      is_load: false,
-      //
-      kinds: edit.kinds,
-    });
-
-  }
-
-  // поиск/выбор поставщика/товара поставщика/точки/документа для коррекции/возврата
-  async search(type, event, value) {
-
-    const search = event.target.value ? event.target.value : value ? value : '';
-
-    if (type === 'search_item') {
-      const vendor_itemsCopy = JSON.parse(JSON.stringify(this.state.vendor_itemsCopy))
-
-      if (vendor_itemsCopy.length) {
-
-        let vendor_items = vendor_itemsCopy.filter((value) => search ? value.name.toLowerCase() === search.toLowerCase() : value);
-
-        vendor_items.map((item) => {
-          item.pq_item = item.pq_item.map(it => {
-            it = { name: `${it.name} ${item.ed_izmer_name}`, id: it.id };
-            return it;
-          });
-          return item;
-        });
-
-        this.setState({
-          vendor_items,
-          all_ed_izmer: search && vendor_items.length ? vendor_items[0].pq_item : [],
-          pq: search && vendor_items.length ? vendor_items[0].pq_item[0].id : '',
-          count: '',
-          fact_unit: '',
-          summ: '',
-          sum_w_nds: '',
-        });
-      }
-
-      this.setState({
-        search_item: search,
-      });
-    }
-
-    if(type === 'doc') {
-
-      if(search) {
-        
-        const docs = this.state.docs;
-        const vendor_id = this.state.vendors[0]?.id;
-        const point = this.state.point;
-        
-        const billing_id = docs.find(doc => doc.name === search)?.id;
-        
-        const obj = {
-          billing_id,
-          vendor_id,
-          point_id: point.id,
-        }
-        
-        const res = await this.getData('get_base_doc_data', obj);
-        
-        this.setState({
-          search_item: '',
-          vendor_items: res.items,
-          vendor_itemsCopy: res.items,
-          users: res.users,
-          all_ed_izmer: [],
-          pq: '',
-          count: '',
-          fact_unit: '',
-          summ: '',
-          sum_w_nds: '',
-          bill_items_doc: res.billing_items,
-        });
-  
-      } else {
-
-        const point = this.state.point;
-        const vendors = this.state.vendors;
-        const docs = this.state.docs;
-
-        if(point && vendors.length === 1 && docs.length) {
-          
-          const data = {
-            point_id: point.id,
-            vendor_id: vendors[0]?.id
-          }
-          
-          const res = await this.getData('get_vendor_items', data);
-          
-          this.setState({
-            bill_items_doc: [],
-            vendor_items: res.items,
-            vendor_itemsCopy: res.items,
-            users: res.users,
-            search_item: '',
-            all_ed_izmer: [],
-            pq: '',
-            count: '',
-            fact_unit: '',
-            summ: '',
-            sum_w_nds: '',
-          });
-        }
-
-      }
-
-      this.setState({
-        [type]: search,
-      });
-
-    }
-  
-  }
-
-  async changeSelect(data, event) {
-    this.handleResize();
-
-    const value = event.target.value;
-    
-    if(data === 'type' && (parseInt(value) === 1 || parseInt(value) === 2)) {
-
-      const point = this.state.point;
-      const vendors = this.state.vendors;
-
-        if(point && vendors.length === 1) {
-          
-          const data = {
-            point_id: point.id,
-            vendor_id: vendors[0]?.id
-          }
-          
-          const res = await this.getData('get_vendor_items', data);
-          
-          this.setState({
-            bill_items_doc: [],
-            vendor_items: res.items,
-            vendor_itemsCopy: res.items,
-            users: res.users,
-            search_item: '',
-            all_ed_izmer: [],
-            pq: '',
-            count: '',
-            fact_unit: '',
-            summ: '',
-            sum_w_nds: '',
-            doc: '',
-          });
-        }
-    }
-
-    this.setState({
-      [data]: value,
-    });
-  }
-
-  changeInput(type, event) {
-    if (type === 'number' || type === 'number_factur') {
-      this.setState({
-        [type]: event.target.value,
-      });
-    } else {
-      if (!this.state.pq && !this.state.all_ed_izmer.lenght) {
-        this.setState({
-          operAlert: true,
-          err_status: false,
-          err_text: 'Необходимо выбрать Товар',
-        });
-        return;
-      }
-
-      if (type === 'count') {
-        const count = event.target.value;
-
-        const fact_unit = Number(this.state.pq) * Number(count);
-
-        this.setState({
-          count,
-          fact_unit: fact_unit ? fact_unit : '',
-        });
-      } else {
-        this.setState({
-          [type]: event.target.value,
-        });
-      }
-    }
-  }
-
-  changeDateRange(data, event) {
-    this.setState({
-      [data]: event,
-    });
-  }
-
-  async changeAutocomplite(type, event, data) {
-    this.setState({
-      [type]: data,
-    });
-  }
-
-  changeItem(data, event) {
-    this.setState({
-      [data]: event.target.value,
-    });
-  }
-
-  check_nds_bill(value) {
-   let nds = [];
-   nds[0] = 'без НДС';
-   nds[10] = '10 %';
-   nds[20] = '20 %';
-   nds[18] = '18 %';
-
-   return nds[Number(value)] ? nds[Number(value)] : false;
-  }
-
-  check_price_item(price, percent, summ, pq) {
-
-    const res = Number(price) / 100 * Number(percent);
-
-    const price_item = Number(summ) / Number(pq);
-
-    if(price_item >= (Number(price) - res) && price_item <= (Number(price) + res)) {
-      return true
-    } else {
-      return false
-    }
-  }
-
-  addItem() {
-    const { count, fact_unit, summ, sum_w_nds, all_ed_izmer, pq, vendor_items } = this.state;
-
-    let bill_items = JSON.parse(JSON.stringify(this.state.bill_items));
-
-    if (!count || !fact_unit || !summ || !sum_w_nds) {
-      this.setState({
-        operAlert: true,
-        err_status: false,
-        err_text: 'Необходимо указать сумму / кол-во Товара',
-      });
-
-      return;
-    }
-
-    const nds = this.check_nds_bill((Number(sum_w_nds) - Number(summ)) / (Number(summ) / 100))
-
-    if (!nds) {
-
-      this.setState({
-        operAlert: true,
-        err_status: false,
-        err_text: 'Суммы указаны неверно',
-      });
-
-      return;
-    }
-
-    const range_price_item = this.check_price_item(vendor_items[0].price, vendor_items[0].vend_percent, summ, pq)
-
-    if(range_price_item) {
-      vendor_items[0].color = false;
-    } else {
-      vendor_items[0].color = true;
-    }
-
-    vendor_items[0].summ_nds = (Number(sum_w_nds) - Number(summ)).toFixed(2);
-    vendor_items[0].nds = nds;
-    vendor_items[0].pq = pq;
-    vendor_items[0].all_ed_izmer = all_ed_izmer;
-    vendor_items[0].count = count;
-    vendor_items[0].fact_unit = (Number(fact_unit)).toFixed(2);
-    vendor_items[0].price_item = summ;
-    vendor_items[0].price_w_nds = sum_w_nds;
-
-    const bill_items_doc = this.state.bill_items_doc;
-
-    if(bill_items_doc.length) {
-      const item = bill_items_doc.find(it => it.item_id === vendor_items[0].id);
-
-      item.fact_unit = (Number(item.count) * Number(item.pq)).toFixed(2);
-      item.summ_nds = (Number(item.price_w_nds) - Number(item.price)).toFixed(2);
-
-      const nds = this.check_nds_bill((Number(item.price_w_nds) - Number(item.price)) / (Number(item.price) / 100))
-
-      if(nds) {
-        item.nds = nds;
-      } else {
-        item.nds = '';
-      }
-
-      vendor_items[0].data_bill = item;
-    }
-
-    bill_items.push(vendor_items[0]);
-
-    const allPrice = (bill_items.reduce((all, item) => all + Number(item.price_item), 0)).toFixed(2);
-    const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
-
-    this.setState({
-      bill_items,
-      allPrice,
-      allPrice_w_nds,
-      count: '',
-      fact_unit: '',
-      summ: '',
-      sum_w_nds: '',
-    });
-  }
-
-  deleteItem(index) {
-    const bill_items = JSON.parse(JSON.stringify(this.state.bill_items));
-
-    bill_items.splice(index, 1);
-
-    const allPrice = (bill_items.reduce((all, item) => all + Number(item.price_item), 0)).toFixed(2);
-    const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
-
-    this.setState({
-      bill_items,
-      allPrice,
-      allPrice_w_nds,
-    });
-  }
-
-  changeDataTable(type, id, key, event) {
-    const value = event.target.value;
-
-    let bill_items = JSON.parse(JSON.stringify(this.state.bill_items));
-
-    bill_items = bill_items.map((item, index) => {
-      if (item.id === id && key === index) {
-
-        item[type] = value;
-
-        if (type === 'pq') {
-          item.fact_unit = (Number(item[type]) * Number(item.count)).toFixed(2);
-
-          const range_price_item = this.check_price_item(item.price, item.vend_percent, item.price_item, item.pq)
-  
-          if(range_price_item) {
-            item.color = false;
-          } else {
-            item.color = true;
-          }
-
-        } 
-
-        if (value && value !== '0' && value[0] !== '0' && type === 'count') {
-
-          item.fact_unit = (Number(item[type]) * Number(item.pq)).toFixed(2);
-          const range_price_item = this.check_price_item(item.price, item.vend_percent, item.price_item, item.pq)
-
-          if(range_price_item) {
-            item.color = false;
-          } else {
-            item.color = true;
-          }
-
-        } else {
-
-          if (type === 'count') {
-            item.fact_unit = 0;
-          }
-    
-          item.color = true;
-
-        }
-
-        if(type === 'price_item' || type === 'price_w_nds') {
-          const nds = this.check_nds_bill((Number(item.price_w_nds) - Number(item.price_item)) / (Number(item.price_item) / 100))
-
-          const range_price_item = this.check_price_item(item.price, item.vend_percent, item.price_item, item.pq)
-  
-          if (nds) {
-            item.nds = nds;
-            item.summ_nds = (Number(item.price_w_nds) - Number(item.price_item)).toFixed(2)
-          } else {
-            item.summ_nds = (0).toFixed(2);
-            item.nds = '';
-          }
-
-          if(nds && range_price_item) {
-            item.color = false;
-          } else {
-            item.color = true;
-          }
-        } 
-
-      }
-
-      return item;
-    });
-
-    if (type === 'price_item') {
-      const allPrice = (bill_items.reduce((all, item) => all + Number(item.price_item), 0)).toFixed(2);
-
-      this.setState({
-        allPrice,
-      });
-    }
-
-    if (type === 'price_w_nds') {
-      const allPrice_w_nds = (bill_items.reduce((all, item) => all + Number(item.price_w_nds), 0)).toFixed(2);
-
-      this.setState({
-        allPrice_w_nds,
-      });
-    }
-
-    this.setState({
-      bill_items,
-    });
-  }
-
-  handleResize() {
-    if (window.innerWidth < 601) {
-      this.setState({
-        fullScreen: true,
-      });
-    } else {
-      this.setState({
-        fullScreen: false,
-      });
-    }
-  }
-
-  openImageBill (image) {
-    this.handleResize();
-
-    this.setState({ 
-      modalDialog: true, 
-      image
-    })
-  }
-
-  changeItemChecked(data, event) {
-    const value = event.target.checked === true ? 1 : 0;
-
-    this.setState({
-      [data]: value,
-    });
-  }
-
   async saveNewBill () {
-    const {number, point, vendors, date, number_factur, date_factur, type, doc, doc_base_id, date_items, user, comment, is_new_doc, bill_items} = this.state;
+    const {number, point, vendors, date, number_factur, date_factur, type, doc, doc_base_id, date_items, user, comment, is_new_doc, bill_items} = this.props.store;
 
     const dateBill = date ? dayjs(date).format('YYYY-MM-DD') : '';
     const dateFactur = date_factur ? dayjs(date_factur).format('YYYY-MM-DD') : '';
@@ -3366,488 +2888,51 @@ class Billing_Edit_ extends React.Component {
   }
 
   render() {
+
+    const { isPink, operAlert, err_status, err_text, closeAlert, is_load_store, modalDialog, fullScreen, image, closeDialog, bill, bill_list, bill_items } = this.props.store;
+
+    // console.log( 'isPink', isPink )
+
     return (
       <>
-        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load}>
+        <Backdrop style={{ zIndex: 99 }} open={this.state.is_load || is_load_store}>
           <CircularProgress color="inherit" />
         </Backdrop>
 
         <Billing_Modal
-          open={this.state.modalDialog}
-          onClose={() => this.setState({ modalDialog: false })}
-          fullScreen={this.state.fullScreen}
-          image={this.state.image}
+          open={modalDialog}
+          onClose={closeDialog}
+          fullScreen={fullScreen}
+          image={image}
         />
 
         <MyAlert
-          isOpen={this.state.operAlert}
-          onClose={() => this.setState({ operAlert: false })}
-          status={this.state.err_status}
-          text={this.state.err_text}
+          isOpen={operAlert}
+          onClose={closeAlert}
+          status={err_status}
+          text={err_text}
         />
 
         <Grid container spacing={3} mb={10}>
 
           <Grid item xs={12} sm={12}>
-            <h1>Редактирование документа:{' '}{this.state.bill?.number}</h1>
+            <h1>Редактирование документа:{' '}{bill?.number}</h1>
             <Divider style={{ backgroundColor: 'rgba(0, 0, 0, 0.87)' }} />
           </Grid>
+
+          <FormHeader_new page={'edit'} />
           
-          <Grid item xs={12} sm={4}>
-            <MyTextInput label="Точка" disabled={true} value={this.state.point_name} className='disabled_input'/>
-          </Grid>
+          <FormImage_new page={'edit'} />
 
-          <Grid item xs={12} sm={4}>
-            <MySelect
-              data={this.state.types}
-              value={this.state.type}
-              multiple={false}
-              is_none={false}
-              func={this.changeSelect.bind(this, 'type')}
-              label="Тип"
-            />
-          </Grid>
+          <FormVendorItems />
 
-          <Grid item xs={12} sm={4}>
-            <MyTextInput label="Поставщик" disabled={true} value={this.state.vendor_name} className='disabled_input'/>
-          </Grid>
-
-          {parseInt(this.state.type) === 2 || parseInt(this.state.type) === 3 ? (
-            <>
-              <Grid item xs={12} sm={4}>
-                <MySelect
-                  data={this.state.kinds}
-                  value={this.state.doc_base_id}
-                  multiple={false}
-                  is_none={false}
-                  func={this.changeSelect.bind(this, 'doc_base_id')}
-                  label="Документ"
-                />
-              </Grid>
-              {parseInt(this.state.type) === 2 ? 
-                <Grid item xs={12} sm={4}></Grid>
-                : null
-              }
-            </>
-          ) : null}
-
-          {parseInt(this.state.type) === 3 || parseInt(this.state.type) === 4 ? (
-            <>
-              <Grid item xs={12} sm={4}>
-                <MyAutocomplite2
-                  data={this.state.docs}
-                  multiple={false}
-                  value={this.state.doc}
-                  func={this.search.bind(this, 'doc')}
-                  onBlur={this.search.bind(this, 'doc')}
-                  label="Документ основание"
-                />
-              </Grid>
-                {parseInt(this.state.type) === 4 ? 
-                  <Grid item xs={12} sm={4}></Grid>
-                  : null
-                }
-            </>
-          ) : null}
-
-          <Grid item xs={12} sm={6}>
-            <MyTextInput
-              label="Номер документа"
-              value={this.state.number}
-              func={this.changeInput.bind(this, 'number')}
-            />
-          </Grid>
-
-          {parseInt(this.state.type) === 2 && !this.state.fullScreen ? 
-            <Grid item xs={12} sm={6}>
-              <MyTextInput
-                label="Номер счет-фактуры"
-                value={this.state.number_factur}
-                func={this.changeInput.bind(this, 'number_factur')}
-              />
-            </Grid>
-            : null
-          }
-
-          <Grid item xs={12} sm={6}>
-            <MyDatePickerNew
-              label="Дата документа"
-              value={this.state.date}
-              func={this.changeDateRange.bind(this, 'date')}
-            />
-          </Grid>
-
-          {parseInt(this.state.type) === 2 && !this.state.fullScreen ? 
-            <Grid item xs={12} sm={6}>
-              <MyDatePickerNew
-                label="Дата счет-фактуры"
-                value={this.state.date_factur}
-                func={this.changeDateRange.bind(this, 'date_factur')}
-              />
-            </Grid>
-            : null
-          }
-
-          <Grid item xs={12} sm={parseInt(this.state.type) === 2 ? 6 : 12}>
-            <TableContainer>
-              <Grid display="flex" flexDirection="row" style={{ fontWeight: 'bold' }}>
-                {!this.state.imgs_bill.length ? 'Фото отсутствует' :
-                  <>
-                    {this.state.imgs_bill.map((img, key) => (
-                      <img 
-                        key={key} 
-                        src={'https://storage.yandexcloud.net/bill/' + img} 
-                        alt="Image bill" 
-                        className="img_modal"
-                        onClick={this.openImageBill.bind(this, 'https://storage.yandexcloud.net/bill/' + img)}
-                      />
-                    ))}
-                  </>
-                }
-              </Grid>
-            </TableContainer>
-          </Grid>
-
-          {parseInt(this.state.type) === 2 && !this.state.fullScreen ? (
-            <Grid item xs={12} sm={6} display="flex" flexDirection="row" style={{ fontWeight: 'bold' }}>
-              {!this.state.imgs_factur.length ? 'Фото отсутствует' :
-                <>
-                  {this.state.imgs_factur.map((img, key) => (
-                    <img 
-                      key={key} 
-                      src={'https://storage.yandexcloud.net/bill/' + img} 
-                      alt="Image bill" 
-                      className="img_modal"
-                      onClick={this.openImageBill.bind(this, 'https://storage.yandexcloud.net/bill/' + img)}
-                    />
-                  ))}
-                </>
-              }
-            </Grid>
-          ) : null}
-
-          <Grid item xs={12} sm={parseInt(this.state.type) === 2 ? 6 : 12}>
-            <div
-              className="dropzone"
-              id="for_img_edit"
-              style={{ width: '100%', minHeight: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >
-              <span>Выбери документ для загрузки</span>
-            </div>
-          </Grid>
-
-          {parseInt(this.state.type) === 2 && !this.state.fullScreen ? (
-            <Grid item xs={12} sm={6}>
-              <div
-                className="dropzone"
-                id="for_img_edit"
-                style={{ width: '100%', minHeight: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <span>Выбери счет-фактуру для загрузки</span>
-              </div>
-            </Grid>
-          ) : null}
-
-          {parseInt(this.state.type) === 2 && this.state.fullScreen ? 
-            <>
-              <Grid item xs={12}>
-                <MyTextInput
-                  label="Номер счет-фактуры"
-                  value={this.state.number_factur}
-                  func={this.changeInput.bind(this, 'number_factur')}
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <MyDatePickerNew
-                  label="Дата счет-фактуры"
-                  value={this.state.date_factur}
-                  func={this.changeDateRange.bind(this, 'date_factur')}
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <TableContainer>
-                  <Grid display="flex" flexDirection="row" style={{ fontWeight: 'bold' }}>
-                    {!this.state.imgs_factur.length ? 'Фото отсутствует' :
-                      <>
-                        {this.state.imgs_factur.map((img, key) => (
-                          <img 
-                            key={key} 
-                            src={'https://storage.yandexcloud.net/bill/' + img} 
-                            alt="Image bill" 
-                            className="img_modal"
-                            onClick={this.openImageBill.bind(this, 'https://storage.yandexcloud.net/bill/' + img)}
-                          />
-                        ))}
-                      </>
-                    }
-                  </Grid>
-                </TableContainer>
-              </Grid>
-
-              <Grid item xs={12}>
-                <div
-                  className="dropzone"
-                  id="for_img_edit"
-                  style={{ width: '100%', minHeight: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                >
-                  <span>Выбери счет-фактуру для загрузки</span>
-                </div>
-              </Grid>
-            </>
-           : null
-          }
-
-          <Grid item xs={12} sm={12}>
-            <h2>Товары поставщика</h2>
-            <Divider style={{ backgroundColor: 'rgba(0, 0, 0, 0.87)' }} />
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <MyAutocomplite2
-              label="Товар поставщика"
-              freeSolo={true}
-              multiple={false}
-              data={this.state.vendor_items}
-              value={this.state.search_item}
-              func={this.search.bind(this, 'search_item')}
-              onBlur={this.search.bind(this, 'search_item')}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={3}>
-            <MySelect
-              data={this.state.all_ed_izmer}
-              value={this.state.pq}
-              multiple={false}
-              is_none={false}
-              func={this.changeSelect.bind(this, 'pq')}
-              label="Объем упаковки"
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={3}>
-            <MyTextInput
-              type="number"
-              label="Кол-во упаковок"
-              value={this.state.count}
-              func={this.changeInput.bind(this, 'count')}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={2}>
-            <MyTextInput label="Кол-вo" disabled={true} value={this.state.fact_unit} className='disabled_input' />
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <MyTextInput
-              type="number"
-              label="Сумма без НДС"
-              value={this.state.summ}
-              func={this.changeInput.bind(this, 'summ')}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <MyTextInput
-              type="number"
-              label="Сумма c НДС"
-              value={this.state.sum_w_nds}
-              func={this.changeInput.bind(this, 'sum_w_nds')}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <Button variant="contained" fullWidth style={{ height: '100%' }} onClick={this.addItem.bind(this)}>
-              <AddIcon />
-            </Button>
-          </Grid>
-
-          <Grid item xs={12} sm={12}>
-            <h2>Товары в документе</h2>
-            <Divider style={{ backgroundColor: 'rgba(0, 0, 0, 0.87)' }} />
-          </Grid>
-
-          <Grid item xs={12} style={{ marginBottom: 20 }} sm={12}>
-            <TableContainer component={Paper}>
-              <Table aria-label="a dense table">
-                <TableHead>
-                  <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
-                    <TableCell style={{ minWidth: '150px' }}>Товар</TableCell>
-                    <TableCell style={{ minWidth: '130px' }}>Изменения</TableCell>
-                    <TableCell style={{ minWidth: '130px' }}>В упак.</TableCell>
-                    <TableCell style={{ minWidth: '130px' }}>Упак</TableCell>
-                    <TableCell>Кол-во</TableCell>
-                    <TableCell style={{ minWidth: '100px' }}>НДС</TableCell>
-                    <TableCell style={{ minWidth: '130px' }}>Сумма без НДС</TableCell>
-                    <TableCell>Сумма НДС</TableCell>
-                    <TableCell style={{ minWidth: '130px' }}>Сумма с НДС</TableCell>
-                    <TableCell></TableCell>
-                    <TableCell></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {this.state.bill_items.map((item, key) => (
-                    <React.Fragment key={key}>
-                       {!item?.data_bill ? null :
-                        <TableRow style={{ backgroundColor: item?.color ? 'rgb(255, 204, 0)' : '#fff' }}>
-                          <TableCell rowSpan={2}>{item?.name ?? item.item_name}</TableCell>
-                          <TableCell>До</TableCell>
-                          <TableCell>{item?.data_bill?.pq} {item.ed_izmer_name}</TableCell>
-                          <TableCell>{item?.data_bill?.count}</TableCell>
-                          <TableCell style={{ whiteSpace: 'nowrap' }}>{item?.data_bill?.fact_unit} {item.ed_izmer_name}</TableCell>
-                          <TableCell>{item?.data_bill?.nds}</TableCell>
-                          <TableCell>{item?.data_bill?.price} ₽</TableCell>
-                          <TableCell style={{ whiteSpace: 'nowrap' }}>{item?.data_bill?.summ_nds} ₽</TableCell>
-                          <TableCell>{item?.data_bill?.price_w_nds} ₽</TableCell>
-                          <TableCell rowSpan={2}>
-                            <Button onClick={this.deleteItem.bind(this, key)} style={{ cursor: 'pointer' }} color="error" variant="contained">
-                              <ClearIcon />
-                            </Button>
-                          </TableCell>
-                          <TableCell rowSpan={2}>
-                            {Number(item.count) === 0 ? Number(item.count).toFixed(2) : (Number(item.price_w_nds) / Number(item.count)).toFixed(2)}
-                          </TableCell>
-                        </TableRow>
-                        }
-                      <TableRow hover style={{ backgroundColor: item?.color ? 'rgb(255, 204, 0)' : '#fff' }}>
-                        {item?.data_bill ? null : <TableCell>{item?.name ?? item.item_name}</TableCell>}
-                        {item?.data_bill ? null : <TableCell></TableCell>}
-                        {!item?.data_bill ? null : <TableCell>После</TableCell>}
-                        <TableCell className="ceil_white">
-                          <MySelect
-                            data={item.all_ed_izmer}
-                            value={item.pq}
-                            multiple={false}
-                            is_none={false}
-                            func={this.changeDataTable.bind(this, 'pq', item.id, key)}
-                            label=""
-                          />
-                        </TableCell>
-                        <TableCell className="ceil_white">
-                          <MyTextInput
-                            type="number"
-                            label=""
-                            value={item.count}
-                            func={this.changeDataTable.bind(this, 'count', item.id, key)}
-                            onBlur={this.changeDataTable.bind(this, 'count', item.id, key)}
-                          />
-                        </TableCell>
-                        <TableCell style={{ whiteSpace: 'nowrap' }}>{item.fact_unit} {item.ed_izmer_name}</TableCell>
-                        <TableCell>{item.nds}</TableCell>
-                        <TableCell className="ceil_white">
-                          <MyTextInput
-                            type="number"
-                            label=""
-                            value={item.price_item}
-                            func={this.changeDataTable.bind(this, 'price_item', item.id, key)}
-                            onBlur={this.changeDataTable.bind(this, 'price_item', item.id, key)}
-                          />
-                        </TableCell>
-                        <TableCell style={{ whiteSpace: 'nowrap' }}>{item.summ_nds} ₽</TableCell>
-                        <TableCell className="ceil_white">
-                          <MyTextInput
-                            type="number"
-                            label=""
-                            value={item.price_w_nds}
-                            func={this.changeDataTable.bind(this, 'price_w_nds', item.id, key)}
-                            onBlur={this.changeDataTable.bind(this, 'price_w_nds', item.id, key)}
-                          />
-                        </TableCell>
-                        {item?.data_bill ? null :
-                          <>
-                            <TableCell>
-                              <Button onClick={this.deleteItem.bind(this, key)} style={{ cursor: 'pointer' }} color="error" variant="contained">
-                                <ClearIcon />
-                              </Button>
-                            </TableCell>
-                            <TableCell>
-                              {Number(item.count) === 0 ? Number(item.count).toFixed(2) : (Number(item.price_w_nds) / Number(item.count)).toFixed(2)}
-                            </TableCell>
-                          </>
-                        }
-                      </TableRow>
-                    </React.Fragment>
-                  ))}
-                  {!this.state.bill_items.length ? null : (
-                    <TableRow sx={{ '& td': { fontWeight: 'bold' } }}>
-                      <TableCell>Итого:</TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell align="center">{this.state.allPrice} ₽</TableCell>
-                      <TableCell></TableCell>
-                      <TableCell align="center">{this.state.allPrice_w_nds} ₽</TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
-
-          {parseInt(this.state.type) === 1 ? null :
-            <>
-              <Grid item xs={12} sm={6}>
-                <MyDatePickerNew
-                  label="Дата разгрузки"
-                  value={this.state.date_items}
-                  func={this.changeDateRange.bind(this, 'date_items')}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <MyAutocomplite
-                  data={this.state.users}
-                  multiple={true}
-                  value={this.state.user}
-                  func={this.changeAutocomplite.bind(this, 'user')}
-                  label="Сотрудники"
-                />
-              </Grid>
-            </>
-          }
-
-          <Grid item xs={12} sm={12}>
-            <MyTextInput
-              label="Комментарии"
-              multiline={true}
-              maxRows={3}
-              value={this.state.comment}
-              func={this.changeItem.bind(this, 'comment')}
-            />
-          </Grid>
-         
-          <Grid item xs={12} sm={6} style={{ display: 'flex', marginBottom: 20 }}>
-            <Typography style={{ fontWeight: 'bold', color: '#9e9e9e' }}>
-              Причина удаления:&nbsp;
-            </Typography>
-            <Typography></Typography>
-          </Grid>
-
-          <Grid item xs={12} sm={6} style={{ display: 'flex', marginBottom: 20 }}>
-            <Typography style={{ fontWeight: 'bold', color: '#9e9e9e' }}>Комментарий бухгалтера:&nbsp;</Typography>
-            <Typography>Переделать фото</Typography>
-          </Grid>
+          <VendorItemsTableEdit />
           
-
-          <Grid item xs={12} sm={12} display="flex" alignItems="center">
-            <MyCheckBox
-              value={parseInt(this.state.is_new_doc) === 1 ? true : false}
-              func={this.changeItemChecked.bind(this, 'is_new_doc')}
-              label=""
-            />
-            <Typography component="span" className="span_text">
-              Поставщик привезет новый документ
-            </Typography>
-          </Grid>
+          <FormOther_new page={'edit'} />
 
           <Billing_Accordion
-            bill_list={this.state.bill_list}
-            bill_items={this.state.bill_items}
+            bill_list={bill_list}
+            bill_items={bill_items}
             type='edit'
           />
 
@@ -3888,8 +2973,10 @@ export function Billing() {
   return <Billing_ />;
 }
 
+const Billing_View_Store = withStore(Billing_View_)
+
 export function BillingView() {
-  return <Billing_View_ />;
+  return <Billing_View_Store />;
 }
 
 const Billing_New_Store = withStore(Billing_New_)
