@@ -214,7 +214,6 @@ class DriverStatTime_ extends React.Component {
                 <TableHead>
                   <TableRow>
                     <TableCell>Курьер</TableCell>
-                    <TableCell align="center">Среднее время</TableCell>
                     <TableCell align="center">Количество</TableCell>
                     <TableCell align="center">Во время</TableCell>
                     <TableCell align="center">С опозданием</TableCell>
@@ -228,7 +227,6 @@ class DriverStatTime_ extends React.Component {
                   {this.state.svod.map((row) => (
                     <TableRow key={row.driver_id}>
                       <TableCell>{row.name}</TableCell>
-                      <TableCell align="center">{row.time2}</TableCell>
                       <TableCell align="center">{row.other_stat.all_count}</TableCell>
                       <TableCell align="center">{row.other_stat.norm} ({row.other_stat.norm_percent}%)</TableCell>
                       <TableCell align="center">{row.other_stat.fake} ({row.other_stat.fake_percent}%)</TableCell>
