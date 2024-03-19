@@ -977,6 +977,10 @@ class WorkSchedule_ extends React.Component {
       confirmDialog: false,
       methodConfirm: null,
       textConfirm: '',
+
+      isOpenWS: false,
+      date_start_ws: dayjs(Date.now()),
+      date_end_ws: dayjs(Date.now()),
     };
   }
 
@@ -2236,6 +2240,22 @@ class WorkSchedule_ extends React.Component {
     }
   }
 
+  async downloadWS(){
+    const data = {
+      date_start  : dayjs(this.state.date_start_ws).format('YYYY-MM-DD'),
+      date_end    : dayjs(this.state.date_end_ws).format('YYYY-MM-DD'),
+      point_id: this.state.point,
+    };
+
+    const res =  await this.getData('downloadWS', data);
+
+    if(res.url){
+      const link = document.createElement('a');
+      link.href = res.url;
+      link.click();
+    }
+  }
+
   clickAppNameUser(index, numberChoose) {
     if(numberChoose === 1) {
       const test_one = this.state.test_one;
@@ -3291,6 +3311,42 @@ class WorkSchedule_ extends React.Component {
           </DialogActions>
         </Dialog>
 
+        {/* модалка для распечатки графика работы */}
+        <Dialog
+          open={this.state.isOpenWS}
+          onClose={() => this.setState({ isOpenWS: false })}
+          scroll="paper"
+          fullWidth={true}
+          maxWidth={'md'}
+          id={'OpenModalM'}
+        >
+          <DialogTitle>График работ</DialogTitle>
+          <DialogContent>
+            <Grid container spacing={3} style={{ marginTop: 2 }}>
+              <Grid item xs={12} sm={6}>
+                <MyDatePickerNew
+                  label="Дата от"
+                  value={dayjs(this.state.date_start_ws)}
+                  func={this.changeDateRange.bind(this, 'date_start_ws')}
+                  minDate={dayjs("2023-05-01")}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <MyDatePickerNew
+                  label="Дата до"
+                  value={dayjs(this.state.date_end_ws)}
+                  func={this.changeDateRange.bind(this, 'date_end_ws')}
+                  minDate={dayjs("2023-05-01")}
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Button style={{ backgroundColor: 'green', color: '#fff' }} onClick={this.downloadWS.bind(this)}>Скачать</Button>
+            <Button style={{ backgroundColor: 'red', color: '#fff' }} onClick={() => this.setState({ isOpenWS: false })}>Отмена</Button>
+          </DialogActions>
+        </Dialog>
+
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
@@ -3316,9 +3372,13 @@ class WorkSchedule_ extends React.Component {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={6} display='flex' justifyContent='space-between'>
             <Button variant="contained" onClick={this.updateData.bind(this)}>
               Обновить данные
+            </Button>
+         
+            <Button variant="contained" onClick={() => this.setState({ isOpenWS: true })}>
+              Распечатать
             </Button>
           </Grid>
 
