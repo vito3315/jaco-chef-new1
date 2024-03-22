@@ -187,7 +187,7 @@ class Fines_err_Modal_item extends React.Component {
     this.props.onClose();
   }
 
-  saveErr(type){
+  saveErr_(type){
     const data = {
       id: this.state.item.err.id,
       type: type
@@ -263,10 +263,10 @@ class Fines_err_Modal_item extends React.Component {
               { this.state.item && parseInt(this.state.item.err.manager_create) == 1 && parseInt(this.state.item.err.status) == 2 && parseInt(this.state.item.err.for_dir) == 1 ?
                 <>
                   <Grid item xs={12} sm={6}>
-                    <Button color="primary" onClick={this.saveErr.bind(this, 'true')}>Подтвердить ошибку</Button>
+                    <Button color="primary" onClick={this.saveErr_.bind(this, 'true')}>Подтвердить ошибку</Button>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Button color="primary" onClick={this.saveErr.bind(this, 'false')}>Отменить ошибку</Button>
+                    <Button color="primary" onClick={this.saveErr_.bind(this, 'false')}>Отменить ошибку</Button>
                   </Grid>
                 </>
                   :
@@ -1239,6 +1239,7 @@ class Fines_err_ extends React.Component {
           item={this.state.item}
           save={this.saveEditItem.bind(this)}
           fullScreen={this.state.fullScreen}
+          saveErr={this.saveErr.bind(this)}
         />
 
         <Grid container spacing={3}>
