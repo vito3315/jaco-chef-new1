@@ -189,7 +189,7 @@ class Fines_err_Modal_item extends React.Component {
 
   saveErr(type){
     const data = {
-      id: item.err.id,
+      id: this.state.item.err.id,
       type: type
     }
 
