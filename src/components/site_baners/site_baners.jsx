@@ -707,7 +707,7 @@ class SiteBaners_Modal extends React.Component {
 
                   {!this.state.banner || this.state.banner.this_ban.img.length == 0 ? null : (
                     <div style={{ height: 400, display: 'flex' }}>
-                      <img style={{ width: '100%', height: 'auto', alignSelf: 'center', borderRadius: 20 }} src={'https://storage.yandexcloud.net/site-home-img/' + this.state.banner.this_ban.img + '3700х1000.jpg'}/>
+                      <img style={{ width: '100%', height: 'auto', alignSelf: 'center', borderRadius: 20 }} src={'https://storage.yandexcloud.net/site-home-img/' + this.state.banner.this_ban.img + '_3700x1000.jpg'}/>
                     </div>
                   )}
 
@@ -719,7 +719,7 @@ class SiteBaners_Modal extends React.Component {
 
                   {!this.state.banner || this.state.banner.this_ban.img.length == 0 ? null : (
                     <div style={{ height: 400, display: 'flex' }}>
-                      <img style={{ width: '100%', height: 'auto', alignSelf: 'center', borderRadius: 40 }} src={'https://storage.yandexcloud.net/site-home-img/' + this.state.banner.this_ban.img + '1000х500.jpg'}/>
+                      <img style={{ width: '100%', height: 'auto', alignSelf: 'center', borderRadius: 40 }} src={'https://storage.yandexcloud.net/site-home-img/' + this.state.banner.this_ban.img + '_1000x500.jpg'}/>
                     </div>
                     )}
 
