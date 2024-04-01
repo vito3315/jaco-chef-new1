@@ -416,6 +416,7 @@ class SiteBaners_Modal extends React.Component {
               this.myDropzone.on('sending', (file, xhr, data) => {
                 data.append('name', banner.this_ban.name);
                 data.append('id', res.id);
+                data.append('type', 'full');
               });
   
               this.myDropzone.on('queuecomplete', (data) => {
@@ -458,6 +459,7 @@ class SiteBaners_Modal extends React.Component {
               this.myDropzone_m.on('sending', (file, xhr, data1) => {
                 data1.append('name', banner.this_ban.name);
                 data1.append('id', res.id);
+                data1.append('type', 'mobile');
               });
   
               this.myDropzone_m.on('queuecomplete', (data) => {
