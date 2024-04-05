@@ -26,23 +26,30 @@ import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import ClearIcon from '@mui/icons-material/Clear';
 import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import ErrorIcon from '@mui/icons-material/Error';
-
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 
 import Dropzone from 'dropzone';
 
 import { MySelect, MyAutocomplite, MyAutocomplite2, MyDatePickerNew, formatDate, MyTextInput, MyCheckBox, MyAlert} from '../../stores/elements';
 
 import queryString from 'query-string';
-import ReactPanZoom from 'react-image-pan-zoom-rotate';
+//import ReactPanZoom from 'react-image-pan-zoom-rotate';
 import dayjs from 'dayjs';
 
 import { create } from 'zustand'
-import { typeOf } from 'mathjs';
+//import { typeOf } from 'mathjs';
+
+import RotateLeftIcon from '@mui/icons-material/RotateLeft';
+import RotateRightIcon from '@mui/icons-material/RotateRight';
+import ContrastIcon from '@mui/icons-material/Contrast';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import ZoomOutIcon from '@mui/icons-material/ZoomOut';
+import CloseIcon from '@mui/icons-material/Close';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import HorizontalSplitIcon from '@mui/icons-material/HorizontalSplit';
+import VerticalSplitIcon from '@mui/icons-material/VerticalSplit';
+
+import Draggable from 'react-draggable';
 
 const useStore = create((set, get) => ({
   isPink: false,
@@ -236,6 +243,7 @@ const useStore = create((set, get) => ({
   },
 
   closeDialog: () => {
+    document.body.style.overflow = "";
     set({ modalDialog: false })
   },
 
@@ -936,33 +944,257 @@ function getOrientation(file, callback) {
 	reader.readAsArrayBuffer(file.slice(0, 64 * 1024));
 };
 
+function MyTooltip(props) {
+  const { children, name, ...other } = props;
+
+  return (
+    <Tooltip title={name} arrow placement="bottom-start"  {...other}
+      componentsProps={{
+        tooltip: {
+          sx: { bgcolor: '#fff', color: '#000', border: '0.5px solid rgba(0, 0, 0, 0.87)',
+            '& .MuiTooltip-arrow': {
+              color: '#fff',
+              '&::before': {
+                backgroundColor: 'white',
+                border: '0.5px solid black',
+              },
+            },
+          },
+        },
+      }}
+    >
+      {children}
+    </Tooltip>
+  );
+}
+
 // модалка просмотра фото/картинок документов на страницах Новая / Просмотр / Редактирование накладной
 class Billing_Modal extends React.Component {
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      rotate: 0,
+      scaleX: 1,
+      scaleY: 1,
+      vertical: false,
+      horizontal: false,
+    };
+  }
+
+  setLeftRotate() {
+    let rotate = this.state.rotate;
+    rotate = rotate - 90;
+ 
+    this.setState({
+      rotate,
+    });
+
+  }
+
+  setRigthRotate() {
+    let rotate = this.state.rotate;
+    rotate = rotate + 90;
+
+    this.setState({
+      rotate,
+    });
+
+  }
+
+  setScaleHorizontal() {
+    let scaleX = this.state.scaleX;
+
+    if(scaleX < 0) {
+      scaleX = scaleX * -1;
+    } else {
+      scaleX = -scaleX;
+    }
+
+    this.setState({
+      scaleX,
+    });
+  }
+
+  setScaleVertical() {
+    let scaleY = this.state.scaleY;
+
+    if(scaleY < 0) {
+      scaleY = scaleY * -1;
+    } else {
+      scaleY = -scaleY;
+    }
+
+    this.setState({
+      scaleY,
+    });
+  }
+
+  setZoomIn() {
+    let scaleY = this.state.scaleY;
+    let scaleX = this.state.scaleX;
+
+    if(scaleY < 0) {
+      scaleY = scaleY - 0.5;
+    } else {
+      scaleY = scaleY + 0.5;
+    }
+
+    if(scaleX < 0) {
+      scaleX = scaleX - 0.5;
+    }  else {
+      scaleX = scaleX + 0.5;
+    }
+
+    this.setState({
+      scaleY,
+      scaleX,
+    });
+
+  }
+
+  setZoomOut() {
+    let scaleY = this.state.scaleY;
+    let scaleX = this.state.scaleX;
+      
+    if(scaleY < 0) {
+      scaleY = scaleY + 0.5;
+    } else {
+      scaleY = scaleY - 0.5;
+    }
+    
+    if(scaleX < 0) {
+      scaleX = scaleX + 0.5;
+    }  else {
+      scaleX = scaleX - 0.5;
+    }
+
+    this.setState({
+      scaleY,
+      scaleX,
+    });
+    
+  }
+
+  setSplitVertical() {
+    this.reset();
+
+    const vertical = this.state.vertical;
+
+    this.setState({
+      vertical: !vertical,
+      horizontal: false,
+    });
+
+  }
+
+  setSplitHorizontal() {
+    this.reset();
+
+    const horizontal = this.state.horizontal;
+
+    this.setState({
+      horizontal: !horizontal,
+      vertical: false
+    });
+
+  }
+
+  reset() {
+    this.setState({
+      rotate: 0,
+      scaleX: 1,
+      scaleY: 1,
+    });
+  }
+
+  shouldComponentUpdate(nextState) {
+    return nextState.rotate !== this.state.rotate || nextState.scaleY !== this.state.scaleY || nextState.scaleX !== this.state.scaleX;
+  }
+
   render() {
     return (
-      <Dialog
-        open={this.props.open}
-        onClose={this.props.onClose.bind(this)}
-        fullScreen={this.props.fullScreen}
-        fullWidth={true}
-        maxWidth='xl'
-      >
-        <DialogContent style={{ paddingBottom: 10, paddingTop: 20 }}>
-
-          <DialogTitle style={{ padding: 0, marginBottom: 20 }}>
-            <IconButton onClick={this.props.onClose.bind(this)} className='close_btn'>
+      <>
+        <div className='modal_btn'>
+          <MyTooltip name='Повернуть на 90 градусов влево'>
+            <IconButton onClick={this.setLeftRotate.bind(this)}>
+              <RotateLeftIcon />
+            </IconButton>
+          </MyTooltip>
+          <MyTooltip name='Повернуть на 90 градусов вправо'>
+            <IconButton onClick={this.setRigthRotate.bind(this)}>
+              <RotateRightIcon />
+            </IconButton>
+          </MyTooltip>
+          <MyTooltip name='Перевернуть по вертикали'>
+            <IconButton onClick={this.setScaleVertical.bind(this)}>
+              <ContrastIcon />
+            </IconButton>
+          </MyTooltip>
+          <MyTooltip name='Перевернуть по горизонтали'>
+            <IconButton onClick={this.setScaleHorizontal.bind(this)}>
+              <ContrastIcon style={{ transform: 'rotate(-90deg)'}}/>
+            </IconButton>
+          </MyTooltip>
+          <MyTooltip name='Увеличить документ'>
+            <IconButton onClick={this.setZoomIn.bind(this)}>
+              <ZoomInIcon />
+            </IconButton>
+          </MyTooltip>
+          <MyTooltip name='Уменьшить документ'>
+            <IconButton onClick={this.setZoomOut.bind(this)}>
+              <ZoomOutIcon />
+            </IconButton>
+          </MyTooltip>
+          <MyTooltip name='Разделить экран по вертикали'>
+            <IconButton onClick={this.setSplitVertical.bind(this)}>
+              <VerticalSplitIcon />
+            </IconButton>
+          </MyTooltip>
+          <MyTooltip name='Разделить экран по горизонтали'>
+            <IconButton onClick={this.setSplitHorizontal.bind(this)}>
+              <HorizontalSplitIcon />
+            </IconButton>
+          </MyTooltip>
+          <MyTooltip name='Сбросить'>
+            <IconButton onClick={this.reset.bind(this)}>
+              <RestartAltIcon />
+            </IconButton>
+          </MyTooltip>
+          <MyTooltip name='Закрыть'>
+            <IconButton onClick={this.props.onClose.bind(this)}>
               <CloseIcon />
             </IconButton>
-          </DialogTitle>
+          </MyTooltip>
+        </div>
 
-          <ReactPanZoom
-            image={this.props.image}
-            alt="Image bill"
-          />
+        <div className="modal" onClick={this.props.onClose.bind(this)} style={{ width: this.state.vertical ? '50%' : '100%', height: this.state.horizontal ? '50vh' : '100vh'}}>
+          <Draggable>
+            <div>
+              <div className="modal_content" style={{transform: `rotate(${this.state.rotate}deg) scale(${this.state.scaleX}, ${this.state.scaleY})`}}>
+                <img 
+                  src={this.props.image} 
+                  alt="Image bill" 
+                  className="image_bill"
+                  onClick={(e) => e.stopPropagation()}
+                  draggable="false"
+                />
+              </div>
+            </div>
+          </Draggable>
+        </div>
 
-        </DialogContent>
-      </Dialog>
+        {this.state.vertical || this.state.horizontal ?
+          <div className="modal"
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)',  width: this.state.vertical ? '50%' : '100%',  height: this.state.horizontal ? '50vh' : '100vh', left: this.state.vertical ? '50%' : 0, top: this.state.horizontal ? '50%' : 0}}>
+            <div className="modal_content">
+              <img  src={this.props.image} alt="Image bill" className="image_bill" draggable="false" />
+            </div>
+          </div> 
+        : null}
+
+      </>
     );
   }
 }
@@ -1014,54 +1246,26 @@ class Billing_Accordion extends React.Component {
                     <Grid item xs display="flex" flexDirection='row'>
 
                       <Typography component="div" style={{ width: '1%', backgroundColor: item.color, marginRight: '1%' }}></Typography>
+                      
+                        <MyTooltip name="Нету бумажного носителя">
+                          <Typography component="div" style={{ width: '3%', display: 'flex', alignItems: 'center' }}>
+                            <MyCheckBox
+                              value={false}
+                              //func={this.props.changeCheck.bind(this, key, 'is_not_del')}
+                              label=""
+                            />
+                          </Typography>
+                        </ MyTooltip>
 
-                      <Tooltip title="Нету бумажного носителя" arrow placement="bottom-start"
-                        componentsProps={{
-                          tooltip: {
-                            sx: { bgcolor: '#fff', color: '#000', border: '0.5px solid rgba(0, 0, 0, 0.87)',
-                              '& .MuiTooltip-arrow': {
-                                color: '#fff',
-                                '&::before': {
-                                  backgroundColor: 'white',
-                                  border: '0.5px solid black',
-                                },
-                              },
-                            },
-                          },
-                        }}
-                      >
-                        <Typography component="div" style={{ width: '3%', display: 'flex', alignItems: 'center' }}>
-                          <MyCheckBox
-                            value={false}
-                            //func={this.props.changeCheck.bind(this, key, 'is_not_del')}
-                            label=""
-                          />
-                        </Typography>
-                      </Tooltip>
-
-                      <Tooltip title="С бумажным носителем все хорошо" arrow placement="bottom-start"
-                        componentsProps={{
-                          tooltip: {
-                            sx: { bgcolor: '#fff', color: '#000', border: '0.5px solid rgba(0, 0, 0, 0.87)',
-                              '& .MuiTooltip-arrow': {
-                                color: '#fff',
-                                '&::before': {
-                                  backgroundColor: 'white',
-                                  border: '0.5px solid black',
-                                },
-                              },
-                            },
-                          },
-                        }}
-                      >
-                        <Typography component="div" style={{ width: '3%', display: 'flex', alignItems: 'center' }}>
-                          <MyCheckBox
-                            value={false}
-                            //func={this.props.changeCheck.bind(this, key, 'is_not_del')}
-                            label=""
-                          />
-                        </Typography>
-                      </Tooltip>
+                        <MyTooltip name="С бумажным носителем все хорошо">
+                          <Typography component="div" style={{ width: '3%', display: 'flex', alignItems: 'center' }}>
+                            <MyCheckBox
+                              value={false}
+                              //func={this.props.changeCheck.bind(this, key, 'is_not_del')}
+                              label=""
+                            />
+                          </Typography>
+                        </MyTooltip>
 
                       <Typography style={{ width: '10%',  display: 'flex', alignItems: 'center' }}>
                         {item.number}
@@ -1603,43 +1807,15 @@ class Billing_ extends React.Component {
                       <TableCell style={{ backgroundColor: item?.color ?? '#fff', color: item?.color ? '#fff' : 'rgba(0, 0, 0, 0.87)'}}>{key + 1}</TableCell>
                       <TableCell>
                         {parseInt(item.check_day) === 1 || parseInt(item.check_price) === 1 ? 
-                          <Tooltip title={item.err_items ? item.err_items : item.err_date} arrow placement="bottom-start"
-                            componentsProps={{
-                              tooltip: {
-                                sx: { bgcolor: '#fff', color: '#000', border: '0.5px solid rgba(0, 0, 0, 0.87)',
-                                  '& .MuiTooltip-arrow': {
-                                    color: '#fff',
-                                    '&::before': {
-                                      backgroundColor: 'white',
-                                      border: '0.5px solid black',
-                                    },
-                                  },
-                                },
-                              },
-                            }}
-                          >
+                          <MyTooltip name={item.err_items ? item.err_items : item.err_date}>
                             <Typography component="div" className="ceil_svg">
                               <ErrorIcon />
                             </Typography>
-                          </Tooltip>
+                          </MyTooltip>
                         : null}
                       </TableCell>
                       <TableCell>
-                        <Tooltip title="Есть в наличии" arrow placement="bottom-start"
-                          componentsProps={{
-                            tooltip: {
-                              sx: { bgcolor: '#fff', color: '#000', border: '0.5px solid rgba(0, 0, 0, 0.87)',
-                                '& .MuiTooltip-arrow': {
-                                  color: '#fff',
-                                  '&::before': {
-                                    backgroundColor: 'white',
-                                    border: '0.5px solid black',
-                                  },
-                                },
-                              },
-                            },
-                          }}
-                        >
+                        <MyTooltip name="Есть в наличии">
                           <Typography component="div" className="ceil_tooltip">
                             <MyCheckBox
                               value={false}
@@ -1647,7 +1823,7 @@ class Billing_ extends React.Component {
                               label=""
                             />
                           </Typography>
-                        </Tooltip>
+                        </ MyTooltip>
                       </TableCell>
                       <TableCell>Прих</TableCell>
                       <TableCell style={{ cursor: 'pointer' }}>
@@ -1841,12 +2017,16 @@ class Billing_View_ extends React.Component {
   }
 
   openImageBill (image) {
+    
     this.handleResize();
+
+    document.body.style.overflow = "hidden";
 
     this.setState({ 
       modalDialog: true, 
       image
     })
+    
   }
 
   render() {
@@ -1856,12 +2036,16 @@ class Billing_View_ extends React.Component {
           <CircularProgress color="inherit" />
         </Backdrop>
 
-        <Billing_Modal
-          open={this.state.modalDialog}
-          onClose={() => this.setState({ modalDialog: false })}
-          fullScreen={this.state.fullScreen}
-          image={this.state.image}
-        />
+        {!this.state.modalDialog ? null :
+          <Billing_Modal
+            onClose={() => {
+              document.body.style.overflow = "";
+              this.setState({ modalDialog: false })
+            }}
+            fullScreen={this.state.fullScreen}
+            image={this.state.image}
+          />
+        }
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={12}>
@@ -1913,7 +2097,7 @@ class Billing_View_ extends React.Component {
               </>
             }
           </Grid>
-
+        
           <VendorItemsTableView />
 
           <Grid item xs={12} sm={12} style={{ display: 'flex' }}>
@@ -2697,12 +2881,13 @@ class Billing_New_ extends React.Component {
           <CircularProgress color="inherit" />
         </Backdrop>
 
-        <Billing_Modal
-          open={modalDialog}
-          onClose={closeDialog}
-          fullScreen={fullScreen}
-          image={image}
-        />
+        {!modalDialog ? null :
+          <Billing_Modal
+            onClose={closeDialog}
+            fullScreen={fullScreen}
+            image={image}
+          />
+        }
         
         <MyAlert
           isOpen={operAlert}
@@ -2899,12 +3084,13 @@ class Billing_Edit_ extends React.Component {
           <CircularProgress color="inherit" />
         </Backdrop>
 
-        <Billing_Modal
-          open={modalDialog}
-          onClose={closeDialog}
-          fullScreen={fullScreen}
-          image={image}
-        />
+        {!modalDialog ? null :
+          <Billing_Modal
+            onClose={closeDialog}
+            fullScreen={fullScreen}
+            image={image}
+          />
+        }
 
         <MyAlert
           isOpen={operAlert}
