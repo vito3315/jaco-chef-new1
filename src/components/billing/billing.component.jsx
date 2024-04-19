@@ -2767,15 +2767,27 @@ class Billing_Edit_ extends React.Component {
 
   async componentDidMount() {
 
-    const bill = JSON.parse(localStorage.getItem('one_bill'));
+    let data_bill = window.location.pathname;
+
+    data_bill = data_bill.split('/');
+
+    const bill = {
+      id: data_bill[3],
+      point_id: data_bill[4],
+      type: data_bill[2],
+    }
+
+    console.log( 'bill', bill, data_bill )
 
     const res = await this.getData('get_one', bill);
     const points = await this.getData('get_points');
 
     const point = points.points.find(point => point.id === res.bill.point_id);
 
+
+
     const data = {
-      point_id: point?.id,
+      point_id: bill['point_id'],
       vendor_id: res?.vendors[0]?.id
     }
 

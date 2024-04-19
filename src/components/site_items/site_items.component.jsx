@@ -251,6 +251,7 @@ class SiteItems_ extends React.Component {
       ],
       cats: [],
       cat_list: [],
+      cat_list_new: [],
 
       ItemTab: '1',
       ItemTab1: '0',
@@ -289,6 +290,7 @@ class SiteItems_ extends React.Component {
       module_name: data.module_info.name,
       cats: data.cats,
       cat_list: data.cat_list,
+      cat_list_new: data.cat_list_new,
       timeUpdate: new Date()
     })
     
@@ -1573,6 +1575,13 @@ class SiteItems_ extends React.Component {
                                 </Grid>
                               </Grid>
                             </Grid>
+                            <Grid item xs={12}>
+                              <Grid container spacing={3}>
+                                <Grid item xs={12} sm={4}>
+                                  <MySelect data={this.state.cat_list_new} value={this.state.editItem.category_id2} func={ this.changeItem.bind(this, 'category_id2') } label='Категория для нового сайта' />
+                                </Grid>
+                              </Grid>
+                            </Grid>
 
                             <Grid item xs={12}>
                               <Grid container spacing={3}>
@@ -1910,6 +1919,13 @@ class SiteItems_ extends React.Component {
                                   </Grid>
                                 </Grid>
                               </Grid>
+                              <Grid item xs={12}>
+                              <Grid container spacing={3}>
+                                <Grid item xs={12} sm={4}>
+                                  <MySelect data={this.state.cat_list_new} value={this.state.editItem.category_id2} func={ this.changeItem.bind(this, 'category_id2') } label='Категория для нового сайта' />
+                                </Grid>
+                              </Grid>
+                            </Grid>
 
                               <Grid item xs={12}>
                                 <Grid container spacing={3}>
