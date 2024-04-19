@@ -951,7 +951,7 @@ function MyTooltip(props) {
     <Tooltip title={name} arrow placement="bottom-start"  {...other}
       componentsProps={{
         tooltip: {
-          sx: { bgcolor: '#fff', color: '#000', border: '0.5px solid rgba(0, 0, 0, 0.87)',
+          sx: { bgcolor: '#fff', color: '#000', fontSize: 16, border: '0.5px solid rgba(0, 0, 0, 0.87)',
             '& .MuiTooltip-arrow': {
               color: '#fff',
               '&::before': {
@@ -1209,128 +1209,127 @@ class Billing_Accordion extends React.Component {
 
     return !is_same;
   }
+
   render() {
     const { bill_list, bill_items, type } = this.props;
 
     return (
       <Grid item xs={12} sm={12} mb={5}>
-        <TableContainer component={Paper}>
-          <Accordion expanded={true} style={{ minWidth: 'max-content'}}>
-            <AccordionDetails>
-              <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ opacity: 0 }} />} aria-controls="panel1a-content">
-                <Grid item xs display="flex" flexDirection="row">
-                  <Typography style={{ width: '1%' }}></Typography>
-                  <Typography style={{ width: '3%' }}></Typography>
-                  <Typography style={{ width: '3%' }}></Typography>
-                  <Typography style={{ width: '10%' }}>
-                    Номер {type === 'edit' ? ' документа' : ' накладной'}
+        
+        <AccordionDetails>
+          <AccordionSummary style={{ cursor: 'default' }} expandIcon={<ExpandMoreIcon sx={{ opacity: 0 }} />} aria-controls="panel1a-content">
+            <Grid item xs display="flex" flexDirection="row">
+              <Typography style={{ width: '1%' }}></Typography>
+              <Typography style={{ width: '3%' }}></Typography>
+              <Typography style={{ width: '3%' }}></Typography>
+              <Typography style={{ width: '10%' }}>
+                Номер {type === 'edit' ? ' документа' : ' накладной'}
+              </Typography>
+              <Typography style={{ width: '10%' }}>
+                Дата в {type === 'edit' ? ' документе' : ' накладной'}
+              </Typography>
+              <Typography style={{ width: '14%', minWidth: '200px' }}>Создатель</Typography>
+              <Typography style={{ width: '10%' }}>Дата обновления</Typography>
+              <Typography style={{ width: '14%', minWidth: '200px' }}>Редактор</Typography>
+              <Typography style={{ width: '10%' }}>Время обновления</Typography>
+              <Typography style={{ width: '17%', minWidth: '250px' }}>
+                Тип {type === 'edit' ? ' документа' : ' накладной'}
+              </Typography>
+              <Typography style={{ width: '8%' }}>Сумма с НДС</Typography>
+            </Grid>
+          </AccordionSummary>
+
+          {bill_list.map((item, i) => (
+            <Accordion key={i}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" className="accordion_summary" style={{ paddingRight: '1%' }}>
+
+                <Grid item xs display="flex" flexDirection='row'>
+
+                  <Typography component="div" style={{ width: '1%', backgroundColor: item.color, marginRight: '1%' }}></Typography>
+                  
+                    <MyTooltip name="Нету бумажного носителя">
+                      <Typography component="div" style={{ width: '3%', display: 'flex', alignItems: 'center' }}>
+                        <MyCheckBox
+                          value={false}
+                          //func={this.props.changeCheck.bind(this, key, 'is_not_del')}
+                          label=""
+                        />
+                      </Typography>
+                    </ MyTooltip>
+
+                    <MyTooltip name="С бумажным носителем все хорошо">
+                      <Typography component="div" style={{ width: '3%', display: 'flex', alignItems: 'center' }}>
+                        <MyCheckBox
+                          value={false}
+                          //func={this.props.changeCheck.bind(this, key, 'is_not_del')}
+                          label=""
+                        />
+                      </Typography>
+                    </MyTooltip>
+
+                  <Typography style={{ width: '10%',  display: 'flex', alignItems: 'center' }}>
+                    {item.number}
                   </Typography>
-                  <Typography style={{ width: '10%' }}>
-                    Дата в {type === 'edit' ? ' документе' : ' накладной'}
+
+                  <Typography style={{ width: '10%',  display: 'flex', alignItems: 'center' }}>
+                    {item.date}
                   </Typography>
-                  <Typography style={{ width: '14%', minWidth: '200px' }}>Создатель</Typography>
-                  <Typography style={{ width: '10%' }}>Дата обновления</Typography>
-                  <Typography style={{ width: '14%', minWidth: '200px' }}>Редактор</Typography>
-                  <Typography style={{ width: '10%' }}>Время обновления</Typography>
-                  <Typography style={{ width: '17%', minWidth: '250px' }}>
-                    Тип {type === 'edit' ? ' документа' : ' накладной'}
+
+                  <Typography style={{ width: '14%', minWidth: '200px', display: 'flex', alignItems: 'center' }}>
+                    {item.creator_id}
                   </Typography>
-                  <Typography style={{ width: '8%' }}>Сумма с НДС</Typography>
+
+                  <Typography style={{ width: '10%',  display: 'flex', alignItems: 'center' }}>
+                    {item.date_update}
+                  </Typography>
+
+                  <Typography style={{ width: '14%', minWidth: '200px', display: 'flex', alignItems: 'center'}}>
+                    {item.editor_id}
+                  </Typography>
+
+                  <Typography style={{ width: '10%',  display: 'flex', alignItems: 'center' }}>
+                    {item.time_update}
+                  </Typography>
+
+                  <Typography style={{ width: '17%', minWidth: '250px',  display: 'flex', alignItems: 'center' }}>
+                    {item.name}
+                  </Typography>
+
+                  <Typography style={{ width: '8%',  display: 'flex', alignItems: 'center' }}>
+                    {item.sum_w_nds}
+                  </Typography>
                 </Grid>
               </AccordionSummary>
 
-              {bill_list.map((item, i) => (
-                <Accordion key={i}>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" className="accordion_summary" style={{ paddingRight: '1%' }}>
+              <AccordionDetails style={{ width: '100%' }}>
+                <Table>
+                  <TableHead>
+                    <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
+                      <TableCell>Товар</TableCell>
+                      <TableCell>Объем упак.</TableCell>
+                      <TableCell>Кол-во упак.</TableCell>
+                      <TableCell>Кол-во</TableCell>
+                      <TableCell>Сумма с НДС</TableCell>
+                    </TableRow>
+                  </TableHead>
 
-                    <Grid item xs display="flex" flexDirection='row'>
-
-                      <Typography component="div" style={{ width: '1%', backgroundColor: item.color, marginRight: '1%' }}></Typography>
-                      
-                        <MyTooltip name="Нету бумажного носителя">
-                          <Typography component="div" style={{ width: '3%', display: 'flex', alignItems: 'center' }}>
-                            <MyCheckBox
-                              value={false}
-                              //func={this.props.changeCheck.bind(this, key, 'is_not_del')}
-                              label=""
-                            />
-                          </Typography>
-                        </ MyTooltip>
-
-                        <MyTooltip name="С бумажным носителем все хорошо">
-                          <Typography component="div" style={{ width: '3%', display: 'flex', alignItems: 'center' }}>
-                            <MyCheckBox
-                              value={false}
-                              //func={this.props.changeCheck.bind(this, key, 'is_not_del')}
-                              label=""
-                            />
-                          </Typography>
-                        </MyTooltip>
-
-                      <Typography style={{ width: '10%',  display: 'flex', alignItems: 'center' }}>
-                        {item.number}
-                      </Typography>
-
-                      <Typography style={{ width: '10%',  display: 'flex', alignItems: 'center' }}>
-                        {item.date}
-                      </Typography>
-
-                      <Typography style={{ width: '14%', minWidth: '200px', display: 'flex', alignItems: 'center' }}>
-                        {item.creator_id}
-                      </Typography>
-
-                      <Typography style={{ width: '10%',  display: 'flex', alignItems: 'center' }}>
-                        {item.date_update}
-                      </Typography>
-
-                      <Typography style={{ width: '14%', minWidth: '200px', display: 'flex', alignItems: 'center'}}>
-                        {item.editor_id}
-                      </Typography>
-
-                      <Typography style={{ width: '10%',  display: 'flex', alignItems: 'center' }}>
-                        {item.time_update}
-                      </Typography>
-
-                      <Typography style={{ width: '17%', minWidth: '250px',  display: 'flex', alignItems: 'center' }}>
-                        {item.name}
-                      </Typography>
-
-                      <Typography style={{ width: '8%',  display: 'flex', alignItems: 'center' }}>
-                        {item.sum_w_nds}
-                      </Typography>
-                    </Grid>
-                  </AccordionSummary>
-
-                  <AccordionDetails style={{ width: '100%' }}>
-                    <Table>
-                      <TableHead>
-                        <TableRow sx={{ '& th': { fontWeight: 'bold' } }}>
-                          <TableCell>Товар</TableCell>
-                          <TableCell>Объем упак.</TableCell>
-                          <TableCell>Кол-во упак.</TableCell>
-                          <TableCell>Кол-во</TableCell>
-                          <TableCell>Сумма с НДС</TableCell>
-                        </TableRow>
-                      </TableHead>
-
-                      <TableBody>
-                        {bill_items?.map((item, key) => (
-                          <TableRow key={key} hover>
-                            <TableCell> {item.item_name} </TableCell>
-                            <TableCell>{item.pq} {item.ed_izmer_name}</TableCell>
-                            <TableCell>{item.count}</TableCell>
-                            <TableCell>{item.fact_unit} {item.ed_izmer_name}</TableCell>
-                            <TableCell> {item.price_w_nds} ₽</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </AccordionDetails>
-                </Accordion>
-              ))}
-            </AccordionDetails>
-          </Accordion>
-        </TableContainer>
+                  <TableBody>
+                    {bill_items?.map((item, key) => (
+                      <TableRow key={key} hover>
+                        <TableCell> {item.item_name} </TableCell>
+                        <TableCell>{item.pq} {item.ed_izmer_name}</TableCell>
+                        <TableCell>{item.count}</TableCell>
+                        <TableCell>{item.fact_unit} {item.ed_izmer_name}</TableCell>
+                        <TableCell> {item.price_w_nds} ₽</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </AccordionDetails>
+            </Accordion>
+          ))}
+        </AccordionDetails>
+        
       </Grid>
     );
   }
@@ -1931,7 +1930,16 @@ class Billing_View_ extends React.Component {
   }
 
   async componentDidMount() {
-    const bill = JSON.parse(localStorage.getItem('one_bill'));
+    
+    let data_bill = window.location.pathname;
+
+    data_bill = data_bill.split('/');
+
+    const bill = {
+      id: data_bill[3],
+      point_id: data_bill[4],
+      type: data_bill[2],
+    }
 
     const data = await this.getData('get_one', bill);
 
@@ -2962,14 +2970,10 @@ class Billing_Edit_ extends React.Component {
       type: data_bill[2],
     }
 
-    console.log( 'bill', bill, data_bill )
-
     const res = await this.getData('get_one', bill);
     const points = await this.getData('get_points');
 
     const point = points.points.find(point => point.id === res.bill.point_id);
-
-
 
     const data = {
       point_id: bill['point_id'],
@@ -2984,6 +2988,8 @@ class Billing_Edit_ extends React.Component {
     getDataBill(res, point, items.items, docs);
 
     document.title = 'Накладные';
+
+    this.myDropzone = new Dropzone("#img_bill", this.dropzoneOptions);
   }
 
   getData = (method, data = {}) => {
@@ -3087,8 +3093,6 @@ class Billing_Edit_ extends React.Component {
   render() {
 
     const { isPink, operAlert, err_status, err_text, closeAlert, is_load_store, modalDialog, fullScreen, image, closeDialog, bill, bill_list, bill_items } = this.props.store;
-
-    // console.log( 'isPink', isPink )
 
     return (
       <>
