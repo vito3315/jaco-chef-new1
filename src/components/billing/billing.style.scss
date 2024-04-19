@@ -1,9 +1,3 @@
-.img_modal {
-  max-width: 300px !important;
-  max-height: 300px !important;
-  margin-right: 10px;
-}
-
 .accordion_summary {
   padding-left: 0 !important;
   margin: 0 !important;
@@ -81,4 +75,60 @@
     .MuiOutlinedInput-notchedOutline {
     border-color: rgba(0, 0, 0, 0.23);
   }
+}
+
+.modal {
+  background-color: rgba(0, 0, 0, 0.6);
+  position: fixed;
+  top: 0;
+  left: 0;
+  opacity: 1;
+  transition: all 0.5s ease 0s;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.modal_btn {
+  position: absolute;
+  top: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+
+  & :hover{
+    background-color: #e5e5e5 !important;
+  }
+
+  & button {
+    background-color: #fff;
+    border-radius: 10%;
+    margin-right: 10px;
+
+    & svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+}
+
+.modal_content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.5s ease 0s;
+}
+
+.image_bill {
+  max-width: 70%;
+  cursor: pointer;
+  width: auto;
+  height: auto;
+}
+
+.img_modal {
+  max-width: 300px !important;
+  max-height: 300px !important;
+  margin-right: 10px;
 }
