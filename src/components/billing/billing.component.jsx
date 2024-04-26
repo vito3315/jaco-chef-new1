@@ -237,9 +237,16 @@ const useStore = create((set, get) => ({
       users: res?.users,
       user: res?.bill_users,
       types: types,
+      type: parseInt(res?.bill?.type_bill) == 1 ? 2 : 4,
+      doc_base_id: parseInt(res?.bill?.type_doc),
       is_load_store: false,
+
+      number_factur: res.bill?.number_factur,
+      date_factur: res.bill?.date_factur,
     });
 
+
+    get().changeKinds(res?.bill?.type_doc);
   },
 
   closeDialog: () => {
@@ -548,35 +555,7 @@ const useStore = create((set, get) => ({
     }
 
     if(data === 'type' && (parseInt(value) === 3 || parseInt(value) === 2)) {
-      let kinds = [];
-
-      if( parseInt(value) === 2 ){
-        kinds = [
-          {
-            "name": "Накладная",
-            "id": "1"
-          },
-          {
-            "name": "УПД",
-            "id": "2"
-          },
-        ];
-      } else {
-        kinds = [
-          {
-            "name": "Накладная",
-            "id": "1"
-          },
-          {
-            "name": "УКД",
-            "id": "2"
-          },
-        ];
-      }
-
-      set({
-        kinds,
-      });
+      get().changeKinds(value);
     }
 
     // if(data === 'type' && parseInt(value) === 2){
@@ -594,6 +573,38 @@ const useStore = create((set, get) => ({
 
     set({
       [data]: event.target.value
+    });
+  },
+
+  changeKinds: (value) => {
+    let kinds = [];
+
+    if( parseInt(value) === 2 ){
+      kinds = [
+        {
+          "name": "Накладная",
+          "id": "1"
+        },
+        {
+          "name": "УПД",
+          "id": "2"
+        },
+      ];
+    } else {
+      kinds = [
+        {
+          "name": "Накладная",
+          "id": "1"
+        },
+        {
+          "name": "УКД",
+          "id": "3"
+        },
+      ];
+    }
+
+    set({
+      kinds,
     });
   },
 
@@ -713,7 +724,7 @@ const useStore = create((set, get) => ({
     nds[20] = '20 %';
     nds[18] = '18 %';
  
-    return nds[Number(value)] ? nds[Number(value)] : false;
+    return nds[Math.round(value)] ? nds[Math.round(value)] : false;
   },
 
   check_price_item: (price, percent, summ, pq) => {

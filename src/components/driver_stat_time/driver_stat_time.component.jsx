@@ -128,10 +128,12 @@ class DriverStatTime_ extends React.Component {
 
     const { date_end, date_start, point } = this.state;
       
+    console.log( point )
+
     const dateStart = date_start ? dayjs(date_start).format('YYYY-MM-DD') : '';
     const dateEnd = date_end ? dayjs(date_end).format('YYYY-MM-DD') : '';
 
-    if( !point?.id || dateStart == '' || dateEnd == '' ){
+    if( point.length == 0 || dateStart == '' || dateEnd == '' ){
       this.setState({
         operAlert: true,
         err_status: false,
@@ -144,7 +146,8 @@ class DriverStatTime_ extends React.Component {
     let data = {
       date_start: dateStart,
       date_end: dateEnd,
-      point_id: point?.id
+      point_id: point.length == 1 ? point[0].id : '',
+      points: point,
     };
 
     let res = await this.getData('show_data', data);
@@ -177,7 +180,7 @@ class DriverStatTime_ extends React.Component {
           <Grid item xs={12} sm={4}>
             <MyAutocomplite
               data={this.state.points}
-              multiple={false}
+              multiple={true}
               value={this.state.point}
               func={this.changeAutocomplite.bind(this, 'point')}
               label="Точка"
@@ -214,6 +217,7 @@ class DriverStatTime_ extends React.Component {
                 <TableHead>
                   <TableRow>
                     <TableCell>Курьер</TableCell>
+                    <TableCell align="center">Среднее время</TableCell>
                     <TableCell align="center">Количество</TableCell>
                     <TableCell align="center">Во время</TableCell>
                     <TableCell align="center">С опозданием</TableCell>
@@ -227,6 +231,7 @@ class DriverStatTime_ extends React.Component {
                   {this.state.svod.map((row) => (
                     <TableRow key={row.driver_id}>
                       <TableCell>{row.name}</TableCell>
+                      <TableCell align="center">{row.time2}</TableCell>
                       <TableCell align="center">{row.other_stat.all_count}</TableCell>
                       <TableCell align="center">{row.other_stat.norm} ({row.other_stat.norm_percent}%)</TableCell>
                       <TableCell align="center">{row.other_stat.fake} ({row.other_stat.fake_percent}%)</TableCell>
