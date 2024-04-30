@@ -74,6 +74,7 @@ class CashBook_ extends React.Component {
       fiz_kassa: {},
       driver_kassa: {},
       openModalType: '',
+      openModalType_edit: false,
       comment: '',
       type: '',
       openModalKassa: '',
@@ -333,6 +334,7 @@ class CashBook_ extends React.Component {
   addData(type, kassa, hist, title){
     this.setState({
       openModalType: type,
+      openModalType_edit: this.state.fiz_kassa[ type+'_is_edit' ] == 'edit' ? true : false,
       openModalKassa: kassa,
       openModalTitle: title,
       openModalHist_data: hist,
@@ -341,6 +343,17 @@ class CashBook_ extends React.Component {
       comment: '',
       summ: 0,
     })
+
+    //Остаток на начало дня - первый раз ставят директора
+
+    //Выручка за день - отчет о закрытии смены
+    //Заемные средства - директор или бухгалтерия
+    //Перемещение из другой кассы - директор / менеджер
+
+    //Выдача заработной платы - бухгалтерия
+    //Инкассация - директор / менеджер
+    //Возврат займа - директор или бухгалтерия
+    //Выдача в подотчет - директор / менеджер
   }
 
   render(){
@@ -358,13 +371,18 @@ class CashBook_ extends React.Component {
           <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
             
             <Grid container spacing={3}>
-              <Grid item xs={12} sm={12}>
-                <MyTextInput label="Сумма" value={this.state.summ} type={'number'} func={this.changeSumm.bind(this)} />
-              </Grid>
 
-              <Grid item xs={12} sm={12}>
-                <MyTextInput label="Комментарий" value={this.state.comment} multiline={true} maxRows={3} type={'text'} func={this.changeComment.bind(this)} />
-              </Grid>
+              { this.state.openModalType_edit === false ? false :
+                <Grid item xs={12} sm={12}>
+                  <MyTextInput label="Сумма" value={this.state.summ} type={'number'} func={this.changeSumm.bind(this)} />
+                </Grid>
+              }
+
+              { this.state.openModalType_edit === false ? false :
+                <Grid item xs={12} sm={12}>
+                  <MyTextInput label="Комментарий" value={this.state.comment} multiline={true} maxRows={3} type={'text'} func={this.changeComment.bind(this)} />
+                </Grid>
+              }
 
               <Grid item xs={12} sm={12}>
                 <TableContainer component={Paper}>
@@ -380,7 +398,7 @@ class CashBook_ extends React.Component {
                     </TableHead>
                     <TableBody>
 
-                      {this.state.openModalHist_data.map( item => 
+                      {this.state.openModalHist_data?.map( item => 
                         
                         <TableRow key={item.id}>
                           <TableCell>{item.user_name}</TableCell>
@@ -401,39 +419,15 @@ class CashBook_ extends React.Component {
             
 
           </DialogContent>
-          <DialogActions style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Button style={{ backgroundColor: 'green', color: '#fff' }} onClick={this.saveGivePrice.bind(this)}>Сохранить</Button>
-            <Button style={{ backgroundColor: 'red', color: '#fff' }} onClick={() => { this.setState({ modalDialog: false, comment: '', openModalType: '', openModalKassa: '', summ: 0 }) }}>Отмена</Button>
-          </DialogActions>
+          { this.state.openModalType_edit === false ? false :
+            <DialogActions style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Button style={{ backgroundColor: 'green', color: '#fff' }} onClick={this.saveGivePrice.bind(this)}>Сохранить</Button>
+              <Button style={{ backgroundColor: 'red', color: '#fff' }} onClick={() => { this.setState({ modalDialog: false, comment: '', openModalType: '', openModalKassa: '', summ: 0 }) }}>Отмена</Button>
+            </DialogActions>
+          }
         </Dialog>
 
-        <Dialog
-          open={this.state.modalDialogGetSumm}
-          onClose={ () => { this.setState({ modalDialogGetSumm: false }) } }
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle>Дополнительная выплата курьеру "{this.state.getSummDriverId ? this.state.getSummDriverId.name : ''}"</DialogTitle>
-          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-            
-            <Grid container spacing={3}>
-              
-              <Grid item xs={12} sm={12}>
-                <MyTextInput type='number' value={ this.state.getSumm } func={ (event) => { this.setState({ getSumm: event.target.value }) } } label='Сумма' />
-              </Grid>
-
-              <Grid item xs={12} sm={12}>
-                <MyTextInput maxRows={2} value={ this.state.getSummComment } func={ (event) => { this.setState({ getSummComment: event.target.value }) } } label='Комментарий' />
-              </Grid>
-
-            </Grid>
-
-          </DialogContent>
-          <DialogActions>
-            <Button color="primary" onClick={this.saveGetPrice.bind(this)}>Сохранить</Button>
-          </DialogActions>
-        </Dialog>
-
+        
         <Dialog
           open={this.state.modalDialogStatSumm}
           onClose={ () => { this.setState({ modalDialogStatSumm: false, getSummDriverId: null }) } }
@@ -476,55 +470,7 @@ class CashBook_ extends React.Component {
           </DialogContent>
         </Dialog>
 
-        <Dialog
-          open={this.state.modalDialogStatSummMain}
-          onClose={ () => { this.setState({ modalDialogStatSummMain: false, getSummDriverId: null }) } }
-          fullWidth={true}
-          maxWidth={'md'}
-        >
-          <DialogTitle>Выплаты "{this.state.getSummDriverId ? this.state.getSummDriverId.name : ''}"</DialogTitle>
-          <DialogContent style={{ paddingBottom: 10, paddingTop: 10 }}>
-            
-            <Table size={'small'}>
-                
-              <TableHead>
-                <TableRow>
-                  <TableCell>Заказ</TableCell>
-                  <TableCell>Дата</TableCell>
-                  <TableCell>Сумма</TableCell>
-                  <TableCell>Пользователь</TableCell>
-                  <TableCell>Тип</TableCell>
-                  { this.state.show_dop == 0 ? false : 
-                    <TableCell>Дистанция</TableCell>
-                  }
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                
-                { this.state.statSummMain.map( (item, key) =>
-                  <TableRow key={key}>
-                    <TableCell>{ parseInt(item.order_id) == 0 ? '' : item.order_id }</TableCell>
-                    <TableCell>{item.date_time}</TableCell>
-                    <TableCell>{ parseInt(item.my_cash) == 0 ? item.give : item.my_cash }</TableCell>
-                    <TableCell>{ parseInt(item.order_id) == 0 ? item.user_name : '' }</TableCell>
-                    <TableCell>{ parseInt(item.order_id) == 0 ? 'Сдал' : 'С заказа' }</TableCell>
-                    { this.state.show_dop == 0 ? false :
-                      <TableCell>{item.dist}</TableCell>
-                    }
-                  </TableRow>
-                ) }
-              
-              </TableBody>
-            
-            </Table>
-
-            
-
-          </DialogContent>
-        </Dialog>
-        
-        <Grid container spacing={3}>
+        <Grid container spacing={3} style={{ paddingBottom: 100 }}>
           <Grid item xs={12} sm={12}>
             <h1>{this.state.module_name}</h1>
           </Grid>
@@ -559,56 +505,183 @@ class CashBook_ extends React.Component {
                 <TableBody>
                   
                   <TableRow>
-                    <TableCell>Остаток на начало дня</TableCell>
+                    <TableCell>
+                      { this.state.fiz_kassa?.ostatok_nachalo_dnya_is_edit === false ?
+                        <Typography 
+                          component="span"
+                        >
+                          Остаток на начало дня
+                        </Typography>
+                          :
+                        <Typography 
+                          component="span"
+                          onClick={this.addData.bind(this, 'ostatok_nachalo_dnya', 'fiz', this.state.fiz_kassa?.ostatok_nachalo_dnya_arr, 'Физическая касса: Остаток на начало дня')} 
+                          style={{ cursor: 'pointer', color: '#c03', padding: '15px 15px 15px 0px' }}
+                        >
+                          Остаток на начало дня
+                        </Typography>
+                      }
+                    </TableCell>
                     <TableCell>{this.state.fiz_kassa?.ostatok_nachalo_dnya}</TableCell>
                     <TableCell></TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell>Выручка</TableCell>
+                    <TableCell>
+                      { this.state.fiz_kassa?.virycka_is_edit === false ?
+                        <Typography 
+                          component="span"
+                        >
+                          Выручка
+                        </Typography>
+                          :
+                        <Typography 
+                          component="span"
+                          onClick={this.addData.bind(this, 'virycka', 'fiz', this.state.fiz_kassa?.virycka_arr, 'Физическая касса: Выручка')} 
+                          style={{ cursor: 'pointer', color: '#c03', padding: '15px 15px 15px 0px' }}
+                        >
+                          Выручка
+                        </Typography>
+                      }
+                      
+                    </TableCell>
                     <TableCell>{this.state.fiz_kassa?.virycka}</TableCell>
                     <TableCell></TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>
-                      <Typography onClick={this.addData.bind(this, 'zaim', 'fiz', this.state.fiz_kassa?.zaim_arr, 'Физическая касса: Заемные средства')} style={{ cursor: 'pointer', color: '#c03' }}>Заемные средства</Typography>
+                      { this.state.fiz_kassa?.zaim_is_edit === false ?
+                        <Typography 
+                          component="span"
+                        >
+                          Заемные средства
+                        </Typography>
+                          :
+                        <Typography 
+                          component="span"
+                          onClick={this.addData.bind(this, 'zaim', 'fiz', this.state.fiz_kassa?.zaim_arr, 'Физическая касса: Заемные средства')} 
+                          style={{ cursor: 'pointer', color: '#c03', padding: '15px 15px 15px 0px' }}
+                        >
+                          Заемные средства
+                        </Typography>
+                      }
                     </TableCell>
                     <TableCell>{this.state.fiz_kassa?.zaim}</TableCell>
                     <TableCell></TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell onClick={this.addData.bind(this, 'dengi_iz_drygoy_kassy', 'fiz', this.state.fiz_kassa?.dengi_iz_drygoy_kassy_arr, 'Физическая касса: Перемещение из другой кассы')} style={{ cursor: 'pointer', color: '#c03' }}>Перемещение из другой кассы</TableCell>
+                    <TableCell>
+                      { this.state.fiz_kassa?.dengi_iz_drygoy_kassy_is_edit === false ?
+                        <Typography
+                          component="span"
+                        >
+                          Перемещение из другой кассы
+                        </Typography>
+                          :
+                        <Typography
+                          component="span"
+                          onClick={this.addData.bind(this, 'dengi_iz_drygoy_kassy', 'fiz', this.state.fiz_kassa?.dengi_iz_drygoy_kassy_arr, 'Физическая касса: Перемещение из другой кассы')} 
+                          style={{ cursor: 'pointer', color: '#c03', padding: '15px 15px 15px 0px' }}
+                        >
+                          Перемещение из другой кассы
+                        </Typography>
+                      }
+                    </TableCell>
                     <TableCell>{this.state.fiz_kassa?.dengi_iz_drygoy_kassy}</TableCell>
                     <TableCell></TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell onClick={this.addData.bind(this, 'vedomosm_zp', 'fiz', this.state.fiz_kassa?.vedomosm_zp_arr, 'Физическая касса: Платежная ведомость на выплату заработной платы')} style={{ cursor: 'pointer', color: '#c03' }}>Платежная ведомость на выплату заработной платы</TableCell>
+                    <TableCell>
+                      { this.state.fiz_kassa?.vedomosm_zp_is_edit === false ?
+                        <Typography
+                          component="span"
+                        >
+                          Платежная ведомость на выплату заработной платы
+                        </Typography>
+                          :
+                        <Typography
+                          component="span"
+                          onClick={this.addData.bind(this, 'vedomosm_zp', 'fiz', this.state.fiz_kassa?.vedomosm_zp_arr, 'Физическая касса: Платежная ведомость на выплату заработной платы')} 
+                          style={{ cursor: 'pointer', color: '#c03', padding: '15px 15px 15px 0px' }}
+                        >
+                          Платежная ведомость на выплату заработной платы
+                        </Typography>
+                      }
+                    </TableCell>
                     <TableCell></TableCell>
                     <TableCell>{this.state.fiz_kassa?.vedomosm_zp}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell onClick={this.addData.bind(this, 'incasacia', 'fiz', this.state.fiz_kassa?.incasacia_arr, 'Физическая касса: Инкассация')} style={{ cursor: 'pointer', color: '#c03' }}>Инкассация</TableCell>
+                    <TableCell>
+                      { this.state.fiz_kassa?.incasacia_is_edit === false ?
+                        <Typography
+                          component="span"
+                        >
+                          Инкассация
+                        </Typography>
+                          :
+                        <Typography
+                          component="span"
+                          onClick={this.addData.bind(this, 'incasacia', 'fiz', this.state.fiz_kassa?.incasacia_arr, 'Физическая касса: Инкассация')} 
+                          style={{ cursor: 'pointer', color: '#c03', padding: '15px 15px 15px 0px' }}
+                        >
+                          Инкассация
+                        </Typography>
+                      }
+                    </TableCell>
                     <TableCell></TableCell>
                     <TableCell>{this.state.fiz_kassa?.incasacia}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell onClick={this.addData.bind(this, 'vozvrat_zaim', 'fiz', this.state.fiz_kassa?.vozvrat_zaim_arr, 'Физическая касса: Возврат займа')} style={{ cursor: 'pointer', color: '#c03' }}>Возврат займа</TableCell>
+                    <TableCell>
+                      { this.state.fiz_kassa?.vozvrat_zaim_is_edit === false ?
+                        <Typography 
+                          component="span"
+                        >
+                          Возврат займа
+                        </Typography>
+                          :
+                        <Typography 
+                          component="span"
+                          onClick={this.addData.bind(this, 'vozvrat_zaim', 'fiz', this.state.fiz_kassa?.vozvrat_zaim_arr, 'Физическая касса: Возврат займа')} 
+                          style={{ cursor: 'pointer', color: '#c03', padding: '15px 15px 15px 0px' }}
+                        >
+                          Возврат займа
+                        </Typography>
+                      }
+                    </TableCell>
                     <TableCell></TableCell>
                     <TableCell>{this.state.fiz_kassa?.vozvrat_zaim}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell onClick={this.addData.bind(this, 'vidacha_otchet', 'fiz', this.state.fiz_kassa?.vidacha_otchet_arr, 'Физическая касса: Выдача в подотчет')} style={{ cursor: 'pointer', color: '#c03' }}>Выдача в подотчет</TableCell>
+                    <TableCell>
+                      { this.state.fiz_kassa?.vidacha_otchet_is_edit === false ?
+                        <Typography 
+                          component="span"
+                        >
+                          Выдача в подотчет
+                        </Typography>
+                          :
+                        <Typography 
+                          component="span"
+                          onClick={this.addData.bind(this, 'vidacha_otchet', 'fiz', this.state.fiz_kassa?.vidacha_otchet_arr, 'Физическая касса: Выдача в подотчет')} 
+                          style={{ cursor: 'pointer', color: '#c03', padding: '15px 15px 15px 0px' }}
+                        >
+                          Выдача в подотчет
+                        </Typography>
+                      }
+                    </TableCell>
                     <TableCell></TableCell>
                     <TableCell>{this.state.fiz_kassa?.vidacha_otchet}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>Итого за день</TableCell>
-                    <TableCell>0</TableCell>
-                    <TableCell>0</TableCell>
+                    <TableCell>{this.state.fiz_kassa?.itog_plus}</TableCell>
+                    <TableCell>{this.state.fiz_kassa?.itog_minus}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell>Остаток на конец  дня</TableCell>
-                    <TableCell></TableCell>
+                    <TableCell>Остаток на конец дня</TableCell>
                     <TableCell>{this.state.fiz_kassa?.ostatok_konec_dnya}</TableCell>
+                    <TableCell></TableCell>
                   </TableRow>
 
                 </TableBody>
