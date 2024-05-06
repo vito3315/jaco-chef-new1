@@ -58,11 +58,11 @@ class DriverStatTime_ extends React.Component {
       dop_show: data.dop_show
     })
     
-    /*if( data.points.length == 1 ){
+    if( data.points.length == 1 ){
       this.setState({
-        point: data.points[0].id
+        point: data.points
       })
-    }*/
+    }
 
     document.title = data.module_info.name;
   }
