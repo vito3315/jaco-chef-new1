@@ -1,0 +1,30 @@
+.button {
+  display: flex!important;
+  justify-content: space-between!important;
+  align-items: center!important;
+}
+
+.accordion_details {
+  overflow: auto;
+  padding: 0 16px 8px 16px !important;
+}
+
+.disabled_input {
+  & .MuiFormLabel-root.MuiInputLabel-root.Mui-disabled {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  & .MuiInputBase-input.MuiOutlinedInput-input.Mui-disabled {
+    opacity: 1 !important;
+    -webkit-text-fill-color: rgba(0, 0, 0, 0.87);
+  }
+
+  & .MuiInputBase-root.MuiOutlinedInput-root.Mui-disabled {
+    color: rgba(0, 0, 0, 0.87);
+  }
+
+  & .MuiInputBase-root.MuiOutlinedInput-root.Mui-disabled
+    .MuiOutlinedInput-notchedOutline {
+    border-color: rgba(0, 0, 0, 0.23);
+  }
+}
