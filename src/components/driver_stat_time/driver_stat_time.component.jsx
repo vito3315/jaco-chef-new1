@@ -60,7 +60,7 @@ class DriverStatTime_ extends React.Component {
     
     if( data.points.length == 1 ){
       this.setState({
-        point: data.points[0]
+        point: data.points
       })
     }
 
