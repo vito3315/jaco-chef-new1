@@ -612,11 +612,18 @@ class SiteBaners_Modal extends React.Component {
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={6} sm={3}>
                   <MyCheckBox
                     label="Активность"
                     value={this.state.banner ? parseInt(this.state.banner.this_ban.is_active) == 1 ? true : false : false}
                     func={this.changeItemChecked.bind(this, 'is_active')}
+                  />
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <MyCheckBox
+                    label="Показывать в акциях"
+                    value={this.state.banner ? parseInt(this.state.banner.this_ban.is_active_actii) == 1 ? true : false : false}
+                    func={this.changeItemChecked.bind(this, 'is_active_actii')}
                   />
                 </Grid>
                 
