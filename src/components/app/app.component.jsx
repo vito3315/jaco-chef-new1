@@ -127,6 +127,7 @@ const NewSiteUsers = React.lazy(() => import("../new_site_users"));
 const DriverStatTime = React.lazy(() => import("../driver_stat_time"));
 const KktInfo = React.lazy(() => import("../kkt_info"));
 const CashBook = React.lazy(() => import("../cash_book"));
+const WriteOffJournal = React.lazy(() => import("../write_off_journal"));
 
 import { SiteSaleMin, SiteSaleMin_New, SiteSaleMin_Edit, SiteSaleMin_StatList } from '../site_sale_min';
 
@@ -471,6 +472,7 @@ export function App () {
                   <Route path={'/driver_stat_time'} exact={ true } element={ <DriverStatTime /> } />
                   <Route path={'/kkt_info'} exact={ true } element={ <KktInfo /> } />
                   <Route path={'/cash_book'} exact={ true } element={ <CashBook /> } />
+                  <Route path={'/write_off_journal'} exact={ true } element={ <WriteOffJournal /> } />
 
                   <Route
                     element={ () =>
