@@ -337,8 +337,9 @@ class Tender_ extends React.Component {
           </Grid> 
         </Grid>
 
-        <Grid container spacing={3} justifyContent="center" mb={5}>
-          <Grid item xs={12} sm={3}>
+        <Grid container spacing={3} mb={3}>
+
+          <Grid item xs={12} sm={2}>
             <MySelect
               data={this.state.cities}
               value={this.state.city}
@@ -346,7 +347,7 @@ class Tender_ extends React.Component {
               label="Город"
             />
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={2}>
             <MyAutocomplite
               label="Тендер"
               multiple={false}
@@ -355,10 +356,8 @@ class Tender_ extends React.Component {
               func={this.changeTender.bind(this)}
             />
           </Grid>
-        </Grid>
-
-        <Grid container spacing={3} justifyContent="center">
-          <Grid item xs={8}>
+          
+          <Grid item xs={12} sm={3}>
             <MyAutocomplite
               label="Поставщик"
               multiple={true}
@@ -367,9 +366,7 @@ class Tender_ extends React.Component {
               func={this.changeVendor.bind(this)}
             />
           </Grid>
-         
-
-          <Grid item xs={8}>
+          <Grid item xs={12} sm={2}>
             <MyAutocomplite
               label="Категория"
               multiple={false}
@@ -379,43 +376,53 @@ class Tender_ extends React.Component {
             />
           </Grid>
 
+
+          <Grid item xs={12} sm={1}>
+            <Button
+              variant="contained"
+              style={{ whiteSpace: 'nowrap' }}
+              onClick={this.getDataTable.bind(this)}
+            >
+              Обновить
+            </Button>
+          </Grid>
+
+          <Grid item xs={12} sm={1}>
+            <Button
+              style={{
+                whiteSpace: 'nowrap',
+                backgroundColor: '#00a550',
+                color: 'white',
+              }}
+              onClick={this.saveData.bind(this)}
+            >
+              Сохранить
+            </Button>
+          </Grid>
+
+          <Grid item xs={12} sm={1}>
+            <Button
+              style={{
+                whiteSpace: 'nowrap',
+                backgroundColor: '#00a550',
+                color: 'white',
+              }}
+              onClick={this.onDownload.bind(this)}
+            >
+              Скачать
+            </Button>
+          </Grid>  
+        </Grid>
+
+        <Grid container spacing={3} justifyContent="center">
+          
+         
+
+          
+
           <Grid item sm={6}>
             <Grid container spacing={3} justifyContent="center">
-              <Grid item xs={12} sm={4}>
-                <Button
-                  variant="contained"
-                  style={{ whiteSpace: 'nowrap' }}
-                  onClick={this.getDataTable.bind(this)}
-                >
-                  Обновить данные
-                </Button>
-              </Grid>
-
-              <Grid item xs={12} sm={4}>
-                <Button
-                  style={{
-                    whiteSpace: 'nowrap',
-                    backgroundColor: '#00a550',
-                    color: 'white',
-                  }}
-                  onClick={this.saveData.bind(this)}
-                >
-                  Сохранить изменения
-                </Button>
-              </Grid>
-
-              <Grid item xs={12} sm={4}>
-                <Button
-                  style={{
-                    whiteSpace: 'nowrap',
-                    backgroundColor: '#00a550',
-                    color: 'white',
-                  }}
-                  onClick={this.onDownload.bind(this)}
-                >
-                  Скачать
-                </Button>
-              </Grid>   
+               
                   
             </Grid>
           </Grid>
