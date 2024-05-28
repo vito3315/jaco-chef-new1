@@ -284,6 +284,7 @@ class CafeDirEdit_ extends React.Component {
       mark: '',
 
       count_orders: [],
+      count_tables: [],
 
       itemNew: {
         dir_price: 0,
@@ -302,6 +303,7 @@ class CafeDirEdit_ extends React.Component {
         full_addr: '',
         sort: 0,
         count_order: '',
+        count_table: '',
       },
 
       openAlert: false,
@@ -320,6 +322,7 @@ class CafeDirEdit_ extends React.Component {
     const res = await this.getData('get_one', point);
 
     let count_orders = [];
+    let count_tables = [];
 
     count_orders.push({
       id: '0',
@@ -333,13 +336,23 @@ class CafeDirEdit_ extends React.Component {
       });
     }
 
+    for(let i = 1; i <= 10; i ++){
+      count_tables.push({
+        id: i,
+        name: i
+      });
+    }
+
+    console.log( { ...res.point_koef, ...res.point_info } )
+
     this.setState({
       points: data.points,
       point: data.points[0],
       cities: res.cities,
       data: { ...res.point_koef, ...res.point_info },
       module_name: data.module_info.name,
-      count_orders: count_orders
+      count_orders: count_orders,
+      count_tables: count_tables
     });
 
     document.title = data.module_info.name;
@@ -653,6 +666,14 @@ class CafeDirEdit_ extends React.Component {
                     value={this.state.data ? this.state.data.count_driver : ''} 
                     func={ this.changeData.bind(this, 'count_driver') } 
                     label='Количество заказов на руках у курьеров' />
+                </Grid> 
+                <Grid item xs={12} sm={4}>
+                  <MySelect 
+                    is_none={false} 
+                    data={this.state.count_tables} 
+                    value={this.state.data ? this.state.data.count_tables : ''} 
+                    func={ this.changeData.bind(this, 'count_tables') } 
+                    label='Количество столов сборки' />
                 </Grid> 
               </Grid>
             </TabPanel>
