@@ -132,7 +132,8 @@ class SiteUserManager_ extends React.Component {
             delModal: false,
 
             graphModal: false,
-            graphType: 0
+            graphType: 0,
+            show_access: 0
         };
     }
 
@@ -146,6 +147,7 @@ class SiteUserManager_ extends React.Component {
             module_name: data.module_info.name,
             point_list: data.points,
             app_list: data.apps,
+            show_access: data.my.show_access
         })
 
         setTimeout(() => {
@@ -756,9 +758,11 @@ class SiteUserManager_ extends React.Component {
                                                     <Grid item xs={12} sm={4}>
                                                         <MyTextInput label="ИНН" value={this.state.editUser.user.inn} func={this.changeItem.bind(this, 'inn')} />
                                                     </Grid>
-                                                    <Grid item xs={12} sm={4}>
-                                                        <MyCheckBox label="Работает официально" value={parseInt(this.state.editUser.user.acc_to_kas) == 1 ? true : false} func={this.changeItem.bind(this, 'acc_to_kas')} />
-                                                    </Grid>
+                                                    { parseInt(show_access) == 0 ? false :
+                                                        <Grid item xs={12} sm={4}>
+                                                            <MyCheckBox label="Работает официально" value={parseInt(this.state.editUser.user.acc_to_kas) == 1 ? true : false} func={this.changeItem.bind(this, 'acc_to_kas')} />
+                                                        </Grid>
+                                                    }
                                                 </Grid>
                                             </Grid>
 
@@ -892,9 +896,11 @@ class SiteUserManager_ extends React.Component {
                                                     <Grid item xs={12} sm={4}>
                                                         <MyTextInput label="ИНН" value={this.state.editUser.user.inn} func={this.changeItem.bind(this, 'inn')} />
                                                     </Grid>
-                                                    <Grid item xs={12} sm={4}>
-                                                        <MyCheckBox label="Работает официально" value={parseInt(this.state.editUser.user.acc_to_kas) == 1 ? true : false} func={this.changeItem.bind(this, 'acc_to_kas')} />
-                                                    </Grid>
+                                                    { parseInt(show_access) == 0 ? false :
+                                                        <Grid item xs={12} sm={4}>
+                                                            <MyCheckBox label="Работает официально" value={parseInt(this.state.editUser.user.acc_to_kas) == 1 ? true : false} func={this.changeItem.bind(this, 'acc_to_kas')} />
+                                                        </Grid>
+                                                    }
                                                 </Grid>
                                             </Grid>
 
