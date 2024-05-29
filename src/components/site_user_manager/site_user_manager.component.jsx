@@ -758,7 +758,7 @@ class SiteUserManager_ extends React.Component {
                                                     <Grid item xs={12} sm={4}>
                                                         <MyTextInput label="ИНН" value={this.state.editUser.user.inn} func={this.changeItem.bind(this, 'inn')} />
                                                     </Grid>
-                                                    { parseInt(show_access) == 0 ? false :
+                                                    { parseInt(this.state.show_access) == 0 ? false :
                                                         <Grid item xs={12} sm={4}>
                                                             <MyCheckBox label="Работает официально" value={parseInt(this.state.editUser.user.acc_to_kas) == 1 ? true : false} func={this.changeItem.bind(this, 'acc_to_kas')} />
                                                         </Grid>
@@ -896,7 +896,7 @@ class SiteUserManager_ extends React.Component {
                                                     <Grid item xs={12} sm={4}>
                                                         <MyTextInput label="ИНН" value={this.state.editUser.user.inn} func={this.changeItem.bind(this, 'inn')} />
                                                     </Grid>
-                                                    { parseInt(show_access) == 0 ? false :
+                                                    { parseInt(this.state.show_access) == 0 ? false :
                                                         <Grid item xs={12} sm={4}>
                                                             <MyCheckBox label="Работает официально" value={parseInt(this.state.editUser.user.acc_to_kas) == 1 ? true : false} func={this.changeItem.bind(this, 'acc_to_kas')} />
                                                         </Grid>
