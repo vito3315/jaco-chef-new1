@@ -377,13 +377,13 @@ class WorkSchedule_Table extends React.Component {
 
                   <TableCell style={{ minWidth: 165, minHeight: 38, cursor: 'pointer' }} onClick={this.clickAppName.bind(this, key)}>{item.data.app_name}</TableCell>
 
-                  {this.props.kind == 'manager' || item.data.smena_id === '-1' ? null : (
+                  {this.props.kind == 'manager' ? null : item.data.smena_id === '-1' ? <TableCell /> : (
                     <TableCell className="checkBox">
                       <MyCheckBox style={{ justifyContent: 'center' }} func={this.props.addUser.bind(this, item.data)} size={'small'} defaultChecked={false} />
                     </TableCell>
                   )}
 
-                  {this.props.kind == 'manager' || item.data.smena_id === '-1' ? null : (
+                  {this.props.kind == 'manager' ? null : item.data.smena_id === '-1' ? <TableCell /> : (
                     <TableCell style={{ textAlign: 'center' }}>
                       <SyncAltIcon style={{ cursor: 'pointer', display: 'block', margin: 'auto' }} onClick={this.props.mix.bind(this, item.data)}/>
                     </TableCell>
@@ -2000,9 +2000,8 @@ class WorkSchedule_ extends React.Component {
       point_id: this.state.point,
     };
 
-    let res = await this.getData('getOneSmena', data);
 
-    // console.log(res);
+    let res = await this.getData('getOneSmena', data);
 
     this.setState({
       editSmena: true,
@@ -2055,8 +2054,6 @@ class WorkSchedule_ extends React.Component {
     };
 
     let res = await this.getData('saveEditSmena', data);
-
-    // console.log(res);
 
     if (res['st'] == true) {
       this.setState({
