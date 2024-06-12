@@ -25,26 +25,9 @@ import SaveIcon from '@mui/icons-material/Save';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
-import {
-  MySelect,
-  MyDatePickerNew,
-  MyTextInput,
-  MyAlert,
-} from '../../stores/elements';
+import {MySelect, MyDatePickerNew, MyTextInput, MyAlert, formatDate} from '../../stores/elements';
 
 import queryString from 'query-string';
-
-function formatDate(date) {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
-
-  return [year, month, day].join('-');
-}
 
 class CheckCheck_Modal extends React.Component {
   constructor(props) {
@@ -90,11 +73,9 @@ class CheckCheck_Modal extends React.Component {
       >
         <DialogTitle className="button">
           <Typography style={{ fontWeight: 'bold' }}>Заказы</Typography>
-          {this.props.fullScreen ? (
-            <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
-              <CloseIcon />
-            </IconButton>
-          ) : null}
+          <IconButton onClick={this.onClose.bind(this)} style={{ cursor: 'pointer' }}>
+            <CloseIcon />
+          </IconButton>
         </DialogTitle>
 
         <DialogContent style={{ paddingTop: 10, paddingBottom: 10 }}>
@@ -231,7 +212,7 @@ class CheckCheck_ extends React.Component {
 
     this.state = {
       module: 'check_check',
-      module_name: 'Проверка чеков',
+      module_name: '',
       is_load: false,
 
       point_list: [],
@@ -259,12 +240,10 @@ class CheckCheck_ extends React.Component {
     };
   }
 
-  getData = (method, data = {}, is_load = true) => {
-    if (is_load == true) {
+  getData = (method, data = {}) => {
       this.setState({
         is_load: true,
       });
-    }
 
     return fetch('https://jacochef.ru/api/index_new.php', {
       method: 'POST',
@@ -358,7 +337,7 @@ class CheckCheck_ extends React.Component {
 
     const res = await this.getData('show', data);
 
-    // console.log(res);
+    // console.log('getOrder res', res);
 
     if (!res.st) {
       this.setState({
