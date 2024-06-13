@@ -133,7 +133,16 @@ class SiteUserManager_ extends React.Component {
 
             graphModal: false,
             graphType: 0,
-            show_access: 0
+            show_access: 0,
+
+            holidayList: [],
+
+            holidayModal: false,
+            holidayStart: new Date(),
+            holidayEnd: new Date(),
+            typeHolidays: null,
+            typesHolidays: [{id: 1, name: 'Отпуск'},{id: 2, name: 'Больничный'}],
+            typesHolidays_: { 1: 'Отпуск', 2: 'Больничный' },
         };
     }
 
@@ -147,7 +156,8 @@ class SiteUserManager_ extends React.Component {
             module_name: data.module_info.name,
             point_list: data.points,
             app_list: data.apps,
-            show_access: data.my.show_access
+            show_access: data.my.show_access,
+            holidayList: data.users_holidays,
         })
 
         setTimeout(() => {
@@ -259,7 +269,8 @@ class SiteUserManager_ extends React.Component {
         this.setState({
             editUser: res,
             chose_app: res.user.app_id,
-            modalUserEdit: true
+            modalUserEdit: true,
+            holidayList: res.users_holidays,
         })
 
         setTimeout(() => {
@@ -314,6 +325,19 @@ class SiteUserManager_ extends React.Component {
                 this.sortPoint();
             }, 300)
         }
+    }
+
+    changeDate(data, event) {
+
+        this.setState({
+            [data]: event
+        })
+    }
+
+    changeData(data, event) {
+        this.setState({
+            [data]: event.target.value
+        })
     }
 
     // функция поиска по телефону или Фамилии
@@ -648,7 +672,54 @@ class SiteUserManager_ extends React.Component {
         };
 
         reader.readAsArrayBuffer(file.slice(0, 64 * 1024));
-    };
+    }
+
+    openHolydayModal() {
+        this.setState({
+            holidayModal: true,
+        })
+    }
+
+    async saveHolidaysUser(){
+        if (!this.click) {
+            this.click = true;
+            
+            let editUser_user = this.state.editUser;
+            
+            let holidayStart = this.state.holidayStart;
+            let holidayEnd = this.state.holidayEnd;
+
+            holidayStart = dayjs(holidayStart).format('YYYY-MM-DD');
+            holidayEnd = dayjs(holidayEnd).format('YYYY-MM-DD');
+    
+            console.log( editUser_user.user.id );
+
+            let data = {
+                user_id: editUser_user.user.id,
+                typeHolidays: this.state.typeHolidays,
+                holidayStart: holidayStart,
+                holidayEnd: holidayEnd,
+            };
+    
+            let res = await this.getData('saveHolidaysUser', data);
+    
+            if (res.st === false) {
+                alert(res.text);
+            } else {
+                this.setState({
+                    modalUserEdit: false,
+                    holidayModal: false,
+                    editUser: null
+                })
+
+                this.getUsers();
+            }
+
+            setTimeout(() => {
+              this.click = false;
+            }, 300);
+        }
+    }
 
     render() {
         return (
@@ -671,6 +742,27 @@ class SiteUserManager_ extends React.Component {
                     </DialogContent>
                     <DialogActions style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Button variant="contained" onClick={this.saveEditUser.bind(this, 0)}>Уволить</Button>
+                        <Button onClick={() => { this.setState({ delModal: false, textDel: '' }) }}>Отмена</Button>
+                    </DialogActions>
+                </Dialog>
+
+                <Dialog open={this.state.holidayModal} onClose={() => { this.setState({ holidayModal: false }) }}>
+                    <DialogTitle>Даты отпуска</DialogTitle>
+                    <DialogContent>
+                        <Grid container spacing={3} style={{ paddingBottom: 10, paddingTop: 20 }}>
+                            <Grid item xs={12} sm={6}>
+                                <MyDatePickerNew label="Дата начала" value={ dayjs(this.state.holidayStart) } func={this.changeDate.bind(this, 'holidayStart')} />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <MyDatePickerNew label="Дата окончания" value={ dayjs(this.state.holidayEnd) } func={this.changeDate.bind(this, 'holidayEnd')} />
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                                <MySelect is_none={false} data={this.state.typesHolidays} value={this.state.typeHolidays} func={this.changeData.bind(this, 'typeHolidays')} label='Тип' />
+                            </Grid>
+                        </Grid>
+                    </DialogContent>
+                    <DialogActions style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Button variant="contained" onClick={this.saveHolidaysUser.bind(this)}>Сохранить</Button>
                         <Button onClick={() => { this.setState({ delModal: false, textDel: '' }) }}>Отмена</Button>
                     </DialogActions>
                 </Dialog>
@@ -749,7 +841,6 @@ class SiteUserManager_ extends React.Component {
 
                                             </Grid>
 
-
                                             <Grid item xs={12}>
                                                 <Grid container spacing={3}>
                                                     <Grid item xs={12} sm={4}>
@@ -780,6 +871,31 @@ class SiteUserManager_ extends React.Component {
                                                         <MySelect data={this.state.point_list_render} value={this.state.editUser.user.point_id} func={this.changeItem.bind(this, 'point_id')} label='Точка' />
                                                     </Grid>
                                                 </Grid>
+                                            </Grid>
+
+                                            <Grid item xs={12}>
+                                                <TableContainer component={Paper}>
+                                                    <Table size={'small'}>
+                                                        <TableHead>
+                                                            <TableRow>
+                                                                <TableCell>#</TableCell>
+                                                                <TableCell></TableCell>
+                                                                <TableCell>Дата начала</TableCell>
+                                                                <TableCell>Дата окончания</TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {this.state.holidayList.map((item, key) =>
+                                                                <TableRow key={key}>
+                                                                    <TableCell>{key+1}</TableCell>
+                                                                    <TableCell>{ this.state.typesHolidays_[ item.type ] }</TableCell>
+                                                                    <TableCell>{item.date_start}</TableCell>
+                                                                    <TableCell>{item.date_end}</TableCell>
+                                                                </TableRow>
+                                                            )}
+                                                        </TableBody>
+                                                    </Table>
+                                                </TableContainer>
                                             </Grid>
 
                                             <Grid item xs={12}>
@@ -828,8 +944,9 @@ class SiteUserManager_ extends React.Component {
                         </Grid>
 
                     </DialogContent>
-                    <DialogActions>
-                        <Button onClick={this.saveEditUser.bind(this, 0)} color="primary">Сохранить</Button>
+                    <DialogActions style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Button onClick={this.openHolydayModal.bind(this)} color="primary" variant="outlined">Отпуск</Button>
+                        <Button onClick={this.saveEditUser.bind(this, 0)} color="primary" variant="contained">Сохранить</Button>
                     </DialogActions>
                 </Dialog>
 
