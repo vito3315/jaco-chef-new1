@@ -39,7 +39,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { MySelect, MyCheckBox, MyTextInput, MyDatePickerNew, formatDate } from '../../stores/elements';
+import { MySelect, MyCheckBox, MyTextInput, MyDatePickerNew, formatDate, MyAutocomplite } from '../../stores/elements';
 
 import Dropzone from "dropzone";
 
@@ -50,6 +50,7 @@ import IconButton from '@mui/material/IconButton';
 import queryString from 'query-string';
 
 import dayjs from 'dayjs';
+import { parse } from 'path-browserify';
 
 class TableStages extends React.Component{
   render (){
@@ -279,7 +280,10 @@ class SiteItems_ extends React.Component {
       item_items_render: [],
 
       openHist: [],
-      timeUpdate: new Date()
+      timeUpdate: new Date(),
+
+      tags_all: [],
+      tags_my: []
     };
   }
   
@@ -441,6 +445,8 @@ class SiteItems_ extends React.Component {
 
       date_update: dayjs(res.item.date_start) ?? dayjs(new Date()),
       
+      tags_all: res.tags_all,
+      tags_my: res.tags_my,
     })
 
     // правка от 18.07.2023
@@ -456,7 +462,9 @@ class SiteItems_ extends React.Component {
 
   async openNew(){
     let res = await this.getData('get_all_for_new');
+
     console.log('it',res.item); 
+
     var items_pf_stages_1 = [],
 			items_pf_stages_2 = [],
 			items_pf_stages_3 = [],
@@ -476,6 +484,11 @@ class SiteItems_ extends React.Component {
       pf_stage_3: items_pf_stages_3,
 
       item_items: items_items,
+
+      tags_all: res.tags_all,
+      tags_my: [],
+      tag_name_new: '',
+      modalNewTag: false,
 
       modalNew: true
     })
@@ -524,6 +537,12 @@ class SiteItems_ extends React.Component {
     
     this.setState({ 
       editItem: vendor
+    })
+  }
+
+  changeItem_(data, event){
+    this.setState({ 
+      [data]: event.target.value
     })
   }
 
@@ -862,6 +881,8 @@ class SiteItems_ extends React.Component {
       pf_stage_3: pf_3,
 
       item_items: this.state.item_items,
+
+      tags_my: this.state.tags_my,
     };
     
     console.log( data );
@@ -976,6 +997,8 @@ class SiteItems_ extends React.Component {
       pf_stage_3: pf_3,
 
       item_items: this.state.item_items,
+
+      tags_my: this.state.tags_my,
     };
 
     let res = await this.getData('saveEditItemHist', data);
@@ -1046,6 +1069,8 @@ class SiteItems_ extends React.Component {
       pf_stage_3: pf_3,
 
       item_items: this.state.item_items,
+
+      tags_my: this.state.tags_my,
     };
 
     let res = await this.getData('saveNewItemHist', data);
@@ -1167,6 +1192,8 @@ class SiteItems_ extends React.Component {
       pf_stage_3: pf_3,
 
       item_items: this.state.item_items,
+
+      tags_my: this.state.tags_my,
     };
 
     let res = await this.getData('saveNewItem', data);
@@ -1463,6 +1490,56 @@ class SiteItems_ extends React.Component {
     })
   }
 
+  changeAutocomplite(data, event, value) {
+
+    let check = value.find( item => parseInt( item.id  ) === -1 );
+    
+    console.log( check );
+
+    if( check ){
+      this.openNewTag();
+
+      return;
+    }else{
+      this.setState({
+        [data]: value
+      });
+    }
+  }
+
+  closeNewTag(){
+    this.setState({ 
+      modalNewTag: false, 
+      tag_name_new: ''
+    })
+  }
+
+  openNewTag(){
+    this.setState({ 
+      modalNewTag: true, 
+      tag_name_new: ''
+    })
+  }
+
+  async saveNewTag(){
+    let data = {
+      name: this.state.tag_name_new
+    };
+
+    let res = await this.getData('saveNewTag', data);
+
+    if( res.st === true ){
+
+      this.setState({
+        tags_all: res.tags,
+      })
+
+      this.closeNewTag();
+    }else{
+      this.openSnack(res.text);
+    }
+  }
+
   render(){
     const action = (
       <IconButton
@@ -1490,6 +1567,24 @@ class SiteItems_ extends React.Component {
           message={this.state.textSnack}
           action={action}
         />
+
+        <Dialog
+          open={ this.state.modalNewTag }
+          onClose={ this.closeNewTag.bind(this) }
+        >
+          <DialogTitle>Новый тег</DialogTitle>
+          <DialogContent>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <MyTextInput label="" value={ this.state.tag_name_new } func={ this.changeItem_.bind(this, 'tag_name_new') } />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={ this.closeNewTag.bind(this) }>Отмена</Button>
+            <Button type="submit" onClick={ this.saveNewTag.bind(this) }>Сохранить</Button>
+          </DialogActions>
+        </Dialog>
         
         <Dialog
           open={this.state.modalEdit}
@@ -1683,6 +1778,16 @@ class SiteItems_ extends React.Component {
                                   <MyTextInput label="Полное описание (в карточке)" value={ this.state.editItem.marc_desc_full } func={ this.changeItem.bind(this, 'marc_desc_full') } />
                                 </Grid>
                               </Grid>
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <MyAutocomplite
+                                label="Теги"
+                                multiple={true}
+                                data={this.state.tags_all}
+                                value={this.state.tags_my}
+                                func={this.changeAutocomplite.bind(this, 'tags_my')}
+                              />
                             </Grid>
 
                             <Grid item xs={12}>
@@ -2038,6 +2143,16 @@ class SiteItems_ extends React.Component {
                                     <MyTextInput label="Полное описание (в карточке)" value={ this.state.editItem.marc_desc_full } func={ this.changeItem.bind(this, 'marc_desc_full') } />
                                   </Grid>
                                 </Grid>
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <MyAutocomplite
+                                  label="Теги"
+                                  multiple={true}
+                                  data={this.state.tags_all}
+                                  value={this.state.tags_my}
+                                  func={this.changeAutocomplite.bind(this, 'tags_my')}
+                                />
                               </Grid>
 
                               <Grid item xs={12}>
